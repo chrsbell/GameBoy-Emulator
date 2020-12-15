@@ -1,0 +1,1 @@
+// A class that provides precise timing functions, constants, and interrupt functions
