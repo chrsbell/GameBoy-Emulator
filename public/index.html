@@ -6,8 +6,23 @@
   <meta name="author" content="Chris Bell">
 </head>
 <body>
-  <div id="app">
+  <script type="x-shader/x-vertex" id="vertex-shader">
+    #version 100
+    attribute vec4 a_position;
 
+    void main() {
+      gl_Position = a_position;
+    }
+    </script>
+    <script type="x-shader/x-fragment" id="fragment-shader">
+    #version 100
+    precision mediump float;
+
+    void main() {
+      gl_FragColor = vec4(1, 0, 0.5, 1); // return reddish-purple
+    }
+  </script>
+  <div id="app">
   </div>
   <script src="dist/bundle.js"></script>
 </body>
