@@ -1,12 +1,14 @@
 import CPU from './CPU';
-import GLRenderer from './Renderer';
+import Renderer from './Renderer'
+import GLRenderer from './GLRenderer';
 
 class App {
+  private cpu: CPU;
+  private renderer: Renderer;
   constructor() {
-    this._cpu = new CPU();
+    this.cpu = new CPU();
     // need to query for canvas, use jquery
     this.renderer = new GLRenderer(null);
-    //
   }
 }
 

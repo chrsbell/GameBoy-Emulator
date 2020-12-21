@@ -1,6 +1,7 @@
 class CPU {
+  address: number;
   constructor() {
-
+    this.address = 0x0;
   }
 }
 

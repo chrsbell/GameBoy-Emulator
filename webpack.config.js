@@ -17,12 +17,14 @@ module.exports = (env, argv) => {
     module: {
       rules: [
         {
-          test: /\.jsx?/,
+          test: /\.tsx?/,
           exclude: /node_modules/,
-          loader: 'babel-loader',
-          options: { presets: ['@babel/preset-env'] },
+          loader: 'ts-loader',
         },
       ],
+    },
+    resolve: {
+      extensions: ['.ts', '.js', '.tsx'],
     },
     plugins: [new CleanWebpackPlugin()],
   };
