@@ -1,4 +1,6 @@
 import Renderer from './Renderer';
+import LCD from './LCDController';
+import $ from 'jquery';
 
 class GLRenderer extends Renderer {
   private gl: WebGL2RenderingContext;
@@ -8,8 +10,12 @@ class GLRenderer extends Renderer {
   private positionAttributeLocation: GLint;
   private positionBuffer: WebGLBuffer;
 
-  constructor(canvas: HTMLCanvasElement) {
+  constructor() {
     super();
+
+    const canvas: HTMLCanvasElement = $('<canvas/>').width(1920).height(1080).get(0) as HTMLCanvasElement;
+    $('#canvas').append(canvas);
+
     if (canvas) {
       this.gl = canvas.getContext('webgl2');
       const gl: WebGL2RenderingContext = this.gl;
@@ -31,15 +37,12 @@ class GLRenderer extends Renderer {
         // bind position buffer and describe/send its data
         this.positionBuffer = gl.createBuffer();
 
-        // this.vaoObjOne = gl.createVertexArray();
-        // this.vaoObjTwo = gl.createVertexArray();
         const size = 2;
         const type = gl.FLOAT;
         const normalize = false;
         const stride = 0;
         const offset = 0;
 
-        // gl.bindVertexArray(this.vaoObjOne);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
         gl.vertexAttribPointer(
           this.positionAttributeLocation,
@@ -50,14 +53,27 @@ class GLRenderer extends Renderer {
           offset
         );
 
-        const objOnePos = [0, -0.5, 0, 0.5, 0.7, 0];
-        // gl.bufferData(gl.ARRAY_BUFFER, 4 * 12, gl.STATIC_DRAW);
-        gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array(objOnePos));
+        let pixelBuffer = [];
+        const xIncr = 2.0 / LCD.width;
+        const yIncr = 2.0 / LCD.height;
+        for (let x = 0; x < LCD.width; x++) {
+          for (let y = 0; y < LCD.height; y++) {
+            let topLeft = {x: -1.0 + (x * xIncr), y: -1.0 + (y * yIncr)};
+            // triangle #1
+            pixelBuffer.push(topLeft.x, topLeft.y);
+            pixelBuffer.push(topLeft.x + xIncr, topLeft.y);
+            pixelBuffer.push(topLeft.x + xIncr, topLeft.y + yIncr);
+            // triangle #2
+            pixelBuffer.push(topLeft.x, topLeft.y);
+            pixelBuffer.push(topLeft.x, topLeft.y + yIncr);
+            pixelBuffer.push(topLeft.x + xIncr, topLeft.y + yIncr);
+          }
+        }
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(pixelBuffer), gl.STATIC_DRAW);
         // gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
         // gl.bindVertexArray(this.vaoObjTwo);
-        const objTwoPos = [-1, 0.5, 0, 1.0, 0.7, 0.5];
         // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(objTwoPos), gl.STATIC_DRAW);
-        gl.bufferSubData(gl.ARRAY_BUFFER, 4 * 6, new Float32Array(objTwoPos));
+        // gl.bufferSubData(gl.ARRAY_BUFFER, 4 * 6, new Float32Array(objTwoPos));
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
       }
     }
@@ -93,16 +109,13 @@ class GLRenderer extends Renderer {
   draw() {
     const { gl } = this;
     // gl.bindVertexArray(this.vao);
-    gl.clearColor(0.1, 0.1, 0.1, 1);
+    gl.clearColor(0.5, 0.5, 0.5, 0.5);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-    var primitiveType = gl.TRIANGLES;
-    var offset = 0;
-    var count = 6;
     gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
-    gl.drawArrays(primitiveType, 0, count);
+    gl.drawArrays(gl.TRIANGLES, 0, 6 * LCD.width * LCD.height);
     // gl.drawArrays(primitiveType, 4 * 2 * 8, count);
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    // gl.bindBuffer(gl.ARRAY_BUFFER, null);
   }
 }
 
