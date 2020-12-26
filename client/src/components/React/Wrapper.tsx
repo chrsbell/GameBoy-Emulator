@@ -36,7 +36,7 @@ const Wrapper = () => {
         <input type="file" name="rom" onChange={(e) => setFile(e.target.files[0])} />
         <input type="submit" />
       </form>
-      <canvas width="1920" height="1080" ref={canvasRef} />
+      <canvas width="787" height="720" ref={canvasRef} />
     </>
   );
 };

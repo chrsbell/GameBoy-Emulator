@@ -9,17 +9,21 @@
   <script type="x-shader/x-vertex" id="vertex-shader">
     #version 100
     attribute vec4 a_position;
+    attribute lowp float a_shade;
+    varying lowp float shade;
 
     void main() {
+      shade = a_shade;
       gl_Position = a_position;
     }
     </script>
     <script type="x-shader/x-fragment" id="fragment-shader">
     #version 100
-    precision mediump float;
+    precision lowp float;
+    varying lowp float shade;
 
     void main() {
-      gl_FragColor = vec4(1, 0, 0.5, 1); // return reddish-purple
+      gl_FragColor = vec4(0, 0, 0, shade); // return reddish-purple
     }
   </script>
   <div id="app">

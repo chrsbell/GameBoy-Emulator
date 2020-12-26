@@ -56,7 +56,7 @@ const App = () => {
 
   return (
     <AppContext.Provider value={{ appState, dispatch }}>
-      <Wrapper />;
+      <Wrapper />
     </AppContext.Provider>
   );
 };
