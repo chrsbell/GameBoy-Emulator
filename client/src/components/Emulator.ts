@@ -1,21 +1,30 @@
 import axios from 'axios';
 import CPU from './CPU';
 import ROM from './ROM';
-import Renderer from './Renderer'
 import GLRenderer from './GLRenderer';
+import type { Hex } from './Types';
 
-class App {
+class Emulator {
   private cpu: CPU;
-  private renderer: Renderer;
+  private renderer: GLRenderer;
   constructor() {
     this.cpu = new CPU();
     // need to query for canvas, use jquery
-    this.renderer = new GLRenderer();
-    ROM.loadFile();
+    // this.renderer = new GLRenderer();
+    // ROM.loadFile();
     this.update = this.update.bind(this);
-    this.update();
+    // this.update();
   }
-
+  initRenderer(canvas: HTMLCanvasElement) {
+    if (!this.renderer) {
+      this.renderer = new GLRenderer(canvas);
+      console.log('Initialized GL Renderer.');
+    }
+  }
+  load(rom: Array<Hex>) {
+    this.update();
+    ROM.loadFile(rom);
+  }
   update() {
     let cyclesPerUpdate = this.cpu.clock / this.renderer.fps;
     let cycles = 0;
@@ -30,4 +39,4 @@ class App {
   }
 }
 
-export default App;
+export default Emulator;

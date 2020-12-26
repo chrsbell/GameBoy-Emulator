@@ -1,8 +1,8 @@
-import Renderer from './Renderer';
 import LCD from './LCDController';
-import $ from 'jquery';
+// import $ from 'jquery';
 
-class GLRenderer extends Renderer {
+class GLRenderer {
+  public fps: number = 60;
   private gl: WebGL2RenderingContext;
   private vertexShader: WebGLShader;
   private fragmentShader: WebGLShader;
@@ -10,12 +10,7 @@ class GLRenderer extends Renderer {
   private positionAttributeLocation: GLint;
   private positionBuffer: WebGLBuffer;
 
-  constructor() {
-    super();
-
-    const canvas: HTMLCanvasElement = $('<canvas/>').width(1920).height(1080).get(0) as HTMLCanvasElement;
-    $('#canvas').append(canvas);
-
+  constructor(canvas: HTMLCanvasElement) {
     if (canvas) {
       this.gl = canvas.getContext('webgl2');
       const gl: WebGL2RenderingContext = this.gl;
@@ -58,7 +53,7 @@ class GLRenderer extends Renderer {
         const yIncr = 2.0 / LCD.height;
         for (let x = 0; x < LCD.width; x++) {
           for (let y = 0; y < LCD.height; y++) {
-            let topLeft = {x: -1.0 + (x * xIncr), y: -1.0 + (y * yIncr)};
+            let topLeft = { x: -1.0 + x * xIncr, y: -1.0 + y * yIncr };
             // triangle #1
             pixelBuffer.push(topLeft.x, topLeft.y);
             pixelBuffer.push(topLeft.x + xIncr, topLeft.y);
@@ -92,7 +87,11 @@ class GLRenderer extends Renderer {
     gl.deleteShader(shader);
   }
 
-  createProgram(gl: WebGL2RenderingContext, vertexShader: WebGLShader, fragmentShader: WebGLShader) {
+  createProgram(
+    gl: WebGL2RenderingContext,
+    vertexShader: WebGLShader,
+    fragmentShader: WebGLShader
+  ) {
     const program: WebGLProgram = gl.createProgram();
     gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);
