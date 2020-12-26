@@ -2,3 +2,5 @@ node_modules
 **bundle.js
 **source.js.map
 **roms
+**dist
+**uploads
