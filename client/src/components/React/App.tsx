@@ -17,7 +17,6 @@ const initialState: AppState = {
 };
 
 const reducer = (state: AppState, action: any) => {
-  debugger;
   switch (action.type) {
     case 'canvas':
       return {

@@ -10,7 +10,7 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 
 app.post('/parse', upload.single('rom'), async (req, res) => {
   let parsed = _.chunk(req.file.buffer.toString('hex'), 2);
-  parsed = parsed.map((chunk) => chunk.join(''));
+  parsed = parsed.map((chunk) => parseInt(chunk.join(''), 16));
   res.status(201).send(parsed);
 });
 

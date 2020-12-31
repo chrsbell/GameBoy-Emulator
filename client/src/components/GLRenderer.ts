@@ -1,4 +1,6 @@
-import LCD from './LCDController';
+import LCD, { Color } from './LCDController';
+
+// could render data as an image texture
 
 class GLRenderer {
   public fps: number = 60;
@@ -50,21 +52,18 @@ class GLRenderer {
             pixelBuffer.push(topLeft.x, topLeft.y);
             pixelBuffer.push(topLeft.x + xIncr, topLeft.y);
             pixelBuffer.push(topLeft.x + xIncr, topLeft.y + yIncr);
+            shadeBuffer.push(...Color.black);
+            shadeBuffer.push(...Color.black);
+            shadeBuffer.push(...Color.black);
             // triangle #2
             pixelBuffer.push(topLeft.x, topLeft.y);
             pixelBuffer.push(topLeft.x, topLeft.y + yIncr);
             pixelBuffer.push(topLeft.x + xIncr, topLeft.y + yIncr);
-            let rand = 1;
-            shadeBuffer.push(rand);
-            shadeBuffer.push(rand);
-            shadeBuffer.push(rand);
-
-            shadeBuffer.push(rand);
-            shadeBuffer.push(rand);
-            shadeBuffer.push(rand);
+            shadeBuffer.push(...Color.black);
+            shadeBuffer.push(...Color.black);
+            shadeBuffer.push(...Color.black);
           }
         }
-
         const size = 2;
         const type = gl.FLOAT;
         const normalize = false;
@@ -82,12 +81,8 @@ class GLRenderer {
         );
 
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(pixelBuffer), gl.STATIC_DRAW);
-        // gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
-        // gl.bindVertexArray(this.vaoObjTwo);
-        // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(objTwoPos), gl.STATIC_DRAW);
-        // gl.bufferSubData(gl.ARRAY_BUFFER, 4 * 6, new Float32Array(objTwoPos));
         gl.bindBuffer(gl.ARRAY_BUFFER, this.shadeBuffer);
-        gl.vertexAttribPointer(this.shadeAttributeLocation, 1, type, normalize, stride, offset);
+        gl.vertexAttribPointer(this.shadeAttributeLocation, 3, type, normalize, stride, offset);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(shadeBuffer), gl.DYNAMIC_DRAW);
       }
     }
@@ -127,12 +122,16 @@ class GLRenderer {
   /**
    * Set a pixel of the virtual screen
    */
-  setPixel(x: number, y: number, shade: number) {
+  setPixel(x: number, y: number, shade: Array<number>) {
     if (x >= 0 && x < LCD.width) {
       if (y >= 0 && y < LCD.height) {
         const { gl } = this;
-        const start = y * 4 * 6 + x * 4 * 6 * LCD.height;
-        const data = Array(6).fill(shade);
+        // sizeof(float) * num vertices per pixel * number of data points
+        const start = y * 72 + x * 72 * LCD.height;
+        let data = [];
+        for (let i = 0; i < 6; i++) {
+          data.push(...shade);
+        }
         gl.bindBuffer(gl.ARRAY_BUFFER, this.shadeBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER, start, new Float32Array(data));
       }
@@ -142,7 +141,6 @@ class GLRenderer {
   draw() {
     const { gl } = this;
     gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
-    gl.clearColor(0.5, 0.5, 0.5, 0.5);
     gl.clear(gl.COLOR_BUFFER_BIT);
     // gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     gl.drawArrays(gl.TRIANGLES, 0, 6 * LCD.width * LCD.height);

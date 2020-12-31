@@ -1,9 +1,10 @@
 import axios from 'axios';
 import CPU from './CPU';
-import ROM from './ROM';
+import Memory from './Memory';
 import GLRenderer from './GLRenderer';
-import LCD from './LCDController';
+import LCD, { Color } from './LCDController';
 import type { Hex } from './Types';
+import _ from 'lodash';
 
 class Emulator {
   private cpu: CPU;
@@ -25,8 +26,8 @@ class Emulator {
     }
   }
   load(rom: Array<Hex>) {
+    Memory.loadFile(rom);
     this.update();
-    ROM.loadFile(rom);
   }
   update() {
     let cyclesPerUpdate = this.cpu.clock / this.renderer.fps;
@@ -39,6 +40,8 @@ class Emulator {
       // update timers and lcd controller using elapsed cpu cycles
     }
 
+    this.renderer.setPixel(this.i, this.j, _.sample(Color));
+
     this.i += 1;
     if (this.i === LCD.width) {
       this.j += 1;
@@ -49,7 +52,6 @@ class Emulator {
       }
     }
 
-    this.renderer.setPixel(this.i, this.j, Math.random());
     // this.renderer.setPixel(1, 0, 0);
     // this.renderer.setPixel(2, 1, 0);
 
