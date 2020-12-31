@@ -1,1 +1,1 @@
-export type Hex = String;
+export type Hex = number;

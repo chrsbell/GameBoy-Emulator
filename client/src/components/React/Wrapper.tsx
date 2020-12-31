@@ -16,7 +16,6 @@ const Wrapper = () => {
     };
     axios.post('/parse', data, options).then((res) => {
       if (res.status === 201) {
-        debugger;
         dispatch({ type: 'parsed_rom', parsedROM: res.data });
       } else {
         console.error('Error parsing ROM on server.');

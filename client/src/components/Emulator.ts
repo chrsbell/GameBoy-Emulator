@@ -1,6 +1,6 @@
 import axios from 'axios';
 import CPU from './CPU';
-import ROM from './ROM';
+import Memory from './Memory';
 import GLRenderer from './GLRenderer';
 import LCD, { Color } from './LCDController';
 import type { Hex } from './Types';
@@ -26,8 +26,8 @@ class Emulator {
     }
   }
   load(rom: Array<Hex>) {
+    Memory.loadFile(rom);
     this.update();
-    ROM.loadFile(rom);
   }
   update() {
     let cyclesPerUpdate = this.cpu.clock / this.renderer.fps;

@@ -1,5 +1,7 @@
 import LCD, { Color } from './LCDController';
 
+// could render data as an image texture
+
 class GLRenderer {
   public fps: number = 60;
   private gl: WebGL2RenderingContext;
@@ -62,8 +64,6 @@ class GLRenderer {
             shadeBuffer.push(...Color.black);
           }
         }
-        debugger;
-
         const size = 2;
         const type = gl.FLOAT;
         const normalize = false;
@@ -81,10 +81,6 @@ class GLRenderer {
         );
 
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(pixelBuffer), gl.STATIC_DRAW);
-        // gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
-        // gl.bindVertexArray(this.vaoObjTwo);
-        // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(objTwoPos), gl.STATIC_DRAW);
-        // gl.bufferSubData(gl.ARRAY_BUFFER, 4 * 6, new Float32Array(objTwoPos));
         gl.bindBuffer(gl.ARRAY_BUFFER, this.shadeBuffer);
         gl.vertexAttribPointer(this.shadeAttributeLocation, 3, type, normalize, stride, offset);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(shadeBuffer), gl.DYNAMIC_DRAW);
@@ -136,7 +132,6 @@ class GLRenderer {
         for (let i = 0; i < 6; i++) {
           data.push(...shade);
         }
-        console.log(data);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.shadeBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER, start, new Float32Array(data));
       }
@@ -145,7 +140,6 @@ class GLRenderer {
 
   draw() {
     const { gl } = this;
-    // gl.clearColor(0.5, 0.5, 0.5, 0.5);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
     gl.clear(gl.COLOR_BUFFER_BIT);
     // gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
