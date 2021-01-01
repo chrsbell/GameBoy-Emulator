@@ -41,7 +41,6 @@ const App = () => {
 
   useEffect(() => {
     const { parsedROM } = appState;
-    console.log(parsedROM);
     if (appState.parsedROM) {
       emulator.current.load(parsedROM);
     }

@@ -1,15 +1,23 @@
 import type { Hex } from './Types';
 
+interface Registers {
+  // enabled with 0Ah in lower 4 bits
+  RAMEnable: boolean;
+  // current ROM bank
+  ROMBank: number;
+  // current RAM bank
+  RAMBank: number;
+  bankingMode: number;
+}
+
 class Memory {
   private buffer: Array<Hex>;
   // the current MBC
   private MBC: number;
   private MBCType: number;
-  // current RAM bank
-  private RAMBank: number;
   private RAMBanks: Array<number>;
   // current ROM bank
-  private ROMBank: number;
+  private registers: Registers;
   /**
    * Initializes the ROM buffer
    */
@@ -18,18 +26,45 @@ class Memory {
     this.MBC = 1;
     // maximum of four RAM banks
     this.RAMBanks = Array(4).fill(0x2000);
-    this.RAMBank = 0;
-    this.ROMBank = 0;
+    this.registers = {
+      RAMBank: 0,
+      ROMBank: 0,
+      RAMEnable: false,
+      bankingMode: 0,
+    };
   }
+
   write(address: number, data: number) {
     if (address < 0x8000) {
-      throw new Error(`Can't write to read-only address: ${address.toString(16)}.`);
+      // need to check/set control registers
+      this.changeBank(address, data);
+      // throw new Error(`Can't write to read-only address: ${address.toString(16)}.`);
     } else if (address >= 0xc000 && address <= 0xdfff) {
       this.buffer[address] = data;
       // write to echo RAM as well
       this.buffer[address + 0x2000] = data;
     } else if (address >= 0xe000 && address <= 0xfdff) {
       throw new Error(`Can't write to prohibited address: ${address.toString(16)}`);
+    }
+  }
+
+  changeBank(address: number, data: number) {
+    if (address < 0x2000) {
+      // RAM enable register
+      this.registers.RAMEnable = (data & 0b00001111) === 0xa ? true : false;
+    } else if (address < 0x4000) {
+      // ROM Bank change (only the lower nibble)
+      this.registers.ROMBank = data & 0b00011111;
+    } else if (address < 0x6000) {
+      // RAM or ROM Bank change
+      // this.registers.RAMBank;
+      if (this.MBCType === 1) {
+        if (this.registers.bankingMode === 0) {
+        }
+      }
+    } else {
+      // Banking mode select
+      this.registers.bankingMode = data & 0x01;
     }
   }
   /**
@@ -39,12 +74,12 @@ class Memory {
     // reading from ROM bank
     if (address >= 0x4000 && address <= 0x7fff) {
       address -= 0x4000;
-      return this.buffer[address + this.ROMBank * 0x4000];
+      return this.buffer[address + this.registers.ROMBank * 0x4000];
     }
     // reading from RAM bank
     if (address >= 0xa000 && address <= 0xbfff) {
       address -= 0xa000;
-      return this.buffer[address + this.RAMBank * 0x2000];
+      return this.buffer[address + this.registers.RAMBank * 0x2000];
     }
     return this.buffer[address];
   }

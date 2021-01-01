@@ -1,6 +1,13 @@
-import React, { useRef, useEffect, useState, useContext, FormEvent } from 'react';
+import React, { useRef, useEffect, useState, useContext, FormEvent, CSSProperties } from 'react';
 import Context from './Context';
 import axios, { AxiosRequestConfig } from 'axios';
+
+const FlexColumn: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  marginTop: '5vh',
+};
 
 const Wrapper = () => {
   const { dispatch, appState } = useContext(Context);
@@ -29,14 +36,15 @@ const Wrapper = () => {
   }, []);
 
   return (
-    <>
+    <div style={FlexColumn}>
       <div id="canvas" />
       <form onSubmit={onSubmit}>
         <input type="file" name="rom" onChange={(e) => setFile(e.target.files[0])} />
         <input type="submit" />
       </form>
+      {/* Use a LCD size similar to GameBoy's */}
       <canvas width="787" height="720" ref={canvasRef} />
-    </>
+    </div>
   );
 };
 
