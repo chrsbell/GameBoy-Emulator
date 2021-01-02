@@ -34,14 +34,15 @@ class Emulator {
     let cycles = 0;
     let elapsed;
 
+    // elapse time according to number of cpu cycles used
     while (cycles < cyclesPerUpdate) {
       elapsed = this.cpu.executeInstruction();
       cycles += elapsed;
-      // update timers and lcd controller using elapsed cpu cycles
+      // need to update timers and lcd controller using elapsed cpu cycles
     }
 
+    // test animation
     this.renderer.setPixel(this.i, this.j, _.sample(Color));
-
     this.i += 1;
     if (this.i === LCD.width) {
       this.j += 1;
@@ -51,9 +52,6 @@ class Emulator {
         this.j = 0;
       }
     }
-
-    // this.renderer.setPixel(1, 0, 0);
-    // this.renderer.setPixel(2, 1, 0);
 
     this.renderer.draw();
     setTimeout(this.update, 1000 / this.renderer.fps);

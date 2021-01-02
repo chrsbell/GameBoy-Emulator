@@ -142,7 +142,6 @@ class GLRenderer {
     const { gl } = this;
     gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
     gl.clear(gl.COLOR_BUFFER_BIT);
-    // gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     gl.drawArrays(gl.TRIANGLES, 0, 6 * LCD.width * LCD.height);
   }
 }
