@@ -1,4 +1,4 @@
-import LCD, { Color } from './LCDController';
+import LCD, { Color } from '../LCDController/LCDController';
 
 // could render data as an image texture
 

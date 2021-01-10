@@ -1,9 +1,9 @@
 import axios from 'axios';
-import CPU from './CPU';
-import Memory from './Memory';
-import GLRenderer from './GLRenderer';
-import LCD, { Color } from './LCDController';
-import type { Hex } from './Types';
+import CPU from '../CPU/CPU';
+import Memory from '../Memory/Memory';
+import GLRenderer from '../GLRenderer/GLRenderer';
+import LCD, { Color } from '../LCDController/LCDController';
+import type { Hex } from '../Types';
 import _ from 'lodash';
 
 class Emulator {
@@ -13,11 +13,7 @@ class Emulator {
   private j: number = 0;
   constructor() {
     this.cpu = new CPU();
-    // need to query for canvas, use jquery
-    // this.renderer = new GLRenderer();
-    // ROM.loadFile();
     this.update = this.update.bind(this);
-    // this.update();
   }
   initRenderer(canvas: HTMLCanvasElement) {
     if (!this.renderer) {

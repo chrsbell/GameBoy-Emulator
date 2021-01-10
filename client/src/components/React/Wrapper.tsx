@@ -12,12 +12,14 @@ const FlexColumn: CSSProperties = {
 const Wrapper = () => {
   const { dispatch, appState } = useContext(Context);
   const canvasRef = useRef(null);
-  const [file, setFile] = useState(null);
+  const [ROMFile, setROMFile] = useState(null);
+  const [BIOSFile, setBIOSFile] = useState(null);
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
     let data = new FormData();
-    data.append('rom', file);
+    data.append('rom', ROMFile);
+    data.append('bios', BIOSFile);
     const options: AxiosRequestConfig = {
       headers: { 'content-type': 'multipart/form-data' },
     };
@@ -39,7 +41,8 @@ const Wrapper = () => {
     <div style={FlexColumn}>
       <div id="canvas" />
       <form onSubmit={onSubmit}>
-        <input type="file" name="rom" onChange={(e) => setFile(e.target.files[0])} />
+        <input type="file" name="rom" onChange={(e) => setROMFile(e.target.files[0])} />
+        <input type="file" name="bios" onChange={(e) => setBIOSFile(e.target.files[0])} />
         <input type="submit" />
       </form>
       {/* Use a LCD size similar to GameBoy's */}

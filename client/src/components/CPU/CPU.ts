@@ -1,4 +1,4 @@
-import Memory from './Memory';
+import Memory from '../Memory/Memory';
 
 class CPU {
   // 16-bit address

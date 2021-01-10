@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom';
 import React, { useEffect, useReducer, useRef } from 'react';
-import Emulator from '../Emulator';
+import Emulator from '../Emulator/Emulator';
 import AppContext from './Context';
 import Wrapper from './Wrapper';
 
