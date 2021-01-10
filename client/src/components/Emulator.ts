@@ -13,11 +13,7 @@ class Emulator {
   private j: number = 0;
   constructor() {
     this.cpu = new CPU();
-    // need to query for canvas, use jquery
-    // this.renderer = new GLRenderer();
-    // ROM.loadFile();
     this.update = this.update.bind(this);
-    // this.update();
   }
   initRenderer(canvas: HTMLCanvasElement) {
     if (!this.renderer) {

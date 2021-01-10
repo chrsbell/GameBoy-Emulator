@@ -1,6 +1,10 @@
 import type { Hex } from './Types';
+const assert = require('assert').strict;
 
-interface Registers {
+interface MBCChip {
+  // the MBC type code
+  type: number;
+  RAMSize: number;
   // enabled with 0Ah in lower 4 bits
   RAMEnable: boolean;
   // current ROM bank
@@ -11,22 +15,23 @@ interface Registers {
 }
 
 class Memory {
-  private buffer: Array<Hex>;
-  // the current MBC
-  private MBC: number;
-  private MBCType: number;
+  // the entire cartridge ROM
+  private ROM: Array<Hex>;
+  // the cartridge's ROM size code
+  private ROMSize: number;
   private RAMBanks: Array<number>;
-  // current ROM bank
-  private registers: Registers;
+  private MBC: MBCChip;
+  private bios: Array<Hex>;
+  private initialized: boolean = false;
   /**
-   * Initializes the ROM buffer
+   * Initializes the ROM
    */
   constructor() {
-    this.buffer = Array(0x200000).fill(0);
-    this.MBC = 1;
-    // maximum of four RAM banks
+    // maximum of four RAM banks (RAM1-4)
     this.RAMBanks = Array(4).fill(0x2000);
-    this.registers = {
+    this.MBC = {
+      type: 0,
+      RAMSize: 0,
       RAMBank: 0,
       ROMBank: 0,
       RAMEnable: false,
@@ -40,9 +45,9 @@ class Memory {
       this.changeBank(address, data);
       // throw new Error(`Can't write to read-only address: ${address.toString(16)}.`);
     } else if (address >= 0xc000 && address <= 0xdfff) {
-      this.buffer[address] = data;
+      this.ROM[address] = data;
       // write to echo RAM as well
-      this.buffer[address + 0x2000] = data;
+      this.ROM[address + 0x2000] = data;
     } else if (address >= 0xe000 && address <= 0xfdff) {
       throw new Error(`Can't write to prohibited address: ${address.toString(16)}`);
     }
@@ -51,56 +56,66 @@ class Memory {
   changeBank(address: number, data: number) {
     if (address < 0x2000) {
       // RAM enable register
-      this.registers.RAMEnable = (data & 0b00001111) === 0xa ? true : false;
+      this.MBC.RAMEnable = (data & 0b00001111) === 0xa;
     } else if (address < 0x4000) {
       // ROM Bank change (only the lower nibble)
-      this.registers.ROMBank = data & 0b00011111;
+      this.MBC.ROMBank = data & 0b00011111;
     } else if (address < 0x6000) {
       // RAM or ROM Bank change
       // this.registers.RAMBank;
-      if (this.MBCType === 1) {
-        if (this.registers.bankingMode === 0) {
+      if (this.MBC.type === 1) {
+        if (this.MBC.bankingMode === 0) {
         }
       }
     } else {
       // Banking mode select
-      this.registers.bankingMode = data & 0x01;
+      this.MBC.bankingMode = data & 0x01;
     }
   }
   /**
    * Return the value at the address as a number
    */
   read(address: number) {
-    // reading from ROM bank
+    // ROM Bank 0 is always available
+    if (address < 0x4000) {
+      return this.ROM[address];
+    }
+    // Reading from ROM bank of cartridge
     if (address >= 0x4000 && address <= 0x7fff) {
-      address -= 0x4000;
-      return this.buffer[address + this.registers.ROMBank * 0x4000];
+      // For non-MBC cartridges, assume cartridge ROM is less than 32kB
+      return this.ROM[address];
     }
     // reading from RAM bank
     if (address >= 0xa000 && address <= 0xbfff) {
-      address -= 0xa000;
-      return this.buffer[address + this.registers.RAMBank * 0x2000];
+      // address -= 0xa000;
+      // return this.ROM[address + this.registers.RAMBank * 0x2000];
     }
-    return this.buffer[address];
+    return this.ROM[address];
   }
   /**
    * Load a file into ROM
    */
   loadFile(rom: Array<Hex>) {
-    this.buffer = rom;
-    const type = this.read(0x147);
-    if (!type) {
-      this.MBCType = 0;
-    } else if (type >= 1 && type <= 3) {
-      this.MBCType = 1;
-    } else if (type === 5 || type === 6) {
-      this.MBCType = 2;
-    } else if (type >= 15 && type <= 19) {
-      this.MBCType = 3;
+    this.ROM = rom;
+    this.MBC.type = this.read(0x147);
+    const ROMSize = this.read(0x148);
+    this.MBC.RAMSize = this.read(0x149);
+    console.log(`ROM Size: $${ROMSize}`);
+    console.log(`RAM Size: ${this.MBC.RAMSize}`);
+    if (!this.MBC.type) {
+      assert(ROMSize === 0);
+      this.initialized = true;
     } else {
-      console.log(`No support for MBC ${type.toString(16)}.`);
+      console.log(`No support for MBC ${this.MBC.type.toString(16)}.`);
     }
     console.log('Loaded file into ROM memory.');
+  }
+  /**
+   * Load a file into BIOS
+   */
+  loadBios(bios: Array<Hex>) {
+    this.bios = bios;
+    console.log('Loaded bios.');
   }
 }
 
