@@ -3,7 +3,7 @@ import CPU from '../CPU/CPU';
 import Memory from '../Memory/Memory';
 import GLRenderer from '../GLRenderer/GLRenderer';
 import LCD, { Color } from '../LCDController/LCDController';
-import type { Hex } from '../Types';
+import { ByteArray } from '../Types';
 import _ from 'lodash';
 
 class Emulator {
@@ -21,7 +21,7 @@ class Emulator {
       console.log('Initialized GL Renderer.');
     }
   }
-  load(rom: Array<Hex>) {
+  load(rom: ByteArray) {
     Memory.loadFile(rom);
     this.update();
   }

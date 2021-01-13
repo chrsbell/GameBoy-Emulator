@@ -3,17 +3,16 @@ import React, { useEffect, useReducer, useRef } from 'react';
 import Emulator from '../Emulator/Emulator';
 import AppContext from './Context';
 import Wrapper from './Wrapper';
-
-import type { Hex } from '../Types';
+import { Byte, ByteArray } from '../Types';
 
 interface AppState {
   canvas: HTMLCanvasElement;
-  parsedROM: Array<Hex>;
+  parsedROM: ByteArray;
 }
 
 const initialState: AppState = {
   canvas: null as HTMLCanvasElement,
-  parsedROM: null as Array<Hex>,
+  parsedROM: null as ByteArray,
 };
 
 const reducer = (state: AppState, action: any) => {
@@ -26,7 +25,7 @@ const reducer = (state: AppState, action: any) => {
     case 'parsed_rom':
       return {
         ...state,
-        parsedROM: action.parsedROM.slice(0),
+        parsedROM: action.parsedROM,
       };
     default:
       return {

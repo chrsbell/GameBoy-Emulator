@@ -12,6 +12,8 @@ const FlexColumn: CSSProperties = {
 const Wrapper = () => {
   const { dispatch, appState } = useContext(Context);
   const canvasRef = useRef(null);
+  const hiddenBIOSRef = useRef(null);
+  const hiddenROMRef = useRef(null);
   const [ROMFile, setROMFile] = useState(null);
   const [BIOSFile, setBIOSFile] = useState(null);
 
@@ -19,7 +21,7 @@ const Wrapper = () => {
     e.preventDefault();
     let data = new FormData();
     data.append('rom', ROMFile);
-    data.append('bios', BIOSFile);
+    // data.append('bios', BIOSFile);
     const options: AxiosRequestConfig = {
       headers: { 'content-type': 'multipart/form-data' },
     };
@@ -40,11 +42,37 @@ const Wrapper = () => {
   return (
     <div style={FlexColumn}>
       <div id="canvas" />
-      <form onSubmit={onSubmit}>
-        <input type="file" name="rom" onChange={(e) => setROMFile(e.target.files[0])} />
-        <input type="file" name="bios" onChange={(e) => setBIOSFile(e.target.files[0])} />
-        <input type="submit" />
-      </form>
+      <button
+        onClick={() => {
+          hiddenROMRef.current.click();
+        }}
+      >
+        Upload ROM
+      </button>
+      <button
+        onClick={() => {
+          hiddenBIOSRef.current.click();
+        }}
+      >
+        BIOS File
+      </button>
+      <input
+        type="file"
+        name="rom"
+        ref={hiddenROMRef}
+        onChange={(e) => setROMFile(e.target.files[0])}
+        style={{ display: 'none' }}
+      />
+      <input
+        type="file"
+        name="bios"
+        ref={hiddenBIOSRef}
+        onChange={(e) => setBIOSFile(e.target.files[0])}
+        style={{ display: 'none' }}
+      />
+      <button type="button" onClick={onSubmit}>
+        Upload
+      </button>
       {/* Use a LCD size similar to GameBoy's */}
       <canvas width="787" height="720" ref={canvasRef} />
     </div>
