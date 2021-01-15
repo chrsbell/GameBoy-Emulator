@@ -21,8 +21,8 @@ class Emulator {
       console.log('Initialized GL Renderer.');
     }
   }
-  load(rom: ByteArray) {
-    Memory.loadFile(rom);
+  load(bios: ByteArray, rom: ByteArray) {
+    Memory.load(bios, rom);
     this.update();
   }
   update() {
@@ -38,7 +38,7 @@ class Emulator {
     }
 
     // test animation
-    this.renderer.setPixel(this.i, this.j, _.sample(Color));
+    // this.renderer.setPixel(this.i, this.j, _.sample(Color));
     this.i += 1;
     if (this.i === LCD.width) {
       this.j += 1;
