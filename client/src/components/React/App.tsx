@@ -1,5 +1,6 @@
-import ReactDOM from 'react-dom';
-import React, { useEffect, useReducer, useRef } from 'react';
+import * as ReactDOM from 'react-dom';
+import * as React from 'react';
+import { useEffect, useReducer, useRef } from 'react';
 import Emulator from '../Emulator/Emulator';
 import AppContext from './Context';
 import Wrapper from './Wrapper';
@@ -8,11 +9,13 @@ import { Byte, ByteArray } from '../Types';
 interface AppState {
   canvas: HTMLCanvasElement;
   parsedROM: ByteArray;
+  parsedBIOS: ByteArray;
 }
 
 const initialState: AppState = {
   canvas: null as HTMLCanvasElement,
   parsedROM: null as ByteArray,
+  parsedBIOS: null as ByteArray,
 };
 
 const reducer = (state: AppState, action: any) => {
@@ -27,6 +30,11 @@ const reducer = (state: AppState, action: any) => {
         ...state,
         parsedROM: action.parsedROM,
       };
+    case 'parsed_bios':
+      return {
+        ...state,
+        parsedBIOS: action.parsedBIOS,
+      };
     default:
       return {
         ...state,
@@ -39,11 +47,11 @@ const App = () => {
   const emulator = useRef(new Emulator());
 
   useEffect(() => {
-    const { parsedROM } = appState;
-    if (appState.parsedROM) {
-      emulator.current.load(parsedROM);
+    const { parsedROM, parsedBIOS } = appState;
+    if (parsedROM && parsedBIOS) {
+      emulator.current.load(parsedBIOS, parsedROM);
     }
-  }, [appState.parsedROM]);
+  }, [appState.parsedROM, appState.parsedBIOS]);
 
   useEffect(() => {
     if (appState.canvas) {

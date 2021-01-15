@@ -76,6 +76,8 @@ interface Cartridge {
 
 class Memory {
   private bios: ByteArray;
+  // whether bios execution has finished
+  public inBios: boolean = false;
   private cart: Cartridge;
   // 8k vRAM
   private vRAM: ByteArray;
@@ -154,6 +156,13 @@ class Memory {
    * Return the value at the address as a number
    */
   read(address: number): number {
+    if (this.inBios) {
+      if (address <= 0xff) {
+        return this.bios[address];
+      } else {
+        this.inBios = false;
+      }
+    }
     if (address < 0x4000) {
       // ROM Bank 0 is always available
       return this.cart.ROM[address];
@@ -181,9 +190,9 @@ class Memory {
     return this.cart.ROM[address];
   }
   /**
-   * Load a file into ROM
+   * Loads parsed files into BIOS/ROM
    */
-  loadFile(rom: ByteArray) {
+  load(bios: ByteArray, rom: ByteArray) {
     this.cart.ROM = rom;
     this.cart.MBCType = new Byte(this.read(0x147));
     this.cart.ROMSize = new Byte(this.read(0x148));
@@ -199,12 +208,8 @@ class Memory {
       console.log(`No support for MBC ${this.cart.MBCType.log()}.`);
     }
     console.log('Loaded file into ROM memory.');
-  }
-  /**
-   * Load a file into BIOS
-   */
-  loadBios(bios: ByteArray) {
     this.bios = bios;
+    this.inBios = true;
     console.log('Loaded bios.');
   }
 }

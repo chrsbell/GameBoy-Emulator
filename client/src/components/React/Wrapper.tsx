@@ -1,4 +1,5 @@
-import React, { useRef, useEffect, useState, useContext, FormEvent, CSSProperties } from 'react';
+import * as React from 'react';
+import { useRef, useEffect, useState, useContext, FormEvent, CSSProperties } from 'react';
 import Context from './Context';
 import axios, { AxiosRequestConfig } from 'axios';
 
@@ -21,13 +22,14 @@ const Wrapper = () => {
     e.preventDefault();
     let data = new FormData();
     data.append('rom', ROMFile);
-    // data.append('bios', BIOSFile);
+    data.append('bios', BIOSFile);
     const options: AxiosRequestConfig = {
       headers: { 'content-type': 'multipart/form-data' },
     };
     axios.post('/parse', data, options).then((res) => {
       if (res.status === 201) {
-        dispatch({ type: 'parsed_rom', parsedROM: res.data });
+        dispatch({ type: 'parsed_rom', parsedROM: res.data.rom });
+        dispatch({ type: 'parsed_bios', parsedBIOS: res.data.bios });
       } else {
         console.error('Error parsing ROM on server.');
       }
