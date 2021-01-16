@@ -1,5 +1,6 @@
 import Memory from '../Memory/Memory';
 import { Byte, Word } from '../Types';
+import Opcodes from './z80/z80';
 
 interface Registers {
   AF: Word;
@@ -31,23 +32,26 @@ class CPU {
       cy: false,
     },
   };
-  private op: {
-    z80: any;
-  };
+  private opcodes: any;
   // number of clock ticks per second
   public clock = 4194304;
   constructor() {
     this.PC = new Word(0x0000);
+    this.opcodes = Opcodes;
+    this.R.AF = new Word(0);
+    this.R.BC = new Word(0);
+    this.R.DE = new Word(0);
+    this.R.HL = new Word(0);
   }
   /**
    * Completes the GB power sequence
    */
   initPowerSequence(): void {
     this.PC.set(0x100);
-    this.R.AF = new Word(0x01b0);
-    this.R.BC = new Word(0x0013);
-    this.R.DE = new Word(0x00d8);
-    this.R.HL = new Word(0x014d);
+    this.R.AF.set(0x01b0);
+    this.R.BC.set(0x0013);
+    this.R.DE.set(0x00d8);
+    this.R.HL.set(0x014d);
   }
   /**
    * Executes next opcode.
@@ -55,16 +59,22 @@ class CPU {
    */
   executeInstruction(): number {
     if (Memory.inBios) {
-      const opcode = Memory.read(this.PC.value());
-      console.log(`PC: ${this.PC.log()}`, new Byte(opcode));
+      const opcode = Memory.readByte(this.PC.value());
+      console.log(`PC: ${this.PC.log()}`, opcode.toString(16));
+      this.PC.set(this.PC.value() + 0x0001);
       // check if finished bios execution
       if (!Memory.inBios) {
         this.initPowerSequence();
-      } else {
-        this.PC.set(this.PC.value() + 0x0001);
       }
+      return 1;
+    } else {
+      // normal execution
+      const opcode = Memory.readByte(this.PC.value());
+      console.log(`PC: ${this.PC.log()}`, opcode.toString(16));
+      const numCycles = this.opcodes[opcode](this);
+      this.opcodes[opcode](this);
+      this.PC.set(this.PC.value() + 0x0001);
     }
-    return 1;
   }
 }
 
