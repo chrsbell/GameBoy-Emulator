@@ -38,11 +38,11 @@ export class Word extends Uint16Array implements Primitive {
   value(): number {
     return this[0];
   }
-  upper(): number {
-    return this[0] & 0b1111111100000000;
+  upper(): Byte {
+    return new Byte(this[0] >> 8);
   }
-  lower(): number {
-    return this[0] & 0b0000000011111111;
+  lower(): Byte {
+    return new Byte(this[0] & 0b0000000011111111);
   }
   set<T>(value: T) {
     if (typeof value === 'number') {

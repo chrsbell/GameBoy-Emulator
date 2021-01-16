@@ -1,5 +1,6 @@
 import Memory from '../Memory/Memory';
 import { Byte, Word } from '../Types';
+import Opcodes from './z80/z80';
 
 interface Registers {
   AF: Word;
@@ -31,13 +32,12 @@ class CPU {
       cy: false,
     },
   };
-  private op: {
-    z80: any;
-  };
+  private opcodes: any;
   // number of clock ticks per second
   public clock = 4194304;
   constructor() {
     this.PC = new Word(0x0000);
+    this.opcodes = Opcodes;
   }
   /**
    * Completes the GB power sequence
@@ -55,8 +55,8 @@ class CPU {
    */
   executeInstruction(): number {
     if (Memory.inBios) {
-      const opcode = Memory.read(this.PC.value());
-      console.log(`PC: ${this.PC.log()}`, new Byte(opcode));
+      const opcode = Memory.readByte(this.PC.value());
+      console.log(`PC: ${this.PC.log()}`, opcode.toString(16));
       // check if finished bios execution
       if (!Memory.inBios) {
         this.initPowerSequence();
