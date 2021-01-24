@@ -1,29 +1,33 @@
 import axios from 'axios';
 import CPU from '../CPU/CPU';
 import Memory from '../Memory/Memory';
-import GLRenderer from '../GLRenderer/GLRenderer';
-import LCD, { Color } from '../LCDController/LCDController';
+import GLRenderer, { Colors } from '../GLRenderer/GLRenderer';
 import { ByteArray } from '../Types';
-import _ from 'lodash';
+import * as _ from 'lodash';
 
 class Emulator {
   private cpu: CPU;
   private i: number = 0;
   private j: number = 0;
+  private timerID: ReturnType<typeof setTimeout>;
   public constructor() {
     this.cpu = new CPU();
     this.update = this.update.bind(this);
   }
-  public initRenderer(canvas: HTMLCanvasElement) {
-    if (!GLRenderer.isInitialized()) {
-      GLRenderer.initialize(canvas);
-      console.log('Initialized GL Renderer.');
-    }
-  }
+  /**
+   * Loads a bios and ROM file into the Memory module.
+   * Stops the currently updating function.
+   */
   public load(bios: ByteArray, rom: ByteArray) {
     Memory.load(bios, rom);
+    clearTimeout(this.timerID);
     this.update();
   }
+  /**
+   * Executes the next set of opcodes and calls renderer update method.
+   * Calls itself at regular intervals according to the renderer's FPS, updating
+   * the ID of setTimeout each time.
+   */
   public update() {
     let cyclesPerUpdate = this.cpu.clock / GLRenderer.fps;
     let cycles = 0;
@@ -37,19 +41,19 @@ class Emulator {
     }
 
     // test animation
-    // GLRenderer.setPixel(this.i, this.j, _.sample(Color));
+    GLRenderer.setPixel(this.i, this.j, _.sample(Colors));
     this.i += 1;
-    if (this.i === LCD.width) {
+    if (this.i === GLRenderer.getScreenWidth()) {
       this.j += 1;
       this.i = 0;
-      if (this.j === LCD.height) {
+      if (this.j === GLRenderer.getScreenHeight()) {
         this.i = 0;
         this.j = 0;
       }
     }
 
     GLRenderer.draw();
-    setTimeout(this.update, 1000 / GLRenderer.fps);
+    this.timerID = setTimeout(this.update, 1000 / GLRenderer.fps);
   }
 }
 

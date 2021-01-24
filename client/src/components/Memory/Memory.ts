@@ -1,5 +1,3 @@
-import { add } from 'lodash';
-import { NumberLiteralType } from 'typescript';
 import { Byte, ByteArray, Word } from '../Types';
 
 interface CartridgeCode {

@@ -55,7 +55,7 @@ const App = () => {
   }, [appState.parsedROM, appState.parsedBIOS]);
 
   useEffect(() => {
-    if (appState.canvas) {
+    if (appState.canvas && !GLRenderer.isInitialized()) {
       GLRenderer.initialize(appState.canvas);
     }
   }, [appState.canvas]);
