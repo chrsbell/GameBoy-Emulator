@@ -10,7 +10,9 @@ export default {
     0x02: function () {
       Memory.writeByte(this.R.BC, this.R.AF.upper());
     },
-    0x03: function () {},
+    0x03: function () {
+      // Memory.writeByte();
+    },
     4: function () {},
     5: function () {},
     6: function () {},

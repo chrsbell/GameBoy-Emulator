@@ -59,7 +59,7 @@ class CPU {
    */
   public executeInstruction(): number {
     if (Memory.inBios) {
-      const opcode = Memory.readByte(this.PC.value());
+      const opcode: number = Memory.readByte(this.PC.value());
       console.log(`PC: ${this.PC.log()}`, opcode.toString(16));
       this.PC.set(this.PC.value() + 0x0001);
       // check if finished bios execution
@@ -69,9 +69,9 @@ class CPU {
       return 1;
     } else {
       // normal execution
-      const opcode = Memory.readByte(this.PC.value());
+      const opcode: number = Memory.readByte(this.PC.value());
       console.log(`PC: ${this.PC.log()}`, opcode.toString(16));
-      const numCycles = this.opcodes[opcode](this);
+      const numCycles: number = this.opcodes[opcode](this);
       this.opcodes[opcode](this);
       this.PC.set(this.PC.value() + 0x0001);
     }
