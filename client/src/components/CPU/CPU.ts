@@ -35,7 +35,7 @@ class CPU {
   private opcodes: any;
   // number of clock ticks per second
   public clock = 4194304;
-  constructor() {
+  public constructor() {
     this.PC = new Word(0x0000);
     this.opcodes = Opcodes;
     this.R.AF = new Word(0);
@@ -46,7 +46,7 @@ class CPU {
   /**
    * Completes the GB power sequence
    */
-  initPowerSequence(): void {
+  public initPowerSequence(): void {
     this.PC.set(0x100);
     this.R.AF.set(0x01b0);
     this.R.BC.set(0x0013);
@@ -57,7 +57,7 @@ class CPU {
    * Executes next opcode.
    * @returns {number} the number of CPU cycles required.
    */
-  executeInstruction(): number {
+  public executeInstruction(): number {
     if (Memory.inBios) {
       const opcode = Memory.readByte(this.PC.value());
       console.log(`PC: ${this.PC.log()}`, opcode.toString(16));

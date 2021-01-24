@@ -91,7 +91,7 @@ class Memory {
   // 126 bytes high RAM
   private hRAM: ByteArray;
   private initialized: boolean = false;
-  constructor() {
+  public constructor() {
     this.vRAM = new ByteArray(0x9fff - 0x8000);
     this.wRAM = new ByteArray(0xdfff - 0xc000);
     this.wRAMShadow = new ByteArray(0xfdff - 0xe000);

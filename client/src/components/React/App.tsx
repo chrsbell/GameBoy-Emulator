@@ -2,6 +2,7 @@ import * as ReactDOM from 'react-dom';
 import * as React from 'react';
 import { useEffect, useReducer, useRef } from 'react';
 import Emulator from '../Emulator/Emulator';
+import GLRenderer from '../GLRenderer/GLRenderer';
 import AppContext from './Context';
 import Wrapper from './Wrapper';
 import { Byte, ByteArray } from '../Types';
@@ -55,7 +56,7 @@ const App = () => {
 
   useEffect(() => {
     if (appState.canvas) {
-      emulator.current.initRenderer(appState.canvas);
+      GLRenderer.initialize(appState.canvas);
     }
   }, [appState.canvas]);
 

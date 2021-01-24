@@ -8,25 +8,24 @@ import _ from 'lodash';
 
 class Emulator {
   private cpu: CPU;
-  private renderer: GLRenderer;
   private i: number = 0;
   private j: number = 0;
-  constructor() {
+  public constructor() {
     this.cpu = new CPU();
     this.update = this.update.bind(this);
   }
-  initRenderer(canvas: HTMLCanvasElement) {
-    if (!this.renderer) {
-      this.renderer = new GLRenderer(canvas);
+  public initRenderer(canvas: HTMLCanvasElement) {
+    if (!GLRenderer.isInitialized()) {
+      GLRenderer.initialize(canvas);
       console.log('Initialized GL Renderer.');
     }
   }
-  load(bios: ByteArray, rom: ByteArray) {
+  public load(bios: ByteArray, rom: ByteArray) {
     Memory.load(bios, rom);
     this.update();
   }
-  update() {
-    let cyclesPerUpdate = this.cpu.clock / this.renderer.fps;
+  public update() {
+    let cyclesPerUpdate = this.cpu.clock / GLRenderer.fps;
     let cycles = 0;
     let elapsed;
 
@@ -38,7 +37,7 @@ class Emulator {
     }
 
     // test animation
-    // this.renderer.setPixel(this.i, this.j, _.sample(Color));
+    // GLRenderer.setPixel(this.i, this.j, _.sample(Color));
     this.i += 1;
     if (this.i === LCD.width) {
       this.j += 1;
@@ -49,8 +48,8 @@ class Emulator {
       }
     }
 
-    this.renderer.draw();
-    setTimeout(this.update, 1000 / this.renderer.fps);
+    GLRenderer.draw();
+    setTimeout(this.update, 1000 / GLRenderer.fps);
   }
 }
 

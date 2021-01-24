@@ -12,8 +12,15 @@ class GLRenderer {
   private positionBuffer: WebGLBuffer;
   private shadeAttributeLocation: GLint;
   private shadeBuffer: WebGLBuffer;
+  private initialized: boolean = false;
 
-  constructor(canvas: HTMLCanvasElement) {
+  public constructor() {}
+
+  public isInitialized() {
+    return this.initialized;
+  }
+
+  public initialize(canvas: HTMLCanvasElement) {
     if (canvas) {
       this.gl = canvas.getContext('webgl2');
       const gl: WebGL2RenderingContext = this.gl;
@@ -86,9 +93,10 @@ class GLRenderer {
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(shadeBuffer), gl.DYNAMIC_DRAW);
       }
     }
+    this.initialized = true;
   }
 
-  createShader(gl: WebGL2RenderingContext, type: number, source: string) {
+  private createShader(gl: WebGL2RenderingContext, type: number, source: string) {
     const shader = gl.createShader(type);
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
@@ -101,7 +109,7 @@ class GLRenderer {
     gl.deleteShader(shader);
   }
 
-  createProgram(
+  private createProgram(
     gl: WebGL2RenderingContext,
     vertexShader: WebGLShader,
     fragmentShader: WebGLShader
@@ -122,7 +130,7 @@ class GLRenderer {
   /**
    * Set a pixel of the virtual screen
    */
-  setPixel(x: number, y: number, shade: Array<number>) {
+  public setPixel(x: number, y: number, shade: Array<number>) {
     if (x >= 0 && x < LCD.width) {
       if (y >= 0 && y < LCD.height) {
         const { gl } = this;
@@ -138,7 +146,7 @@ class GLRenderer {
     }
   }
 
-  draw() {
+  public draw() {
     const { gl } = this;
     gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
     gl.clear(gl.COLOR_BUFFER_BIT);
@@ -146,4 +154,4 @@ class GLRenderer {
   }
 }
 
-export default GLRenderer;
+export default new GLRenderer();
