@@ -5,6 +5,7 @@ import CPU from '../CPU';
  * No operation.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const NOP = (cpu: CPU): number => {
   Instructions.map[0x00].apply(cpu);
@@ -15,6 +16,7 @@ const NOP = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_BC_i_from_d16_i = (cpu: CPU): number => {
   Instructions.map[0x01].apply(cpu);
@@ -25,6 +27,7 @@ const LD_into_BC_i_from_d16_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_BC_m_from_A_i = (cpu: CPU): number => {
   Instructions.map[0x02].apply(cpu);
@@ -35,6 +38,7 @@ const LD_into_BC_m_from_A_i = (cpu: CPU): number => {
  * Increment register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const INC_BC_i = (cpu: CPU): number => {
   Instructions.map[0x03].apply(cpu);
@@ -45,6 +49,7 @@ const INC_BC_i = (cpu: CPU): number => {
  * Increment register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const INC_B_i = (cpu: CPU): number => {
   Instructions.map[0x04].apply(cpu);
@@ -55,6 +60,7 @@ const INC_B_i = (cpu: CPU): number => {
  * Decrement register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const DEC_B_i = (cpu: CPU): number => {
   Instructions.map[0x05].apply(cpu);
@@ -65,6 +71,7 @@ const DEC_B_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_B_i_from_d8_i = (cpu: CPU): number => {
   Instructions.map[0x06].apply(cpu);
@@ -75,6 +82,7 @@ const LD_into_B_i_from_d8_i = (cpu: CPU): number => {
  * Rotate A left. Old bit 7 to Carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const RLCA = (cpu: CPU): number => {
   Instructions.map[0x07].apply(cpu);
@@ -85,6 +93,7 @@ const RLCA = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_a16_m_from_SP_i = (cpu: CPU): number => {
   Instructions.map[0x08].apply(cpu);
@@ -95,6 +104,7 @@ const LD_into_a16_m_from_SP_i = (cpu: CPU): number => {
  * Add.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: N, H, C
  */
 const ADD_into_HL_i_from_BC_i = (cpu: CPU): number => {
   Instructions.map[0x09].apply(cpu);
@@ -105,6 +115,7 @@ const ADD_into_HL_i_from_BC_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_A_i_from_BC_m = (cpu: CPU): number => {
   Instructions.map[0x0a].apply(cpu);
@@ -115,6 +126,7 @@ const LD_into_A_i_from_BC_m = (cpu: CPU): number => {
  * Decrement register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const DEC_BC_i = (cpu: CPU): number => {
   Instructions.map[0x0b].apply(cpu);
@@ -125,6 +137,7 @@ const DEC_BC_i = (cpu: CPU): number => {
  * Increment register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const INC_C_i = (cpu: CPU): number => {
   Instructions.map[0x0c].apply(cpu);
@@ -135,6 +148,7 @@ const INC_C_i = (cpu: CPU): number => {
  * Decrement register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const DEC_C_i = (cpu: CPU): number => {
   Instructions.map[0x0d].apply(cpu);
@@ -145,6 +159,7 @@ const DEC_C_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_C_i_from_d8_i = (cpu: CPU): number => {
   Instructions.map[0x0e].apply(cpu);
@@ -155,6 +170,7 @@ const LD_into_C_i_from_d8_i = (cpu: CPU): number => {
  * Rotate A right. Old bit 0 to Carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const RRCA = (cpu: CPU): number => {
   Instructions.map[0x0f].apply(cpu);
@@ -165,6 +181,7 @@ const RRCA = (cpu: CPU): number => {
  *  Halt CPU & LCD display until button pressed.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const STOP = (cpu: CPU): number => {
   Instructions.map[0x10].apply(cpu);
@@ -175,6 +192,7 @@ const STOP = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_DE_i_from_d16_i = (cpu: CPU): number => {
   Instructions.map[0x11].apply(cpu);
@@ -185,6 +203,7 @@ const LD_into_DE_i_from_d16_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_DE_m_from_A_i = (cpu: CPU): number => {
   Instructions.map[0x12].apply(cpu);
@@ -195,6 +214,7 @@ const LD_into_DE_m_from_A_i = (cpu: CPU): number => {
  * Increment register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const INC_DE_i = (cpu: CPU): number => {
   Instructions.map[0x13].apply(cpu);
@@ -205,6 +225,7 @@ const INC_DE_i = (cpu: CPU): number => {
  * Increment register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const INC_D_i = (cpu: CPU): number => {
   Instructions.map[0x14].apply(cpu);
@@ -215,6 +236,7 @@ const INC_D_i = (cpu: CPU): number => {
  * Decrement register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const DEC_D_i = (cpu: CPU): number => {
   Instructions.map[0x15].apply(cpu);
@@ -225,6 +247,7 @@ const DEC_D_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_D_i_from_d8_i = (cpu: CPU): number => {
   Instructions.map[0x16].apply(cpu);
@@ -232,10 +255,12 @@ const LD_into_D_i_from_d8_i = (cpu: CPU): number => {
 };
 
 /**
- * Rotate A left through Carry flag.
- * @param - CPU class.
- * @returns - Number of system clock ticks used.
- */
+     * Rotate A left through Carry flag.
+     * @param - CPU class.
+     * @returns - Number of system clock ticks used.
+
+    * Affected flags: Z, N, H, C
+    */
 const RLA = (cpu: CPU): number => {
   Instructions.map[0x17].apply(cpu);
   return 4;
@@ -245,6 +270,7 @@ const RLA = (cpu: CPU): number => {
  * Unconditional jump to the relative address.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const JR_to_A_i__r8_i = (cpu: CPU): number => {
   Instructions.map[0x18].apply(cpu);
@@ -255,6 +281,7 @@ const JR_to_A_i__r8_i = (cpu: CPU): number => {
  * Add.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: N, H, C
  */
 const ADD_into_HL_i_from_DE_i = (cpu: CPU): number => {
   Instructions.map[0x19].apply(cpu);
@@ -265,6 +292,7 @@ const ADD_into_HL_i_from_DE_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_A_i_from_DE_m = (cpu: CPU): number => {
   Instructions.map[0x1a].apply(cpu);
@@ -275,6 +303,7 @@ const LD_into_A_i_from_DE_m = (cpu: CPU): number => {
  * Decrement register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const DEC_DE_i = (cpu: CPU): number => {
   Instructions.map[0x1b].apply(cpu);
@@ -285,6 +314,7 @@ const DEC_DE_i = (cpu: CPU): number => {
  * Increment register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const INC_E_i = (cpu: CPU): number => {
   Instructions.map[0x1c].apply(cpu);
@@ -295,6 +325,7 @@ const INC_E_i = (cpu: CPU): number => {
  * Decrement register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const DEC_E_i = (cpu: CPU): number => {
   Instructions.map[0x1d].apply(cpu);
@@ -305,6 +336,7 @@ const DEC_E_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_E_i_from_d8_i = (cpu: CPU): number => {
   Instructions.map[0x1e].apply(cpu);
@@ -312,10 +344,12 @@ const LD_into_E_i_from_d8_i = (cpu: CPU): number => {
 };
 
 /**
- * Rotate A right through Carry flag.
- * @param - CPU class.
- * @returns - Number of system clock ticks used.
- */
+     * Rotate A right through Carry flag.
+     * @param - CPU class.
+     * @returns - Number of system clock ticks used.
+
+    * Affected flags: Z, N, H, C
+    */
 const RRA = (cpu: CPU): number => {
   Instructions.map[0x1f].apply(cpu);
   return 4;
@@ -325,6 +359,7 @@ const RRA = (cpu: CPU): number => {
  * Unconditional jump to the relative address.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const JR_to_NZ_i__r8_i = (cpu: CPU): number => {
   Instructions.map[0x20].apply(cpu);
@@ -335,6 +370,7 @@ const JR_to_NZ_i__r8_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_HL_i_from_d16_i = (cpu: CPU): number => {
   Instructions.map[0x21].apply(cpu);
@@ -345,6 +381,7 @@ const LD_into_HL_i_from_d16_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_HL_incr_m_from_A_i = (cpu: CPU): number => {
   Instructions.map[0x22].apply(cpu);
@@ -355,6 +392,7 @@ const LD_into_HL_incr_m_from_A_i = (cpu: CPU): number => {
  * Increment register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const INC_HL_i = (cpu: CPU): number => {
   Instructions.map[0x23].apply(cpu);
@@ -365,6 +403,7 @@ const INC_HL_i = (cpu: CPU): number => {
  * Increment register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const INC_H_i = (cpu: CPU): number => {
   Instructions.map[0x24].apply(cpu);
@@ -375,6 +414,7 @@ const INC_H_i = (cpu: CPU): number => {
  * Decrement register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const DEC_H_i = (cpu: CPU): number => {
   Instructions.map[0x25].apply(cpu);
@@ -385,6 +425,7 @@ const DEC_H_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_H_i_from_d8_i = (cpu: CPU): number => {
   Instructions.map[0x26].apply(cpu);
@@ -395,6 +436,7 @@ const LD_into_H_i_from_d8_i = (cpu: CPU): number => {
  * Decimal adjust register A.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, H, C
  */
 const DAA_A = (cpu: CPU): number => {
   Instructions.map[0x27].apply(cpu);
@@ -405,6 +447,7 @@ const DAA_A = (cpu: CPU): number => {
  * Unconditional jump to the relative address.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const JR_to_Z_i__r8_i = (cpu: CPU): number => {
   Instructions.map[0x28].apply(cpu);
@@ -415,6 +458,7 @@ const JR_to_Z_i__r8_i = (cpu: CPU): number => {
  * Add.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: N, H, C
  */
 const ADD_into_HL_i_from_HL_i = (cpu: CPU): number => {
   Instructions.map[0x29].apply(cpu);
@@ -425,6 +469,7 @@ const ADD_into_HL_i_from_HL_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_A_i_from_HL_incr_m = (cpu: CPU): number => {
   Instructions.map[0x2a].apply(cpu);
@@ -435,6 +480,7 @@ const LD_into_A_i_from_HL_incr_m = (cpu: CPU): number => {
  * Decrement register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const DEC_HL_i = (cpu: CPU): number => {
   Instructions.map[0x2b].apply(cpu);
@@ -445,6 +491,7 @@ const DEC_HL_i = (cpu: CPU): number => {
  * Increment register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const INC_L_i = (cpu: CPU): number => {
   Instructions.map[0x2c].apply(cpu);
@@ -455,6 +502,7 @@ const INC_L_i = (cpu: CPU): number => {
  * Decrement register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const DEC_L_i = (cpu: CPU): number => {
   Instructions.map[0x2d].apply(cpu);
@@ -465,6 +513,7 @@ const DEC_L_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_L_i_from_d8_i = (cpu: CPU): number => {
   Instructions.map[0x2e].apply(cpu);
@@ -475,6 +524,7 @@ const LD_into_L_i_from_d8_i = (cpu: CPU): number => {
  * Complement A register. (Flip all bits.)
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: N, H
  */
 const CPL_A = (cpu: CPU): number => {
   Instructions.map[0x2f].apply(cpu);
@@ -485,6 +535,7 @@ const CPL_A = (cpu: CPU): number => {
  * Unconditional jump to the relative address.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const JR_to_NC_i__r8_i = (cpu: CPU): number => {
   Instructions.map[0x30].apply(cpu);
@@ -495,6 +546,7 @@ const JR_to_NC_i__r8_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_SP_i_from_d16_i = (cpu: CPU): number => {
   Instructions.map[0x31].apply(cpu);
@@ -505,6 +557,7 @@ const LD_into_SP_i_from_d16_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_HL_decr_m_from_A_i = (cpu: CPU): number => {
   Instructions.map[0x32].apply(cpu);
@@ -515,6 +568,7 @@ const LD_into_HL_decr_m_from_A_i = (cpu: CPU): number => {
  * Increment register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const INC_SP_i = (cpu: CPU): number => {
   Instructions.map[0x33].apply(cpu);
@@ -525,6 +579,7 @@ const INC_SP_i = (cpu: CPU): number => {
  * Increment register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const INC_HL_m = (cpu: CPU): number => {
   Instructions.map[0x34].apply(cpu);
@@ -535,6 +590,7 @@ const INC_HL_m = (cpu: CPU): number => {
  * Decrement register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const DEC_HL_m = (cpu: CPU): number => {
   Instructions.map[0x35].apply(cpu);
@@ -545,6 +601,7 @@ const DEC_HL_m = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_HL_m_from_d8_i = (cpu: CPU): number => {
   Instructions.map[0x36].apply(cpu);
@@ -555,6 +612,7 @@ const LD_into_HL_m_from_d8_i = (cpu: CPU): number => {
  *  Set Carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: N, H, C
  */
 const SCF = (cpu: CPU): number => {
   Instructions.map[0x37].apply(cpu);
@@ -565,6 +623,7 @@ const SCF = (cpu: CPU): number => {
  * Unconditional jump to the relative address.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const JR_to_C_i__r8_i = (cpu: CPU): number => {
   Instructions.map[0x38].apply(cpu);
@@ -575,6 +634,7 @@ const JR_to_C_i__r8_i = (cpu: CPU): number => {
  * Add.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: N, H, C
  */
 const ADD_into_HL_i_from_SP_i = (cpu: CPU): number => {
   Instructions.map[0x39].apply(cpu);
@@ -585,6 +645,7 @@ const ADD_into_HL_i_from_SP_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_A_i_from_HL_decr_m = (cpu: CPU): number => {
   Instructions.map[0x3a].apply(cpu);
@@ -595,6 +656,7 @@ const LD_into_A_i_from_HL_decr_m = (cpu: CPU): number => {
  * Decrement register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const DEC_SP_i = (cpu: CPU): number => {
   Instructions.map[0x3b].apply(cpu);
@@ -605,6 +667,7 @@ const DEC_SP_i = (cpu: CPU): number => {
  * Increment register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const INC_A_i = (cpu: CPU): number => {
   Instructions.map[0x3c].apply(cpu);
@@ -615,6 +678,7 @@ const INC_A_i = (cpu: CPU): number => {
  * Decrement register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const DEC_A_i = (cpu: CPU): number => {
   Instructions.map[0x3d].apply(cpu);
@@ -625,6 +689,7 @@ const DEC_A_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_A_i_from_d8_i = (cpu: CPU): number => {
   Instructions.map[0x3e].apply(cpu);
@@ -632,12 +697,14 @@ const LD_into_A_i_from_d8_i = (cpu: CPU): number => {
 };
 
 /**
- * Complement carry flag.
- * If C flag is set, then reset it.
- * If C flag is reset, then set it.
- * @param - CPU class.
- * @returns - Number of system clock ticks used.
- */
+     * Complement carry flag.
+     * If C flag is set, then reset it.
+     * If C flag is reset, then set it.
+     * @param - CPU class.
+     * @returns - Number of system clock ticks used.
+
+    * Affected flags: N, H, C
+    */
 const CCF = (cpu: CPU): number => {
   Instructions.map[0x3f].apply(cpu);
   return 4;
@@ -647,6 +714,7 @@ const CCF = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_B_i_from_B_i = (cpu: CPU): number => {
   Instructions.map[0x40].apply(cpu);
@@ -657,6 +725,7 @@ const LD_into_B_i_from_B_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_B_i_from_C_i = (cpu: CPU): number => {
   Instructions.map[0x41].apply(cpu);
@@ -667,6 +736,7 @@ const LD_into_B_i_from_C_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_B_i_from_D_i = (cpu: CPU): number => {
   Instructions.map[0x42].apply(cpu);
@@ -677,6 +747,7 @@ const LD_into_B_i_from_D_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_B_i_from_E_i = (cpu: CPU): number => {
   Instructions.map[0x43].apply(cpu);
@@ -687,6 +758,7 @@ const LD_into_B_i_from_E_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_B_i_from_H_i = (cpu: CPU): number => {
   Instructions.map[0x44].apply(cpu);
@@ -697,6 +769,7 @@ const LD_into_B_i_from_H_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_B_i_from_L_i = (cpu: CPU): number => {
   Instructions.map[0x45].apply(cpu);
@@ -707,6 +780,7 @@ const LD_into_B_i_from_L_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_B_i_from_HL_m = (cpu: CPU): number => {
   Instructions.map[0x46].apply(cpu);
@@ -717,6 +791,7 @@ const LD_into_B_i_from_HL_m = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_B_i_from_A_i = (cpu: CPU): number => {
   Instructions.map[0x47].apply(cpu);
@@ -727,6 +802,7 @@ const LD_into_B_i_from_A_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_C_i_from_B_i = (cpu: CPU): number => {
   Instructions.map[0x48].apply(cpu);
@@ -737,6 +813,7 @@ const LD_into_C_i_from_B_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_C_i_from_C_i = (cpu: CPU): number => {
   Instructions.map[0x49].apply(cpu);
@@ -747,6 +824,7 @@ const LD_into_C_i_from_C_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_C_i_from_D_i = (cpu: CPU): number => {
   Instructions.map[0x4a].apply(cpu);
@@ -757,6 +835,7 @@ const LD_into_C_i_from_D_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_C_i_from_E_i = (cpu: CPU): number => {
   Instructions.map[0x4b].apply(cpu);
@@ -767,6 +846,7 @@ const LD_into_C_i_from_E_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_C_i_from_H_i = (cpu: CPU): number => {
   Instructions.map[0x4c].apply(cpu);
@@ -777,6 +857,7 @@ const LD_into_C_i_from_H_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_C_i_from_L_i = (cpu: CPU): number => {
   Instructions.map[0x4d].apply(cpu);
@@ -787,6 +868,7 @@ const LD_into_C_i_from_L_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_C_i_from_HL_m = (cpu: CPU): number => {
   Instructions.map[0x4e].apply(cpu);
@@ -797,6 +879,7 @@ const LD_into_C_i_from_HL_m = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_C_i_from_A_i = (cpu: CPU): number => {
   Instructions.map[0x4f].apply(cpu);
@@ -807,6 +890,7 @@ const LD_into_C_i_from_A_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_D_i_from_B_i = (cpu: CPU): number => {
   Instructions.map[0x50].apply(cpu);
@@ -817,6 +901,7 @@ const LD_into_D_i_from_B_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_D_i_from_C_i = (cpu: CPU): number => {
   Instructions.map[0x51].apply(cpu);
@@ -827,6 +912,7 @@ const LD_into_D_i_from_C_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_D_i_from_D_i = (cpu: CPU): number => {
   Instructions.map[0x52].apply(cpu);
@@ -837,6 +923,7 @@ const LD_into_D_i_from_D_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_D_i_from_E_i = (cpu: CPU): number => {
   Instructions.map[0x53].apply(cpu);
@@ -847,6 +934,7 @@ const LD_into_D_i_from_E_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_D_i_from_H_i = (cpu: CPU): number => {
   Instructions.map[0x54].apply(cpu);
@@ -857,6 +945,7 @@ const LD_into_D_i_from_H_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_D_i_from_L_i = (cpu: CPU): number => {
   Instructions.map[0x55].apply(cpu);
@@ -867,6 +956,7 @@ const LD_into_D_i_from_L_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_D_i_from_HL_m = (cpu: CPU): number => {
   Instructions.map[0x56].apply(cpu);
@@ -877,6 +967,7 @@ const LD_into_D_i_from_HL_m = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_D_i_from_A_i = (cpu: CPU): number => {
   Instructions.map[0x57].apply(cpu);
@@ -887,6 +978,7 @@ const LD_into_D_i_from_A_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_E_i_from_B_i = (cpu: CPU): number => {
   Instructions.map[0x58].apply(cpu);
@@ -897,6 +989,7 @@ const LD_into_E_i_from_B_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_E_i_from_C_i = (cpu: CPU): number => {
   Instructions.map[0x59].apply(cpu);
@@ -907,6 +1000,7 @@ const LD_into_E_i_from_C_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_E_i_from_D_i = (cpu: CPU): number => {
   Instructions.map[0x5a].apply(cpu);
@@ -917,6 +1011,7 @@ const LD_into_E_i_from_D_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_E_i_from_E_i = (cpu: CPU): number => {
   Instructions.map[0x5b].apply(cpu);
@@ -927,6 +1022,7 @@ const LD_into_E_i_from_E_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_E_i_from_H_i = (cpu: CPU): number => {
   Instructions.map[0x5c].apply(cpu);
@@ -937,6 +1033,7 @@ const LD_into_E_i_from_H_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_E_i_from_L_i = (cpu: CPU): number => {
   Instructions.map[0x5d].apply(cpu);
@@ -947,6 +1044,7 @@ const LD_into_E_i_from_L_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_E_i_from_HL_m = (cpu: CPU): number => {
   Instructions.map[0x5e].apply(cpu);
@@ -957,6 +1055,7 @@ const LD_into_E_i_from_HL_m = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_E_i_from_A_i = (cpu: CPU): number => {
   Instructions.map[0x5f].apply(cpu);
@@ -967,6 +1066,7 @@ const LD_into_E_i_from_A_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_H_i_from_B_i = (cpu: CPU): number => {
   Instructions.map[0x60].apply(cpu);
@@ -977,6 +1077,7 @@ const LD_into_H_i_from_B_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_H_i_from_C_i = (cpu: CPU): number => {
   Instructions.map[0x61].apply(cpu);
@@ -987,6 +1088,7 @@ const LD_into_H_i_from_C_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_H_i_from_D_i = (cpu: CPU): number => {
   Instructions.map[0x62].apply(cpu);
@@ -997,6 +1099,7 @@ const LD_into_H_i_from_D_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_H_i_from_E_i = (cpu: CPU): number => {
   Instructions.map[0x63].apply(cpu);
@@ -1007,6 +1110,7 @@ const LD_into_H_i_from_E_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_H_i_from_H_i = (cpu: CPU): number => {
   Instructions.map[0x64].apply(cpu);
@@ -1017,6 +1121,7 @@ const LD_into_H_i_from_H_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_H_i_from_L_i = (cpu: CPU): number => {
   Instructions.map[0x65].apply(cpu);
@@ -1027,6 +1132,7 @@ const LD_into_H_i_from_L_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_H_i_from_HL_m = (cpu: CPU): number => {
   Instructions.map[0x66].apply(cpu);
@@ -1037,6 +1143,7 @@ const LD_into_H_i_from_HL_m = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_H_i_from_A_i = (cpu: CPU): number => {
   Instructions.map[0x67].apply(cpu);
@@ -1047,6 +1154,7 @@ const LD_into_H_i_from_A_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_L_i_from_B_i = (cpu: CPU): number => {
   Instructions.map[0x68].apply(cpu);
@@ -1057,6 +1165,7 @@ const LD_into_L_i_from_B_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_L_i_from_C_i = (cpu: CPU): number => {
   Instructions.map[0x69].apply(cpu);
@@ -1067,6 +1176,7 @@ const LD_into_L_i_from_C_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_L_i_from_D_i = (cpu: CPU): number => {
   Instructions.map[0x6a].apply(cpu);
@@ -1077,6 +1187,7 @@ const LD_into_L_i_from_D_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_L_i_from_E_i = (cpu: CPU): number => {
   Instructions.map[0x6b].apply(cpu);
@@ -1087,6 +1198,7 @@ const LD_into_L_i_from_E_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_L_i_from_H_i = (cpu: CPU): number => {
   Instructions.map[0x6c].apply(cpu);
@@ -1097,6 +1209,7 @@ const LD_into_L_i_from_H_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_L_i_from_L_i = (cpu: CPU): number => {
   Instructions.map[0x6d].apply(cpu);
@@ -1107,6 +1220,7 @@ const LD_into_L_i_from_L_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_L_i_from_HL_m = (cpu: CPU): number => {
   Instructions.map[0x6e].apply(cpu);
@@ -1117,6 +1231,7 @@ const LD_into_L_i_from_HL_m = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_L_i_from_A_i = (cpu: CPU): number => {
   Instructions.map[0x6f].apply(cpu);
@@ -1127,6 +1242,7 @@ const LD_into_L_i_from_A_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_HL_m_from_B_i = (cpu: CPU): number => {
   Instructions.map[0x70].apply(cpu);
@@ -1137,6 +1253,7 @@ const LD_into_HL_m_from_B_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_HL_m_from_C_i = (cpu: CPU): number => {
   Instructions.map[0x71].apply(cpu);
@@ -1147,6 +1264,7 @@ const LD_into_HL_m_from_C_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_HL_m_from_D_i = (cpu: CPU): number => {
   Instructions.map[0x72].apply(cpu);
@@ -1157,6 +1275,7 @@ const LD_into_HL_m_from_D_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_HL_m_from_E_i = (cpu: CPU): number => {
   Instructions.map[0x73].apply(cpu);
@@ -1167,6 +1286,7 @@ const LD_into_HL_m_from_E_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_HL_m_from_H_i = (cpu: CPU): number => {
   Instructions.map[0x74].apply(cpu);
@@ -1177,6 +1297,7 @@ const LD_into_HL_m_from_H_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_HL_m_from_L_i = (cpu: CPU): number => {
   Instructions.map[0x75].apply(cpu);
@@ -1184,10 +1305,12 @@ const LD_into_HL_m_from_L_i = (cpu: CPU): number => {
 };
 
 /**
- * Disables interrupt handling.
- * @param - CPU class.
- * @returns - Number of system clock ticks used.
- */
+     * Disables interrupt handling.
+     * @param - CPU class.
+     * @returns - Number of system clock ticks used.
+
+    * Affected flags:
+    */
 const HALT = (cpu: CPU): number => {
   Instructions.map[0x76].apply(cpu);
   return 4;
@@ -1197,6 +1320,7 @@ const HALT = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_HL_m_from_A_i = (cpu: CPU): number => {
   Instructions.map[0x77].apply(cpu);
@@ -1207,6 +1331,7 @@ const LD_into_HL_m_from_A_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_A_i_from_B_i = (cpu: CPU): number => {
   Instructions.map[0x78].apply(cpu);
@@ -1217,6 +1342,7 @@ const LD_into_A_i_from_B_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_A_i_from_C_i = (cpu: CPU): number => {
   Instructions.map[0x79].apply(cpu);
@@ -1227,6 +1353,7 @@ const LD_into_A_i_from_C_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_A_i_from_D_i = (cpu: CPU): number => {
   Instructions.map[0x7a].apply(cpu);
@@ -1237,6 +1364,7 @@ const LD_into_A_i_from_D_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_A_i_from_E_i = (cpu: CPU): number => {
   Instructions.map[0x7b].apply(cpu);
@@ -1247,6 +1375,7 @@ const LD_into_A_i_from_E_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_A_i_from_H_i = (cpu: CPU): number => {
   Instructions.map[0x7c].apply(cpu);
@@ -1257,6 +1386,7 @@ const LD_into_A_i_from_H_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_A_i_from_L_i = (cpu: CPU): number => {
   Instructions.map[0x7d].apply(cpu);
@@ -1267,6 +1397,7 @@ const LD_into_A_i_from_L_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_A_i_from_HL_m = (cpu: CPU): number => {
   Instructions.map[0x7e].apply(cpu);
@@ -1277,6 +1408,7 @@ const LD_into_A_i_from_HL_m = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_A_i_from_A_i = (cpu: CPU): number => {
   Instructions.map[0x7f].apply(cpu);
@@ -1287,6 +1419,7 @@ const LD_into_A_i_from_A_i = (cpu: CPU): number => {
  * Add.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const ADD_into_A_i_from_B_i = (cpu: CPU): number => {
   Instructions.map[0x80].apply(cpu);
@@ -1297,6 +1430,7 @@ const ADD_into_A_i_from_B_i = (cpu: CPU): number => {
  * Add.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const ADD_into_A_i_from_C_i = (cpu: CPU): number => {
   Instructions.map[0x81].apply(cpu);
@@ -1307,6 +1441,7 @@ const ADD_into_A_i_from_C_i = (cpu: CPU): number => {
  * Add.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const ADD_into_A_i_from_D_i = (cpu: CPU): number => {
   Instructions.map[0x82].apply(cpu);
@@ -1317,6 +1452,7 @@ const ADD_into_A_i_from_D_i = (cpu: CPU): number => {
  * Add.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const ADD_into_A_i_from_E_i = (cpu: CPU): number => {
   Instructions.map[0x83].apply(cpu);
@@ -1327,6 +1463,7 @@ const ADD_into_A_i_from_E_i = (cpu: CPU): number => {
  * Add.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const ADD_into_A_i_from_H_i = (cpu: CPU): number => {
   Instructions.map[0x84].apply(cpu);
@@ -1337,6 +1474,7 @@ const ADD_into_A_i_from_H_i = (cpu: CPU): number => {
  * Add.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const ADD_into_A_i_from_L_i = (cpu: CPU): number => {
   Instructions.map[0x85].apply(cpu);
@@ -1347,6 +1485,7 @@ const ADD_into_A_i_from_L_i = (cpu: CPU): number => {
  * Add.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const ADD_into_A_i_from_HL_m = (cpu: CPU): number => {
   Instructions.map[0x86].apply(cpu);
@@ -1357,6 +1496,7 @@ const ADD_into_A_i_from_HL_m = (cpu: CPU): number => {
  * Add.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const ADD_into_A_i_from_A_i = (cpu: CPU): number => {
   Instructions.map[0x87].apply(cpu);
@@ -1367,6 +1507,7 @@ const ADD_into_A_i_from_A_i = (cpu: CPU): number => {
  * Add with carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const ADC_into_A_i_from_B_i = (cpu: CPU): number => {
   Instructions.map[0x88].apply(cpu);
@@ -1377,6 +1518,7 @@ const ADC_into_A_i_from_B_i = (cpu: CPU): number => {
  * Add with carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const ADC_into_A_i_from_C_i = (cpu: CPU): number => {
   Instructions.map[0x89].apply(cpu);
@@ -1387,6 +1529,7 @@ const ADC_into_A_i_from_C_i = (cpu: CPU): number => {
  * Add with carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const ADC_into_A_i_from_D_i = (cpu: CPU): number => {
   Instructions.map[0x8a].apply(cpu);
@@ -1397,6 +1540,7 @@ const ADC_into_A_i_from_D_i = (cpu: CPU): number => {
  * Add with carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const ADC_into_A_i_from_E_i = (cpu: CPU): number => {
   Instructions.map[0x8b].apply(cpu);
@@ -1407,6 +1551,7 @@ const ADC_into_A_i_from_E_i = (cpu: CPU): number => {
  * Add with carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const ADC_into_A_i_from_H_i = (cpu: CPU): number => {
   Instructions.map[0x8c].apply(cpu);
@@ -1417,6 +1562,7 @@ const ADC_into_A_i_from_H_i = (cpu: CPU): number => {
  * Add with carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const ADC_into_A_i_from_L_i = (cpu: CPU): number => {
   Instructions.map[0x8d].apply(cpu);
@@ -1427,6 +1573,7 @@ const ADC_into_A_i_from_L_i = (cpu: CPU): number => {
  * Add with carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const ADC_into_A_i_from_HL_m = (cpu: CPU): number => {
   Instructions.map[0x8e].apply(cpu);
@@ -1437,6 +1584,7 @@ const ADC_into_A_i_from_HL_m = (cpu: CPU): number => {
  * Add with carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const ADC_into_A_i_from_A_i = (cpu: CPU): number => {
   Instructions.map[0x8f].apply(cpu);
@@ -1447,6 +1595,7 @@ const ADC_into_A_i_from_A_i = (cpu: CPU): number => {
  * Subtract.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SUB_from_A_i_value_B_i = (cpu: CPU): number => {
   Instructions.map[0x90].apply(cpu);
@@ -1457,6 +1606,7 @@ const SUB_from_A_i_value_B_i = (cpu: CPU): number => {
  * Subtract.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SUB_from_A_i_value_C_i = (cpu: CPU): number => {
   Instructions.map[0x91].apply(cpu);
@@ -1467,6 +1617,7 @@ const SUB_from_A_i_value_C_i = (cpu: CPU): number => {
  * Subtract.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SUB_from_A_i_value_D_i = (cpu: CPU): number => {
   Instructions.map[0x92].apply(cpu);
@@ -1477,6 +1628,7 @@ const SUB_from_A_i_value_D_i = (cpu: CPU): number => {
  * Subtract.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SUB_from_A_i_value_E_i = (cpu: CPU): number => {
   Instructions.map[0x93].apply(cpu);
@@ -1487,6 +1639,7 @@ const SUB_from_A_i_value_E_i = (cpu: CPU): number => {
  * Subtract.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SUB_from_A_i_value_H_i = (cpu: CPU): number => {
   Instructions.map[0x94].apply(cpu);
@@ -1497,6 +1650,7 @@ const SUB_from_A_i_value_H_i = (cpu: CPU): number => {
  * Subtract.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SUB_from_A_i_value_L_i = (cpu: CPU): number => {
   Instructions.map[0x95].apply(cpu);
@@ -1507,6 +1661,7 @@ const SUB_from_A_i_value_L_i = (cpu: CPU): number => {
  * Subtract.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SUB_from_A_i_value_HL_m = (cpu: CPU): number => {
   Instructions.map[0x96].apply(cpu);
@@ -1517,6 +1672,7 @@ const SUB_from_A_i_value_HL_m = (cpu: CPU): number => {
  * Subtract.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SUB_from_A_i_value_A_i = (cpu: CPU): number => {
   Instructions.map[0x97].apply(cpu);
@@ -1529,6 +1685,7 @@ const SUB_from_A_i_value_A_i = (cpu: CPU): number => {
  * @returns - Number of system clock ticks used.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SBC_from_A_i_value_B_i = (cpu: CPU): number => {
   Instructions.map[0x98].apply(cpu);
@@ -1541,6 +1698,7 @@ const SBC_from_A_i_value_B_i = (cpu: CPU): number => {
  * @returns - Number of system clock ticks used.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SBC_from_A_i_value_C_i = (cpu: CPU): number => {
   Instructions.map[0x99].apply(cpu);
@@ -1553,6 +1711,7 @@ const SBC_from_A_i_value_C_i = (cpu: CPU): number => {
  * @returns - Number of system clock ticks used.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SBC_from_A_i_value_D_i = (cpu: CPU): number => {
   Instructions.map[0x9a].apply(cpu);
@@ -1565,6 +1724,7 @@ const SBC_from_A_i_value_D_i = (cpu: CPU): number => {
  * @returns - Number of system clock ticks used.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SBC_from_A_i_value_E_i = (cpu: CPU): number => {
   Instructions.map[0x9b].apply(cpu);
@@ -1577,6 +1737,7 @@ const SBC_from_A_i_value_E_i = (cpu: CPU): number => {
  * @returns - Number of system clock ticks used.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SBC_from_A_i_value_H_i = (cpu: CPU): number => {
   Instructions.map[0x9c].apply(cpu);
@@ -1589,6 +1750,7 @@ const SBC_from_A_i_value_H_i = (cpu: CPU): number => {
  * @returns - Number of system clock ticks used.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SBC_from_A_i_value_L_i = (cpu: CPU): number => {
   Instructions.map[0x9d].apply(cpu);
@@ -1601,6 +1763,7 @@ const SBC_from_A_i_value_L_i = (cpu: CPU): number => {
  * @returns - Number of system clock ticks used.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SBC_from_A_i_value_HL_m = (cpu: CPU): number => {
   Instructions.map[0x9e].apply(cpu);
@@ -1613,6 +1776,7 @@ const SBC_from_A_i_value_HL_m = (cpu: CPU): number => {
  * @returns - Number of system clock ticks used.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SBC_from_A_i_value_A_i = (cpu: CPU): number => {
   Instructions.map[0x9f].apply(cpu);
@@ -1623,6 +1787,7 @@ const SBC_from_A_i_value_A_i = (cpu: CPU): number => {
  * Logical AND.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const AND_A_with_B = (cpu: CPU): number => {
   Instructions.map[0xa0].apply(cpu);
@@ -1633,6 +1798,7 @@ const AND_A_with_B = (cpu: CPU): number => {
  * Logical AND.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const AND_A_with_C = (cpu: CPU): number => {
   Instructions.map[0xa1].apply(cpu);
@@ -1643,6 +1809,7 @@ const AND_A_with_C = (cpu: CPU): number => {
  * Logical AND.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const AND_A_with_D = (cpu: CPU): number => {
   Instructions.map[0xa2].apply(cpu);
@@ -1653,6 +1820,7 @@ const AND_A_with_D = (cpu: CPU): number => {
  * Logical AND.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const AND_A_with_E = (cpu: CPU): number => {
   Instructions.map[0xa3].apply(cpu);
@@ -1663,6 +1831,7 @@ const AND_A_with_E = (cpu: CPU): number => {
  * Logical AND.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const AND_A_with_H = (cpu: CPU): number => {
   Instructions.map[0xa4].apply(cpu);
@@ -1673,6 +1842,7 @@ const AND_A_with_H = (cpu: CPU): number => {
  * Logical AND.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const AND_A_with_L = (cpu: CPU): number => {
   Instructions.map[0xa5].apply(cpu);
@@ -1683,6 +1853,7 @@ const AND_A_with_L = (cpu: CPU): number => {
  * Logical AND.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const AND_A_with_HL = (cpu: CPU): number => {
   Instructions.map[0xa6].apply(cpu);
@@ -1693,6 +1864,7 @@ const AND_A_with_HL = (cpu: CPU): number => {
  * Logical AND.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const AND_A_with_A = (cpu: CPU): number => {
   Instructions.map[0xa7].apply(cpu);
@@ -1703,6 +1875,7 @@ const AND_A_with_A = (cpu: CPU): number => {
  * Logical XOR.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const XOR_A_with_B = (cpu: CPU): number => {
   Instructions.map[0xa8].apply(cpu);
@@ -1713,6 +1886,7 @@ const XOR_A_with_B = (cpu: CPU): number => {
  * Logical XOR.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const XOR_A_with_C = (cpu: CPU): number => {
   Instructions.map[0xa9].apply(cpu);
@@ -1723,6 +1897,7 @@ const XOR_A_with_C = (cpu: CPU): number => {
  * Logical XOR.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const XOR_A_with_D = (cpu: CPU): number => {
   Instructions.map[0xaa].apply(cpu);
@@ -1733,6 +1908,7 @@ const XOR_A_with_D = (cpu: CPU): number => {
  * Logical XOR.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const XOR_A_with_E = (cpu: CPU): number => {
   Instructions.map[0xab].apply(cpu);
@@ -1743,6 +1919,7 @@ const XOR_A_with_E = (cpu: CPU): number => {
  * Logical XOR.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const XOR_A_with_H = (cpu: CPU): number => {
   Instructions.map[0xac].apply(cpu);
@@ -1753,6 +1930,7 @@ const XOR_A_with_H = (cpu: CPU): number => {
  * Logical XOR.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const XOR_A_with_L = (cpu: CPU): number => {
   Instructions.map[0xad].apply(cpu);
@@ -1763,6 +1941,7 @@ const XOR_A_with_L = (cpu: CPU): number => {
  * Logical XOR.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const XOR_A_with_HL = (cpu: CPU): number => {
   Instructions.map[0xae].apply(cpu);
@@ -1773,6 +1952,7 @@ const XOR_A_with_HL = (cpu: CPU): number => {
  * Logical XOR.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const XOR_A_with_A = (cpu: CPU): number => {
   Instructions.map[0xaf].apply(cpu);
@@ -1783,6 +1963,7 @@ const XOR_A_with_A = (cpu: CPU): number => {
  * Logical OR.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const OR_A_with_B = (cpu: CPU): number => {
   Instructions.map[0xb0].apply(cpu);
@@ -1793,6 +1974,7 @@ const OR_A_with_B = (cpu: CPU): number => {
  * Logical OR.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const OR_A_with_C = (cpu: CPU): number => {
   Instructions.map[0xb1].apply(cpu);
@@ -1803,6 +1985,7 @@ const OR_A_with_C = (cpu: CPU): number => {
  * Logical OR.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const OR_A_with_D = (cpu: CPU): number => {
   Instructions.map[0xb2].apply(cpu);
@@ -1813,6 +1996,7 @@ const OR_A_with_D = (cpu: CPU): number => {
  * Logical OR.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const OR_A_with_E = (cpu: CPU): number => {
   Instructions.map[0xb3].apply(cpu);
@@ -1823,6 +2007,7 @@ const OR_A_with_E = (cpu: CPU): number => {
  * Logical OR.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const OR_A_with_H = (cpu: CPU): number => {
   Instructions.map[0xb4].apply(cpu);
@@ -1833,6 +2018,7 @@ const OR_A_with_H = (cpu: CPU): number => {
  * Logical OR.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const OR_A_with_L = (cpu: CPU): number => {
   Instructions.map[0xb5].apply(cpu);
@@ -1843,6 +2029,7 @@ const OR_A_with_L = (cpu: CPU): number => {
  * Logical OR.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const OR_A_with_HL = (cpu: CPU): number => {
   Instructions.map[0xb6].apply(cpu);
@@ -1853,6 +2040,7 @@ const OR_A_with_HL = (cpu: CPU): number => {
  * Logical OR.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const OR_A_with_A = (cpu: CPU): number => {
   Instructions.map[0xb7].apply(cpu);
@@ -1863,6 +2051,7 @@ const OR_A_with_A = (cpu: CPU): number => {
  * Compare A with regiseter.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const CP_A_with_B = (cpu: CPU): number => {
   Instructions.map[0xb8].apply(cpu);
@@ -1873,6 +2062,7 @@ const CP_A_with_B = (cpu: CPU): number => {
  * Compare A with regiseter.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const CP_A_with_C = (cpu: CPU): number => {
   Instructions.map[0xb9].apply(cpu);
@@ -1883,6 +2073,7 @@ const CP_A_with_C = (cpu: CPU): number => {
  * Compare A with regiseter.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const CP_A_with_D = (cpu: CPU): number => {
   Instructions.map[0xba].apply(cpu);
@@ -1893,6 +2084,7 @@ const CP_A_with_D = (cpu: CPU): number => {
  * Compare A with regiseter.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const CP_A_with_E = (cpu: CPU): number => {
   Instructions.map[0xbb].apply(cpu);
@@ -1903,6 +2095,7 @@ const CP_A_with_E = (cpu: CPU): number => {
  * Compare A with regiseter.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const CP_A_with_H = (cpu: CPU): number => {
   Instructions.map[0xbc].apply(cpu);
@@ -1913,6 +2106,7 @@ const CP_A_with_H = (cpu: CPU): number => {
  * Compare A with regiseter.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const CP_A_with_L = (cpu: CPU): number => {
   Instructions.map[0xbd].apply(cpu);
@@ -1923,6 +2117,7 @@ const CP_A_with_L = (cpu: CPU): number => {
  * Compare A with regiseter.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const CP_A_with_HL = (cpu: CPU): number => {
   Instructions.map[0xbe].apply(cpu);
@@ -1933,6 +2128,7 @@ const CP_A_with_HL = (cpu: CPU): number => {
  * Compare A with regiseter.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const CP_A_with_A = (cpu: CPU): number => {
   Instructions.map[0xbf].apply(cpu);
@@ -1943,6 +2139,7 @@ const CP_A_with_A = (cpu: CPU): number => {
  * Return from a function.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RET_to_A_i__NZ_i = (cpu: CPU): number => {
   Instructions.map[0xc0].apply(cpu);
@@ -1953,6 +2150,7 @@ const RET_to_A_i__NZ_i = (cpu: CPU): number => {
  * Pops to the 16-bit register, data from the stack memory.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const POP_off_SP_into_BC_i = (cpu: CPU): number => {
   Instructions.map[0xc1].apply(cpu);
@@ -1963,6 +2161,7 @@ const POP_off_SP_into_BC_i = (cpu: CPU): number => {
  * Unconditional jump to the absolute address specified by the 16-bit operand
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const JP_to_NZ_i__a16_i = (cpu: CPU): number => {
   Instructions.map[0xc2].apply(cpu);
@@ -1973,6 +2172,7 @@ const JP_to_NZ_i__a16_i = (cpu: CPU): number => {
  * Unconditional jump to the absolute address specified by the 16-bit operand
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const JP_to_A_i__a16_i = (cpu: CPU): number => {
   Instructions.map[0xc3].apply(cpu);
@@ -1983,6 +2183,7 @@ const JP_to_A_i__a16_i = (cpu: CPU): number => {
  * Function call to the absolute address.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const CALL_to_NZ_i_from_a16_i = (cpu: CPU): number => {
   Instructions.map[0xc4].apply(cpu);
@@ -1993,6 +2194,7 @@ const CALL_to_NZ_i_from_a16_i = (cpu: CPU): number => {
  * Push to the stack memory, data from the 16-bit register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const PUSH_onto_SP_register_BC_i = (cpu: CPU): number => {
   Instructions.map[0xc5].apply(cpu);
@@ -2003,6 +2205,7 @@ const PUSH_onto_SP_register_BC_i = (cpu: CPU): number => {
  * Add.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const ADD_into_A_i_from_d8_i = (cpu: CPU): number => {
   Instructions.map[0xc6].apply(cpu);
@@ -2013,6 +2216,7 @@ const ADD_into_A_i_from_d8_i = (cpu: CPU): number => {
  * Unconditional function call to the absolute fixed address
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RST_to_A_i_from_00H_i = (cpu: CPU): number => {
   Instructions.map[0xc7].apply(cpu);
@@ -2023,6 +2227,7 @@ const RST_to_A_i_from_00H_i = (cpu: CPU): number => {
  * Return from a function.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RET_to_A_i__Z_i = (cpu: CPU): number => {
   Instructions.map[0xc8].apply(cpu);
@@ -2033,6 +2238,7 @@ const RET_to_A_i__Z_i = (cpu: CPU): number => {
  * Return from a function.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RET = (cpu: CPU): number => {
   Instructions.map[0xc9].apply(cpu);
@@ -2043,6 +2249,7 @@ const RET = (cpu: CPU): number => {
  * Unconditional jump to the absolute address specified by the 16-bit operand
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const JP_to_Z_i__a16_i = (cpu: CPU): number => {
   Instructions.map[0xca].apply(cpu);
@@ -2053,6 +2260,7 @@ const JP_to_Z_i__a16_i = (cpu: CPU): number => {
  * Execute a CB-prefixed instruction.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const PREFIX = (cpu: CPU): number => {
   Instructions.map[0xcb].apply(cpu);
@@ -2063,6 +2271,7 @@ const PREFIX = (cpu: CPU): number => {
  * Function call to the absolute address.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const CALL_to_Z_i_from_a16_i = (cpu: CPU): number => {
   Instructions.map[0xcc].apply(cpu);
@@ -2073,6 +2282,7 @@ const CALL_to_Z_i_from_a16_i = (cpu: CPU): number => {
  * Function call to the absolute address.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const CALL_to_A_i_from_a16_i = (cpu: CPU): number => {
   Instructions.map[0xcd].apply(cpu);
@@ -2083,6 +2293,7 @@ const CALL_to_A_i_from_a16_i = (cpu: CPU): number => {
  * Add with carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const ADC_into_A_i_from_d8_i = (cpu: CPU): number => {
   Instructions.map[0xce].apply(cpu);
@@ -2093,6 +2304,7 @@ const ADC_into_A_i_from_d8_i = (cpu: CPU): number => {
  * Unconditional function call to the absolute fixed address
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RST_to_A_i_from_08H_i = (cpu: CPU): number => {
   Instructions.map[0xcf].apply(cpu);
@@ -2103,6 +2315,7 @@ const RST_to_A_i_from_08H_i = (cpu: CPU): number => {
  * Return from a function.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RET_to_A_i__NC_i = (cpu: CPU): number => {
   Instructions.map[0xd0].apply(cpu);
@@ -2113,6 +2326,7 @@ const RET_to_A_i__NC_i = (cpu: CPU): number => {
  * Pops to the 16-bit register, data from the stack memory.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const POP_off_SP_into_DE_i = (cpu: CPU): number => {
   Instructions.map[0xd1].apply(cpu);
@@ -2123,6 +2337,7 @@ const POP_off_SP_into_DE_i = (cpu: CPU): number => {
  * Unconditional jump to the absolute address specified by the 16-bit operand
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const JP_to_NC_i__a16_i = (cpu: CPU): number => {
   Instructions.map[0xd2].apply(cpu);
@@ -2131,6 +2346,7 @@ const JP_to_NC_i__a16_i = (cpu: CPU): number => {
 
 /**
  * Invalid opcode.
+ * Affected flags:
  */
 const ILLEGAL_D3 = (cpu: CPU): number => {
   Instructions.map[0xd3].apply(cpu);
@@ -2141,6 +2357,7 @@ const ILLEGAL_D3 = (cpu: CPU): number => {
  * Function call to the absolute address.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const CALL_to_NC_i_from_a16_i = (cpu: CPU): number => {
   Instructions.map[0xd4].apply(cpu);
@@ -2151,6 +2368,7 @@ const CALL_to_NC_i_from_a16_i = (cpu: CPU): number => {
  * Push to the stack memory, data from the 16-bit register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const PUSH_onto_SP_register_DE_i = (cpu: CPU): number => {
   Instructions.map[0xd5].apply(cpu);
@@ -2161,6 +2379,7 @@ const PUSH_onto_SP_register_DE_i = (cpu: CPU): number => {
  * Subtract.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SUB_from_A_i_value_d8_i = (cpu: CPU): number => {
   Instructions.map[0xd6].apply(cpu);
@@ -2171,6 +2390,7 @@ const SUB_from_A_i_value_d8_i = (cpu: CPU): number => {
  * Unconditional function call to the absolute fixed address
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RST_to_A_i_from_10H_i = (cpu: CPU): number => {
   Instructions.map[0xd7].apply(cpu);
@@ -2181,6 +2401,7 @@ const RST_to_A_i_from_10H_i = (cpu: CPU): number => {
  * Return from a function.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RET_to_A_i__C_i = (cpu: CPU): number => {
   Instructions.map[0xd8].apply(cpu);
@@ -2191,6 +2412,7 @@ const RET_to_A_i__C_i = (cpu: CPU): number => {
  * Return from a function.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RETI = (cpu: CPU): number => {
   Instructions.map[0xd9].apply(cpu);
@@ -2201,6 +2423,7 @@ const RETI = (cpu: CPU): number => {
  * Unconditional jump to the absolute address specified by the 16-bit operand
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const JP_to_C_i__a16_i = (cpu: CPU): number => {
   Instructions.map[0xda].apply(cpu);
@@ -2209,6 +2432,7 @@ const JP_to_C_i__a16_i = (cpu: CPU): number => {
 
 /**
  * Invalid opcode.
+ * Affected flags:
  */
 const ILLEGAL_DB = (cpu: CPU): number => {
   Instructions.map[0xdb].apply(cpu);
@@ -2219,6 +2443,7 @@ const ILLEGAL_DB = (cpu: CPU): number => {
  * Function call to the absolute address.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const CALL_to_C_i_from_a16_i = (cpu: CPU): number => {
   Instructions.map[0xdc].apply(cpu);
@@ -2227,6 +2452,7 @@ const CALL_to_C_i_from_a16_i = (cpu: CPU): number => {
 
 /**
  * Invalid opcode.
+ * Affected flags:
  */
 const ILLEGAL_DD = (cpu: CPU): number => {
   Instructions.map[0xdd].apply(cpu);
@@ -2239,6 +2465,7 @@ const ILLEGAL_DD = (cpu: CPU): number => {
  * @returns - Number of system clock ticks used.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SBC_from_A_i_value_d8_i = (cpu: CPU): number => {
   Instructions.map[0xde].apply(cpu);
@@ -2249,6 +2476,7 @@ const SBC_from_A_i_value_d8_i = (cpu: CPU): number => {
  * Unconditional function call to the absolute fixed address
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RST_to_A_i_from_18H_i = (cpu: CPU): number => {
   Instructions.map[0xdf].apply(cpu);
@@ -2259,6 +2487,7 @@ const RST_to_A_i_from_18H_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LDH_into_a8_m_from_A_i = (cpu: CPU): number => {
   Instructions.map[0xe0].apply(cpu);
@@ -2269,6 +2498,7 @@ const LDH_into_a8_m_from_A_i = (cpu: CPU): number => {
  * Pops to the 16-bit register, data from the stack memory.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const POP_off_SP_into_HL_i = (cpu: CPU): number => {
   Instructions.map[0xe1].apply(cpu);
@@ -2279,6 +2509,7 @@ const POP_off_SP_into_HL_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_C_m_from_A_i = (cpu: CPU): number => {
   Instructions.map[0xe2].apply(cpu);
@@ -2287,6 +2518,7 @@ const LD_into_C_m_from_A_i = (cpu: CPU): number => {
 
 /**
  * Invalid opcode.
+ * Affected flags:
  */
 const ILLEGAL_E3 = (cpu: CPU): number => {
   Instructions.map[0xe3].apply(cpu);
@@ -2295,6 +2527,7 @@ const ILLEGAL_E3 = (cpu: CPU): number => {
 
 /**
  * Invalid opcode.
+ * Affected flags:
  */
 const ILLEGAL_E4 = (cpu: CPU): number => {
   Instructions.map[0xe4].apply(cpu);
@@ -2305,6 +2538,7 @@ const ILLEGAL_E4 = (cpu: CPU): number => {
  * Push to the stack memory, data from the 16-bit register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const PUSH_onto_SP_register_HL_i = (cpu: CPU): number => {
   Instructions.map[0xe5].apply(cpu);
@@ -2315,6 +2549,7 @@ const PUSH_onto_SP_register_HL_i = (cpu: CPU): number => {
  * Logical AND.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const AND_A_with_d8 = (cpu: CPU): number => {
   Instructions.map[0xe6].apply(cpu);
@@ -2325,6 +2560,7 @@ const AND_A_with_d8 = (cpu: CPU): number => {
  * Unconditional function call to the absolute fixed address
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RST_to_A_i_from_20H_i = (cpu: CPU): number => {
   Instructions.map[0xe7].apply(cpu);
@@ -2335,6 +2571,7 @@ const RST_to_A_i_from_20H_i = (cpu: CPU): number => {
  * Add.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const ADD_into_SP_i_from_r8_i = (cpu: CPU): number => {
   Instructions.map[0xe8].apply(cpu);
@@ -2345,6 +2582,7 @@ const ADD_into_SP_i_from_r8_i = (cpu: CPU): number => {
  * Unconditional jump to the absolute address specified by the 16-bit operand
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const JP_to_A_i__HL_i = (cpu: CPU): number => {
   Instructions.map[0xe9].apply(cpu);
@@ -2355,6 +2593,7 @@ const JP_to_A_i__HL_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_a16_m_from_A_i = (cpu: CPU): number => {
   Instructions.map[0xea].apply(cpu);
@@ -2363,6 +2602,7 @@ const LD_into_a16_m_from_A_i = (cpu: CPU): number => {
 
 /**
  * Invalid opcode.
+ * Affected flags:
  */
 const ILLEGAL_EB = (cpu: CPU): number => {
   Instructions.map[0xeb].apply(cpu);
@@ -2371,6 +2611,7 @@ const ILLEGAL_EB = (cpu: CPU): number => {
 
 /**
  * Invalid opcode.
+ * Affected flags:
  */
 const ILLEGAL_EC = (cpu: CPU): number => {
   Instructions.map[0xec].apply(cpu);
@@ -2379,6 +2620,7 @@ const ILLEGAL_EC = (cpu: CPU): number => {
 
 /**
  * Invalid opcode.
+ * Affected flags:
  */
 const ILLEGAL_ED = (cpu: CPU): number => {
   Instructions.map[0xed].apply(cpu);
@@ -2389,6 +2631,7 @@ const ILLEGAL_ED = (cpu: CPU): number => {
  * Logical XOR.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const XOR_A_with_d8 = (cpu: CPU): number => {
   Instructions.map[0xee].apply(cpu);
@@ -2399,6 +2642,7 @@ const XOR_A_with_d8 = (cpu: CPU): number => {
  * Unconditional function call to the absolute fixed address
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RST_to_A_i_from_28H_i = (cpu: CPU): number => {
   Instructions.map[0xef].apply(cpu);
@@ -2409,6 +2653,7 @@ const RST_to_A_i_from_28H_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LDH_into_A_i_from_a8_m = (cpu: CPU): number => {
   Instructions.map[0xf0].apply(cpu);
@@ -2419,6 +2664,7 @@ const LDH_into_A_i_from_a8_m = (cpu: CPU): number => {
  * Pops to the 16-bit register, data from the stack memory.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const POP_off_SP_into_AF_i = (cpu: CPU): number => {
   Instructions.map[0xf1].apply(cpu);
@@ -2429,6 +2675,7 @@ const POP_off_SP_into_AF_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_A_i_from_C_m = (cpu: CPU): number => {
   Instructions.map[0xf2].apply(cpu);
@@ -2439,6 +2686,7 @@ const LD_into_A_i_from_C_m = (cpu: CPU): number => {
  * Disables interrupt handling.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const DI = (cpu: CPU): number => {
   Instructions.map[0xf3].apply(cpu);
@@ -2447,6 +2695,7 @@ const DI = (cpu: CPU): number => {
 
 /**
  * Invalid opcode.
+ * Affected flags:
  */
 const ILLEGAL_F4 = (cpu: CPU): number => {
   Instructions.map[0xf4].apply(cpu);
@@ -2457,6 +2706,7 @@ const ILLEGAL_F4 = (cpu: CPU): number => {
  * Push to the stack memory, data from the 16-bit register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const PUSH_onto_SP_register_AF_i = (cpu: CPU): number => {
   Instructions.map[0xf5].apply(cpu);
@@ -2467,6 +2717,7 @@ const PUSH_onto_SP_register_AF_i = (cpu: CPU): number => {
  * Logical OR.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const OR_A_with_d8 = (cpu: CPU): number => {
   Instructions.map[0xf6].apply(cpu);
@@ -2477,6 +2728,7 @@ const OR_A_with_d8 = (cpu: CPU): number => {
  * Unconditional function call to the absolute fixed address
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RST_to_A_i_from_30H_i = (cpu: CPU): number => {
   Instructions.map[0xf7].apply(cpu);
@@ -2487,6 +2739,7 @@ const RST_to_A_i_from_30H_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const LD_into_HL_i_from_SP_incr_i = (cpu: CPU): number => {
   Instructions.map[0xf8].apply(cpu);
@@ -2497,6 +2750,7 @@ const LD_into_HL_i_from_SP_incr_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_SP_i_from_HL_i = (cpu: CPU): number => {
   Instructions.map[0xf9].apply(cpu);
@@ -2507,6 +2761,7 @@ const LD_into_SP_i_from_HL_i = (cpu: CPU): number => {
  * Load data into the register.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const LD_into_A_i_from_a16_m = (cpu: CPU): number => {
   Instructions.map[0xfa].apply(cpu);
@@ -2517,6 +2772,7 @@ const LD_into_A_i_from_a16_m = (cpu: CPU): number => {
  * Disables interrupt handling.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const EI = (cpu: CPU): number => {
   Instructions.map[0xfb].apply(cpu);
@@ -2525,6 +2781,7 @@ const EI = (cpu: CPU): number => {
 
 /**
  * Invalid opcode.
+ * Affected flags:
  */
 const ILLEGAL_FC = (cpu: CPU): number => {
   Instructions.map[0xfc].apply(cpu);
@@ -2533,6 +2790,7 @@ const ILLEGAL_FC = (cpu: CPU): number => {
 
 /**
  * Invalid opcode.
+ * Affected flags:
  */
 const ILLEGAL_FD = (cpu: CPU): number => {
   Instructions.map[0xfd].apply(cpu);
@@ -2543,6 +2801,7 @@ const ILLEGAL_FD = (cpu: CPU): number => {
  * Compare A with regiseter.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const CP_A_with_d8 = (cpu: CPU): number => {
   Instructions.map[0xfe].apply(cpu);
@@ -2553,6 +2812,7 @@ const CP_A_with_d8 = (cpu: CPU): number => {
  * Unconditional function call to the absolute fixed address
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RST_to_A_i_from_38H_i = (cpu: CPU): number => {
   Instructions.map[0xff].apply(cpu);
@@ -2563,6 +2823,7 @@ const RST_to_A_i_from_38H_i = (cpu: CPU): number => {
  * Rotate n left. Old bit 7 to Carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const RLC_B_i = (cpu: CPU): number => {
   Instructions.map[0x00].apply(cpu);
@@ -2573,6 +2834,7 @@ const RLC_B_i = (cpu: CPU): number => {
  * Rotate n left. Old bit 7 to Carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const RLC_C_i = (cpu: CPU): number => {
   Instructions.map[0x01].apply(cpu);
@@ -2583,6 +2845,7 @@ const RLC_C_i = (cpu: CPU): number => {
  * Rotate n left. Old bit 7 to Carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const RLC_D_i = (cpu: CPU): number => {
   Instructions.map[0x02].apply(cpu);
@@ -2593,6 +2856,7 @@ const RLC_D_i = (cpu: CPU): number => {
  * Rotate n left. Old bit 7 to Carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const RLC_E_i = (cpu: CPU): number => {
   Instructions.map[0x03].apply(cpu);
@@ -2603,6 +2867,7 @@ const RLC_E_i = (cpu: CPU): number => {
  * Rotate n left. Old bit 7 to Carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const RLC_H_i = (cpu: CPU): number => {
   Instructions.map[0x04].apply(cpu);
@@ -2613,6 +2878,7 @@ const RLC_H_i = (cpu: CPU): number => {
  * Rotate n left. Old bit 7 to Carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const RLC_L_i = (cpu: CPU): number => {
   Instructions.map[0x05].apply(cpu);
@@ -2623,6 +2889,7 @@ const RLC_L_i = (cpu: CPU): number => {
  * Rotate n left. Old bit 7 to Carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const RLC_HL_m = (cpu: CPU): number => {
   Instructions.map[0x06].apply(cpu);
@@ -2633,6 +2900,7 @@ const RLC_HL_m = (cpu: CPU): number => {
  * Rotate n left. Old bit 7 to Carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const RLC_A_i = (cpu: CPU): number => {
   Instructions.map[0x07].apply(cpu);
@@ -2643,6 +2911,7 @@ const RLC_A_i = (cpu: CPU): number => {
  * Rotate n right. Old bit 0 to Carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const RRC_B_i = (cpu: CPU): number => {
   Instructions.map[0x08].apply(cpu);
@@ -2653,6 +2922,7 @@ const RRC_B_i = (cpu: CPU): number => {
  * Rotate n right. Old bit 0 to Carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const RRC_C_i = (cpu: CPU): number => {
   Instructions.map[0x09].apply(cpu);
@@ -2663,6 +2933,7 @@ const RRC_C_i = (cpu: CPU): number => {
  * Rotate n right. Old bit 0 to Carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const RRC_D_i = (cpu: CPU): number => {
   Instructions.map[0x0a].apply(cpu);
@@ -2673,6 +2944,7 @@ const RRC_D_i = (cpu: CPU): number => {
  * Rotate n right. Old bit 0 to Carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const RRC_E_i = (cpu: CPU): number => {
   Instructions.map[0x0b].apply(cpu);
@@ -2683,6 +2955,7 @@ const RRC_E_i = (cpu: CPU): number => {
  * Rotate n right. Old bit 0 to Carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const RRC_H_i = (cpu: CPU): number => {
   Instructions.map[0x0c].apply(cpu);
@@ -2693,6 +2966,7 @@ const RRC_H_i = (cpu: CPU): number => {
  * Rotate n right. Old bit 0 to Carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const RRC_L_i = (cpu: CPU): number => {
   Instructions.map[0x0d].apply(cpu);
@@ -2703,6 +2977,7 @@ const RRC_L_i = (cpu: CPU): number => {
  * Rotate n right. Old bit 0 to Carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const RRC_HL_m = (cpu: CPU): number => {
   Instructions.map[0x0e].apply(cpu);
@@ -2713,6 +2988,7 @@ const RRC_HL_m = (cpu: CPU): number => {
  * Rotate n right. Old bit 0 to Carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const RRC_A_i = (cpu: CPU): number => {
   Instructions.map[0x0f].apply(cpu);
@@ -2720,80 +2996,96 @@ const RRC_A_i = (cpu: CPU): number => {
 };
 
 /**
- * Rotate n left through Carry flag.
- * @param - CPU class.
- * @returns - Number of system clock ticks used.
- */
+     * Rotate n left through Carry flag.
+     * @param - CPU class.
+     * @returns - Number of system clock ticks used.
+
+    * Affected flags: Z, N, H, C
+    */
 const RL_B_i = (cpu: CPU): number => {
   Instructions.map[0x10].apply(cpu);
   return 8;
 };
 
 /**
- * Rotate n left through Carry flag.
- * @param - CPU class.
- * @returns - Number of system clock ticks used.
- */
+     * Rotate n left through Carry flag.
+     * @param - CPU class.
+     * @returns - Number of system clock ticks used.
+
+    * Affected flags: Z, N, H, C
+    */
 const RL_C_i = (cpu: CPU): number => {
   Instructions.map[0x11].apply(cpu);
   return 8;
 };
 
 /**
- * Rotate n left through Carry flag.
- * @param - CPU class.
- * @returns - Number of system clock ticks used.
- */
+     * Rotate n left through Carry flag.
+     * @param - CPU class.
+     * @returns - Number of system clock ticks used.
+
+    * Affected flags: Z, N, H, C
+    */
 const RL_D_i = (cpu: CPU): number => {
   Instructions.map[0x12].apply(cpu);
   return 8;
 };
 
 /**
- * Rotate n left through Carry flag.
- * @param - CPU class.
- * @returns - Number of system clock ticks used.
- */
+     * Rotate n left through Carry flag.
+     * @param - CPU class.
+     * @returns - Number of system clock ticks used.
+
+    * Affected flags: Z, N, H, C
+    */
 const RL_E_i = (cpu: CPU): number => {
   Instructions.map[0x13].apply(cpu);
   return 8;
 };
 
 /**
- * Rotate n left through Carry flag.
- * @param - CPU class.
- * @returns - Number of system clock ticks used.
- */
+     * Rotate n left through Carry flag.
+     * @param - CPU class.
+     * @returns - Number of system clock ticks used.
+
+    * Affected flags: Z, N, H, C
+    */
 const RL_H_i = (cpu: CPU): number => {
   Instructions.map[0x14].apply(cpu);
   return 8;
 };
 
 /**
- * Rotate n left through Carry flag.
- * @param - CPU class.
- * @returns - Number of system clock ticks used.
- */
+     * Rotate n left through Carry flag.
+     * @param - CPU class.
+     * @returns - Number of system clock ticks used.
+
+    * Affected flags: Z, N, H, C
+    */
 const RL_L_i = (cpu: CPU): number => {
   Instructions.map[0x15].apply(cpu);
   return 8;
 };
 
 /**
- * Rotate n left through Carry flag.
- * @param - CPU class.
- * @returns - Number of system clock ticks used.
- */
+     * Rotate n left through Carry flag.
+     * @param - CPU class.
+     * @returns - Number of system clock ticks used.
+
+    * Affected flags: Z, N, H, C
+    */
 const RL_HL_m = (cpu: CPU): number => {
   Instructions.map[0x16].apply(cpu);
   return 16;
 };
 
 /**
- * Rotate n left through Carry flag.
- * @param - CPU class.
- * @returns - Number of system clock ticks used.
- */
+     * Rotate n left through Carry flag.
+     * @param - CPU class.
+     * @returns - Number of system clock ticks used.
+
+    * Affected flags: Z, N, H, C
+    */
 const RL_A_i = (cpu: CPU): number => {
   Instructions.map[0x17].apply(cpu);
   return 8;
@@ -2803,6 +3095,7 @@ const RL_A_i = (cpu: CPU): number => {
  * Rotate n right through Carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const RR_B_i = (cpu: CPU): number => {
   Instructions.map[0x18].apply(cpu);
@@ -2813,6 +3106,7 @@ const RR_B_i = (cpu: CPU): number => {
  * Rotate n right through Carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const RR_C_i = (cpu: CPU): number => {
   Instructions.map[0x19].apply(cpu);
@@ -2823,6 +3117,7 @@ const RR_C_i = (cpu: CPU): number => {
  * Rotate n right through Carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const RR_D_i = (cpu: CPU): number => {
   Instructions.map[0x1a].apply(cpu);
@@ -2833,6 +3128,7 @@ const RR_D_i = (cpu: CPU): number => {
  * Rotate n right through Carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const RR_E_i = (cpu: CPU): number => {
   Instructions.map[0x1b].apply(cpu);
@@ -2843,6 +3139,7 @@ const RR_E_i = (cpu: CPU): number => {
  * Rotate n right through Carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const RR_H_i = (cpu: CPU): number => {
   Instructions.map[0x1c].apply(cpu);
@@ -2853,6 +3150,7 @@ const RR_H_i = (cpu: CPU): number => {
  * Rotate n right through Carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const RR_L_i = (cpu: CPU): number => {
   Instructions.map[0x1d].apply(cpu);
@@ -2863,6 +3161,7 @@ const RR_L_i = (cpu: CPU): number => {
  * Rotate n right through Carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const RR_HL_m = (cpu: CPU): number => {
   Instructions.map[0x1e].apply(cpu);
@@ -2873,6 +3172,7 @@ const RR_HL_m = (cpu: CPU): number => {
  * Rotate n right through Carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const RR_A_i = (cpu: CPU): number => {
   Instructions.map[0x1f].apply(cpu);
@@ -2883,6 +3183,7 @@ const RR_A_i = (cpu: CPU): number => {
  * Shift n left into Carry. LSB of n set to 0.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SLA_B_i = (cpu: CPU): number => {
   Instructions.map[0x20].apply(cpu);
@@ -2893,6 +3194,7 @@ const SLA_B_i = (cpu: CPU): number => {
  * Shift n left into Carry. LSB of n set to 0.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SLA_C_i = (cpu: CPU): number => {
   Instructions.map[0x21].apply(cpu);
@@ -2903,6 +3205,7 @@ const SLA_C_i = (cpu: CPU): number => {
  * Shift n left into Carry. LSB of n set to 0.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SLA_D_i = (cpu: CPU): number => {
   Instructions.map[0x22].apply(cpu);
@@ -2913,6 +3216,7 @@ const SLA_D_i = (cpu: CPU): number => {
  * Shift n left into Carry. LSB of n set to 0.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SLA_E_i = (cpu: CPU): number => {
   Instructions.map[0x23].apply(cpu);
@@ -2923,6 +3227,7 @@ const SLA_E_i = (cpu: CPU): number => {
  * Shift n left into Carry. LSB of n set to 0.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SLA_H_i = (cpu: CPU): number => {
   Instructions.map[0x24].apply(cpu);
@@ -2933,6 +3238,7 @@ const SLA_H_i = (cpu: CPU): number => {
  * Shift n left into Carry. LSB of n set to 0.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SLA_L_i = (cpu: CPU): number => {
   Instructions.map[0x25].apply(cpu);
@@ -2943,6 +3249,7 @@ const SLA_L_i = (cpu: CPU): number => {
  * Shift n left into Carry. LSB of n set to 0.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SLA_HL_m = (cpu: CPU): number => {
   Instructions.map[0x26].apply(cpu);
@@ -2953,6 +3260,7 @@ const SLA_HL_m = (cpu: CPU): number => {
  * Shift n left into Carry. LSB of n set to 0.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SLA_A_i = (cpu: CPU): number => {
   Instructions.map[0x27].apply(cpu);
@@ -2963,6 +3271,7 @@ const SLA_A_i = (cpu: CPU): number => {
  * Shift n right into Carry. MSB doesn't change.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SRA_B_i = (cpu: CPU): number => {
   Instructions.map[0x28].apply(cpu);
@@ -2973,6 +3282,7 @@ const SRA_B_i = (cpu: CPU): number => {
  * Shift n right into Carry. MSB doesn't change.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SRA_C_i = (cpu: CPU): number => {
   Instructions.map[0x29].apply(cpu);
@@ -2983,6 +3293,7 @@ const SRA_C_i = (cpu: CPU): number => {
  * Shift n right into Carry. MSB doesn't change.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SRA_D_i = (cpu: CPU): number => {
   Instructions.map[0x2a].apply(cpu);
@@ -2993,6 +3304,7 @@ const SRA_D_i = (cpu: CPU): number => {
  * Shift n right into Carry. MSB doesn't change.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SRA_E_i = (cpu: CPU): number => {
   Instructions.map[0x2b].apply(cpu);
@@ -3003,6 +3315,7 @@ const SRA_E_i = (cpu: CPU): number => {
  * Shift n right into Carry. MSB doesn't change.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SRA_H_i = (cpu: CPU): number => {
   Instructions.map[0x2c].apply(cpu);
@@ -3013,6 +3326,7 @@ const SRA_H_i = (cpu: CPU): number => {
  * Shift n right into Carry. MSB doesn't change.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SRA_L_i = (cpu: CPU): number => {
   Instructions.map[0x2d].apply(cpu);
@@ -3023,6 +3337,7 @@ const SRA_L_i = (cpu: CPU): number => {
  * Shift n right into Carry. MSB doesn't change.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SRA_HL_m = (cpu: CPU): number => {
   Instructions.map[0x2e].apply(cpu);
@@ -3033,6 +3348,7 @@ const SRA_HL_m = (cpu: CPU): number => {
  * Shift n right into Carry. MSB doesn't change.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SRA_A_i = (cpu: CPU): number => {
   Instructions.map[0x2f].apply(cpu);
@@ -3043,6 +3359,7 @@ const SRA_A_i = (cpu: CPU): number => {
  * Swap upper and lower nibbles.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SWAP_B_i = (cpu: CPU): number => {
   Instructions.map[0x30].apply(cpu);
@@ -3053,6 +3370,7 @@ const SWAP_B_i = (cpu: CPU): number => {
  * Swap upper and lower nibbles.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SWAP_C_i = (cpu: CPU): number => {
   Instructions.map[0x31].apply(cpu);
@@ -3063,6 +3381,7 @@ const SWAP_C_i = (cpu: CPU): number => {
  * Swap upper and lower nibbles.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SWAP_D_i = (cpu: CPU): number => {
   Instructions.map[0x32].apply(cpu);
@@ -3073,6 +3392,7 @@ const SWAP_D_i = (cpu: CPU): number => {
  * Swap upper and lower nibbles.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SWAP_E_i = (cpu: CPU): number => {
   Instructions.map[0x33].apply(cpu);
@@ -3083,6 +3403,7 @@ const SWAP_E_i = (cpu: CPU): number => {
  * Swap upper and lower nibbles.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SWAP_H_i = (cpu: CPU): number => {
   Instructions.map[0x34].apply(cpu);
@@ -3093,6 +3414,7 @@ const SWAP_H_i = (cpu: CPU): number => {
  * Swap upper and lower nibbles.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SWAP_L_i = (cpu: CPU): number => {
   Instructions.map[0x35].apply(cpu);
@@ -3103,6 +3425,7 @@ const SWAP_L_i = (cpu: CPU): number => {
  * Swap upper and lower nibbles.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SWAP_HL_m = (cpu: CPU): number => {
   Instructions.map[0x36].apply(cpu);
@@ -3113,6 +3436,7 @@ const SWAP_HL_m = (cpu: CPU): number => {
  * Swap upper and lower nibbles.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SWAP_A_i = (cpu: CPU): number => {
   Instructions.map[0x37].apply(cpu);
@@ -3123,6 +3447,7 @@ const SWAP_A_i = (cpu: CPU): number => {
  * Shift n right into Carry. MSB set to 0.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SRL_B_i = (cpu: CPU): number => {
   Instructions.map[0x38].apply(cpu);
@@ -3133,6 +3458,7 @@ const SRL_B_i = (cpu: CPU): number => {
  * Shift n right into Carry. MSB set to 0.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SRL_C_i = (cpu: CPU): number => {
   Instructions.map[0x39].apply(cpu);
@@ -3143,6 +3469,7 @@ const SRL_C_i = (cpu: CPU): number => {
  * Shift n right into Carry. MSB set to 0.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SRL_D_i = (cpu: CPU): number => {
   Instructions.map[0x3a].apply(cpu);
@@ -3153,6 +3480,7 @@ const SRL_D_i = (cpu: CPU): number => {
  * Shift n right into Carry. MSB set to 0.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SRL_E_i = (cpu: CPU): number => {
   Instructions.map[0x3b].apply(cpu);
@@ -3163,6 +3491,7 @@ const SRL_E_i = (cpu: CPU): number => {
  * Shift n right into Carry. MSB set to 0.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SRL_H_i = (cpu: CPU): number => {
   Instructions.map[0x3c].apply(cpu);
@@ -3173,6 +3502,7 @@ const SRL_H_i = (cpu: CPU): number => {
  * Shift n right into Carry. MSB set to 0.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SRL_L_i = (cpu: CPU): number => {
   Instructions.map[0x3d].apply(cpu);
@@ -3183,6 +3513,7 @@ const SRL_L_i = (cpu: CPU): number => {
  * Shift n right into Carry. MSB set to 0.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SRL_HL_m = (cpu: CPU): number => {
   Instructions.map[0x3e].apply(cpu);
@@ -3193,6 +3524,7 @@ const SRL_HL_m = (cpu: CPU): number => {
  * Shift n right into Carry. MSB set to 0.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H, C
  */
 const SRL_A_i = (cpu: CPU): number => {
   Instructions.map[0x3f].apply(cpu);
@@ -3203,6 +3535,7 @@ const SRL_A_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_0_i_of_B_i = (cpu: CPU): number => {
   Instructions.map[0x40].apply(cpu);
@@ -3213,6 +3546,7 @@ const BIT_test_0_i_of_B_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_0_i_of_C_i = (cpu: CPU): number => {
   Instructions.map[0x41].apply(cpu);
@@ -3223,6 +3557,7 @@ const BIT_test_0_i_of_C_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_0_i_of_D_i = (cpu: CPU): number => {
   Instructions.map[0x42].apply(cpu);
@@ -3233,6 +3568,7 @@ const BIT_test_0_i_of_D_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_0_i_of_E_i = (cpu: CPU): number => {
   Instructions.map[0x43].apply(cpu);
@@ -3243,6 +3579,7 @@ const BIT_test_0_i_of_E_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_0_i_of_H_i = (cpu: CPU): number => {
   Instructions.map[0x44].apply(cpu);
@@ -3253,6 +3590,7 @@ const BIT_test_0_i_of_H_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_0_i_of_L_i = (cpu: CPU): number => {
   Instructions.map[0x45].apply(cpu);
@@ -3263,6 +3601,7 @@ const BIT_test_0_i_of_L_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_0_i_of_HL_m = (cpu: CPU): number => {
   Instructions.map[0x46].apply(cpu);
@@ -3273,6 +3612,7 @@ const BIT_test_0_i_of_HL_m = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_0_i_of_A_i = (cpu: CPU): number => {
   Instructions.map[0x47].apply(cpu);
@@ -3283,6 +3623,7 @@ const BIT_test_0_i_of_A_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_1_i_of_B_i = (cpu: CPU): number => {
   Instructions.map[0x48].apply(cpu);
@@ -3293,6 +3634,7 @@ const BIT_test_1_i_of_B_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_1_i_of_C_i = (cpu: CPU): number => {
   Instructions.map[0x49].apply(cpu);
@@ -3303,6 +3645,7 @@ const BIT_test_1_i_of_C_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_1_i_of_D_i = (cpu: CPU): number => {
   Instructions.map[0x4a].apply(cpu);
@@ -3313,6 +3656,7 @@ const BIT_test_1_i_of_D_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_1_i_of_E_i = (cpu: CPU): number => {
   Instructions.map[0x4b].apply(cpu);
@@ -3323,6 +3667,7 @@ const BIT_test_1_i_of_E_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_1_i_of_H_i = (cpu: CPU): number => {
   Instructions.map[0x4c].apply(cpu);
@@ -3333,6 +3678,7 @@ const BIT_test_1_i_of_H_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_1_i_of_L_i = (cpu: CPU): number => {
   Instructions.map[0x4d].apply(cpu);
@@ -3343,6 +3689,7 @@ const BIT_test_1_i_of_L_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_1_i_of_HL_m = (cpu: CPU): number => {
   Instructions.map[0x4e].apply(cpu);
@@ -3353,6 +3700,7 @@ const BIT_test_1_i_of_HL_m = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_1_i_of_A_i = (cpu: CPU): number => {
   Instructions.map[0x4f].apply(cpu);
@@ -3363,6 +3711,7 @@ const BIT_test_1_i_of_A_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_2_i_of_B_i = (cpu: CPU): number => {
   Instructions.map[0x50].apply(cpu);
@@ -3373,6 +3722,7 @@ const BIT_test_2_i_of_B_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_2_i_of_C_i = (cpu: CPU): number => {
   Instructions.map[0x51].apply(cpu);
@@ -3383,6 +3733,7 @@ const BIT_test_2_i_of_C_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_2_i_of_D_i = (cpu: CPU): number => {
   Instructions.map[0x52].apply(cpu);
@@ -3393,6 +3744,7 @@ const BIT_test_2_i_of_D_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_2_i_of_E_i = (cpu: CPU): number => {
   Instructions.map[0x53].apply(cpu);
@@ -3403,6 +3755,7 @@ const BIT_test_2_i_of_E_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_2_i_of_H_i = (cpu: CPU): number => {
   Instructions.map[0x54].apply(cpu);
@@ -3413,6 +3766,7 @@ const BIT_test_2_i_of_H_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_2_i_of_L_i = (cpu: CPU): number => {
   Instructions.map[0x55].apply(cpu);
@@ -3423,6 +3777,7 @@ const BIT_test_2_i_of_L_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_2_i_of_HL_m = (cpu: CPU): number => {
   Instructions.map[0x56].apply(cpu);
@@ -3433,6 +3788,7 @@ const BIT_test_2_i_of_HL_m = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_2_i_of_A_i = (cpu: CPU): number => {
   Instructions.map[0x57].apply(cpu);
@@ -3443,6 +3799,7 @@ const BIT_test_2_i_of_A_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_3_i_of_B_i = (cpu: CPU): number => {
   Instructions.map[0x58].apply(cpu);
@@ -3453,6 +3810,7 @@ const BIT_test_3_i_of_B_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_3_i_of_C_i = (cpu: CPU): number => {
   Instructions.map[0x59].apply(cpu);
@@ -3463,6 +3821,7 @@ const BIT_test_3_i_of_C_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_3_i_of_D_i = (cpu: CPU): number => {
   Instructions.map[0x5a].apply(cpu);
@@ -3473,6 +3832,7 @@ const BIT_test_3_i_of_D_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_3_i_of_E_i = (cpu: CPU): number => {
   Instructions.map[0x5b].apply(cpu);
@@ -3483,6 +3843,7 @@ const BIT_test_3_i_of_E_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_3_i_of_H_i = (cpu: CPU): number => {
   Instructions.map[0x5c].apply(cpu);
@@ -3493,6 +3854,7 @@ const BIT_test_3_i_of_H_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_3_i_of_L_i = (cpu: CPU): number => {
   Instructions.map[0x5d].apply(cpu);
@@ -3503,6 +3865,7 @@ const BIT_test_3_i_of_L_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_3_i_of_HL_m = (cpu: CPU): number => {
   Instructions.map[0x5e].apply(cpu);
@@ -3513,6 +3876,7 @@ const BIT_test_3_i_of_HL_m = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_3_i_of_A_i = (cpu: CPU): number => {
   Instructions.map[0x5f].apply(cpu);
@@ -3523,6 +3887,7 @@ const BIT_test_3_i_of_A_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_4_i_of_B_i = (cpu: CPU): number => {
   Instructions.map[0x60].apply(cpu);
@@ -3533,6 +3898,7 @@ const BIT_test_4_i_of_B_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_4_i_of_C_i = (cpu: CPU): number => {
   Instructions.map[0x61].apply(cpu);
@@ -3543,6 +3909,7 @@ const BIT_test_4_i_of_C_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_4_i_of_D_i = (cpu: CPU): number => {
   Instructions.map[0x62].apply(cpu);
@@ -3553,6 +3920,7 @@ const BIT_test_4_i_of_D_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_4_i_of_E_i = (cpu: CPU): number => {
   Instructions.map[0x63].apply(cpu);
@@ -3563,6 +3931,7 @@ const BIT_test_4_i_of_E_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_4_i_of_H_i = (cpu: CPU): number => {
   Instructions.map[0x64].apply(cpu);
@@ -3573,6 +3942,7 @@ const BIT_test_4_i_of_H_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_4_i_of_L_i = (cpu: CPU): number => {
   Instructions.map[0x65].apply(cpu);
@@ -3583,6 +3953,7 @@ const BIT_test_4_i_of_L_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_4_i_of_HL_m = (cpu: CPU): number => {
   Instructions.map[0x66].apply(cpu);
@@ -3593,6 +3964,7 @@ const BIT_test_4_i_of_HL_m = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_4_i_of_A_i = (cpu: CPU): number => {
   Instructions.map[0x67].apply(cpu);
@@ -3603,6 +3975,7 @@ const BIT_test_4_i_of_A_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_5_i_of_B_i = (cpu: CPU): number => {
   Instructions.map[0x68].apply(cpu);
@@ -3613,6 +3986,7 @@ const BIT_test_5_i_of_B_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_5_i_of_C_i = (cpu: CPU): number => {
   Instructions.map[0x69].apply(cpu);
@@ -3623,6 +3997,7 @@ const BIT_test_5_i_of_C_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_5_i_of_D_i = (cpu: CPU): number => {
   Instructions.map[0x6a].apply(cpu);
@@ -3633,6 +4008,7 @@ const BIT_test_5_i_of_D_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_5_i_of_E_i = (cpu: CPU): number => {
   Instructions.map[0x6b].apply(cpu);
@@ -3643,6 +4019,7 @@ const BIT_test_5_i_of_E_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_5_i_of_H_i = (cpu: CPU): number => {
   Instructions.map[0x6c].apply(cpu);
@@ -3653,6 +4030,7 @@ const BIT_test_5_i_of_H_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_5_i_of_L_i = (cpu: CPU): number => {
   Instructions.map[0x6d].apply(cpu);
@@ -3663,6 +4041,7 @@ const BIT_test_5_i_of_L_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_5_i_of_HL_m = (cpu: CPU): number => {
   Instructions.map[0x6e].apply(cpu);
@@ -3673,6 +4052,7 @@ const BIT_test_5_i_of_HL_m = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_5_i_of_A_i = (cpu: CPU): number => {
   Instructions.map[0x6f].apply(cpu);
@@ -3683,6 +4063,7 @@ const BIT_test_5_i_of_A_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_6_i_of_B_i = (cpu: CPU): number => {
   Instructions.map[0x70].apply(cpu);
@@ -3693,6 +4074,7 @@ const BIT_test_6_i_of_B_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_6_i_of_C_i = (cpu: CPU): number => {
   Instructions.map[0x71].apply(cpu);
@@ -3703,6 +4085,7 @@ const BIT_test_6_i_of_C_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_6_i_of_D_i = (cpu: CPU): number => {
   Instructions.map[0x72].apply(cpu);
@@ -3713,6 +4096,7 @@ const BIT_test_6_i_of_D_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_6_i_of_E_i = (cpu: CPU): number => {
   Instructions.map[0x73].apply(cpu);
@@ -3723,6 +4107,7 @@ const BIT_test_6_i_of_E_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_6_i_of_H_i = (cpu: CPU): number => {
   Instructions.map[0x74].apply(cpu);
@@ -3733,6 +4118,7 @@ const BIT_test_6_i_of_H_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_6_i_of_L_i = (cpu: CPU): number => {
   Instructions.map[0x75].apply(cpu);
@@ -3743,6 +4129,7 @@ const BIT_test_6_i_of_L_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_6_i_of_HL_m = (cpu: CPU): number => {
   Instructions.map[0x76].apply(cpu);
@@ -3753,6 +4140,7 @@ const BIT_test_6_i_of_HL_m = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_6_i_of_A_i = (cpu: CPU): number => {
   Instructions.map[0x77].apply(cpu);
@@ -3763,6 +4151,7 @@ const BIT_test_6_i_of_A_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_7_i_of_B_i = (cpu: CPU): number => {
   Instructions.map[0x78].apply(cpu);
@@ -3773,6 +4162,7 @@ const BIT_test_7_i_of_B_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_7_i_of_C_i = (cpu: CPU): number => {
   Instructions.map[0x79].apply(cpu);
@@ -3783,6 +4173,7 @@ const BIT_test_7_i_of_C_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_7_i_of_D_i = (cpu: CPU): number => {
   Instructions.map[0x7a].apply(cpu);
@@ -3793,6 +4184,7 @@ const BIT_test_7_i_of_D_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_7_i_of_E_i = (cpu: CPU): number => {
   Instructions.map[0x7b].apply(cpu);
@@ -3803,6 +4195,7 @@ const BIT_test_7_i_of_E_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_7_i_of_H_i = (cpu: CPU): number => {
   Instructions.map[0x7c].apply(cpu);
@@ -3813,6 +4206,7 @@ const BIT_test_7_i_of_H_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_7_i_of_L_i = (cpu: CPU): number => {
   Instructions.map[0x7d].apply(cpu);
@@ -3823,6 +4217,7 @@ const BIT_test_7_i_of_L_i = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_7_i_of_HL_m = (cpu: CPU): number => {
   Instructions.map[0x7e].apply(cpu);
@@ -3833,6 +4228,7 @@ const BIT_test_7_i_of_HL_m = (cpu: CPU): number => {
  * Test bit in register
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags: Z, N, H
  */
 const BIT_test_7_i_of_A_i = (cpu: CPU): number => {
   Instructions.map[0x7f].apply(cpu);
@@ -3843,6 +4239,7 @@ const BIT_test_7_i_of_A_i = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit0_of_B = (cpu: CPU): number => {
   Instructions.map[0x80].apply(cpu);
@@ -3853,6 +4250,7 @@ const RES_bit0_of_B = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit0_of_C = (cpu: CPU): number => {
   Instructions.map[0x81].apply(cpu);
@@ -3863,6 +4261,7 @@ const RES_bit0_of_C = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit0_of_D = (cpu: CPU): number => {
   Instructions.map[0x82].apply(cpu);
@@ -3873,6 +4272,7 @@ const RES_bit0_of_D = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit0_of_E = (cpu: CPU): number => {
   Instructions.map[0x83].apply(cpu);
@@ -3883,6 +4283,7 @@ const RES_bit0_of_E = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit0_of_H = (cpu: CPU): number => {
   Instructions.map[0x84].apply(cpu);
@@ -3893,6 +4294,7 @@ const RES_bit0_of_H = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit0_of_L = (cpu: CPU): number => {
   Instructions.map[0x85].apply(cpu);
@@ -3903,6 +4305,7 @@ const RES_bit0_of_L = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit0_of_HL = (cpu: CPU): number => {
   Instructions.map[0x86].apply(cpu);
@@ -3913,6 +4316,7 @@ const RES_bit0_of_HL = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit0_of_A = (cpu: CPU): number => {
   Instructions.map[0x87].apply(cpu);
@@ -3923,6 +4327,7 @@ const RES_bit0_of_A = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit1_of_B = (cpu: CPU): number => {
   Instructions.map[0x88].apply(cpu);
@@ -3933,6 +4338,7 @@ const RES_bit1_of_B = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit1_of_C = (cpu: CPU): number => {
   Instructions.map[0x89].apply(cpu);
@@ -3943,6 +4349,7 @@ const RES_bit1_of_C = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit1_of_D = (cpu: CPU): number => {
   Instructions.map[0x8a].apply(cpu);
@@ -3953,6 +4360,7 @@ const RES_bit1_of_D = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit1_of_E = (cpu: CPU): number => {
   Instructions.map[0x8b].apply(cpu);
@@ -3963,6 +4371,7 @@ const RES_bit1_of_E = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit1_of_H = (cpu: CPU): number => {
   Instructions.map[0x8c].apply(cpu);
@@ -3973,6 +4382,7 @@ const RES_bit1_of_H = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit1_of_L = (cpu: CPU): number => {
   Instructions.map[0x8d].apply(cpu);
@@ -3983,6 +4393,7 @@ const RES_bit1_of_L = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit1_of_HL = (cpu: CPU): number => {
   Instructions.map[0x8e].apply(cpu);
@@ -3993,6 +4404,7 @@ const RES_bit1_of_HL = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit1_of_A = (cpu: CPU): number => {
   Instructions.map[0x8f].apply(cpu);
@@ -4003,6 +4415,7 @@ const RES_bit1_of_A = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit2_of_B = (cpu: CPU): number => {
   Instructions.map[0x90].apply(cpu);
@@ -4013,6 +4426,7 @@ const RES_bit2_of_B = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit2_of_C = (cpu: CPU): number => {
   Instructions.map[0x91].apply(cpu);
@@ -4023,6 +4437,7 @@ const RES_bit2_of_C = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit2_of_D = (cpu: CPU): number => {
   Instructions.map[0x92].apply(cpu);
@@ -4033,6 +4448,7 @@ const RES_bit2_of_D = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit2_of_E = (cpu: CPU): number => {
   Instructions.map[0x93].apply(cpu);
@@ -4043,6 +4459,7 @@ const RES_bit2_of_E = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit2_of_H = (cpu: CPU): number => {
   Instructions.map[0x94].apply(cpu);
@@ -4053,6 +4470,7 @@ const RES_bit2_of_H = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit2_of_L = (cpu: CPU): number => {
   Instructions.map[0x95].apply(cpu);
@@ -4063,6 +4481,7 @@ const RES_bit2_of_L = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit2_of_HL = (cpu: CPU): number => {
   Instructions.map[0x96].apply(cpu);
@@ -4073,6 +4492,7 @@ const RES_bit2_of_HL = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit2_of_A = (cpu: CPU): number => {
   Instructions.map[0x97].apply(cpu);
@@ -4083,6 +4503,7 @@ const RES_bit2_of_A = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit3_of_B = (cpu: CPU): number => {
   Instructions.map[0x98].apply(cpu);
@@ -4093,6 +4514,7 @@ const RES_bit3_of_B = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit3_of_C = (cpu: CPU): number => {
   Instructions.map[0x99].apply(cpu);
@@ -4103,6 +4525,7 @@ const RES_bit3_of_C = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit3_of_D = (cpu: CPU): number => {
   Instructions.map[0x9a].apply(cpu);
@@ -4113,6 +4536,7 @@ const RES_bit3_of_D = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit3_of_E = (cpu: CPU): number => {
   Instructions.map[0x9b].apply(cpu);
@@ -4123,6 +4547,7 @@ const RES_bit3_of_E = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit3_of_H = (cpu: CPU): number => {
   Instructions.map[0x9c].apply(cpu);
@@ -4133,6 +4558,7 @@ const RES_bit3_of_H = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit3_of_L = (cpu: CPU): number => {
   Instructions.map[0x9d].apply(cpu);
@@ -4143,6 +4569,7 @@ const RES_bit3_of_L = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit3_of_HL = (cpu: CPU): number => {
   Instructions.map[0x9e].apply(cpu);
@@ -4153,6 +4580,7 @@ const RES_bit3_of_HL = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit3_of_A = (cpu: CPU): number => {
   Instructions.map[0x9f].apply(cpu);
@@ -4163,6 +4591,7 @@ const RES_bit3_of_A = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit4_of_B = (cpu: CPU): number => {
   Instructions.map[0xa0].apply(cpu);
@@ -4173,6 +4602,7 @@ const RES_bit4_of_B = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit4_of_C = (cpu: CPU): number => {
   Instructions.map[0xa1].apply(cpu);
@@ -4183,6 +4613,7 @@ const RES_bit4_of_C = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit4_of_D = (cpu: CPU): number => {
   Instructions.map[0xa2].apply(cpu);
@@ -4193,6 +4624,7 @@ const RES_bit4_of_D = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit4_of_E = (cpu: CPU): number => {
   Instructions.map[0xa3].apply(cpu);
@@ -4203,6 +4635,7 @@ const RES_bit4_of_E = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit4_of_H = (cpu: CPU): number => {
   Instructions.map[0xa4].apply(cpu);
@@ -4213,6 +4646,7 @@ const RES_bit4_of_H = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit4_of_L = (cpu: CPU): number => {
   Instructions.map[0xa5].apply(cpu);
@@ -4223,6 +4657,7 @@ const RES_bit4_of_L = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit4_of_HL = (cpu: CPU): number => {
   Instructions.map[0xa6].apply(cpu);
@@ -4233,6 +4668,7 @@ const RES_bit4_of_HL = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit4_of_A = (cpu: CPU): number => {
   Instructions.map[0xa7].apply(cpu);
@@ -4243,6 +4679,7 @@ const RES_bit4_of_A = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit5_of_B = (cpu: CPU): number => {
   Instructions.map[0xa8].apply(cpu);
@@ -4253,6 +4690,7 @@ const RES_bit5_of_B = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit5_of_C = (cpu: CPU): number => {
   Instructions.map[0xa9].apply(cpu);
@@ -4263,6 +4701,7 @@ const RES_bit5_of_C = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit5_of_D = (cpu: CPU): number => {
   Instructions.map[0xaa].apply(cpu);
@@ -4273,6 +4712,7 @@ const RES_bit5_of_D = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit5_of_E = (cpu: CPU): number => {
   Instructions.map[0xab].apply(cpu);
@@ -4283,6 +4723,7 @@ const RES_bit5_of_E = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit5_of_H = (cpu: CPU): number => {
   Instructions.map[0xac].apply(cpu);
@@ -4293,6 +4734,7 @@ const RES_bit5_of_H = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit5_of_L = (cpu: CPU): number => {
   Instructions.map[0xad].apply(cpu);
@@ -4303,6 +4745,7 @@ const RES_bit5_of_L = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit5_of_HL = (cpu: CPU): number => {
   Instructions.map[0xae].apply(cpu);
@@ -4313,6 +4756,7 @@ const RES_bit5_of_HL = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit5_of_A = (cpu: CPU): number => {
   Instructions.map[0xaf].apply(cpu);
@@ -4323,6 +4767,7 @@ const RES_bit5_of_A = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit6_of_B = (cpu: CPU): number => {
   Instructions.map[0xb0].apply(cpu);
@@ -4333,6 +4778,7 @@ const RES_bit6_of_B = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit6_of_C = (cpu: CPU): number => {
   Instructions.map[0xb1].apply(cpu);
@@ -4343,6 +4789,7 @@ const RES_bit6_of_C = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit6_of_D = (cpu: CPU): number => {
   Instructions.map[0xb2].apply(cpu);
@@ -4353,6 +4800,7 @@ const RES_bit6_of_D = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit6_of_E = (cpu: CPU): number => {
   Instructions.map[0xb3].apply(cpu);
@@ -4363,6 +4811,7 @@ const RES_bit6_of_E = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit6_of_H = (cpu: CPU): number => {
   Instructions.map[0xb4].apply(cpu);
@@ -4373,6 +4822,7 @@ const RES_bit6_of_H = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit6_of_L = (cpu: CPU): number => {
   Instructions.map[0xb5].apply(cpu);
@@ -4383,6 +4833,7 @@ const RES_bit6_of_L = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit6_of_HL = (cpu: CPU): number => {
   Instructions.map[0xb6].apply(cpu);
@@ -4393,6 +4844,7 @@ const RES_bit6_of_HL = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit6_of_A = (cpu: CPU): number => {
   Instructions.map[0xb7].apply(cpu);
@@ -4403,6 +4855,7 @@ const RES_bit6_of_A = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit7_of_B = (cpu: CPU): number => {
   Instructions.map[0xb8].apply(cpu);
@@ -4413,6 +4866,7 @@ const RES_bit7_of_B = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit7_of_C = (cpu: CPU): number => {
   Instructions.map[0xb9].apply(cpu);
@@ -4423,6 +4877,7 @@ const RES_bit7_of_C = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit7_of_D = (cpu: CPU): number => {
   Instructions.map[0xba].apply(cpu);
@@ -4433,6 +4888,7 @@ const RES_bit7_of_D = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit7_of_E = (cpu: CPU): number => {
   Instructions.map[0xbb].apply(cpu);
@@ -4443,6 +4899,7 @@ const RES_bit7_of_E = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit7_of_H = (cpu: CPU): number => {
   Instructions.map[0xbc].apply(cpu);
@@ -4453,6 +4910,7 @@ const RES_bit7_of_H = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit7_of_L = (cpu: CPU): number => {
   Instructions.map[0xbd].apply(cpu);
@@ -4463,6 +4921,7 @@ const RES_bit7_of_L = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit7_of_HL = (cpu: CPU): number => {
   Instructions.map[0xbe].apply(cpu);
@@ -4473,6 +4932,7 @@ const RES_bit7_of_HL = (cpu: CPU): number => {
  * Reset bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const RES_bit7_of_A = (cpu: CPU): number => {
   Instructions.map[0xbf].apply(cpu);
@@ -4483,6 +4943,7 @@ const RES_bit7_of_A = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit0_of_B = (cpu: CPU): number => {
   Instructions.map[0xc0].apply(cpu);
@@ -4493,6 +4954,7 @@ const SET_bit0_of_B = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit0_of_C = (cpu: CPU): number => {
   Instructions.map[0xc1].apply(cpu);
@@ -4503,6 +4965,7 @@ const SET_bit0_of_C = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit0_of_D = (cpu: CPU): number => {
   Instructions.map[0xc2].apply(cpu);
@@ -4513,6 +4976,7 @@ const SET_bit0_of_D = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit0_of_E = (cpu: CPU): number => {
   Instructions.map[0xc3].apply(cpu);
@@ -4523,6 +4987,7 @@ const SET_bit0_of_E = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit0_of_H = (cpu: CPU): number => {
   Instructions.map[0xc4].apply(cpu);
@@ -4533,6 +4998,7 @@ const SET_bit0_of_H = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit0_of_L = (cpu: CPU): number => {
   Instructions.map[0xc5].apply(cpu);
@@ -4543,6 +5009,7 @@ const SET_bit0_of_L = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit0_of_HL = (cpu: CPU): number => {
   Instructions.map[0xc6].apply(cpu);
@@ -4553,6 +5020,7 @@ const SET_bit0_of_HL = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit0_of_A = (cpu: CPU): number => {
   Instructions.map[0xc7].apply(cpu);
@@ -4563,6 +5031,7 @@ const SET_bit0_of_A = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit1_of_B = (cpu: CPU): number => {
   Instructions.map[0xc8].apply(cpu);
@@ -4573,6 +5042,7 @@ const SET_bit1_of_B = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit1_of_C = (cpu: CPU): number => {
   Instructions.map[0xc9].apply(cpu);
@@ -4583,6 +5053,7 @@ const SET_bit1_of_C = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit1_of_D = (cpu: CPU): number => {
   Instructions.map[0xca].apply(cpu);
@@ -4593,6 +5064,7 @@ const SET_bit1_of_D = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit1_of_E = (cpu: CPU): number => {
   Instructions.map[0xcb].apply(cpu);
@@ -4603,6 +5075,7 @@ const SET_bit1_of_E = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit1_of_H = (cpu: CPU): number => {
   Instructions.map[0xcc].apply(cpu);
@@ -4613,6 +5086,7 @@ const SET_bit1_of_H = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit1_of_L = (cpu: CPU): number => {
   Instructions.map[0xcd].apply(cpu);
@@ -4623,6 +5097,7 @@ const SET_bit1_of_L = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit1_of_HL = (cpu: CPU): number => {
   Instructions.map[0xce].apply(cpu);
@@ -4633,6 +5108,7 @@ const SET_bit1_of_HL = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit1_of_A = (cpu: CPU): number => {
   Instructions.map[0xcf].apply(cpu);
@@ -4643,6 +5119,7 @@ const SET_bit1_of_A = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit2_of_B = (cpu: CPU): number => {
   Instructions.map[0xd0].apply(cpu);
@@ -4653,6 +5130,7 @@ const SET_bit2_of_B = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit2_of_C = (cpu: CPU): number => {
   Instructions.map[0xd1].apply(cpu);
@@ -4663,6 +5141,7 @@ const SET_bit2_of_C = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit2_of_D = (cpu: CPU): number => {
   Instructions.map[0xd2].apply(cpu);
@@ -4673,6 +5152,7 @@ const SET_bit2_of_D = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit2_of_E = (cpu: CPU): number => {
   Instructions.map[0xd3].apply(cpu);
@@ -4683,6 +5163,7 @@ const SET_bit2_of_E = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit2_of_H = (cpu: CPU): number => {
   Instructions.map[0xd4].apply(cpu);
@@ -4693,6 +5174,7 @@ const SET_bit2_of_H = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit2_of_L = (cpu: CPU): number => {
   Instructions.map[0xd5].apply(cpu);
@@ -4703,6 +5185,7 @@ const SET_bit2_of_L = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit2_of_HL = (cpu: CPU): number => {
   Instructions.map[0xd6].apply(cpu);
@@ -4713,6 +5196,7 @@ const SET_bit2_of_HL = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit2_of_A = (cpu: CPU): number => {
   Instructions.map[0xd7].apply(cpu);
@@ -4723,6 +5207,7 @@ const SET_bit2_of_A = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit3_of_B = (cpu: CPU): number => {
   Instructions.map[0xd8].apply(cpu);
@@ -4733,6 +5218,7 @@ const SET_bit3_of_B = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit3_of_C = (cpu: CPU): number => {
   Instructions.map[0xd9].apply(cpu);
@@ -4743,6 +5229,7 @@ const SET_bit3_of_C = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit3_of_D = (cpu: CPU): number => {
   Instructions.map[0xda].apply(cpu);
@@ -4753,6 +5240,7 @@ const SET_bit3_of_D = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit3_of_E = (cpu: CPU): number => {
   Instructions.map[0xdb].apply(cpu);
@@ -4763,6 +5251,7 @@ const SET_bit3_of_E = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit3_of_H = (cpu: CPU): number => {
   Instructions.map[0xdc].apply(cpu);
@@ -4773,6 +5262,7 @@ const SET_bit3_of_H = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit3_of_L = (cpu: CPU): number => {
   Instructions.map[0xdd].apply(cpu);
@@ -4783,6 +5273,7 @@ const SET_bit3_of_L = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit3_of_HL = (cpu: CPU): number => {
   Instructions.map[0xde].apply(cpu);
@@ -4793,6 +5284,7 @@ const SET_bit3_of_HL = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit3_of_A = (cpu: CPU): number => {
   Instructions.map[0xdf].apply(cpu);
@@ -4803,6 +5295,7 @@ const SET_bit3_of_A = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit4_of_B = (cpu: CPU): number => {
   Instructions.map[0xe0].apply(cpu);
@@ -4813,6 +5306,7 @@ const SET_bit4_of_B = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit4_of_C = (cpu: CPU): number => {
   Instructions.map[0xe1].apply(cpu);
@@ -4823,6 +5317,7 @@ const SET_bit4_of_C = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit4_of_D = (cpu: CPU): number => {
   Instructions.map[0xe2].apply(cpu);
@@ -4833,6 +5328,7 @@ const SET_bit4_of_D = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit4_of_E = (cpu: CPU): number => {
   Instructions.map[0xe3].apply(cpu);
@@ -4843,6 +5339,7 @@ const SET_bit4_of_E = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit4_of_H = (cpu: CPU): number => {
   Instructions.map[0xe4].apply(cpu);
@@ -4853,6 +5350,7 @@ const SET_bit4_of_H = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit4_of_L = (cpu: CPU): number => {
   Instructions.map[0xe5].apply(cpu);
@@ -4863,6 +5361,7 @@ const SET_bit4_of_L = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit4_of_HL = (cpu: CPU): number => {
   Instructions.map[0xe6].apply(cpu);
@@ -4873,6 +5372,7 @@ const SET_bit4_of_HL = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit4_of_A = (cpu: CPU): number => {
   Instructions.map[0xe7].apply(cpu);
@@ -4883,6 +5383,7 @@ const SET_bit4_of_A = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit5_of_B = (cpu: CPU): number => {
   Instructions.map[0xe8].apply(cpu);
@@ -4893,6 +5394,7 @@ const SET_bit5_of_B = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit5_of_C = (cpu: CPU): number => {
   Instructions.map[0xe9].apply(cpu);
@@ -4903,6 +5405,7 @@ const SET_bit5_of_C = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit5_of_D = (cpu: CPU): number => {
   Instructions.map[0xea].apply(cpu);
@@ -4913,6 +5416,7 @@ const SET_bit5_of_D = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit5_of_E = (cpu: CPU): number => {
   Instructions.map[0xeb].apply(cpu);
@@ -4923,6 +5427,7 @@ const SET_bit5_of_E = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit5_of_H = (cpu: CPU): number => {
   Instructions.map[0xec].apply(cpu);
@@ -4933,6 +5438,7 @@ const SET_bit5_of_H = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit5_of_L = (cpu: CPU): number => {
   Instructions.map[0xed].apply(cpu);
@@ -4943,6 +5449,7 @@ const SET_bit5_of_L = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit5_of_HL = (cpu: CPU): number => {
   Instructions.map[0xee].apply(cpu);
@@ -4953,6 +5460,7 @@ const SET_bit5_of_HL = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit5_of_A = (cpu: CPU): number => {
   Instructions.map[0xef].apply(cpu);
@@ -4963,6 +5471,7 @@ const SET_bit5_of_A = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit6_of_B = (cpu: CPU): number => {
   Instructions.map[0xf0].apply(cpu);
@@ -4973,6 +5482,7 @@ const SET_bit6_of_B = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit6_of_C = (cpu: CPU): number => {
   Instructions.map[0xf1].apply(cpu);
@@ -4983,6 +5493,7 @@ const SET_bit6_of_C = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit6_of_D = (cpu: CPU): number => {
   Instructions.map[0xf2].apply(cpu);
@@ -4993,6 +5504,7 @@ const SET_bit6_of_D = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit6_of_E = (cpu: CPU): number => {
   Instructions.map[0xf3].apply(cpu);
@@ -5003,6 +5515,7 @@ const SET_bit6_of_E = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit6_of_H = (cpu: CPU): number => {
   Instructions.map[0xf4].apply(cpu);
@@ -5013,6 +5526,7 @@ const SET_bit6_of_H = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit6_of_L = (cpu: CPU): number => {
   Instructions.map[0xf5].apply(cpu);
@@ -5023,6 +5537,7 @@ const SET_bit6_of_L = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit6_of_HL = (cpu: CPU): number => {
   Instructions.map[0xf6].apply(cpu);
@@ -5033,6 +5548,7 @@ const SET_bit6_of_HL = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit6_of_A = (cpu: CPU): number => {
   Instructions.map[0xf7].apply(cpu);
@@ -5043,6 +5559,7 @@ const SET_bit6_of_A = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit7_of_B = (cpu: CPU): number => {
   Instructions.map[0xf8].apply(cpu);
@@ -5053,6 +5570,7 @@ const SET_bit7_of_B = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit7_of_C = (cpu: CPU): number => {
   Instructions.map[0xf9].apply(cpu);
@@ -5063,6 +5581,7 @@ const SET_bit7_of_C = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit7_of_D = (cpu: CPU): number => {
   Instructions.map[0xfa].apply(cpu);
@@ -5073,6 +5592,7 @@ const SET_bit7_of_D = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit7_of_E = (cpu: CPU): number => {
   Instructions.map[0xfb].apply(cpu);
@@ -5083,6 +5603,7 @@ const SET_bit7_of_E = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit7_of_H = (cpu: CPU): number => {
   Instructions.map[0xfc].apply(cpu);
@@ -5093,6 +5614,7 @@ const SET_bit7_of_H = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit7_of_L = (cpu: CPU): number => {
   Instructions.map[0xfd].apply(cpu);
@@ -5103,6 +5625,7 @@ const SET_bit7_of_L = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit7_of_HL = (cpu: CPU): number => {
   Instructions.map[0xfe].apply(cpu);
@@ -5113,6 +5636,7 @@ const SET_bit7_of_HL = (cpu: CPU): number => {
  * Set bit b in register r.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * Affected flags:
  */
 const SET_bit7_of_A = (cpu: CPU): number => {
   Instructions.map[0xff].apply(cpu);

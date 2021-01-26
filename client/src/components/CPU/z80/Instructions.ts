@@ -1,4 +1,5 @@
 import Memory from '../../Memory/Memory';
+import { Byte, Word } from '../../Types';
 
 export default {
   map: {
@@ -8,13 +9,33 @@ export default {
       this.PC.set(this.PC.value() + 2);
     },
     0x02: function () {
-      Memory.writeByte(this.R.BC, this.R.AF.upper());
+      Memory.writeByte(this.R.BC.value(), this.R.AF.upper());
     },
     0x03: function () {
-      // Memory.writeByte();
+      this.R.BC.set(this.R.BC.value() + 1);
     },
-    4: function () {},
-    5: function () {},
+    0x04: function () {
+      // convert operand to unsigned
+      const operand = new Byte(1);
+      // check for half carry on affected byte only
+      this.checkHalfCarry(this.R.BC.upper(), operand);
+      // perform addition
+      operand.set(this.R.BC.upper().value() + operand.value());
+      this.R.BC.setUpper(operand);
+
+      this.checkZFlag(this.R.BC.upper());
+      this.R.F.N = false;
+    },
+    0x05: function () {
+      // convert operand to unsigned
+      const operand = new Byte(-1);
+      this.checkHalfCarry(this.R.BC.upper(), operand);
+      operand.set(this.R.BC.upper().value() + operand.value());
+      this.R.BC.setUpper(operand);
+
+      this.checkZFlag(this.R.BC.upper());
+      this.R.F.N = true;
+    },
     6: function () {},
     7: function () {},
     8: function () {},

@@ -8,10 +8,10 @@ interface Registers {
   DE: Word;
   HL: Word;
   F: {
-    zf: boolean; // set if last op producted 0
-    n: boolean; // set if last op was subtraction
-    h: boolean; // set if result's lower half of last op overflowed past 15
-    cy: boolean; // set if last op produced a result over 255 or under 0
+    Z: boolean; // set if last op producted 0
+    N: boolean; // set if last op was subtraction
+    H: boolean; // set if result's lower half of last op overflowed past 15
+    CY: boolean; // set if last op produced a result over 255 or under 0
   };
 }
 
@@ -26,10 +26,10 @@ class CPU {
     DE: null as Word,
     HL: null as Word,
     F: {
-      zf: false,
-      n: false,
-      h: false,
-      cy: false,
+      Z: false,
+      N: false,
+      H: false,
+      CY: false,
     },
   };
   private opcodes: any;
@@ -42,6 +42,24 @@ class CPU {
     this.R.BC = new Word(0);
     this.R.DE = new Word(0);
     this.R.HL = new Word(0);
+  }
+  /**
+   * Sets the Z flag if the register is 0
+   */
+  private checkZFlag(reg: Byte): void {
+    if (!reg.value()) {
+      this.R.F.Z = true;
+    }
+  }
+  /**
+   * Sets the half carry flag if a carry will be generated from bits 3 to 4 of the sum.
+   * For 16-bit operations, this function should be called on the upper bytes of the operands.
+   * Sources:
+   * https://stackoverflow.com/questions/8868396/game-boy-what-constitutes-a-half-carry
+   * https://gbdev.io/gb-opcodes/optables/
+   */
+  private checkHalfCarry(op1: Byte, op2: Byte): void {
+    this.R.F.H = (((op1.value() & 0xf) + (op2.value() & 0xf)) & 0x10) === 0x10;
   }
   /**
    * Completes the GB power sequence
