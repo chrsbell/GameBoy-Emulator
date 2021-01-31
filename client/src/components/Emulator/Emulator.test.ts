@@ -1,2 +1,2 @@
-import CPU from '../CPU/CPU';
-import Emulator from './Emulator';
+import CPU from '../CPU';
+import Emulator from '.';

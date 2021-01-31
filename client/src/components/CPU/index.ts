@@ -1,7 +1,6 @@
-import { BaseType } from 'typescript';
-import Memory from '../Memory/Memory';
+import Memory from '../Memory';
 import { Byte, Word } from '../Types';
-import Opcodes from './z80/z80';
+import Opcodes from './z80';
 
 // Using a class to prevent accidentally setting flag outside 0/1
 class Flag {

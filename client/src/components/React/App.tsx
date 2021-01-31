@@ -1,8 +1,8 @@
 import * as ReactDOM from 'react-dom';
 import * as React from 'react';
 import { useEffect, useReducer, useRef } from 'react';
-import Emulator from '../Emulator/Emulator';
-import GLRenderer from '../GLRenderer/GLRenderer';
+import Emulator from '../Emulator';
+import GLRenderer from '../GLRenderer';
 import AppContext from './Context';
 import Wrapper from './Wrapper';
 import { Byte, ByteArray } from '../Types';

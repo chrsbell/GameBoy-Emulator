@@ -1,6 +1,6 @@
-import Memory from '../../Memory/Memory';
+import Memory from '../../Memory';
 import { Byte, Word } from '../../Types';
-import CPU from '../CPU';
+import CPU from '../';
 
 export default {
   map: {

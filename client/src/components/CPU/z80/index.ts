@@ -1,5 +1,5 @@
 import Instructions from './Instructions';
-import CPU from '../CPU';
+import CPU from '../';
 
 /**
  * No operation.
