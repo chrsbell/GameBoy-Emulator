@@ -29,7 +29,7 @@ class Emulator {
    * the ID of setTimeout each time.
    */
   public update() {
-    let cyclesPerUpdate = this.cpu.clock / GLRenderer.fps;
+    let cyclesPerUpdate = CPU.clock / GLRenderer.fps;
     let cycles = 0;
     let elapsed;
 
@@ -37,7 +37,7 @@ class Emulator {
     while (cycles < cyclesPerUpdate) {
       elapsed = this.cpu.executeInstruction();
       cycles += elapsed;
-      // need to update timers and lcd controller using elapsed cpu cycles
+      // need to update timers using elapsed cpu cycles
     }
 
     // test animation

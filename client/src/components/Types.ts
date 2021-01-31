@@ -8,6 +8,7 @@ const pad = function (str: string, width: number, replacement: string = '0'): st
 interface Primitive {
   log: () => string;
   value: () => number;
+  add(operand: number): void;
 }
 
 export class Byte extends Uint8Array implements Primitive {
@@ -29,6 +30,9 @@ export class Byte extends Uint8Array implements Primitive {
     } else {
       throw new Error(`Cannot set Byte to non-number.`);
     }
+  }
+  add(operand: number): void {
+    this.set(this.value() + operand);
   }
   log(): string {
     return `0x${pad(this[0].toString(16), 2)}`;
@@ -83,6 +87,9 @@ export class Word extends Uint16Array implements Primitive {
     } else {
       throw new Error(`Cannot set Byte to non-number.`);
     }
+  }
+  add(operand: number): void {
+    this.set(this.value() + operand);
   }
   public log(): string {
     return `0x${pad(this[0].toString(16), 4)}`;
