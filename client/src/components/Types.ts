@@ -31,6 +31,9 @@ export class Byte extends Uint8Array implements Primitive {
       throw new Error(`Cannot set Byte to non-number.`);
     }
   }
+  /**
+   * Adds the operand to the byte.
+   */
   add(operand: number): void {
     this.set(this.value() + operand);
   }

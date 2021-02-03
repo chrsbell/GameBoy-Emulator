@@ -4,12 +4,15 @@ import Opcodes from './z80';
 
 // Using a class to prevent accidentally setting flag outside 0/1
 class Flag {
-  private value: number = 0;
+  private flagValue: number = 0;
   public flag(newValue: number): void {
-    this.value = 1;
     if (newValue !== 0 && newValue !== 1) {
       throw new Error('Tried to set flag outside range.');
     }
+    this.flagValue = newValue;
+  }
+  public value(): number {
+    return this.flagValue;
   }
 }
 

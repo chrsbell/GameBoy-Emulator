@@ -2,6 +2,27 @@ import Memory from '../../Memory';
 import { Byte, Word } from '../../Types';
 import CPU from '../';
 
+/**
+ * To double-check:
+ * RLCA
+ * RRCA
+ * RLA
+ * RRA
+ *
+ * Implement:
+ * STOP
+ */
+
+/**
+ * Converts the value to its signed format using two's complement
+ */
+const toSigned = (value: number) => {
+  if (value >= 128) {
+    return -((~value + 1) & 255);
+  }
+  return value;
+};
+
 export default {
   map: {
     0x00: function (this: CPU) {},
@@ -12,7 +33,7 @@ export default {
       Memory.writeByte(this.R.BC.value(), this.R.AF.upper());
     },
     0x03: function (this: CPU) {
-      this.R.BC.set(this.R.BC.value() + 1);
+      this.R.BC.add(1);
     },
     0x04: function (this: CPU) {
       // convert operand to unsigned
@@ -20,7 +41,7 @@ export default {
       // check for half carry on affected byte only
       this.checkHalfCarry(this.R.BC.upper(), operand);
       // perform addition
-      operand.set(this.R.BC.upper().value() + operand.value());
+      operand.add(this.R.BC.upper().value());
       this.R.BC.setUpper(operand);
 
       this.checkZFlag(this.R.BC.upper());
@@ -30,13 +51,14 @@ export default {
       // convert operand to unsigned
       const operand = new Byte(-1);
       this.checkHalfCarry(this.R.BC.upper(), operand);
-      operand.set(this.R.BC.upper().value() + operand.value());
+      operand.add(this.R.BC.upper().value());
       this.R.BC.setUpper(operand);
 
       this.checkZFlag(this.R.BC.upper());
       this.R.F.N.flag(1);
     },
     0x06: function (this: CPU) {
+      // load into B from PC (immediate)
       this.R.BC.setUpper(new Byte(Memory.readByte(this.PC.value())));
     },
     0x07: function (this: CPU) {
@@ -62,28 +84,154 @@ export default {
     0x0a: function (this: CPU) {
       this.R.AF.setUpper(new Byte(Memory.readByte(this.R.BC.value())));
     },
-    11: function (this: CPU) {},
-    12: function (this: CPU) {},
-    13: function (this: CPU) {},
-    14: function (this: CPU) {},
-    15: function (this: CPU) {},
-    16: function (this: CPU) {},
-    17: function (this: CPU) {},
-    18: function (this: CPU) {},
-    19: function (this: CPU) {},
-    20: function (this: CPU) {},
-    21: function (this: CPU) {},
-    22: function (this: CPU) {},
-    23: function (this: CPU) {},
-    24: function (this: CPU) {},
-    25: function (this: CPU) {},
-    26: function (this: CPU) {},
-    27: function (this: CPU) {},
-    28: function (this: CPU) {},
-    29: function (this: CPU) {},
-    30: function (this: CPU) {},
-    31: function (this: CPU) {},
-    32: function (this: CPU) {},
+    0x0b: function (this: CPU) {
+      this.R.BC.add(-1);
+    },
+    0x0c: function (this: CPU) {
+      // convert operand to unsigned
+      const operand = new Byte(1);
+      // check for half carry on affected byte only
+      this.checkHalfCarry(this.R.BC.lower(), operand);
+      // perform addition
+      operand.add(this.R.BC.lower().value());
+      this.R.BC.setLower(operand);
+
+      this.checkZFlag(this.R.BC.lower());
+      this.R.F.N.flag(0);
+    },
+    0x0d: function (this: CPU) {
+      // convert operand to unsigned
+      const operand = new Byte(-1);
+      // check for half carry on affected byte only
+      this.checkHalfCarry(this.R.BC.lower(), operand);
+      // perform addition
+      operand.add(this.R.BC.lower().value());
+      this.R.BC.setLower(operand);
+
+      this.checkZFlag(this.R.BC.lower());
+      this.R.F.N.flag(1);
+    },
+    0x0e: function (this: CPU) {
+      // load into C from PC (immediate)
+      this.R.BC.setLower(new Byte(Memory.readByte(this.PC.value())));
+    },
+    0x0f: function (this: CPU) {
+      // check carry flag
+      const bitZero = this.R.AF.upper().value() & 1;
+      this.R.F.CY.flag(bitZero);
+      // right shift
+      const shifted = this.R.AF.upper().value() >> 1;
+      this.R.AF.setUpper(new Byte(shifted | (bitZero << 7)));
+      // flag resets
+      this.R.F.N.flag(0);
+      this.R.F.H.flag(0);
+      this.R.F.Z.flag(0);
+    },
+    0x10: function (this: CPU) {
+      console.log('Instruction halted.');
+      throw new Error();
+    },
+    0x11: function (this: CPU) {
+      this.R.DE.set(Memory.readWord(this.PC.value()));
+    },
+    0x12: function (this: CPU) {
+      Memory.writeByte(this.R.DE.value(), this.R.AF.upper());
+    },
+    0x13: function (this: CPU) {
+      this.R.DE.add(1);
+    },
+    0x14: function (this: CPU) {
+      // convert operand to unsigned
+      const operand = new Byte(1);
+      // check for half carry on affected byte only
+      this.checkHalfCarry(this.R.DE.upper(), operand);
+      // perform addition
+      operand.add(this.R.DE.upper().value());
+      this.R.DE.setUpper(operand);
+
+      this.checkZFlag(this.R.DE.upper());
+      this.R.F.N.flag(0);
+    },
+    0x15: function (this: CPU) {
+      // convert operand to unsigned
+      const operand = new Byte(-1);
+      // check for half carry on affected byte only
+      this.checkHalfCarry(this.R.DE.upper(), operand);
+      // perform addition
+      operand.add(this.R.DE.upper().value());
+      this.R.DE.setUpper(operand);
+
+      this.checkZFlag(this.R.DE.upper());
+      this.R.F.N.flag(1);
+    },
+    0x16: function (this: CPU) {
+      this.R.DE.setUpper(new Byte(Memory.readByte(this.PC.value())));
+    },
+    0x17: function (this: CPU) {
+      // need to rotate left through the carry flag
+      // get the old carry value
+      const oldCY = this.R.F.CY.value();
+      // set the carry flag to the 7th bit of A
+      this.R.F.CY.flag(this.R.AF.upper().value() >> 7);
+      // rotate left
+      let shifted = this.R.AF.upper().value() << 1;
+      // combine old flag and shifted, set to A
+      this.R.AF.setUpper(new Byte(shifted | oldCY));
+    },
+    0x18: function (this: CPU) {
+      this.PC.add(toSigned(Memory.readByte(this.PC.value())));
+    },
+    0x19: function (this: CPU) {
+      this.checkFullCarry(this.R.HL, this.R.DE);
+      this.checkHalfCarry(this.R.HL.upper(), this.R.DE.upper());
+      this.R.HL.add(this.R.DE.value());
+      this.R.F.N.flag(0);
+    },
+    0x1a: function (this: CPU) {
+      this.R.AF.setUpper(new Byte(Memory.readByte(this.R.DE.value())));
+    },
+    0x1b: function (this: CPU) {
+      this.R.DE.add(-1);
+    },
+    0x1c: function (this: CPU) {
+      // convert operand to unsigned
+      const operand = new Byte(1);
+      // check for half carry on affected byte only
+      this.checkHalfCarry(this.R.DE.lower(), operand);
+      // perform addition
+      operand.add(this.R.DE.lower().value());
+      this.R.DE.setLower(operand);
+
+      this.checkZFlag(this.R.DE.lower());
+      this.R.F.N.flag(0);
+    },
+    0x1d: function (this: CPU) {
+      // convert operand to unsigned
+      const operand = new Byte(-1);
+      // check for half carry on affected byte only
+      this.checkHalfCarry(this.R.DE.lower(), operand);
+      // perform addition
+      operand.add(this.R.DE.lower().value());
+      this.R.DE.setLower(operand);
+
+      this.checkZFlag(this.R.DE.lower());
+      this.R.F.N.flag(1);
+    },
+    0x1e: function (this: CPU) {
+      this.R.DE.setLower(new Byte(Memory.readByte(this.PC.value())));
+    },
+    0x1f: function (this: CPU) {
+      // rotate right through the carry flag
+      // get the old carry value
+      const oldCY = this.R.F.CY.value();
+      // set the carry flag to the 0th bit of A
+      this.R.F.CY.flag(this.R.AF.upper().value() & 1);
+      // rotate right
+      let shifted = this.R.AF.upper().value() >> 1;
+      // combine old flag and shifted, set to A
+      this.R.AF.setUpper(new Byte(shifted | (oldCY << 7)));
+    },
+    0x20: function (this: CPU) {},
     33: function (this: CPU) {},
     34: function (this: CPU) {},
     35: function (this: CPU) {},
