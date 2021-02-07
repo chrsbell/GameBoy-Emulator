@@ -10,6 +10,7 @@ import CPU from '../';
  * RRA
  *
  * Implement:
+ * Template functions for recurring opcodes
  * STOP
  */
 
@@ -22,6 +23,17 @@ const toSigned = (value: number) => {
   }
   return value;
 };
+
+// const LDii = (r1: Word, r1Upper: boolean, writeVal: Byte) => {
+//   let writeVal: Byte;
+//   if (r2Upper) {
+//     writeVal = r2.upper();
+//   }
+//   if (r1Upper) {
+//     r1.setUpper(writeVal);
+//   }
+// }
+// const LDmi = () =>
 
 export default {
   map: {
@@ -231,38 +243,226 @@ export default {
       // combine old flag and shifted, set to A
       this.R.AF.setUpper(new Byte(shifted | (oldCY << 7)));
     },
-    0x20: function (this: CPU) {},
-    33: function (this: CPU) {},
-    34: function (this: CPU) {},
-    35: function (this: CPU) {},
-    36: function (this: CPU) {},
-    37: function (this: CPU) {},
-    38: function (this: CPU) {},
-    39: function (this: CPU) {},
-    40: function (this: CPU) {},
-    41: function (this: CPU) {},
-    42: function (this: CPU) {},
-    43: function (this: CPU) {},
-    44: function (this: CPU) {},
-    45: function (this: CPU) {},
-    46: function (this: CPU) {},
-    47: function (this: CPU) {},
-    48: function (this: CPU) {},
-    49: function (this: CPU) {},
-    50: function (this: CPU) {},
-    51: function (this: CPU) {},
-    52: function (this: CPU) {},
-    53: function (this: CPU) {},
-    54: function (this: CPU) {},
-    55: function (this: CPU) {},
-    56: function (this: CPU) {},
-    57: function (this: CPU) {},
-    58: function (this: CPU) {},
-    59: function (this: CPU) {},
-    60: function (this: CPU) {},
-    61: function (this: CPU) {},
-    62: function (this: CPU) {},
-    63: function (this: CPU) {},
+    0x20: function (this: CPU): boolean {
+      const incr = toSigned(Memory.readByte(this.PC.value()));
+      // increment PC if zero flag was reset
+      if (!this.R.F.Z.value()) {
+        this.PC.add(incr);
+        return true;
+      }
+      return false;
+    },
+    0x21: function (this: CPU) {
+      this.R.HL.set(Memory.readWord(this.PC.value()));
+    },
+    0x22: function (this: CPU) {
+      Memory.writeByte(this.R.HL.value(), this.R.AF.upper());
+      this.R.HL.add(1);
+    },
+    0x23: function (this: CPU) {
+      this.R.HL.add(1);
+    },
+    0x24: function (this: CPU) {
+      // convert operand to unsigned
+      const operand = new Byte(1);
+      // check for half carry on affected byte only
+      this.checkHalfCarry(this.R.HL.upper(), operand);
+      // perform addition
+      operand.add(this.R.HL.upper().value());
+      this.R.HL.setUpper(operand);
+
+      this.checkZFlag(operand);
+      this.R.F.N.flag(0);
+    },
+    0x25: function (this: CPU) {
+      // convert operand to unsigned
+      const operand = new Byte(-1);
+      // check for half carry on affected byte only
+      this.checkHalfCarry(this.R.HL.upper(), operand);
+      // perform addition
+      operand.add(this.R.HL.upper().value());
+      this.R.HL.setUpper(operand);
+
+      this.checkZFlag(operand);
+      this.R.F.N.flag(1);
+    },
+    0x26: function (this: CPU) {
+      this.R.HL.setUpper(new Byte(Memory.readByte(this.PC.value())));
+    },
+    /**
+     * DAA instruction taken from - https://forums.nesdev.com/viewtopic.php?t=15944#p196282
+     */
+    0x27: function (this: CPU) {
+      // note: assumes a is a uint8_t and wraps from 0xff to 0
+      if (!this.R.F.N.value()) {
+        // after an addition, adjust if (half-)carry occurred or if result is out of bounds
+        if (this.R.F.CY.value() || this.R.AF.upper().value() > 0x99) {
+          this.R.AF.addUpper(0x60);
+          this.R.F.CY.flag(1);
+        }
+        if (this.R.F.H.value() || (this.R.AF.upper().value() & 0x0f) > 0x09) {
+          this.R.AF.addUpper(0x6);
+        }
+      } else {
+        // after a subtraction, only adjust if (half-)carry occurred
+        if (this.R.F.CY.value()) {
+          this.R.AF.addUpper(-0x60);
+        }
+        if (this.R.F.H.value()) {
+          this.R.AF.addUpper(-0x6);
+        }
+      }
+      // these flags are always updated
+      const AZero = this.R.AF.upper().value() === 0 ? 1 : 0;
+      this.R.F.Z.flag(AZero); // the usual z flag
+      this.R.F.H.flag(0); // h flag is always cleared
+    },
+    0x28: function (this: CPU) {
+      const incr = toSigned(Memory.readByte(this.PC.value()));
+      // increment PC if zero flag was set
+      if (this.R.F.Z.value()) {
+        this.PC.add(incr);
+        return true;
+      }
+      return false;
+    },
+    0x29: function (this: CPU) {
+      this.checkFullCarry(this.R.HL, this.R.HL);
+      this.checkHalfCarry(this.R.HL.upper(), this.R.HL.upper());
+      this.R.HL.add(this.R.HL.value());
+      this.R.F.N.flag(0);
+    },
+    0x2a: function (this: CPU) {
+      this.R.AF.setUpper(new Byte(Memory.readByte(this.R.HL.value())));
+      this.R.HL.add(1);
+    },
+    0x2b: function (this: CPU) {
+      this.R.HL.add(-1);
+    },
+    0x2c: function (this: CPU) {
+      const operand = new Byte(1);
+      this.checkHalfCarry(this.R.HL.lower(), operand);
+      operand.add(this.R.HL.lower().value());
+      this.R.HL.setLower(operand);
+      this.checkZFlag(operand);
+      this.R.F.N.flag(0);
+    },
+    0x2d: function (this: CPU) {
+      const operand = new Byte(-1);
+      this.checkHalfCarry(this.R.HL.lower(), operand);
+      operand.add(this.R.HL.lower().value());
+      this.R.HL.setLower(operand);
+      this.checkZFlag(operand);
+      this.R.F.N.flag(1);
+    },
+    0x2e: function (this: CPU) {
+      this.R.HL.setLower(new Byte(Memory.readByte(this.PC.value())));
+    },
+    0x2f: function (this: CPU) {
+      this.R.AF.setUpper(new Byte(~this.R.AF.upper()));
+      this.R.F.N.flag(1);
+      this.R.F.H.flag(1);
+    },
+    0x30: function (this: CPU) {
+      const incr = toSigned(Memory.readByte(this.PC.value()));
+      if (!this.R.F.CY.value()) {
+        this.PC.add(incr);
+        return true;
+      }
+      return false;
+    },
+    0x31: function (this: CPU) {
+      this.SP.set(Memory.readWord(this.PC.value()));
+    },
+    0x32: function (this: CPU) {
+      Memory.writeByte(this.R.HL.value(), this.R.AF.upper());
+      this.R.HL.add(-1);
+    },
+    0x33: function (this: CPU) {
+      this.SP.add(1);
+    },
+    0x34: function (this: CPU) {
+      // convert operand to unsigned
+      const operand = new Byte(1);
+      const newVal: Byte = new Byte(Memory.readByte(this.R.HL.value()));
+      // check for half carry on affected byte only
+      this.checkHalfCarry(newVal, operand);
+      operand.add(this.R.HL.value());
+      Memory.writeByte(this.R.HL.value(), operand);
+
+      this.checkZFlag(operand);
+      this.R.F.N.flag(0);
+    },
+    0x35: function (this: CPU) {
+      // convert operand to unsigned
+      const operand = new Byte(-1);
+      const newVal: Byte = new Byte(Memory.readByte(this.R.HL.value()));
+      // check for half carry on affected byte only
+      this.checkHalfCarry(newVal, operand);
+      operand.add(this.R.HL.value());
+      Memory.writeByte(this.R.HL.value(), operand);
+
+      this.checkZFlag(operand);
+      this.R.F.N.flag(1);
+    },
+    0x36: function (this: CPU) {
+      Memory.writeByte(this.R.HL.value(), new Byte(Memory.readByte(this.PC.value())));
+    },
+    0x37: function (this: CPU) {
+      this.R.F.CY.flag(1);
+      this.R.F.N.flag(0);
+      this.R.F.H.flag(0);
+    },
+    0x38: function (this: CPU) {
+      const incr = toSigned(Memory.readByte(this.PC.value()));
+      if (this.R.F.CY.value()) {
+        this.PC.add(incr);
+        return true;
+      }
+      return false;
+    },
+    0x39: function (this: CPU) {
+      this.checkFullCarry(this.R.HL, this.SP);
+      this.checkHalfCarry(this.R.HL.upper(), this.SP.upper());
+      this.R.HL.add(this.SP.value());
+      this.R.F.N.flag(0);
+    },
+    0x3a: function (this: CPU) {
+      this.R.AF.setUpper(new Byte(Memory.readByte(this.R.HL.value())));
+      this.R.HL.add(-1);
+    },
+    0x3b: function (this: CPU) {
+      this.SP.add(-1);
+    },
+    0x3c: function (this: CPU) {
+      const operand = new Byte(1);
+      this.checkHalfCarry(this.R.AF.upper(), operand);
+      operand.add(this.R.AF.upper().value());
+      this.R.AF.setUpper(operand);
+      this.checkZFlag(operand);
+      this.R.F.N.flag(0);
+    },
+    0x3d: function (this: CPU) {
+      const operand = new Byte(-1);
+      this.checkHalfCarry(this.R.AF.upper(), operand);
+      operand.add(this.R.AF.upper().value());
+      this.R.AF.setUpper(operand);
+      this.checkZFlag(operand);
+      this.R.F.N.flag(1);
+    },
+    0x3e: function (this: CPU) {
+      this.R.AF.setUpper(new Byte(Memory.readByte(this.PC.value())));
+    },
+    0x3f: function (this: CPU) {
+      const { value } = this.R.F.CY;
+      if (value) {
+        this.R.F.CY.flag(0);
+      } else {
+        this.R.F.CY.flag(1);
+      }
+      this.R.F.N.flag(0);
+      this.R.F.H.flag(0);
+    },
     64: function (this: CPU) {},
     65: function (this: CPU) {},
     66: function (this: CPU) {},

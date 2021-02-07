@@ -282,8 +282,8 @@ function LD_into_D_i_from_d8_i(this: CPU): number {
      * @param - CPU class.
      * @returns - Number of system clock ticks used.
 
-    * Affected flags: Z, N, H, C
-    */
+      * Affected flags: Z, N, H, C
+      */
 function RLA(this: CPU): number {
   Instructions.map[0x17].call(this);
   this.PC.add(1);
@@ -297,9 +297,10 @@ function RLA(this: CPU): number {
  * Affected flags:
  */
 function JR_to_A_i__r8_i(this: CPU): number {
-  Instructions.map[0x18].call(this);
+  let condition: boolean = Instructions.map[0x18].call(this);
   this.PC.add(2);
-  return 12;
+  // if condition passed, elapse larger number of m cycles
+  return condition ? 12 : undefined;
 }
 
 /**
@@ -379,8 +380,8 @@ function LD_into_E_i_from_d8_i(this: CPU): number {
      * @param - CPU class.
      * @returns - Number of system clock ticks used.
 
-    * Affected flags: Z, N, H, C
-    */
+      * Affected flags: Z, N, H, C
+      */
 function RRA(this: CPU): number {
   Instructions.map[0x1f].call(this);
   this.PC.add(1);
@@ -388,15 +389,16 @@ function RRA(this: CPU): number {
 }
 
 /**
- * Unconditional jump to the relative address.
+ * Conditional jump to the relative address.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-function JR_to_NZ_i__r8_i(this: CPU): number {
-  Instructions.map[0x20].call(this);
+function JR_C_to_NZ_i__r8_i(this: CPU): number {
+  let condition: boolean = Instructions.map[0x20].call(this);
   this.PC.add(2);
-  return 12 || 8;
+  // if condition passed, elapse larger number of m cycles
+  return condition ? 12 : 8;
 }
 
 /**
@@ -484,15 +486,16 @@ function DAA_A(this: CPU): number {
 }
 
 /**
- * Unconditional jump to the relative address.
+ * Conditional jump to the relative address.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-function JR_to_Z_i__r8_i(this: CPU): number {
-  Instructions.map[0x28].call(this);
+function JR_C_to_Z_i__r8_i(this: CPU): number {
+  let condition: boolean = Instructions.map[0x28].call(this);
   this.PC.add(2);
-  return 12 || 8;
+  // if condition passed, elapse larger number of m cycles
+  return condition ? 12 : 8;
 }
 
 /**
@@ -580,15 +583,16 @@ function CPL_A(this: CPU): number {
 }
 
 /**
- * Unconditional jump to the relative address.
+ * Conditional jump to the relative address.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-function JR_to_NC_i__r8_i(this: CPU): number {
-  Instructions.map[0x30].call(this);
+function JR_C_to_NC_i__r8_i(this: CPU): number {
+  let condition: boolean = Instructions.map[0x30].call(this);
   this.PC.add(2);
-  return 12 || 8;
+  // if condition passed, elapse larger number of m cycles
+  return condition ? 12 : 8;
 }
 
 /**
@@ -676,15 +680,16 @@ function SCF(this: CPU): number {
 }
 
 /**
- * Unconditional jump to the relative address.
+ * Conditional jump to the relative address.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-function JR_to_C_i__r8_i(this: CPU): number {
-  Instructions.map[0x38].call(this);
+function JR_C_to_C_i__r8_i(this: CPU): number {
+  let condition: boolean = Instructions.map[0x38].call(this);
   this.PC.add(2);
-  return 12 || 8;
+  // if condition passed, elapse larger number of m cycles
+  return condition ? 12 : 8;
 }
 
 /**
@@ -766,8 +771,8 @@ function LD_into_A_i_from_d8_i(this: CPU): number {
      * @param - CPU class.
      * @returns - Number of system clock ticks used.
 
-    * Affected flags: N, H, C
-    */
+      * Affected flags: N, H, C
+      */
 function CCF(this: CPU): number {
   Instructions.map[0x3f].call(this);
   this.PC.add(1);
@@ -1427,8 +1432,8 @@ function LD_into_HL_m_from_L_i(this: CPU): number {
      * @param - CPU class.
      * @returns - Number of system clock ticks used.
 
-    * Affected flags:
-    */
+      * Affected flags:
+      */
 function HALT(this: CPU): number {
   Instructions.map[0x76].call(this);
   this.PC.add(1);
@@ -1835,8 +1840,6 @@ function SUB_from_A_i_value_A_i(this: CPU): number {
  * Subtract with carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
- * @param - CPU class.
- * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
 function SBC_from_A_i_value_B_i(this: CPU): number {
@@ -1847,8 +1850,6 @@ function SBC_from_A_i_value_B_i(this: CPU): number {
 
 /**
  * Subtract with carry flag.
- * @param - CPU class.
- * @returns - Number of system clock ticks used.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
@@ -1863,8 +1864,6 @@ function SBC_from_A_i_value_C_i(this: CPU): number {
  * Subtract with carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
- * @param - CPU class.
- * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
 function SBC_from_A_i_value_D_i(this: CPU): number {
@@ -1875,8 +1874,6 @@ function SBC_from_A_i_value_D_i(this: CPU): number {
 
 /**
  * Subtract with carry flag.
- * @param - CPU class.
- * @returns - Number of system clock ticks used.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
@@ -1891,8 +1888,6 @@ function SBC_from_A_i_value_E_i(this: CPU): number {
  * Subtract with carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
- * @param - CPU class.
- * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
 function SBC_from_A_i_value_H_i(this: CPU): number {
@@ -1903,8 +1898,6 @@ function SBC_from_A_i_value_H_i(this: CPU): number {
 
 /**
  * Subtract with carry flag.
- * @param - CPU class.
- * @returns - Number of system clock ticks used.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
@@ -1919,8 +1912,6 @@ function SBC_from_A_i_value_L_i(this: CPU): number {
  * Subtract with carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
- * @param - CPU class.
- * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
 function SBC_from_A_i_value_HL_m(this: CPU): number {
@@ -1931,8 +1922,6 @@ function SBC_from_A_i_value_HL_m(this: CPU): number {
 
 /**
  * Subtract with carry flag.
- * @param - CPU class.
- * @returns - Number of system clock ticks used.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
@@ -2352,27 +2341,29 @@ function POP_off_SP_into_BC_i(this: CPU): number {
 }
 
 /**
- * Unconditional jump to the absolute address specified by the 16-bit operand
+ * Conditional jump to the absolute address specified by the 16-bit operand.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-function JP_to_NZ_i__a16_i(this: CPU): number {
-  Instructions.map[0xc2].call(this);
+function JP_C_to_NZ_i__a16_i(this: CPU): number {
+  let condition: boolean = Instructions.map[0xc2].call(this);
   this.PC.add(3);
-  return 16 || 12;
+  // if condition passed, elapse larger number of m cycles
+  return condition ? 16 : 12;
 }
 
 /**
- * Unconditional jump to the absolute address specified by the 16-bit operand
+ * Unconditional jump to the absolute address specified by the 16-bit operand.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
 function JP_to_A_i__a16_i(this: CPU): number {
-  Instructions.map[0xc3].call(this);
+  let condition: boolean = Instructions.map[0xc3].call(this);
   this.PC.add(3);
-  return 16;
+  // if condition passed, elapse larger number of m cycles
+  return condition ? 16 : undefined;
 }
 
 /**
@@ -2448,15 +2439,16 @@ function RET(this: CPU): number {
 }
 
 /**
- * Unconditional jump to the absolute address specified by the 16-bit operand
+ * Conditional jump to the absolute address specified by the 16-bit operand.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-function JP_to_Z_i__a16_i(this: CPU): number {
-  Instructions.map[0xca].call(this);
+function JP_C_to_Z_i__a16_i(this: CPU): number {
+  let condition: boolean = Instructions.map[0xca].call(this);
   this.PC.add(3);
-  return 16 || 12;
+  // if condition passed, elapse larger number of m cycles
+  return condition ? 16 : 12;
 }
 
 /**
@@ -2544,15 +2536,16 @@ function POP_off_SP_into_DE_i(this: CPU): number {
 }
 
 /**
- * Unconditional jump to the absolute address specified by the 16-bit operand
+ * Conditional jump to the absolute address specified by the 16-bit operand.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-function JP_to_NC_i__a16_i(this: CPU): number {
-  Instructions.map[0xd2].call(this);
+function JP_C_to_NC_i__a16_i(this: CPU): number {
+  let condition: boolean = Instructions.map[0xd2].call(this);
   this.PC.add(3);
-  return 16 || 12;
+  // if condition passed, elapse larger number of m cycles
+  return condition ? 16 : 12;
 }
 
 /**
@@ -2638,15 +2631,16 @@ function RETI(this: CPU): number {
 }
 
 /**
- * Unconditional jump to the absolute address specified by the 16-bit operand
+ * Conditional jump to the absolute address specified by the 16-bit operand.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-function JP_to_C_i__a16_i(this: CPU): number {
-  Instructions.map[0xda].call(this);
+function JP_C_to_C_i__a16_i(this: CPU): number {
+  let condition: boolean = Instructions.map[0xda].call(this);
   this.PC.add(3);
-  return 16 || 12;
+  // if condition passed, elapse larger number of m cycles
+  return condition ? 16 : 12;
 }
 
 /**
@@ -2683,8 +2677,6 @@ function ILLEGAL_DD(this: CPU): number {
 
 /**
  * Subtract with carry flag.
- * @param - CPU class.
- * @returns - Number of system clock ticks used.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
@@ -2812,15 +2804,16 @@ function ADD_into_SP_i_from_r8_i(this: CPU): number {
 }
 
 /**
- * Unconditional jump to the absolute address specified by the 16-bit operand
+ * Unconditional jump to the absolute address specified by the 16-bit operand.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
 function JP_to_A_i__HL_i(this: CPU): number {
-  Instructions.map[0xe9].call(this);
+  let condition: boolean = Instructions.map[0xe9].call(this);
   this.PC.add(1);
-  return 4;
+  // if condition passed, elapse larger number of m cycles
+  return condition ? 4 : undefined;
 }
 
 /**
@@ -3272,8 +3265,8 @@ function RRC_A_i(this: CPU): number {
      * @param - CPU class.
      * @returns - Number of system clock ticks used.
 
-    * Affected flags: Z, N, H, C
-    */
+      * Affected flags: Z, N, H, C
+      */
 function RL_B_i(this: CPU): number {
   Instructions.map[0x10].call(this);
   this.PC.add(2);
@@ -3285,8 +3278,8 @@ function RL_B_i(this: CPU): number {
      * @param - CPU class.
      * @returns - Number of system clock ticks used.
 
-    * Affected flags: Z, N, H, C
-    */
+      * Affected flags: Z, N, H, C
+      */
 function RL_C_i(this: CPU): number {
   Instructions.map[0x11].call(this);
   this.PC.add(2);
@@ -3298,8 +3291,8 @@ function RL_C_i(this: CPU): number {
      * @param - CPU class.
      * @returns - Number of system clock ticks used.
 
-    * Affected flags: Z, N, H, C
-    */
+      * Affected flags: Z, N, H, C
+      */
 function RL_D_i(this: CPU): number {
   Instructions.map[0x12].call(this);
   this.PC.add(2);
@@ -3311,8 +3304,8 @@ function RL_D_i(this: CPU): number {
      * @param - CPU class.
      * @returns - Number of system clock ticks used.
 
-    * Affected flags: Z, N, H, C
-    */
+      * Affected flags: Z, N, H, C
+      */
 function RL_E_i(this: CPU): number {
   Instructions.map[0x13].call(this);
   this.PC.add(2);
@@ -3324,8 +3317,8 @@ function RL_E_i(this: CPU): number {
      * @param - CPU class.
      * @returns - Number of system clock ticks used.
 
-    * Affected flags: Z, N, H, C
-    */
+      * Affected flags: Z, N, H, C
+      */
 function RL_H_i(this: CPU): number {
   Instructions.map[0x14].call(this);
   this.PC.add(2);
@@ -3337,8 +3330,8 @@ function RL_H_i(this: CPU): number {
      * @param - CPU class.
      * @returns - Number of system clock ticks used.
 
-    * Affected flags: Z, N, H, C
-    */
+      * Affected flags: Z, N, H, C
+      */
 function RL_L_i(this: CPU): number {
   Instructions.map[0x15].call(this);
   this.PC.add(2);
@@ -3350,8 +3343,8 @@ function RL_L_i(this: CPU): number {
      * @param - CPU class.
      * @returns - Number of system clock ticks used.
 
-    * Affected flags: Z, N, H, C
-    */
+      * Affected flags: Z, N, H, C
+      */
 function RL_HL_m(this: CPU): number {
   Instructions.map[0x16].call(this);
   this.PC.add(2);
@@ -3363,8 +3356,8 @@ function RL_HL_m(this: CPU): number {
      * @param - CPU class.
      * @returns - Number of system clock ticks used.
 
-    * Affected flags: Z, N, H, C
-    */
+      * Affected flags: Z, N, H, C
+      */
 function RL_A_i(this: CPU): number {
   Instructions.map[0x17].call(this);
   this.PC.add(2);
@@ -6188,7 +6181,7 @@ export default {
   0x1d: DEC_E_i,
   0x1e: LD_into_E_i_from_d8_i,
   0x1f: RRA,
-  0x20: JR_to_NZ_i__r8_i,
+  0x20: JR_C_to_NZ_i__r8_i,
   0x21: LD_into_HL_i_from_d16_i,
   0x22: LD_into_HL_incr_m_from_A_i,
   0x23: INC_HL_i,
@@ -6196,7 +6189,7 @@ export default {
   0x25: DEC_H_i,
   0x26: LD_into_H_i_from_d8_i,
   0x27: DAA_A,
-  0x28: JR_to_Z_i__r8_i,
+  0x28: JR_C_to_Z_i__r8_i,
   0x29: ADD_into_HL_i_from_HL_i,
   0x2a: LD_into_A_i_from_HL_incr_m,
   0x2b: DEC_HL_i,
@@ -6204,7 +6197,7 @@ export default {
   0x2d: DEC_L_i,
   0x2e: LD_into_L_i_from_d8_i,
   0x2f: CPL_A,
-  0x30: JR_to_NC_i__r8_i,
+  0x30: JR_C_to_NC_i__r8_i,
   0x31: LD_into_SP_i_from_d16_i,
   0x32: LD_into_HL_decr_m_from_A_i,
   0x33: INC_SP_i,
@@ -6212,7 +6205,7 @@ export default {
   0x35: DEC_HL_m,
   0x36: LD_into_HL_m_from_d8_i,
   0x37: SCF,
-  0x38: JR_to_C_i__r8_i,
+  0x38: JR_C_to_C_i__r8_i,
   0x39: ADD_into_HL_i_from_SP_i,
   0x3a: LD_into_A_i_from_HL_decr_m,
   0x3b: DEC_SP_i,
@@ -6350,7 +6343,7 @@ export default {
   0xbf: CP_A_with_A,
   0xc0: RET_to_A_i__NZ_i,
   0xc1: POP_off_SP_into_BC_i,
-  0xc2: JP_to_NZ_i__a16_i,
+  0xc2: JP_C_to_NZ_i__a16_i,
   0xc3: JP_to_A_i__a16_i,
   0xc4: CALL_to_NZ_i_from_a16_i,
   0xc5: PUSH_onto_SP_register_BC_i,
@@ -6358,7 +6351,7 @@ export default {
   0xc7: RST_to_A_i_from_00H_i,
   0xc8: RET_to_A_i__Z_i,
   0xc9: RET,
-  0xca: JP_to_Z_i__a16_i,
+  0xca: JP_C_to_Z_i__a16_i,
   0xcb: PREFIX,
   0xcc: CALL_to_Z_i_from_a16_i,
   0xcd: CALL_to_A_i_from_a16_i,
@@ -6366,7 +6359,7 @@ export default {
   0xcf: RST_to_A_i_from_08H_i,
   0xd0: RET_to_A_i__NC_i,
   0xd1: POP_off_SP_into_DE_i,
-  0xd2: JP_to_NC_i__a16_i,
+  0xd2: JP_C_to_NC_i__a16_i,
   0xd3: ILLEGAL_D3,
   0xd4: CALL_to_NC_i_from_a16_i,
   0xd5: PUSH_onto_SP_register_DE_i,
@@ -6374,7 +6367,7 @@ export default {
   0xd7: RST_to_A_i_from_10H_i,
   0xd8: RET_to_A_i__C_i,
   0xd9: RETI,
-  0xda: JP_to_C_i__a16_i,
+  0xda: JP_C_to_C_i__a16_i,
   0xdb: ILLEGAL_DB,
   0xdc: CALL_to_C_i_from_a16_i,
   0xdd: ILLEGAL_DD,
