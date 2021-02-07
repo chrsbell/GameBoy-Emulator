@@ -37,6 +37,9 @@ export class Byte extends Uint8Array implements Primitive {
   add(operand: number): void {
     this.set(this.value() + operand);
   }
+  /**
+   * Logs the byte as a hex value.
+   */
   log(): string {
     return `0x${pad(this[0].toString(16), 2)}`;
   }
@@ -91,9 +94,31 @@ export class Word extends Uint16Array implements Primitive {
       throw new Error(`Cannot set Byte to non-number.`);
     }
   }
-  add(operand: number): void {
+  /**
+   * Adds the operand to the word.
+   */
+  public add(operand: number): void {
     this.set(this.value() + operand);
   }
+  /**
+   * Adds the operand to the upper byte.
+   */
+  public addUpper(operand: number): void {
+    let upper: Byte = this.upper();
+    upper.add(operand);
+    this.setUpper(upper);
+  }
+  /**
+   * Adds the operand to the lower byte.
+   */
+  public addLower(operand: number): void {
+    let lower: Byte = this.lower();
+    lower.add(operand);
+    this.setLower(lower);
+  }
+  /**
+   * Logs the word as a hex value.
+   */
   public log(): string {
     return `0x${pad(this[0].toString(16), 4)}`;
   }
