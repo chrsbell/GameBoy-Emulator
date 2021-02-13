@@ -38,6 +38,12 @@ export class Byte extends Uint8Array implements Primitive {
     this.set(this.value() + operand);
   }
   /**
+   * Returns negated value as an unsigned byte
+   */
+  negate(value: number): Byte {
+    return new Byte(this.value() * -1);
+  }
+  /**
    * Logs the byte as a hex value.
    */
   log(): string {

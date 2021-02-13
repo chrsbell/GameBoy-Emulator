@@ -46,12 +46,15 @@ class CPU {
       CY: new Flag(),
     },
   };
+  protected halted: boolean;
   protected opcodes: any;
   // number of clock ticks per second
   static clock = 4194304;
   public constructor() {
-    this.PC = new Word(0x0000);
+    this.PC = new Word(0);
+    this.SP = new Word(0);
     this.opcodes = Opcodes;
+    this.halted = false;
     this.R.AF = new Word(0);
     this.R.BC = new Word(0);
     this.R.DE = new Word(0);
@@ -80,7 +83,7 @@ class CPU {
   /**
    * Sets the carry flag if the sum will exceed the size of the data type.
    */
-  protected checkFullCarry(op1: Word, op2: Word): void;
+  // protected checkFullCarry(op1: Word, op2: Word): void;
   protected checkFullCarry(op1: Byte | Word, op2: Byte | Word): void {
     let overflow: number = op1.value() + op2.value();
     if (op1 instanceof Word) {
@@ -125,7 +128,6 @@ class CPU {
       // normal execution
       const opcode: number = Memory.readByte(this.PC.value());
       console.log(`PC: ${this.PC.log()}`, opcode.toString(16));
-      debugger;
       const numCycles: number = this.opcodes[opcode].call(this);
       this.opcodes[opcode].call(this);
     }

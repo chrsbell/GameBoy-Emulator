@@ -8,7 +8,7 @@ import CPU from '../';
  * Affected flags:
  */
 function NOP(this: CPU): number {
-  Instructions.map[0x00].call(this);
+  Instructions.map['0x00'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -20,7 +20,7 @@ function NOP(this: CPU): number {
  * Affected flags:
  */
 function LD_into_BC_i_from_d16_i(this: CPU): number {
-  Instructions.map[0x01].call(this);
+  Instructions.map['0x01'].call(this);
   this.PC.add(3);
   return 12;
 }
@@ -32,7 +32,7 @@ function LD_into_BC_i_from_d16_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_BC_m_from_A_i(this: CPU): number {
-  Instructions.map[0x02].call(this);
+  Instructions.map['0x02'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -44,7 +44,7 @@ function LD_into_BC_m_from_A_i(this: CPU): number {
  * Affected flags:
  */
 function INC_BC_i(this: CPU): number {
-  Instructions.map[0x03].call(this);
+  Instructions.map['0x03'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -56,7 +56,7 @@ function INC_BC_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function INC_B_i(this: CPU): number {
-  Instructions.map[0x04].call(this);
+  Instructions.map['0x04'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -68,7 +68,7 @@ function INC_B_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function DEC_B_i(this: CPU): number {
-  Instructions.map[0x05].call(this);
+  Instructions.map['0x05'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -80,7 +80,7 @@ function DEC_B_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_B_i_from_d8_i(this: CPU): number {
-  Instructions.map[0x06].call(this);
+  Instructions.map['0x06'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -92,7 +92,7 @@ function LD_into_B_i_from_d8_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function RLCA(this: CPU): number {
-  Instructions.map[0x07].call(this);
+  Instructions.map['0x07'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -104,7 +104,7 @@ function RLCA(this: CPU): number {
  * Affected flags:
  */
 function LD_into_a16_m_from_SP_i(this: CPU): number {
-  Instructions.map[0x08].call(this);
+  Instructions.map['0x08'].call(this);
   this.PC.add(3);
   return 20;
 }
@@ -116,7 +116,7 @@ function LD_into_a16_m_from_SP_i(this: CPU): number {
  * Affected flags: N, H, C
  */
 function ADD_into_HL_i_from_BC_i(this: CPU): number {
-  Instructions.map[0x09].call(this);
+  Instructions.map['0x09'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -128,7 +128,7 @@ function ADD_into_HL_i_from_BC_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_A_i_from_BC_m(this: CPU): number {
-  Instructions.map[0x0a].call(this);
+  Instructions.map['0x0a'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -140,7 +140,7 @@ function LD_into_A_i_from_BC_m(this: CPU): number {
  * Affected flags:
  */
 function DEC_BC_i(this: CPU): number {
-  Instructions.map[0x0b].call(this);
+  Instructions.map['0x0b'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -152,7 +152,7 @@ function DEC_BC_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function INC_C_i(this: CPU): number {
-  Instructions.map[0x0c].call(this);
+  Instructions.map['0x0c'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -164,7 +164,7 @@ function INC_C_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function DEC_C_i(this: CPU): number {
-  Instructions.map[0x0d].call(this);
+  Instructions.map['0x0d'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -176,7 +176,7 @@ function DEC_C_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_C_i_from_d8_i(this: CPU): number {
-  Instructions.map[0x0e].call(this);
+  Instructions.map['0x0e'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -188,7 +188,7 @@ function LD_into_C_i_from_d8_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function RRCA(this: CPU): number {
-  Instructions.map[0x0f].call(this);
+  Instructions.map['0x0f'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -200,7 +200,7 @@ function RRCA(this: CPU): number {
  * Affected flags:
  */
 function STOP(this: CPU): number {
-  Instructions.map[0x10].call(this);
+  Instructions.map['0x10'].call(this);
   this.PC.add(2);
   return 4;
 }
@@ -212,7 +212,7 @@ function STOP(this: CPU): number {
  * Affected flags:
  */
 function LD_into_DE_i_from_d16_i(this: CPU): number {
-  Instructions.map[0x11].call(this);
+  Instructions.map['0x11'].call(this);
   this.PC.add(3);
   return 12;
 }
@@ -224,7 +224,7 @@ function LD_into_DE_i_from_d16_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_DE_m_from_A_i(this: CPU): number {
-  Instructions.map[0x12].call(this);
+  Instructions.map['0x12'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -236,7 +236,7 @@ function LD_into_DE_m_from_A_i(this: CPU): number {
  * Affected flags:
  */
 function INC_DE_i(this: CPU): number {
-  Instructions.map[0x13].call(this);
+  Instructions.map['0x13'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -248,7 +248,7 @@ function INC_DE_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function INC_D_i(this: CPU): number {
-  Instructions.map[0x14].call(this);
+  Instructions.map['0x14'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -260,7 +260,7 @@ function INC_D_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function DEC_D_i(this: CPU): number {
-  Instructions.map[0x15].call(this);
+  Instructions.map['0x15'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -272,7 +272,7 @@ function DEC_D_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_D_i_from_d8_i(this: CPU): number {
-  Instructions.map[0x16].call(this);
+  Instructions.map['0x16'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -282,10 +282,10 @@ function LD_into_D_i_from_d8_i(this: CPU): number {
      * @param - CPU class.
      * @returns - Number of system clock ticks used.
 
-      * Affected flags: Z, N, H, C
-      */
+    * Affected flags: Z, N, H, C
+    */
 function RLA(this: CPU): number {
-  Instructions.map[0x17].call(this);
+  Instructions.map['0x17'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -297,10 +297,9 @@ function RLA(this: CPU): number {
  * Affected flags:
  */
 function JR_to_A_i__r8_i(this: CPU): number {
-  let condition: boolean = Instructions.map[0x18].call(this);
+  Instructions.map['0x18'].call(this);
   this.PC.add(2);
-  // if condition passed, elapse larger number of m cycles
-  return condition ? 12 : undefined;
+  return 12;
 }
 
 /**
@@ -310,7 +309,7 @@ function JR_to_A_i__r8_i(this: CPU): number {
  * Affected flags: N, H, C
  */
 function ADD_into_HL_i_from_DE_i(this: CPU): number {
-  Instructions.map[0x19].call(this);
+  Instructions.map['0x19'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -322,7 +321,7 @@ function ADD_into_HL_i_from_DE_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_A_i_from_DE_m(this: CPU): number {
-  Instructions.map[0x1a].call(this);
+  Instructions.map['0x1a'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -334,7 +333,7 @@ function LD_into_A_i_from_DE_m(this: CPU): number {
  * Affected flags:
  */
 function DEC_DE_i(this: CPU): number {
-  Instructions.map[0x1b].call(this);
+  Instructions.map['0x1b'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -346,7 +345,7 @@ function DEC_DE_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function INC_E_i(this: CPU): number {
-  Instructions.map[0x1c].call(this);
+  Instructions.map['0x1c'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -358,7 +357,7 @@ function INC_E_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function DEC_E_i(this: CPU): number {
-  Instructions.map[0x1d].call(this);
+  Instructions.map['0x1d'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -370,7 +369,7 @@ function DEC_E_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_E_i_from_d8_i(this: CPU): number {
-  Instructions.map[0x1e].call(this);
+  Instructions.map['0x1e'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -380,25 +379,24 @@ function LD_into_E_i_from_d8_i(this: CPU): number {
      * @param - CPU class.
      * @returns - Number of system clock ticks used.
 
-      * Affected flags: Z, N, H, C
-      */
+    * Affected flags: Z, N, H, C
+    */
 function RRA(this: CPU): number {
-  Instructions.map[0x1f].call(this);
+  Instructions.map['0x1f'].call(this);
   this.PC.add(1);
   return 4;
 }
 
 /**
- * Conditional jump to the relative address.
+ * Unconditional jump to the relative address.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-function JR_C_to_NZ_i__r8_i(this: CPU): number {
-  let condition: boolean = Instructions.map[0x20].call(this);
+function JR_to_NZ_i__r8_i(this: CPU): number {
+  Instructions.map['0x20'].call(this);
   this.PC.add(2);
-  // if condition passed, elapse larger number of m cycles
-  return condition ? 12 : 8;
+  return 12 || 8;
 }
 
 /**
@@ -408,7 +406,7 @@ function JR_C_to_NZ_i__r8_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_HL_i_from_d16_i(this: CPU): number {
-  Instructions.map[0x21].call(this);
+  Instructions.map['0x21'].call(this);
   this.PC.add(3);
   return 12;
 }
@@ -420,7 +418,7 @@ function LD_into_HL_i_from_d16_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_HL_incr_m_from_A_i(this: CPU): number {
-  Instructions.map[0x22].call(this);
+  Instructions.map['0x22'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -432,7 +430,7 @@ function LD_into_HL_incr_m_from_A_i(this: CPU): number {
  * Affected flags:
  */
 function INC_HL_i(this: CPU): number {
-  Instructions.map[0x23].call(this);
+  Instructions.map['0x23'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -444,7 +442,7 @@ function INC_HL_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function INC_H_i(this: CPU): number {
-  Instructions.map[0x24].call(this);
+  Instructions.map['0x24'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -456,7 +454,7 @@ function INC_H_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function DEC_H_i(this: CPU): number {
-  Instructions.map[0x25].call(this);
+  Instructions.map['0x25'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -468,7 +466,7 @@ function DEC_H_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_H_i_from_d8_i(this: CPU): number {
-  Instructions.map[0x26].call(this);
+  Instructions.map['0x26'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -480,22 +478,21 @@ function LD_into_H_i_from_d8_i(this: CPU): number {
  * Affected flags: Z, H, C
  */
 function DAA_A(this: CPU): number {
-  Instructions.map[0x27].call(this);
+  Instructions.map['0x27'].call(this);
   this.PC.add(1);
   return 4;
 }
 
 /**
- * Conditional jump to the relative address.
+ * Unconditional jump to the relative address.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-function JR_C_to_Z_i__r8_i(this: CPU): number {
-  let condition: boolean = Instructions.map[0x28].call(this);
+function JR_to_Z_i__r8_i(this: CPU): number {
+  Instructions.map['0x28'].call(this);
   this.PC.add(2);
-  // if condition passed, elapse larger number of m cycles
-  return condition ? 12 : 8;
+  return 12 || 8;
 }
 
 /**
@@ -505,7 +502,7 @@ function JR_C_to_Z_i__r8_i(this: CPU): number {
  * Affected flags: N, H, C
  */
 function ADD_into_HL_i_from_HL_i(this: CPU): number {
-  Instructions.map[0x29].call(this);
+  Instructions.map['0x29'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -517,7 +514,7 @@ function ADD_into_HL_i_from_HL_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_A_i_from_HL_incr_m(this: CPU): number {
-  Instructions.map[0x2a].call(this);
+  Instructions.map['0x2a'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -529,7 +526,7 @@ function LD_into_A_i_from_HL_incr_m(this: CPU): number {
  * Affected flags:
  */
 function DEC_HL_i(this: CPU): number {
-  Instructions.map[0x2b].call(this);
+  Instructions.map['0x2b'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -541,7 +538,7 @@ function DEC_HL_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function INC_L_i(this: CPU): number {
-  Instructions.map[0x2c].call(this);
+  Instructions.map['0x2c'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -553,7 +550,7 @@ function INC_L_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function DEC_L_i(this: CPU): number {
-  Instructions.map[0x2d].call(this);
+  Instructions.map['0x2d'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -565,7 +562,7 @@ function DEC_L_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_L_i_from_d8_i(this: CPU): number {
-  Instructions.map[0x2e].call(this);
+  Instructions.map['0x2e'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -577,22 +574,21 @@ function LD_into_L_i_from_d8_i(this: CPU): number {
  * Affected flags: N, H
  */
 function CPL_A(this: CPU): number {
-  Instructions.map[0x2f].call(this);
+  Instructions.map['0x2f'].call(this);
   this.PC.add(1);
   return 4;
 }
 
 /**
- * Conditional jump to the relative address.
+ * Unconditional jump to the relative address.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-function JR_C_to_NC_i__r8_i(this: CPU): number {
-  let condition: boolean = Instructions.map[0x30].call(this);
+function JR_to_NC_i__r8_i(this: CPU): number {
+  Instructions.map['0x30'].call(this);
   this.PC.add(2);
-  // if condition passed, elapse larger number of m cycles
-  return condition ? 12 : 8;
+  return 12 || 8;
 }
 
 /**
@@ -602,7 +598,7 @@ function JR_C_to_NC_i__r8_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_SP_i_from_d16_i(this: CPU): number {
-  Instructions.map[0x31].call(this);
+  Instructions.map['0x31'].call(this);
   this.PC.add(3);
   return 12;
 }
@@ -614,7 +610,7 @@ function LD_into_SP_i_from_d16_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_HL_decr_m_from_A_i(this: CPU): number {
-  Instructions.map[0x32].call(this);
+  Instructions.map['0x32'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -626,7 +622,7 @@ function LD_into_HL_decr_m_from_A_i(this: CPU): number {
  * Affected flags:
  */
 function INC_SP_i(this: CPU): number {
-  Instructions.map[0x33].call(this);
+  Instructions.map['0x33'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -638,7 +634,7 @@ function INC_SP_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function INC_HL_m(this: CPU): number {
-  Instructions.map[0x34].call(this);
+  Instructions.map['0x34'].call(this);
   this.PC.add(1);
   return 12;
 }
@@ -650,7 +646,7 @@ function INC_HL_m(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function DEC_HL_m(this: CPU): number {
-  Instructions.map[0x35].call(this);
+  Instructions.map['0x35'].call(this);
   this.PC.add(1);
   return 12;
 }
@@ -662,7 +658,7 @@ function DEC_HL_m(this: CPU): number {
  * Affected flags:
  */
 function LD_into_HL_m_from_d8_i(this: CPU): number {
-  Instructions.map[0x36].call(this);
+  Instructions.map['0x36'].call(this);
   this.PC.add(2);
   return 12;
 }
@@ -674,22 +670,21 @@ function LD_into_HL_m_from_d8_i(this: CPU): number {
  * Affected flags: N, H, C
  */
 function SCF(this: CPU): number {
-  Instructions.map[0x37].call(this);
+  Instructions.map['0x37'].call(this);
   this.PC.add(1);
   return 4;
 }
 
 /**
- * Conditional jump to the relative address.
+ * Unconditional jump to the relative address.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-function JR_C_to_C_i__r8_i(this: CPU): number {
-  let condition: boolean = Instructions.map[0x38].call(this);
+function JR_to_C_i__r8_i(this: CPU): number {
+  Instructions.map['0x38'].call(this);
   this.PC.add(2);
-  // if condition passed, elapse larger number of m cycles
-  return condition ? 12 : 8;
+  return 12 || 8;
 }
 
 /**
@@ -699,7 +694,7 @@ function JR_C_to_C_i__r8_i(this: CPU): number {
  * Affected flags: N, H, C
  */
 function ADD_into_HL_i_from_SP_i(this: CPU): number {
-  Instructions.map[0x39].call(this);
+  Instructions.map['0x39'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -711,7 +706,7 @@ function ADD_into_HL_i_from_SP_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_A_i_from_HL_decr_m(this: CPU): number {
-  Instructions.map[0x3a].call(this);
+  Instructions.map['0x3a'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -723,7 +718,7 @@ function LD_into_A_i_from_HL_decr_m(this: CPU): number {
  * Affected flags:
  */
 function DEC_SP_i(this: CPU): number {
-  Instructions.map[0x3b].call(this);
+  Instructions.map['0x3b'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -735,7 +730,7 @@ function DEC_SP_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function INC_A_i(this: CPU): number {
-  Instructions.map[0x3c].call(this);
+  Instructions.map['0x3c'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -747,7 +742,7 @@ function INC_A_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function DEC_A_i(this: CPU): number {
-  Instructions.map[0x3d].call(this);
+  Instructions.map['0x3d'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -759,7 +754,7 @@ function DEC_A_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_A_i_from_d8_i(this: CPU): number {
-  Instructions.map[0x3e].call(this);
+  Instructions.map['0x3e'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -771,10 +766,10 @@ function LD_into_A_i_from_d8_i(this: CPU): number {
      * @param - CPU class.
      * @returns - Number of system clock ticks used.
 
-      * Affected flags: N, H, C
-      */
+    * Affected flags: N, H, C
+    */
 function CCF(this: CPU): number {
-  Instructions.map[0x3f].call(this);
+  Instructions.map['0x3f'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -786,7 +781,7 @@ function CCF(this: CPU): number {
  * Affected flags:
  */
 function LD_into_B_i_from_B_i(this: CPU): number {
-  Instructions.map[0x40].call(this);
+  Instructions.map['0x40'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -798,7 +793,7 @@ function LD_into_B_i_from_B_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_B_i_from_C_i(this: CPU): number {
-  Instructions.map[0x41].call(this);
+  Instructions.map['0x41'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -810,7 +805,7 @@ function LD_into_B_i_from_C_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_B_i_from_D_i(this: CPU): number {
-  Instructions.map[0x42].call(this);
+  Instructions.map['0x42'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -822,7 +817,7 @@ function LD_into_B_i_from_D_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_B_i_from_E_i(this: CPU): number {
-  Instructions.map[0x43].call(this);
+  Instructions.map['0x43'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -834,7 +829,7 @@ function LD_into_B_i_from_E_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_B_i_from_H_i(this: CPU): number {
-  Instructions.map[0x44].call(this);
+  Instructions.map['0x44'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -846,7 +841,7 @@ function LD_into_B_i_from_H_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_B_i_from_L_i(this: CPU): number {
-  Instructions.map[0x45].call(this);
+  Instructions.map['0x45'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -858,7 +853,7 @@ function LD_into_B_i_from_L_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_B_i_from_HL_m(this: CPU): number {
-  Instructions.map[0x46].call(this);
+  Instructions.map['0x46'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -870,7 +865,7 @@ function LD_into_B_i_from_HL_m(this: CPU): number {
  * Affected flags:
  */
 function LD_into_B_i_from_A_i(this: CPU): number {
-  Instructions.map[0x47].call(this);
+  Instructions.map['0x47'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -882,7 +877,7 @@ function LD_into_B_i_from_A_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_C_i_from_B_i(this: CPU): number {
-  Instructions.map[0x48].call(this);
+  Instructions.map['0x48'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -894,7 +889,7 @@ function LD_into_C_i_from_B_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_C_i_from_C_i(this: CPU): number {
-  Instructions.map[0x49].call(this);
+  Instructions.map['0x49'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -906,7 +901,7 @@ function LD_into_C_i_from_C_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_C_i_from_D_i(this: CPU): number {
-  Instructions.map[0x4a].call(this);
+  Instructions.map['0x4a'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -918,7 +913,7 @@ function LD_into_C_i_from_D_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_C_i_from_E_i(this: CPU): number {
-  Instructions.map[0x4b].call(this);
+  Instructions.map['0x4b'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -930,7 +925,7 @@ function LD_into_C_i_from_E_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_C_i_from_H_i(this: CPU): number {
-  Instructions.map[0x4c].call(this);
+  Instructions.map['0x4c'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -942,7 +937,7 @@ function LD_into_C_i_from_H_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_C_i_from_L_i(this: CPU): number {
-  Instructions.map[0x4d].call(this);
+  Instructions.map['0x4d'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -954,7 +949,7 @@ function LD_into_C_i_from_L_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_C_i_from_HL_m(this: CPU): number {
-  Instructions.map[0x4e].call(this);
+  Instructions.map['0x4e'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -966,7 +961,7 @@ function LD_into_C_i_from_HL_m(this: CPU): number {
  * Affected flags:
  */
 function LD_into_C_i_from_A_i(this: CPU): number {
-  Instructions.map[0x4f].call(this);
+  Instructions.map['0x4f'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -978,7 +973,7 @@ function LD_into_C_i_from_A_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_D_i_from_B_i(this: CPU): number {
-  Instructions.map[0x50].call(this);
+  Instructions.map['0x50'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -990,7 +985,7 @@ function LD_into_D_i_from_B_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_D_i_from_C_i(this: CPU): number {
-  Instructions.map[0x51].call(this);
+  Instructions.map['0x51'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1002,7 +997,7 @@ function LD_into_D_i_from_C_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_D_i_from_D_i(this: CPU): number {
-  Instructions.map[0x52].call(this);
+  Instructions.map['0x52'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1014,7 +1009,7 @@ function LD_into_D_i_from_D_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_D_i_from_E_i(this: CPU): number {
-  Instructions.map[0x53].call(this);
+  Instructions.map['0x53'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1026,7 +1021,7 @@ function LD_into_D_i_from_E_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_D_i_from_H_i(this: CPU): number {
-  Instructions.map[0x54].call(this);
+  Instructions.map['0x54'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1038,7 +1033,7 @@ function LD_into_D_i_from_H_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_D_i_from_L_i(this: CPU): number {
-  Instructions.map[0x55].call(this);
+  Instructions.map['0x55'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1050,7 +1045,7 @@ function LD_into_D_i_from_L_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_D_i_from_HL_m(this: CPU): number {
-  Instructions.map[0x56].call(this);
+  Instructions.map['0x56'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -1062,7 +1057,7 @@ function LD_into_D_i_from_HL_m(this: CPU): number {
  * Affected flags:
  */
 function LD_into_D_i_from_A_i(this: CPU): number {
-  Instructions.map[0x57].call(this);
+  Instructions.map['0x57'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1074,7 +1069,7 @@ function LD_into_D_i_from_A_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_E_i_from_B_i(this: CPU): number {
-  Instructions.map[0x58].call(this);
+  Instructions.map['0x58'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1086,7 +1081,7 @@ function LD_into_E_i_from_B_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_E_i_from_C_i(this: CPU): number {
-  Instructions.map[0x59].call(this);
+  Instructions.map['0x59'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1098,7 +1093,7 @@ function LD_into_E_i_from_C_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_E_i_from_D_i(this: CPU): number {
-  Instructions.map[0x5a].call(this);
+  Instructions.map['0x5a'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1110,7 +1105,7 @@ function LD_into_E_i_from_D_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_E_i_from_E_i(this: CPU): number {
-  Instructions.map[0x5b].call(this);
+  Instructions.map['0x5b'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1122,7 +1117,7 @@ function LD_into_E_i_from_E_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_E_i_from_H_i(this: CPU): number {
-  Instructions.map[0x5c].call(this);
+  Instructions.map['0x5c'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1134,7 +1129,7 @@ function LD_into_E_i_from_H_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_E_i_from_L_i(this: CPU): number {
-  Instructions.map[0x5d].call(this);
+  Instructions.map['0x5d'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1146,7 +1141,7 @@ function LD_into_E_i_from_L_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_E_i_from_HL_m(this: CPU): number {
-  Instructions.map[0x5e].call(this);
+  Instructions.map['0x5e'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -1158,7 +1153,7 @@ function LD_into_E_i_from_HL_m(this: CPU): number {
  * Affected flags:
  */
 function LD_into_E_i_from_A_i(this: CPU): number {
-  Instructions.map[0x5f].call(this);
+  Instructions.map['0x5f'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1170,7 +1165,7 @@ function LD_into_E_i_from_A_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_H_i_from_B_i(this: CPU): number {
-  Instructions.map[0x60].call(this);
+  Instructions.map['0x60'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1182,7 +1177,7 @@ function LD_into_H_i_from_B_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_H_i_from_C_i(this: CPU): number {
-  Instructions.map[0x61].call(this);
+  Instructions.map['0x61'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1194,7 +1189,7 @@ function LD_into_H_i_from_C_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_H_i_from_D_i(this: CPU): number {
-  Instructions.map[0x62].call(this);
+  Instructions.map['0x62'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1206,7 +1201,7 @@ function LD_into_H_i_from_D_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_H_i_from_E_i(this: CPU): number {
-  Instructions.map[0x63].call(this);
+  Instructions.map['0x63'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1218,7 +1213,7 @@ function LD_into_H_i_from_E_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_H_i_from_H_i(this: CPU): number {
-  Instructions.map[0x64].call(this);
+  Instructions.map['0x64'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1230,7 +1225,7 @@ function LD_into_H_i_from_H_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_H_i_from_L_i(this: CPU): number {
-  Instructions.map[0x65].call(this);
+  Instructions.map['0x65'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1242,7 +1237,7 @@ function LD_into_H_i_from_L_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_H_i_from_HL_m(this: CPU): number {
-  Instructions.map[0x66].call(this);
+  Instructions.map['0x66'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -1254,7 +1249,7 @@ function LD_into_H_i_from_HL_m(this: CPU): number {
  * Affected flags:
  */
 function LD_into_H_i_from_A_i(this: CPU): number {
-  Instructions.map[0x67].call(this);
+  Instructions.map['0x67'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1266,7 +1261,7 @@ function LD_into_H_i_from_A_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_L_i_from_B_i(this: CPU): number {
-  Instructions.map[0x68].call(this);
+  Instructions.map['0x68'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1278,7 +1273,7 @@ function LD_into_L_i_from_B_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_L_i_from_C_i(this: CPU): number {
-  Instructions.map[0x69].call(this);
+  Instructions.map['0x69'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1290,7 +1285,7 @@ function LD_into_L_i_from_C_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_L_i_from_D_i(this: CPU): number {
-  Instructions.map[0x6a].call(this);
+  Instructions.map['0x6a'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1302,7 +1297,7 @@ function LD_into_L_i_from_D_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_L_i_from_E_i(this: CPU): number {
-  Instructions.map[0x6b].call(this);
+  Instructions.map['0x6b'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1314,7 +1309,7 @@ function LD_into_L_i_from_E_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_L_i_from_H_i(this: CPU): number {
-  Instructions.map[0x6c].call(this);
+  Instructions.map['0x6c'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1326,7 +1321,7 @@ function LD_into_L_i_from_H_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_L_i_from_L_i(this: CPU): number {
-  Instructions.map[0x6d].call(this);
+  Instructions.map['0x6d'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1338,7 +1333,7 @@ function LD_into_L_i_from_L_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_L_i_from_HL_m(this: CPU): number {
-  Instructions.map[0x6e].call(this);
+  Instructions.map['0x6e'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -1350,7 +1345,7 @@ function LD_into_L_i_from_HL_m(this: CPU): number {
  * Affected flags:
  */
 function LD_into_L_i_from_A_i(this: CPU): number {
-  Instructions.map[0x6f].call(this);
+  Instructions.map['0x6f'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1362,7 +1357,7 @@ function LD_into_L_i_from_A_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_HL_m_from_B_i(this: CPU): number {
-  Instructions.map[0x70].call(this);
+  Instructions.map['0x70'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -1374,7 +1369,7 @@ function LD_into_HL_m_from_B_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_HL_m_from_C_i(this: CPU): number {
-  Instructions.map[0x71].call(this);
+  Instructions.map['0x71'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -1386,7 +1381,7 @@ function LD_into_HL_m_from_C_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_HL_m_from_D_i(this: CPU): number {
-  Instructions.map[0x72].call(this);
+  Instructions.map['0x72'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -1398,7 +1393,7 @@ function LD_into_HL_m_from_D_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_HL_m_from_E_i(this: CPU): number {
-  Instructions.map[0x73].call(this);
+  Instructions.map['0x73'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -1410,7 +1405,7 @@ function LD_into_HL_m_from_E_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_HL_m_from_H_i(this: CPU): number {
-  Instructions.map[0x74].call(this);
+  Instructions.map['0x74'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -1422,7 +1417,7 @@ function LD_into_HL_m_from_H_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_HL_m_from_L_i(this: CPU): number {
-  Instructions.map[0x75].call(this);
+  Instructions.map['0x75'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -1432,10 +1427,10 @@ function LD_into_HL_m_from_L_i(this: CPU): number {
      * @param - CPU class.
      * @returns - Number of system clock ticks used.
 
-      * Affected flags:
-      */
+    * Affected flags:
+    */
 function HALT(this: CPU): number {
-  Instructions.map[0x76].call(this);
+  Instructions.map['0x76'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1447,7 +1442,7 @@ function HALT(this: CPU): number {
  * Affected flags:
  */
 function LD_into_HL_m_from_A_i(this: CPU): number {
-  Instructions.map[0x77].call(this);
+  Instructions.map['0x77'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -1459,7 +1454,7 @@ function LD_into_HL_m_from_A_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_A_i_from_B_i(this: CPU): number {
-  Instructions.map[0x78].call(this);
+  Instructions.map['0x78'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1471,7 +1466,7 @@ function LD_into_A_i_from_B_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_A_i_from_C_i(this: CPU): number {
-  Instructions.map[0x79].call(this);
+  Instructions.map['0x79'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1483,7 +1478,7 @@ function LD_into_A_i_from_C_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_A_i_from_D_i(this: CPU): number {
-  Instructions.map[0x7a].call(this);
+  Instructions.map['0x7a'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1495,7 +1490,7 @@ function LD_into_A_i_from_D_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_A_i_from_E_i(this: CPU): number {
-  Instructions.map[0x7b].call(this);
+  Instructions.map['0x7b'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1507,7 +1502,7 @@ function LD_into_A_i_from_E_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_A_i_from_H_i(this: CPU): number {
-  Instructions.map[0x7c].call(this);
+  Instructions.map['0x7c'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1519,7 +1514,7 @@ function LD_into_A_i_from_H_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_A_i_from_L_i(this: CPU): number {
-  Instructions.map[0x7d].call(this);
+  Instructions.map['0x7d'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1531,7 +1526,7 @@ function LD_into_A_i_from_L_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_A_i_from_HL_m(this: CPU): number {
-  Instructions.map[0x7e].call(this);
+  Instructions.map['0x7e'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -1543,7 +1538,7 @@ function LD_into_A_i_from_HL_m(this: CPU): number {
  * Affected flags:
  */
 function LD_into_A_i_from_A_i(this: CPU): number {
-  Instructions.map[0x7f].call(this);
+  Instructions.map['0x7f'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1555,7 +1550,7 @@ function LD_into_A_i_from_A_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function ADD_into_A_i_from_B_i(this: CPU): number {
-  Instructions.map[0x80].call(this);
+  Instructions.map['0x80'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1567,7 +1562,7 @@ function ADD_into_A_i_from_B_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function ADD_into_A_i_from_C_i(this: CPU): number {
-  Instructions.map[0x81].call(this);
+  Instructions.map['0x81'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1579,7 +1574,7 @@ function ADD_into_A_i_from_C_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function ADD_into_A_i_from_D_i(this: CPU): number {
-  Instructions.map[0x82].call(this);
+  Instructions.map['0x82'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1591,7 +1586,7 @@ function ADD_into_A_i_from_D_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function ADD_into_A_i_from_E_i(this: CPU): number {
-  Instructions.map[0x83].call(this);
+  Instructions.map['0x83'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1603,7 +1598,7 @@ function ADD_into_A_i_from_E_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function ADD_into_A_i_from_H_i(this: CPU): number {
-  Instructions.map[0x84].call(this);
+  Instructions.map['0x84'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1615,7 +1610,7 @@ function ADD_into_A_i_from_H_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function ADD_into_A_i_from_L_i(this: CPU): number {
-  Instructions.map[0x85].call(this);
+  Instructions.map['0x85'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1627,7 +1622,7 @@ function ADD_into_A_i_from_L_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function ADD_into_A_i_from_HL_m(this: CPU): number {
-  Instructions.map[0x86].call(this);
+  Instructions.map['0x86'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -1639,7 +1634,7 @@ function ADD_into_A_i_from_HL_m(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function ADD_into_A_i_from_A_i(this: CPU): number {
-  Instructions.map[0x87].call(this);
+  Instructions.map['0x87'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1651,7 +1646,7 @@ function ADD_into_A_i_from_A_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function ADC_into_A_i_from_B_i(this: CPU): number {
-  Instructions.map[0x88].call(this);
+  Instructions.map['0x88'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1663,7 +1658,7 @@ function ADC_into_A_i_from_B_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function ADC_into_A_i_from_C_i(this: CPU): number {
-  Instructions.map[0x89].call(this);
+  Instructions.map['0x89'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1675,7 +1670,7 @@ function ADC_into_A_i_from_C_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function ADC_into_A_i_from_D_i(this: CPU): number {
-  Instructions.map[0x8a].call(this);
+  Instructions.map['0x8a'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1687,7 +1682,7 @@ function ADC_into_A_i_from_D_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function ADC_into_A_i_from_E_i(this: CPU): number {
-  Instructions.map[0x8b].call(this);
+  Instructions.map['0x8b'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1699,7 +1694,7 @@ function ADC_into_A_i_from_E_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function ADC_into_A_i_from_H_i(this: CPU): number {
-  Instructions.map[0x8c].call(this);
+  Instructions.map['0x8c'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1711,7 +1706,7 @@ function ADC_into_A_i_from_H_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function ADC_into_A_i_from_L_i(this: CPU): number {
-  Instructions.map[0x8d].call(this);
+  Instructions.map['0x8d'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1723,7 +1718,7 @@ function ADC_into_A_i_from_L_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function ADC_into_A_i_from_HL_m(this: CPU): number {
-  Instructions.map[0x8e].call(this);
+  Instructions.map['0x8e'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -1735,7 +1730,7 @@ function ADC_into_A_i_from_HL_m(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function ADC_into_A_i_from_A_i(this: CPU): number {
-  Instructions.map[0x8f].call(this);
+  Instructions.map['0x8f'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1747,7 +1742,7 @@ function ADC_into_A_i_from_A_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SUB_from_A_i_value_B_i(this: CPU): number {
-  Instructions.map[0x90].call(this);
+  Instructions.map['0x90'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1759,7 +1754,7 @@ function SUB_from_A_i_value_B_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SUB_from_A_i_value_C_i(this: CPU): number {
-  Instructions.map[0x91].call(this);
+  Instructions.map['0x91'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1771,7 +1766,7 @@ function SUB_from_A_i_value_C_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SUB_from_A_i_value_D_i(this: CPU): number {
-  Instructions.map[0x92].call(this);
+  Instructions.map['0x92'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1783,7 +1778,7 @@ function SUB_from_A_i_value_D_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SUB_from_A_i_value_E_i(this: CPU): number {
-  Instructions.map[0x93].call(this);
+  Instructions.map['0x93'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1795,7 +1790,7 @@ function SUB_from_A_i_value_E_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SUB_from_A_i_value_H_i(this: CPU): number {
-  Instructions.map[0x94].call(this);
+  Instructions.map['0x94'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1807,7 +1802,7 @@ function SUB_from_A_i_value_H_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SUB_from_A_i_value_L_i(this: CPU): number {
-  Instructions.map[0x95].call(this);
+  Instructions.map['0x95'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1819,7 +1814,7 @@ function SUB_from_A_i_value_L_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SUB_from_A_i_value_HL_m(this: CPU): number {
-  Instructions.map[0x96].call(this);
+  Instructions.map['0x96'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -1831,79 +1826,91 @@ function SUB_from_A_i_value_HL_m(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SUB_from_A_i_value_A_i(this: CPU): number {
-  Instructions.map[0x97].call(this);
+  Instructions.map['0x97'].call(this);
   this.PC.add(1);
   return 4;
 }
 
 /**
  * Subtract with carry flag.
+ * @param - CPU class.
+ * @returns - Number of system clock ticks used.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
 function SBC_from_A_i_value_B_i(this: CPU): number {
-  Instructions.map[0x98].call(this);
+  Instructions.map['0x98'].call(this);
   this.PC.add(1);
   return 4;
 }
 
 /**
  * Subtract with carry flag.
+ * @param - CPU class.
+ * @returns - Number of system clock ticks used.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
 function SBC_from_A_i_value_C_i(this: CPU): number {
-  Instructions.map[0x99].call(this);
+  Instructions.map['0x99'].call(this);
   this.PC.add(1);
   return 4;
 }
 
 /**
  * Subtract with carry flag.
+ * @param - CPU class.
+ * @returns - Number of system clock ticks used.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
 function SBC_from_A_i_value_D_i(this: CPU): number {
-  Instructions.map[0x9a].call(this);
+  Instructions.map['0x9a'].call(this);
   this.PC.add(1);
   return 4;
 }
 
 /**
  * Subtract with carry flag.
+ * @param - CPU class.
+ * @returns - Number of system clock ticks used.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
 function SBC_from_A_i_value_E_i(this: CPU): number {
-  Instructions.map[0x9b].call(this);
+  Instructions.map['0x9b'].call(this);
   this.PC.add(1);
   return 4;
 }
 
 /**
  * Subtract with carry flag.
+ * @param - CPU class.
+ * @returns - Number of system clock ticks used.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
 function SBC_from_A_i_value_H_i(this: CPU): number {
-  Instructions.map[0x9c].call(this);
+  Instructions.map['0x9c'].call(this);
   this.PC.add(1);
   return 4;
 }
 
 /**
  * Subtract with carry flag.
+ * @param - CPU class.
+ * @returns - Number of system clock ticks used.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
 function SBC_from_A_i_value_L_i(this: CPU): number {
-  Instructions.map[0x9d].call(this);
+  Instructions.map['0x9d'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1912,10 +1919,12 @@ function SBC_from_A_i_value_L_i(this: CPU): number {
  * Subtract with carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * @param - CPU class.
+ * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
 function SBC_from_A_i_value_HL_m(this: CPU): number {
-  Instructions.map[0x9e].call(this);
+  Instructions.map['0x9e'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -1924,10 +1933,12 @@ function SBC_from_A_i_value_HL_m(this: CPU): number {
  * Subtract with carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * @param - CPU class.
+ * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
 function SBC_from_A_i_value_A_i(this: CPU): number {
-  Instructions.map[0x9f].call(this);
+  Instructions.map['0x9f'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1939,7 +1950,7 @@ function SBC_from_A_i_value_A_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function AND_A_with_B(this: CPU): number {
-  Instructions.map[0xa0].call(this);
+  Instructions.map['0xa0'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1951,7 +1962,7 @@ function AND_A_with_B(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function AND_A_with_C(this: CPU): number {
-  Instructions.map[0xa1].call(this);
+  Instructions.map['0xa1'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1963,7 +1974,7 @@ function AND_A_with_C(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function AND_A_with_D(this: CPU): number {
-  Instructions.map[0xa2].call(this);
+  Instructions.map['0xa2'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1975,7 +1986,7 @@ function AND_A_with_D(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function AND_A_with_E(this: CPU): number {
-  Instructions.map[0xa3].call(this);
+  Instructions.map['0xa3'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1987,7 +1998,7 @@ function AND_A_with_E(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function AND_A_with_H(this: CPU): number {
-  Instructions.map[0xa4].call(this);
+  Instructions.map['0xa4'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -1999,7 +2010,7 @@ function AND_A_with_H(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function AND_A_with_L(this: CPU): number {
-  Instructions.map[0xa5].call(this);
+  Instructions.map['0xa5'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2011,7 +2022,7 @@ function AND_A_with_L(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function AND_A_with_HL(this: CPU): number {
-  Instructions.map[0xa6].call(this);
+  Instructions.map['0xa6'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -2023,7 +2034,7 @@ function AND_A_with_HL(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function AND_A_with_A(this: CPU): number {
-  Instructions.map[0xa7].call(this);
+  Instructions.map['0xa7'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2035,7 +2046,7 @@ function AND_A_with_A(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function XOR_A_with_B(this: CPU): number {
-  Instructions.map[0xa8].call(this);
+  Instructions.map['0xa8'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2047,7 +2058,7 @@ function XOR_A_with_B(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function XOR_A_with_C(this: CPU): number {
-  Instructions.map[0xa9].call(this);
+  Instructions.map['0xa9'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2059,7 +2070,7 @@ function XOR_A_with_C(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function XOR_A_with_D(this: CPU): number {
-  Instructions.map[0xaa].call(this);
+  Instructions.map['0xaa'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2071,7 +2082,7 @@ function XOR_A_with_D(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function XOR_A_with_E(this: CPU): number {
-  Instructions.map[0xab].call(this);
+  Instructions.map['0xab'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2083,7 +2094,7 @@ function XOR_A_with_E(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function XOR_A_with_H(this: CPU): number {
-  Instructions.map[0xac].call(this);
+  Instructions.map['0xac'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2095,7 +2106,7 @@ function XOR_A_with_H(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function XOR_A_with_L(this: CPU): number {
-  Instructions.map[0xad].call(this);
+  Instructions.map['0xad'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2107,7 +2118,7 @@ function XOR_A_with_L(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function XOR_A_with_HL(this: CPU): number {
-  Instructions.map[0xae].call(this);
+  Instructions.map['0xae'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -2119,7 +2130,7 @@ function XOR_A_with_HL(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function XOR_A_with_A(this: CPU): number {
-  Instructions.map[0xaf].call(this);
+  Instructions.map['0xaf'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2131,7 +2142,7 @@ function XOR_A_with_A(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function OR_A_with_B(this: CPU): number {
-  Instructions.map[0xb0].call(this);
+  Instructions.map['0xb0'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2143,7 +2154,7 @@ function OR_A_with_B(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function OR_A_with_C(this: CPU): number {
-  Instructions.map[0xb1].call(this);
+  Instructions.map['0xb1'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2155,7 +2166,7 @@ function OR_A_with_C(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function OR_A_with_D(this: CPU): number {
-  Instructions.map[0xb2].call(this);
+  Instructions.map['0xb2'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2167,7 +2178,7 @@ function OR_A_with_D(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function OR_A_with_E(this: CPU): number {
-  Instructions.map[0xb3].call(this);
+  Instructions.map['0xb3'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2179,7 +2190,7 @@ function OR_A_with_E(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function OR_A_with_H(this: CPU): number {
-  Instructions.map[0xb4].call(this);
+  Instructions.map['0xb4'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2191,7 +2202,7 @@ function OR_A_with_H(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function OR_A_with_L(this: CPU): number {
-  Instructions.map[0xb5].call(this);
+  Instructions.map['0xb5'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2203,7 +2214,7 @@ function OR_A_with_L(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function OR_A_with_HL(this: CPU): number {
-  Instructions.map[0xb6].call(this);
+  Instructions.map['0xb6'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -2215,7 +2226,7 @@ function OR_A_with_HL(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function OR_A_with_A(this: CPU): number {
-  Instructions.map[0xb7].call(this);
+  Instructions.map['0xb7'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2227,7 +2238,7 @@ function OR_A_with_A(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function CP_A_with_B(this: CPU): number {
-  Instructions.map[0xb8].call(this);
+  Instructions.map['0xb8'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2239,7 +2250,7 @@ function CP_A_with_B(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function CP_A_with_C(this: CPU): number {
-  Instructions.map[0xb9].call(this);
+  Instructions.map['0xb9'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2251,7 +2262,7 @@ function CP_A_with_C(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function CP_A_with_D(this: CPU): number {
-  Instructions.map[0xba].call(this);
+  Instructions.map['0xba'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2263,7 +2274,7 @@ function CP_A_with_D(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function CP_A_with_E(this: CPU): number {
-  Instructions.map[0xbb].call(this);
+  Instructions.map['0xbb'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2275,7 +2286,7 @@ function CP_A_with_E(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function CP_A_with_H(this: CPU): number {
-  Instructions.map[0xbc].call(this);
+  Instructions.map['0xbc'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2287,7 +2298,7 @@ function CP_A_with_H(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function CP_A_with_L(this: CPU): number {
-  Instructions.map[0xbd].call(this);
+  Instructions.map['0xbd'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2299,7 +2310,7 @@ function CP_A_with_L(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function CP_A_with_HL(this: CPU): number {
-  Instructions.map[0xbe].call(this);
+  Instructions.map['0xbe'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -2311,7 +2322,7 @@ function CP_A_with_HL(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function CP_A_with_A(this: CPU): number {
-  Instructions.map[0xbf].call(this);
+  Instructions.map['0xbf'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2323,7 +2334,7 @@ function CP_A_with_A(this: CPU): number {
  * Affected flags:
  */
 function RET_to_A_i__NZ_i(this: CPU): number {
-  Instructions.map[0xc0].call(this);
+  Instructions.map['0xc0'].call(this);
   this.PC.add(1);
   return 20 || 8;
 }
@@ -2335,35 +2346,33 @@ function RET_to_A_i__NZ_i(this: CPU): number {
  * Affected flags:
  */
 function POP_off_SP_into_BC_i(this: CPU): number {
-  Instructions.map[0xc1].call(this);
+  Instructions.map['0xc1'].call(this);
   this.PC.add(1);
   return 12;
 }
 
 /**
- * Conditional jump to the absolute address specified by the 16-bit operand.
+ * Unconditional jump to the absolute address specified by the 16-bit operand
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-function JP_C_to_NZ_i__a16_i(this: CPU): number {
-  let condition: boolean = Instructions.map[0xc2].call(this);
+function JP_to_NZ_i__a16_i(this: CPU): number {
+  Instructions.map['0xc2'].call(this);
   this.PC.add(3);
-  // if condition passed, elapse larger number of m cycles
-  return condition ? 16 : 12;
+  return 16 || 12;
 }
 
 /**
- * Unconditional jump to the absolute address specified by the 16-bit operand.
+ * Unconditional jump to the absolute address specified by the 16-bit operand
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
 function JP_to_A_i__a16_i(this: CPU): number {
-  let condition: boolean = Instructions.map[0xc3].call(this);
+  Instructions.map['0xc3'].call(this);
   this.PC.add(3);
-  // if condition passed, elapse larger number of m cycles
-  return condition ? 16 : undefined;
+  return 16;
 }
 
 /**
@@ -2373,7 +2382,7 @@ function JP_to_A_i__a16_i(this: CPU): number {
  * Affected flags:
  */
 function CALL_to_NZ_i_from_a16_i(this: CPU): number {
-  Instructions.map[0xc4].call(this);
+  Instructions.map['0xc4'].call(this);
   this.PC.add(3);
   return 24 || 12;
 }
@@ -2385,7 +2394,7 @@ function CALL_to_NZ_i_from_a16_i(this: CPU): number {
  * Affected flags:
  */
 function PUSH_onto_SP_register_BC_i(this: CPU): number {
-  Instructions.map[0xc5].call(this);
+  Instructions.map['0xc5'].call(this);
   this.PC.add(1);
   return 16;
 }
@@ -2397,7 +2406,7 @@ function PUSH_onto_SP_register_BC_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function ADD_into_A_i_from_d8_i(this: CPU): number {
-  Instructions.map[0xc6].call(this);
+  Instructions.map['0xc6'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -2409,7 +2418,7 @@ function ADD_into_A_i_from_d8_i(this: CPU): number {
  * Affected flags:
  */
 function RST_to_A_i_from_00H_i(this: CPU): number {
-  Instructions.map[0xc7].call(this);
+  Instructions.map['0xc7'].call(this);
   this.PC.add(1);
   return 16;
 }
@@ -2421,7 +2430,7 @@ function RST_to_A_i_from_00H_i(this: CPU): number {
  * Affected flags:
  */
 function RET_to_A_i__Z_i(this: CPU): number {
-  Instructions.map[0xc8].call(this);
+  Instructions.map['0xc8'].call(this);
   this.PC.add(1);
   return 20 || 8;
 }
@@ -2433,22 +2442,21 @@ function RET_to_A_i__Z_i(this: CPU): number {
  * Affected flags:
  */
 function RET(this: CPU): number {
-  Instructions.map[0xc9].call(this);
+  Instructions.map['0xc9'].call(this);
   this.PC.add(1);
   return 16;
 }
 
 /**
- * Conditional jump to the absolute address specified by the 16-bit operand.
+ * Unconditional jump to the absolute address specified by the 16-bit operand
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-function JP_C_to_Z_i__a16_i(this: CPU): number {
-  let condition: boolean = Instructions.map[0xca].call(this);
+function JP_to_Z_i__a16_i(this: CPU): number {
+  Instructions.map['0xca'].call(this);
   this.PC.add(3);
-  // if condition passed, elapse larger number of m cycles
-  return condition ? 16 : 12;
+  return 16 || 12;
 }
 
 /**
@@ -2458,7 +2466,7 @@ function JP_C_to_Z_i__a16_i(this: CPU): number {
  * Affected flags:
  */
 function PREFIX(this: CPU): number {
-  Instructions.map[0xcb].call(this);
+  Instructions.map['0xcb'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2470,7 +2478,7 @@ function PREFIX(this: CPU): number {
  * Affected flags:
  */
 function CALL_to_Z_i_from_a16_i(this: CPU): number {
-  Instructions.map[0xcc].call(this);
+  Instructions.map['0xcc'].call(this);
   this.PC.add(3);
   return 24 || 12;
 }
@@ -2482,7 +2490,7 @@ function CALL_to_Z_i_from_a16_i(this: CPU): number {
  * Affected flags:
  */
 function CALL_to_A_i_from_a16_i(this: CPU): number {
-  Instructions.map[0xcd].call(this);
+  Instructions.map['0xcd'].call(this);
   this.PC.add(3);
   return 24;
 }
@@ -2494,7 +2502,7 @@ function CALL_to_A_i_from_a16_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function ADC_into_A_i_from_d8_i(this: CPU): number {
-  Instructions.map[0xce].call(this);
+  Instructions.map['0xce'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -2506,7 +2514,7 @@ function ADC_into_A_i_from_d8_i(this: CPU): number {
  * Affected flags:
  */
 function RST_to_A_i_from_08H_i(this: CPU): number {
-  Instructions.map[0xcf].call(this);
+  Instructions.map['0xcf'].call(this);
   this.PC.add(1);
   return 16;
 }
@@ -2518,7 +2526,7 @@ function RST_to_A_i_from_08H_i(this: CPU): number {
  * Affected flags:
  */
 function RET_to_A_i__NC_i(this: CPU): number {
-  Instructions.map[0xd0].call(this);
+  Instructions.map['0xd0'].call(this);
   this.PC.add(1);
   return 20 || 8;
 }
@@ -2530,22 +2538,21 @@ function RET_to_A_i__NC_i(this: CPU): number {
  * Affected flags:
  */
 function POP_off_SP_into_DE_i(this: CPU): number {
-  Instructions.map[0xd1].call(this);
+  Instructions.map['0xd1'].call(this);
   this.PC.add(1);
   return 12;
 }
 
 /**
- * Conditional jump to the absolute address specified by the 16-bit operand.
+ * Unconditional jump to the absolute address specified by the 16-bit operand
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-function JP_C_to_NC_i__a16_i(this: CPU): number {
-  let condition: boolean = Instructions.map[0xd2].call(this);
+function JP_to_NC_i__a16_i(this: CPU): number {
+  Instructions.map['0xd2'].call(this);
   this.PC.add(3);
-  // if condition passed, elapse larger number of m cycles
-  return condition ? 16 : 12;
+  return 16 || 12;
 }
 
 /**
@@ -2553,7 +2560,7 @@ function JP_C_to_NC_i__a16_i(this: CPU): number {
  * Affected flags:
  */
 function ILLEGAL_D3(this: CPU): number {
-  Instructions.map[0xd3].call(this);
+  Instructions.map['0xd3'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2565,7 +2572,7 @@ function ILLEGAL_D3(this: CPU): number {
  * Affected flags:
  */
 function CALL_to_NC_i_from_a16_i(this: CPU): number {
-  Instructions.map[0xd4].call(this);
+  Instructions.map['0xd4'].call(this);
   this.PC.add(3);
   return 24 || 12;
 }
@@ -2577,7 +2584,7 @@ function CALL_to_NC_i_from_a16_i(this: CPU): number {
  * Affected flags:
  */
 function PUSH_onto_SP_register_DE_i(this: CPU): number {
-  Instructions.map[0xd5].call(this);
+  Instructions.map['0xd5'].call(this);
   this.PC.add(1);
   return 16;
 }
@@ -2589,7 +2596,7 @@ function PUSH_onto_SP_register_DE_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SUB_from_A_i_value_d8_i(this: CPU): number {
-  Instructions.map[0xd6].call(this);
+  Instructions.map['0xd6'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -2601,7 +2608,7 @@ function SUB_from_A_i_value_d8_i(this: CPU): number {
  * Affected flags:
  */
 function RST_to_A_i_from_10H_i(this: CPU): number {
-  Instructions.map[0xd7].call(this);
+  Instructions.map['0xd7'].call(this);
   this.PC.add(1);
   return 16;
 }
@@ -2613,7 +2620,7 @@ function RST_to_A_i_from_10H_i(this: CPU): number {
  * Affected flags:
  */
 function RET_to_A_i__C_i(this: CPU): number {
-  Instructions.map[0xd8].call(this);
+  Instructions.map['0xd8'].call(this);
   this.PC.add(1);
   return 20 || 8;
 }
@@ -2625,22 +2632,21 @@ function RET_to_A_i__C_i(this: CPU): number {
  * Affected flags:
  */
 function RETI(this: CPU): number {
-  Instructions.map[0xd9].call(this);
+  Instructions.map['0xd9'].call(this);
   this.PC.add(1);
   return 16;
 }
 
 /**
- * Conditional jump to the absolute address specified by the 16-bit operand.
+ * Unconditional jump to the absolute address specified by the 16-bit operand
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-function JP_C_to_C_i__a16_i(this: CPU): number {
-  let condition: boolean = Instructions.map[0xda].call(this);
+function JP_to_C_i__a16_i(this: CPU): number {
+  Instructions.map['0xda'].call(this);
   this.PC.add(3);
-  // if condition passed, elapse larger number of m cycles
-  return condition ? 16 : 12;
+  return 16 || 12;
 }
 
 /**
@@ -2648,7 +2654,7 @@ function JP_C_to_C_i__a16_i(this: CPU): number {
  * Affected flags:
  */
 function ILLEGAL_DB(this: CPU): number {
-  Instructions.map[0xdb].call(this);
+  Instructions.map['0xdb'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2660,7 +2666,7 @@ function ILLEGAL_DB(this: CPU): number {
  * Affected flags:
  */
 function CALL_to_C_i_from_a16_i(this: CPU): number {
-  Instructions.map[0xdc].call(this);
+  Instructions.map['0xdc'].call(this);
   this.PC.add(3);
   return 24 || 12;
 }
@@ -2670,7 +2676,7 @@ function CALL_to_C_i_from_a16_i(this: CPU): number {
  * Affected flags:
  */
 function ILLEGAL_DD(this: CPU): number {
-  Instructions.map[0xdd].call(this);
+  Instructions.map['0xdd'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2679,10 +2685,12 @@ function ILLEGAL_DD(this: CPU): number {
  * Subtract with carry flag.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
+ * @param - CPU class.
+ * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
 function SBC_from_A_i_value_d8_i(this: CPU): number {
-  Instructions.map[0xde].call(this);
+  Instructions.map['0xde'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -2694,7 +2702,7 @@ function SBC_from_A_i_value_d8_i(this: CPU): number {
  * Affected flags:
  */
 function RST_to_A_i_from_18H_i(this: CPU): number {
-  Instructions.map[0xdf].call(this);
+  Instructions.map['0xdf'].call(this);
   this.PC.add(1);
   return 16;
 }
@@ -2706,7 +2714,7 @@ function RST_to_A_i_from_18H_i(this: CPU): number {
  * Affected flags:
  */
 function LDH_into_a8_m_from_A_i(this: CPU): number {
-  Instructions.map[0xe0].call(this);
+  Instructions.map['0xe0'].call(this);
   this.PC.add(2);
   return 12;
 }
@@ -2718,7 +2726,7 @@ function LDH_into_a8_m_from_A_i(this: CPU): number {
  * Affected flags:
  */
 function POP_off_SP_into_HL_i(this: CPU): number {
-  Instructions.map[0xe1].call(this);
+  Instructions.map['0xe1'].call(this);
   this.PC.add(1);
   return 12;
 }
@@ -2730,7 +2738,7 @@ function POP_off_SP_into_HL_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_C_m_from_A_i(this: CPU): number {
-  Instructions.map[0xe2].call(this);
+  Instructions.map['0xe2'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -2740,7 +2748,7 @@ function LD_into_C_m_from_A_i(this: CPU): number {
  * Affected flags:
  */
 function ILLEGAL_E3(this: CPU): number {
-  Instructions.map[0xe3].call(this);
+  Instructions.map['0xe3'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2750,7 +2758,7 @@ function ILLEGAL_E3(this: CPU): number {
  * Affected flags:
  */
 function ILLEGAL_E4(this: CPU): number {
-  Instructions.map[0xe4].call(this);
+  Instructions.map['0xe4'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2762,7 +2770,7 @@ function ILLEGAL_E4(this: CPU): number {
  * Affected flags:
  */
 function PUSH_onto_SP_register_HL_i(this: CPU): number {
-  Instructions.map[0xe5].call(this);
+  Instructions.map['0xe5'].call(this);
   this.PC.add(1);
   return 16;
 }
@@ -2774,7 +2782,7 @@ function PUSH_onto_SP_register_HL_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function AND_A_with_d8(this: CPU): number {
-  Instructions.map[0xe6].call(this);
+  Instructions.map['0xe6'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -2786,7 +2794,7 @@ function AND_A_with_d8(this: CPU): number {
  * Affected flags:
  */
 function RST_to_A_i_from_20H_i(this: CPU): number {
-  Instructions.map[0xe7].call(this);
+  Instructions.map['0xe7'].call(this);
   this.PC.add(1);
   return 16;
 }
@@ -2798,22 +2806,21 @@ function RST_to_A_i_from_20H_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function ADD_into_SP_i_from_r8_i(this: CPU): number {
-  Instructions.map[0xe8].call(this);
+  Instructions.map['0xe8'].call(this);
   this.PC.add(2);
   return 16;
 }
 
 /**
- * Unconditional jump to the absolute address specified by the 16-bit operand.
+ * Unconditional jump to the absolute address specified by the 16-bit operand
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
 function JP_to_A_i__HL_i(this: CPU): number {
-  let condition: boolean = Instructions.map[0xe9].call(this);
+  Instructions.map['0xe9'].call(this);
   this.PC.add(1);
-  // if condition passed, elapse larger number of m cycles
-  return condition ? 4 : undefined;
+  return 4;
 }
 
 /**
@@ -2823,7 +2830,7 @@ function JP_to_A_i__HL_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_a16_m_from_A_i(this: CPU): number {
-  Instructions.map[0xea].call(this);
+  Instructions.map['0xea'].call(this);
   this.PC.add(3);
   return 16;
 }
@@ -2833,7 +2840,7 @@ function LD_into_a16_m_from_A_i(this: CPU): number {
  * Affected flags:
  */
 function ILLEGAL_EB(this: CPU): number {
-  Instructions.map[0xeb].call(this);
+  Instructions.map['0xeb'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2843,7 +2850,7 @@ function ILLEGAL_EB(this: CPU): number {
  * Affected flags:
  */
 function ILLEGAL_EC(this: CPU): number {
-  Instructions.map[0xec].call(this);
+  Instructions.map['0xec'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2853,7 +2860,7 @@ function ILLEGAL_EC(this: CPU): number {
  * Affected flags:
  */
 function ILLEGAL_ED(this: CPU): number {
-  Instructions.map[0xed].call(this);
+  Instructions.map['0xed'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2865,7 +2872,7 @@ function ILLEGAL_ED(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function XOR_A_with_d8(this: CPU): number {
-  Instructions.map[0xee].call(this);
+  Instructions.map['0xee'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -2877,7 +2884,7 @@ function XOR_A_with_d8(this: CPU): number {
  * Affected flags:
  */
 function RST_to_A_i_from_28H_i(this: CPU): number {
-  Instructions.map[0xef].call(this);
+  Instructions.map['0xef'].call(this);
   this.PC.add(1);
   return 16;
 }
@@ -2889,7 +2896,7 @@ function RST_to_A_i_from_28H_i(this: CPU): number {
  * Affected flags:
  */
 function LDH_into_A_i_from_a8_m(this: CPU): number {
-  Instructions.map[0xf0].call(this);
+  Instructions.map['0xf0'].call(this);
   this.PC.add(2);
   return 12;
 }
@@ -2901,7 +2908,7 @@ function LDH_into_A_i_from_a8_m(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function POP_off_SP_into_AF_i(this: CPU): number {
-  Instructions.map[0xf1].call(this);
+  Instructions.map['0xf1'].call(this);
   this.PC.add(1);
   return 12;
 }
@@ -2913,7 +2920,7 @@ function POP_off_SP_into_AF_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_A_i_from_C_m(this: CPU): number {
-  Instructions.map[0xf2].call(this);
+  Instructions.map['0xf2'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -2925,7 +2932,7 @@ function LD_into_A_i_from_C_m(this: CPU): number {
  * Affected flags:
  */
 function DI(this: CPU): number {
-  Instructions.map[0xf3].call(this);
+  Instructions.map['0xf3'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2935,7 +2942,7 @@ function DI(this: CPU): number {
  * Affected flags:
  */
 function ILLEGAL_F4(this: CPU): number {
-  Instructions.map[0xf4].call(this);
+  Instructions.map['0xf4'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -2947,7 +2954,7 @@ function ILLEGAL_F4(this: CPU): number {
  * Affected flags:
  */
 function PUSH_onto_SP_register_AF_i(this: CPU): number {
-  Instructions.map[0xf5].call(this);
+  Instructions.map['0xf5'].call(this);
   this.PC.add(1);
   return 16;
 }
@@ -2959,7 +2966,7 @@ function PUSH_onto_SP_register_AF_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function OR_A_with_d8(this: CPU): number {
-  Instructions.map[0xf6].call(this);
+  Instructions.map['0xf6'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -2971,7 +2978,7 @@ function OR_A_with_d8(this: CPU): number {
  * Affected flags:
  */
 function RST_to_A_i_from_30H_i(this: CPU): number {
-  Instructions.map[0xf7].call(this);
+  Instructions.map['0xf7'].call(this);
   this.PC.add(1);
   return 16;
 }
@@ -2983,7 +2990,7 @@ function RST_to_A_i_from_30H_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function LD_into_HL_i_from_SP_incr_i(this: CPU): number {
-  Instructions.map[0xf8].call(this);
+  Instructions.map['0xf8'].call(this);
   this.PC.add(2);
   return 12;
 }
@@ -2995,7 +3002,7 @@ function LD_into_HL_i_from_SP_incr_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_SP_i_from_HL_i(this: CPU): number {
-  Instructions.map[0xf9].call(this);
+  Instructions.map['0xf9'].call(this);
   this.PC.add(1);
   return 8;
 }
@@ -3007,7 +3014,7 @@ function LD_into_SP_i_from_HL_i(this: CPU): number {
  * Affected flags:
  */
 function LD_into_A_i_from_a16_m(this: CPU): number {
-  Instructions.map[0xfa].call(this);
+  Instructions.map['0xfa'].call(this);
   this.PC.add(3);
   return 16;
 }
@@ -3019,7 +3026,7 @@ function LD_into_A_i_from_a16_m(this: CPU): number {
  * Affected flags:
  */
 function EI(this: CPU): number {
-  Instructions.map[0xfb].call(this);
+  Instructions.map['0xfb'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -3029,7 +3036,7 @@ function EI(this: CPU): number {
  * Affected flags:
  */
 function ILLEGAL_FC(this: CPU): number {
-  Instructions.map[0xfc].call(this);
+  Instructions.map['0xfc'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -3039,7 +3046,7 @@ function ILLEGAL_FC(this: CPU): number {
  * Affected flags:
  */
 function ILLEGAL_FD(this: CPU): number {
-  Instructions.map[0xfd].call(this);
+  Instructions.map['0xfd'].call(this);
   this.PC.add(1);
   return 4;
 }
@@ -3051,7 +3058,7 @@ function ILLEGAL_FD(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function CP_A_with_d8(this: CPU): number {
-  Instructions.map[0xfe].call(this);
+  Instructions.map['0xfe'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3063,7 +3070,7 @@ function CP_A_with_d8(this: CPU): number {
  * Affected flags:
  */
 function RST_to_A_i_from_38H_i(this: CPU): number {
-  Instructions.map[0xff].call(this);
+  Instructions.map['0xff'].call(this);
   this.PC.add(1);
   return 16;
 }
@@ -3075,7 +3082,7 @@ function RST_to_A_i_from_38H_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function RLC_B_i(this: CPU): number {
-  Instructions.map[0x00].call(this);
+  Instructions.map['0x00'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3087,7 +3094,7 @@ function RLC_B_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function RLC_C_i(this: CPU): number {
-  Instructions.map[0x01].call(this);
+  Instructions.map['0x01'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3099,7 +3106,7 @@ function RLC_C_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function RLC_D_i(this: CPU): number {
-  Instructions.map[0x02].call(this);
+  Instructions.map['0x02'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3111,7 +3118,7 @@ function RLC_D_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function RLC_E_i(this: CPU): number {
-  Instructions.map[0x03].call(this);
+  Instructions.map['0x03'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3123,7 +3130,7 @@ function RLC_E_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function RLC_H_i(this: CPU): number {
-  Instructions.map[0x04].call(this);
+  Instructions.map['0x04'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3135,7 +3142,7 @@ function RLC_H_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function RLC_L_i(this: CPU): number {
-  Instructions.map[0x05].call(this);
+  Instructions.map['0x05'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3147,7 +3154,7 @@ function RLC_L_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function RLC_HL_m(this: CPU): number {
-  Instructions.map[0x06].call(this);
+  Instructions.map['0x06'].call(this);
   this.PC.add(2);
   return 16;
 }
@@ -3159,7 +3166,7 @@ function RLC_HL_m(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function RLC_A_i(this: CPU): number {
-  Instructions.map[0x07].call(this);
+  Instructions.map['0x07'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3171,7 +3178,7 @@ function RLC_A_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function RRC_B_i(this: CPU): number {
-  Instructions.map[0x08].call(this);
+  Instructions.map['0x08'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3183,7 +3190,7 @@ function RRC_B_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function RRC_C_i(this: CPU): number {
-  Instructions.map[0x09].call(this);
+  Instructions.map['0x09'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3195,7 +3202,7 @@ function RRC_C_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function RRC_D_i(this: CPU): number {
-  Instructions.map[0x0a].call(this);
+  Instructions.map['0x0a'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3207,7 +3214,7 @@ function RRC_D_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function RRC_E_i(this: CPU): number {
-  Instructions.map[0x0b].call(this);
+  Instructions.map['0x0b'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3219,7 +3226,7 @@ function RRC_E_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function RRC_H_i(this: CPU): number {
-  Instructions.map[0x0c].call(this);
+  Instructions.map['0x0c'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3231,7 +3238,7 @@ function RRC_H_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function RRC_L_i(this: CPU): number {
-  Instructions.map[0x0d].call(this);
+  Instructions.map['0x0d'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3243,7 +3250,7 @@ function RRC_L_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function RRC_HL_m(this: CPU): number {
-  Instructions.map[0x0e].call(this);
+  Instructions.map['0x0e'].call(this);
   this.PC.add(2);
   return 16;
 }
@@ -3255,7 +3262,7 @@ function RRC_HL_m(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function RRC_A_i(this: CPU): number {
-  Instructions.map[0x0f].call(this);
+  Instructions.map['0x0f'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3265,10 +3272,10 @@ function RRC_A_i(this: CPU): number {
      * @param - CPU class.
      * @returns - Number of system clock ticks used.
 
-      * Affected flags: Z, N, H, C
-      */
+    * Affected flags: Z, N, H, C
+    */
 function RL_B_i(this: CPU): number {
-  Instructions.map[0x10].call(this);
+  Instructions.map['0x10'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3278,10 +3285,10 @@ function RL_B_i(this: CPU): number {
      * @param - CPU class.
      * @returns - Number of system clock ticks used.
 
-      * Affected flags: Z, N, H, C
-      */
+    * Affected flags: Z, N, H, C
+    */
 function RL_C_i(this: CPU): number {
-  Instructions.map[0x11].call(this);
+  Instructions.map['0x11'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3291,10 +3298,10 @@ function RL_C_i(this: CPU): number {
      * @param - CPU class.
      * @returns - Number of system clock ticks used.
 
-      * Affected flags: Z, N, H, C
-      */
+    * Affected flags: Z, N, H, C
+    */
 function RL_D_i(this: CPU): number {
-  Instructions.map[0x12].call(this);
+  Instructions.map['0x12'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3304,10 +3311,10 @@ function RL_D_i(this: CPU): number {
      * @param - CPU class.
      * @returns - Number of system clock ticks used.
 
-      * Affected flags: Z, N, H, C
-      */
+    * Affected flags: Z, N, H, C
+    */
 function RL_E_i(this: CPU): number {
-  Instructions.map[0x13].call(this);
+  Instructions.map['0x13'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3317,10 +3324,10 @@ function RL_E_i(this: CPU): number {
      * @param - CPU class.
      * @returns - Number of system clock ticks used.
 
-      * Affected flags: Z, N, H, C
-      */
+    * Affected flags: Z, N, H, C
+    */
 function RL_H_i(this: CPU): number {
-  Instructions.map[0x14].call(this);
+  Instructions.map['0x14'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3330,10 +3337,10 @@ function RL_H_i(this: CPU): number {
      * @param - CPU class.
      * @returns - Number of system clock ticks used.
 
-      * Affected flags: Z, N, H, C
-      */
+    * Affected flags: Z, N, H, C
+    */
 function RL_L_i(this: CPU): number {
-  Instructions.map[0x15].call(this);
+  Instructions.map['0x15'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3343,10 +3350,10 @@ function RL_L_i(this: CPU): number {
      * @param - CPU class.
      * @returns - Number of system clock ticks used.
 
-      * Affected flags: Z, N, H, C
-      */
+    * Affected flags: Z, N, H, C
+    */
 function RL_HL_m(this: CPU): number {
-  Instructions.map[0x16].call(this);
+  Instructions.map['0x16'].call(this);
   this.PC.add(2);
   return 16;
 }
@@ -3356,10 +3363,10 @@ function RL_HL_m(this: CPU): number {
      * @param - CPU class.
      * @returns - Number of system clock ticks used.
 
-      * Affected flags: Z, N, H, C
-      */
+    * Affected flags: Z, N, H, C
+    */
 function RL_A_i(this: CPU): number {
-  Instructions.map[0x17].call(this);
+  Instructions.map['0x17'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3371,7 +3378,7 @@ function RL_A_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function RR_B_i(this: CPU): number {
-  Instructions.map[0x18].call(this);
+  Instructions.map['0x18'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3383,7 +3390,7 @@ function RR_B_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function RR_C_i(this: CPU): number {
-  Instructions.map[0x19].call(this);
+  Instructions.map['0x19'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3395,7 +3402,7 @@ function RR_C_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function RR_D_i(this: CPU): number {
-  Instructions.map[0x1a].call(this);
+  Instructions.map['0x1a'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3407,7 +3414,7 @@ function RR_D_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function RR_E_i(this: CPU): number {
-  Instructions.map[0x1b].call(this);
+  Instructions.map['0x1b'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3419,7 +3426,7 @@ function RR_E_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function RR_H_i(this: CPU): number {
-  Instructions.map[0x1c].call(this);
+  Instructions.map['0x1c'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3431,7 +3438,7 @@ function RR_H_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function RR_L_i(this: CPU): number {
-  Instructions.map[0x1d].call(this);
+  Instructions.map['0x1d'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3443,7 +3450,7 @@ function RR_L_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function RR_HL_m(this: CPU): number {
-  Instructions.map[0x1e].call(this);
+  Instructions.map['0x1e'].call(this);
   this.PC.add(2);
   return 16;
 }
@@ -3455,7 +3462,7 @@ function RR_HL_m(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function RR_A_i(this: CPU): number {
-  Instructions.map[0x1f].call(this);
+  Instructions.map['0x1f'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3467,7 +3474,7 @@ function RR_A_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SLA_B_i(this: CPU): number {
-  Instructions.map[0x20].call(this);
+  Instructions.map['0x20'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3479,7 +3486,7 @@ function SLA_B_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SLA_C_i(this: CPU): number {
-  Instructions.map[0x21].call(this);
+  Instructions.map['0x21'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3491,7 +3498,7 @@ function SLA_C_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SLA_D_i(this: CPU): number {
-  Instructions.map[0x22].call(this);
+  Instructions.map['0x22'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3503,7 +3510,7 @@ function SLA_D_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SLA_E_i(this: CPU): number {
-  Instructions.map[0x23].call(this);
+  Instructions.map['0x23'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3515,7 +3522,7 @@ function SLA_E_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SLA_H_i(this: CPU): number {
-  Instructions.map[0x24].call(this);
+  Instructions.map['0x24'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3527,7 +3534,7 @@ function SLA_H_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SLA_L_i(this: CPU): number {
-  Instructions.map[0x25].call(this);
+  Instructions.map['0x25'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3539,7 +3546,7 @@ function SLA_L_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SLA_HL_m(this: CPU): number {
-  Instructions.map[0x26].call(this);
+  Instructions.map['0x26'].call(this);
   this.PC.add(2);
   return 16;
 }
@@ -3551,7 +3558,7 @@ function SLA_HL_m(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SLA_A_i(this: CPU): number {
-  Instructions.map[0x27].call(this);
+  Instructions.map['0x27'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3563,7 +3570,7 @@ function SLA_A_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SRA_B_i(this: CPU): number {
-  Instructions.map[0x28].call(this);
+  Instructions.map['0x28'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3575,7 +3582,7 @@ function SRA_B_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SRA_C_i(this: CPU): number {
-  Instructions.map[0x29].call(this);
+  Instructions.map['0x29'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3587,7 +3594,7 @@ function SRA_C_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SRA_D_i(this: CPU): number {
-  Instructions.map[0x2a].call(this);
+  Instructions.map['0x2a'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3599,7 +3606,7 @@ function SRA_D_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SRA_E_i(this: CPU): number {
-  Instructions.map[0x2b].call(this);
+  Instructions.map['0x2b'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3611,7 +3618,7 @@ function SRA_E_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SRA_H_i(this: CPU): number {
-  Instructions.map[0x2c].call(this);
+  Instructions.map['0x2c'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3623,7 +3630,7 @@ function SRA_H_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SRA_L_i(this: CPU): number {
-  Instructions.map[0x2d].call(this);
+  Instructions.map['0x2d'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3635,7 +3642,7 @@ function SRA_L_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SRA_HL_m(this: CPU): number {
-  Instructions.map[0x2e].call(this);
+  Instructions.map['0x2e'].call(this);
   this.PC.add(2);
   return 16;
 }
@@ -3647,7 +3654,7 @@ function SRA_HL_m(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SRA_A_i(this: CPU): number {
-  Instructions.map[0x2f].call(this);
+  Instructions.map['0x2f'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3659,7 +3666,7 @@ function SRA_A_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SWAP_B_i(this: CPU): number {
-  Instructions.map[0x30].call(this);
+  Instructions.map['0x30'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3671,7 +3678,7 @@ function SWAP_B_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SWAP_C_i(this: CPU): number {
-  Instructions.map[0x31].call(this);
+  Instructions.map['0x31'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3683,7 +3690,7 @@ function SWAP_C_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SWAP_D_i(this: CPU): number {
-  Instructions.map[0x32].call(this);
+  Instructions.map['0x32'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3695,7 +3702,7 @@ function SWAP_D_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SWAP_E_i(this: CPU): number {
-  Instructions.map[0x33].call(this);
+  Instructions.map['0x33'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3707,7 +3714,7 @@ function SWAP_E_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SWAP_H_i(this: CPU): number {
-  Instructions.map[0x34].call(this);
+  Instructions.map['0x34'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3719,7 +3726,7 @@ function SWAP_H_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SWAP_L_i(this: CPU): number {
-  Instructions.map[0x35].call(this);
+  Instructions.map['0x35'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3731,7 +3738,7 @@ function SWAP_L_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SWAP_HL_m(this: CPU): number {
-  Instructions.map[0x36].call(this);
+  Instructions.map['0x36'].call(this);
   this.PC.add(2);
   return 16;
 }
@@ -3743,7 +3750,7 @@ function SWAP_HL_m(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SWAP_A_i(this: CPU): number {
-  Instructions.map[0x37].call(this);
+  Instructions.map['0x37'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3755,7 +3762,7 @@ function SWAP_A_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SRL_B_i(this: CPU): number {
-  Instructions.map[0x38].call(this);
+  Instructions.map['0x38'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3767,7 +3774,7 @@ function SRL_B_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SRL_C_i(this: CPU): number {
-  Instructions.map[0x39].call(this);
+  Instructions.map['0x39'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3779,7 +3786,7 @@ function SRL_C_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SRL_D_i(this: CPU): number {
-  Instructions.map[0x3a].call(this);
+  Instructions.map['0x3a'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3791,7 +3798,7 @@ function SRL_D_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SRL_E_i(this: CPU): number {
-  Instructions.map[0x3b].call(this);
+  Instructions.map['0x3b'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3803,7 +3810,7 @@ function SRL_E_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SRL_H_i(this: CPU): number {
-  Instructions.map[0x3c].call(this);
+  Instructions.map['0x3c'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3815,7 +3822,7 @@ function SRL_H_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SRL_L_i(this: CPU): number {
-  Instructions.map[0x3d].call(this);
+  Instructions.map['0x3d'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3827,7 +3834,7 @@ function SRL_L_i(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SRL_HL_m(this: CPU): number {
-  Instructions.map[0x3e].call(this);
+  Instructions.map['0x3e'].call(this);
   this.PC.add(2);
   return 16;
 }
@@ -3839,7 +3846,7 @@ function SRL_HL_m(this: CPU): number {
  * Affected flags: Z, N, H, C
  */
 function SRL_A_i(this: CPU): number {
-  Instructions.map[0x3f].call(this);
+  Instructions.map['0x3f'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3851,7 +3858,7 @@ function SRL_A_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_0_i_of_B_i(this: CPU): number {
-  Instructions.map[0x40].call(this);
+  Instructions.map['0x40'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3863,7 +3870,7 @@ function BIT_test_0_i_of_B_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_0_i_of_C_i(this: CPU): number {
-  Instructions.map[0x41].call(this);
+  Instructions.map['0x41'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3875,7 +3882,7 @@ function BIT_test_0_i_of_C_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_0_i_of_D_i(this: CPU): number {
-  Instructions.map[0x42].call(this);
+  Instructions.map['0x42'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3887,7 +3894,7 @@ function BIT_test_0_i_of_D_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_0_i_of_E_i(this: CPU): number {
-  Instructions.map[0x43].call(this);
+  Instructions.map['0x43'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3899,7 +3906,7 @@ function BIT_test_0_i_of_E_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_0_i_of_H_i(this: CPU): number {
-  Instructions.map[0x44].call(this);
+  Instructions.map['0x44'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3911,7 +3918,7 @@ function BIT_test_0_i_of_H_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_0_i_of_L_i(this: CPU): number {
-  Instructions.map[0x45].call(this);
+  Instructions.map['0x45'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3923,7 +3930,7 @@ function BIT_test_0_i_of_L_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_0_i_of_HL_m(this: CPU): number {
-  Instructions.map[0x46].call(this);
+  Instructions.map['0x46'].call(this);
   this.PC.add(2);
   return 12;
 }
@@ -3935,7 +3942,7 @@ function BIT_test_0_i_of_HL_m(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_0_i_of_A_i(this: CPU): number {
-  Instructions.map[0x47].call(this);
+  Instructions.map['0x47'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3947,7 +3954,7 @@ function BIT_test_0_i_of_A_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_1_i_of_B_i(this: CPU): number {
-  Instructions.map[0x48].call(this);
+  Instructions.map['0x48'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3959,7 +3966,7 @@ function BIT_test_1_i_of_B_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_1_i_of_C_i(this: CPU): number {
-  Instructions.map[0x49].call(this);
+  Instructions.map['0x49'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3971,7 +3978,7 @@ function BIT_test_1_i_of_C_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_1_i_of_D_i(this: CPU): number {
-  Instructions.map[0x4a].call(this);
+  Instructions.map['0x4a'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3983,7 +3990,7 @@ function BIT_test_1_i_of_D_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_1_i_of_E_i(this: CPU): number {
-  Instructions.map[0x4b].call(this);
+  Instructions.map['0x4b'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -3995,7 +4002,7 @@ function BIT_test_1_i_of_E_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_1_i_of_H_i(this: CPU): number {
-  Instructions.map[0x4c].call(this);
+  Instructions.map['0x4c'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4007,7 +4014,7 @@ function BIT_test_1_i_of_H_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_1_i_of_L_i(this: CPU): number {
-  Instructions.map[0x4d].call(this);
+  Instructions.map['0x4d'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4019,7 +4026,7 @@ function BIT_test_1_i_of_L_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_1_i_of_HL_m(this: CPU): number {
-  Instructions.map[0x4e].call(this);
+  Instructions.map['0x4e'].call(this);
   this.PC.add(2);
   return 12;
 }
@@ -4031,7 +4038,7 @@ function BIT_test_1_i_of_HL_m(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_1_i_of_A_i(this: CPU): number {
-  Instructions.map[0x4f].call(this);
+  Instructions.map['0x4f'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4043,7 +4050,7 @@ function BIT_test_1_i_of_A_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_2_i_of_B_i(this: CPU): number {
-  Instructions.map[0x50].call(this);
+  Instructions.map['0x50'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4055,7 +4062,7 @@ function BIT_test_2_i_of_B_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_2_i_of_C_i(this: CPU): number {
-  Instructions.map[0x51].call(this);
+  Instructions.map['0x51'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4067,7 +4074,7 @@ function BIT_test_2_i_of_C_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_2_i_of_D_i(this: CPU): number {
-  Instructions.map[0x52].call(this);
+  Instructions.map['0x52'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4079,7 +4086,7 @@ function BIT_test_2_i_of_D_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_2_i_of_E_i(this: CPU): number {
-  Instructions.map[0x53].call(this);
+  Instructions.map['0x53'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4091,7 +4098,7 @@ function BIT_test_2_i_of_E_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_2_i_of_H_i(this: CPU): number {
-  Instructions.map[0x54].call(this);
+  Instructions.map['0x54'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4103,7 +4110,7 @@ function BIT_test_2_i_of_H_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_2_i_of_L_i(this: CPU): number {
-  Instructions.map[0x55].call(this);
+  Instructions.map['0x55'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4115,7 +4122,7 @@ function BIT_test_2_i_of_L_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_2_i_of_HL_m(this: CPU): number {
-  Instructions.map[0x56].call(this);
+  Instructions.map['0x56'].call(this);
   this.PC.add(2);
   return 12;
 }
@@ -4127,7 +4134,7 @@ function BIT_test_2_i_of_HL_m(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_2_i_of_A_i(this: CPU): number {
-  Instructions.map[0x57].call(this);
+  Instructions.map['0x57'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4139,7 +4146,7 @@ function BIT_test_2_i_of_A_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_3_i_of_B_i(this: CPU): number {
-  Instructions.map[0x58].call(this);
+  Instructions.map['0x58'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4151,7 +4158,7 @@ function BIT_test_3_i_of_B_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_3_i_of_C_i(this: CPU): number {
-  Instructions.map[0x59].call(this);
+  Instructions.map['0x59'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4163,7 +4170,7 @@ function BIT_test_3_i_of_C_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_3_i_of_D_i(this: CPU): number {
-  Instructions.map[0x5a].call(this);
+  Instructions.map['0x5a'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4175,7 +4182,7 @@ function BIT_test_3_i_of_D_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_3_i_of_E_i(this: CPU): number {
-  Instructions.map[0x5b].call(this);
+  Instructions.map['0x5b'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4187,7 +4194,7 @@ function BIT_test_3_i_of_E_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_3_i_of_H_i(this: CPU): number {
-  Instructions.map[0x5c].call(this);
+  Instructions.map['0x5c'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4199,7 +4206,7 @@ function BIT_test_3_i_of_H_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_3_i_of_L_i(this: CPU): number {
-  Instructions.map[0x5d].call(this);
+  Instructions.map['0x5d'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4211,7 +4218,7 @@ function BIT_test_3_i_of_L_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_3_i_of_HL_m(this: CPU): number {
-  Instructions.map[0x5e].call(this);
+  Instructions.map['0x5e'].call(this);
   this.PC.add(2);
   return 12;
 }
@@ -4223,7 +4230,7 @@ function BIT_test_3_i_of_HL_m(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_3_i_of_A_i(this: CPU): number {
-  Instructions.map[0x5f].call(this);
+  Instructions.map['0x5f'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4235,7 +4242,7 @@ function BIT_test_3_i_of_A_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_4_i_of_B_i(this: CPU): number {
-  Instructions.map[0x60].call(this);
+  Instructions.map['0x60'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4247,7 +4254,7 @@ function BIT_test_4_i_of_B_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_4_i_of_C_i(this: CPU): number {
-  Instructions.map[0x61].call(this);
+  Instructions.map['0x61'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4259,7 +4266,7 @@ function BIT_test_4_i_of_C_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_4_i_of_D_i(this: CPU): number {
-  Instructions.map[0x62].call(this);
+  Instructions.map['0x62'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4271,7 +4278,7 @@ function BIT_test_4_i_of_D_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_4_i_of_E_i(this: CPU): number {
-  Instructions.map[0x63].call(this);
+  Instructions.map['0x63'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4283,7 +4290,7 @@ function BIT_test_4_i_of_E_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_4_i_of_H_i(this: CPU): number {
-  Instructions.map[0x64].call(this);
+  Instructions.map['0x64'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4295,7 +4302,7 @@ function BIT_test_4_i_of_H_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_4_i_of_L_i(this: CPU): number {
-  Instructions.map[0x65].call(this);
+  Instructions.map['0x65'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4307,7 +4314,7 @@ function BIT_test_4_i_of_L_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_4_i_of_HL_m(this: CPU): number {
-  Instructions.map[0x66].call(this);
+  Instructions.map['0x66'].call(this);
   this.PC.add(2);
   return 12;
 }
@@ -4319,7 +4326,7 @@ function BIT_test_4_i_of_HL_m(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_4_i_of_A_i(this: CPU): number {
-  Instructions.map[0x67].call(this);
+  Instructions.map['0x67'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4331,7 +4338,7 @@ function BIT_test_4_i_of_A_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_5_i_of_B_i(this: CPU): number {
-  Instructions.map[0x68].call(this);
+  Instructions.map['0x68'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4343,7 +4350,7 @@ function BIT_test_5_i_of_B_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_5_i_of_C_i(this: CPU): number {
-  Instructions.map[0x69].call(this);
+  Instructions.map['0x69'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4355,7 +4362,7 @@ function BIT_test_5_i_of_C_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_5_i_of_D_i(this: CPU): number {
-  Instructions.map[0x6a].call(this);
+  Instructions.map['0x6a'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4367,7 +4374,7 @@ function BIT_test_5_i_of_D_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_5_i_of_E_i(this: CPU): number {
-  Instructions.map[0x6b].call(this);
+  Instructions.map['0x6b'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4379,7 +4386,7 @@ function BIT_test_5_i_of_E_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_5_i_of_H_i(this: CPU): number {
-  Instructions.map[0x6c].call(this);
+  Instructions.map['0x6c'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4391,7 +4398,7 @@ function BIT_test_5_i_of_H_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_5_i_of_L_i(this: CPU): number {
-  Instructions.map[0x6d].call(this);
+  Instructions.map['0x6d'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4403,7 +4410,7 @@ function BIT_test_5_i_of_L_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_5_i_of_HL_m(this: CPU): number {
-  Instructions.map[0x6e].call(this);
+  Instructions.map['0x6e'].call(this);
   this.PC.add(2);
   return 12;
 }
@@ -4415,7 +4422,7 @@ function BIT_test_5_i_of_HL_m(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_5_i_of_A_i(this: CPU): number {
-  Instructions.map[0x6f].call(this);
+  Instructions.map['0x6f'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4427,7 +4434,7 @@ function BIT_test_5_i_of_A_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_6_i_of_B_i(this: CPU): number {
-  Instructions.map[0x70].call(this);
+  Instructions.map['0x70'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4439,7 +4446,7 @@ function BIT_test_6_i_of_B_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_6_i_of_C_i(this: CPU): number {
-  Instructions.map[0x71].call(this);
+  Instructions.map['0x71'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4451,7 +4458,7 @@ function BIT_test_6_i_of_C_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_6_i_of_D_i(this: CPU): number {
-  Instructions.map[0x72].call(this);
+  Instructions.map['0x72'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4463,7 +4470,7 @@ function BIT_test_6_i_of_D_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_6_i_of_E_i(this: CPU): number {
-  Instructions.map[0x73].call(this);
+  Instructions.map['0x73'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4475,7 +4482,7 @@ function BIT_test_6_i_of_E_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_6_i_of_H_i(this: CPU): number {
-  Instructions.map[0x74].call(this);
+  Instructions.map['0x74'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4487,7 +4494,7 @@ function BIT_test_6_i_of_H_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_6_i_of_L_i(this: CPU): number {
-  Instructions.map[0x75].call(this);
+  Instructions.map['0x75'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4499,7 +4506,7 @@ function BIT_test_6_i_of_L_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_6_i_of_HL_m(this: CPU): number {
-  Instructions.map[0x76].call(this);
+  Instructions.map['0x76'].call(this);
   this.PC.add(2);
   return 12;
 }
@@ -4511,7 +4518,7 @@ function BIT_test_6_i_of_HL_m(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_6_i_of_A_i(this: CPU): number {
-  Instructions.map[0x77].call(this);
+  Instructions.map['0x77'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4523,7 +4530,7 @@ function BIT_test_6_i_of_A_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_7_i_of_B_i(this: CPU): number {
-  Instructions.map[0x78].call(this);
+  Instructions.map['0x78'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4535,7 +4542,7 @@ function BIT_test_7_i_of_B_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_7_i_of_C_i(this: CPU): number {
-  Instructions.map[0x79].call(this);
+  Instructions.map['0x79'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4547,7 +4554,7 @@ function BIT_test_7_i_of_C_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_7_i_of_D_i(this: CPU): number {
-  Instructions.map[0x7a].call(this);
+  Instructions.map['0x7a'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4559,7 +4566,7 @@ function BIT_test_7_i_of_D_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_7_i_of_E_i(this: CPU): number {
-  Instructions.map[0x7b].call(this);
+  Instructions.map['0x7b'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4571,7 +4578,7 @@ function BIT_test_7_i_of_E_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_7_i_of_H_i(this: CPU): number {
-  Instructions.map[0x7c].call(this);
+  Instructions.map['0x7c'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4583,7 +4590,7 @@ function BIT_test_7_i_of_H_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_7_i_of_L_i(this: CPU): number {
-  Instructions.map[0x7d].call(this);
+  Instructions.map['0x7d'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4595,7 +4602,7 @@ function BIT_test_7_i_of_L_i(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_7_i_of_HL_m(this: CPU): number {
-  Instructions.map[0x7e].call(this);
+  Instructions.map['0x7e'].call(this);
   this.PC.add(2);
   return 12;
 }
@@ -4607,7 +4614,7 @@ function BIT_test_7_i_of_HL_m(this: CPU): number {
  * Affected flags: Z, N, H
  */
 function BIT_test_7_i_of_A_i(this: CPU): number {
-  Instructions.map[0x7f].call(this);
+  Instructions.map['0x7f'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4619,7 +4626,7 @@ function BIT_test_7_i_of_A_i(this: CPU): number {
  * Affected flags:
  */
 function RES_bit0_of_B(this: CPU): number {
-  Instructions.map[0x80].call(this);
+  Instructions.map['0x80'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4631,7 +4638,7 @@ function RES_bit0_of_B(this: CPU): number {
  * Affected flags:
  */
 function RES_bit0_of_C(this: CPU): number {
-  Instructions.map[0x81].call(this);
+  Instructions.map['0x81'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4643,7 +4650,7 @@ function RES_bit0_of_C(this: CPU): number {
  * Affected flags:
  */
 function RES_bit0_of_D(this: CPU): number {
-  Instructions.map[0x82].call(this);
+  Instructions.map['0x82'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4655,7 +4662,7 @@ function RES_bit0_of_D(this: CPU): number {
  * Affected flags:
  */
 function RES_bit0_of_E(this: CPU): number {
-  Instructions.map[0x83].call(this);
+  Instructions.map['0x83'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4667,7 +4674,7 @@ function RES_bit0_of_E(this: CPU): number {
  * Affected flags:
  */
 function RES_bit0_of_H(this: CPU): number {
-  Instructions.map[0x84].call(this);
+  Instructions.map['0x84'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4679,7 +4686,7 @@ function RES_bit0_of_H(this: CPU): number {
  * Affected flags:
  */
 function RES_bit0_of_L(this: CPU): number {
-  Instructions.map[0x85].call(this);
+  Instructions.map['0x85'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4691,7 +4698,7 @@ function RES_bit0_of_L(this: CPU): number {
  * Affected flags:
  */
 function RES_bit0_of_HL(this: CPU): number {
-  Instructions.map[0x86].call(this);
+  Instructions.map['0x86'].call(this);
   this.PC.add(2);
   return 16;
 }
@@ -4703,7 +4710,7 @@ function RES_bit0_of_HL(this: CPU): number {
  * Affected flags:
  */
 function RES_bit0_of_A(this: CPU): number {
-  Instructions.map[0x87].call(this);
+  Instructions.map['0x87'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4715,7 +4722,7 @@ function RES_bit0_of_A(this: CPU): number {
  * Affected flags:
  */
 function RES_bit1_of_B(this: CPU): number {
-  Instructions.map[0x88].call(this);
+  Instructions.map['0x88'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4727,7 +4734,7 @@ function RES_bit1_of_B(this: CPU): number {
  * Affected flags:
  */
 function RES_bit1_of_C(this: CPU): number {
-  Instructions.map[0x89].call(this);
+  Instructions.map['0x89'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4739,7 +4746,7 @@ function RES_bit1_of_C(this: CPU): number {
  * Affected flags:
  */
 function RES_bit1_of_D(this: CPU): number {
-  Instructions.map[0x8a].call(this);
+  Instructions.map['0x8a'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4751,7 +4758,7 @@ function RES_bit1_of_D(this: CPU): number {
  * Affected flags:
  */
 function RES_bit1_of_E(this: CPU): number {
-  Instructions.map[0x8b].call(this);
+  Instructions.map['0x8b'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4763,7 +4770,7 @@ function RES_bit1_of_E(this: CPU): number {
  * Affected flags:
  */
 function RES_bit1_of_H(this: CPU): number {
-  Instructions.map[0x8c].call(this);
+  Instructions.map['0x8c'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4775,7 +4782,7 @@ function RES_bit1_of_H(this: CPU): number {
  * Affected flags:
  */
 function RES_bit1_of_L(this: CPU): number {
-  Instructions.map[0x8d].call(this);
+  Instructions.map['0x8d'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4787,7 +4794,7 @@ function RES_bit1_of_L(this: CPU): number {
  * Affected flags:
  */
 function RES_bit1_of_HL(this: CPU): number {
-  Instructions.map[0x8e].call(this);
+  Instructions.map['0x8e'].call(this);
   this.PC.add(2);
   return 16;
 }
@@ -4799,7 +4806,7 @@ function RES_bit1_of_HL(this: CPU): number {
  * Affected flags:
  */
 function RES_bit1_of_A(this: CPU): number {
-  Instructions.map[0x8f].call(this);
+  Instructions.map['0x8f'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4811,7 +4818,7 @@ function RES_bit1_of_A(this: CPU): number {
  * Affected flags:
  */
 function RES_bit2_of_B(this: CPU): number {
-  Instructions.map[0x90].call(this);
+  Instructions.map['0x90'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4823,7 +4830,7 @@ function RES_bit2_of_B(this: CPU): number {
  * Affected flags:
  */
 function RES_bit2_of_C(this: CPU): number {
-  Instructions.map[0x91].call(this);
+  Instructions.map['0x91'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4835,7 +4842,7 @@ function RES_bit2_of_C(this: CPU): number {
  * Affected flags:
  */
 function RES_bit2_of_D(this: CPU): number {
-  Instructions.map[0x92].call(this);
+  Instructions.map['0x92'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4847,7 +4854,7 @@ function RES_bit2_of_D(this: CPU): number {
  * Affected flags:
  */
 function RES_bit2_of_E(this: CPU): number {
-  Instructions.map[0x93].call(this);
+  Instructions.map['0x93'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4859,7 +4866,7 @@ function RES_bit2_of_E(this: CPU): number {
  * Affected flags:
  */
 function RES_bit2_of_H(this: CPU): number {
-  Instructions.map[0x94].call(this);
+  Instructions.map['0x94'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4871,7 +4878,7 @@ function RES_bit2_of_H(this: CPU): number {
  * Affected flags:
  */
 function RES_bit2_of_L(this: CPU): number {
-  Instructions.map[0x95].call(this);
+  Instructions.map['0x95'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4883,7 +4890,7 @@ function RES_bit2_of_L(this: CPU): number {
  * Affected flags:
  */
 function RES_bit2_of_HL(this: CPU): number {
-  Instructions.map[0x96].call(this);
+  Instructions.map['0x96'].call(this);
   this.PC.add(2);
   return 16;
 }
@@ -4895,7 +4902,7 @@ function RES_bit2_of_HL(this: CPU): number {
  * Affected flags:
  */
 function RES_bit2_of_A(this: CPU): number {
-  Instructions.map[0x97].call(this);
+  Instructions.map['0x97'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4907,7 +4914,7 @@ function RES_bit2_of_A(this: CPU): number {
  * Affected flags:
  */
 function RES_bit3_of_B(this: CPU): number {
-  Instructions.map[0x98].call(this);
+  Instructions.map['0x98'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4919,7 +4926,7 @@ function RES_bit3_of_B(this: CPU): number {
  * Affected flags:
  */
 function RES_bit3_of_C(this: CPU): number {
-  Instructions.map[0x99].call(this);
+  Instructions.map['0x99'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4931,7 +4938,7 @@ function RES_bit3_of_C(this: CPU): number {
  * Affected flags:
  */
 function RES_bit3_of_D(this: CPU): number {
-  Instructions.map[0x9a].call(this);
+  Instructions.map['0x9a'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4943,7 +4950,7 @@ function RES_bit3_of_D(this: CPU): number {
  * Affected flags:
  */
 function RES_bit3_of_E(this: CPU): number {
-  Instructions.map[0x9b].call(this);
+  Instructions.map['0x9b'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4955,7 +4962,7 @@ function RES_bit3_of_E(this: CPU): number {
  * Affected flags:
  */
 function RES_bit3_of_H(this: CPU): number {
-  Instructions.map[0x9c].call(this);
+  Instructions.map['0x9c'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4967,7 +4974,7 @@ function RES_bit3_of_H(this: CPU): number {
  * Affected flags:
  */
 function RES_bit3_of_L(this: CPU): number {
-  Instructions.map[0x9d].call(this);
+  Instructions.map['0x9d'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -4979,7 +4986,7 @@ function RES_bit3_of_L(this: CPU): number {
  * Affected flags:
  */
 function RES_bit3_of_HL(this: CPU): number {
-  Instructions.map[0x9e].call(this);
+  Instructions.map['0x9e'].call(this);
   this.PC.add(2);
   return 16;
 }
@@ -4991,7 +4998,7 @@ function RES_bit3_of_HL(this: CPU): number {
  * Affected flags:
  */
 function RES_bit3_of_A(this: CPU): number {
-  Instructions.map[0x9f].call(this);
+  Instructions.map['0x9f'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5003,7 +5010,7 @@ function RES_bit3_of_A(this: CPU): number {
  * Affected flags:
  */
 function RES_bit4_of_B(this: CPU): number {
-  Instructions.map[0xa0].call(this);
+  Instructions.map['0xa0'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5015,7 +5022,7 @@ function RES_bit4_of_B(this: CPU): number {
  * Affected flags:
  */
 function RES_bit4_of_C(this: CPU): number {
-  Instructions.map[0xa1].call(this);
+  Instructions.map['0xa1'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5027,7 +5034,7 @@ function RES_bit4_of_C(this: CPU): number {
  * Affected flags:
  */
 function RES_bit4_of_D(this: CPU): number {
-  Instructions.map[0xa2].call(this);
+  Instructions.map['0xa2'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5039,7 +5046,7 @@ function RES_bit4_of_D(this: CPU): number {
  * Affected flags:
  */
 function RES_bit4_of_E(this: CPU): number {
-  Instructions.map[0xa3].call(this);
+  Instructions.map['0xa3'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5051,7 +5058,7 @@ function RES_bit4_of_E(this: CPU): number {
  * Affected flags:
  */
 function RES_bit4_of_H(this: CPU): number {
-  Instructions.map[0xa4].call(this);
+  Instructions.map['0xa4'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5063,7 +5070,7 @@ function RES_bit4_of_H(this: CPU): number {
  * Affected flags:
  */
 function RES_bit4_of_L(this: CPU): number {
-  Instructions.map[0xa5].call(this);
+  Instructions.map['0xa5'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5075,7 +5082,7 @@ function RES_bit4_of_L(this: CPU): number {
  * Affected flags:
  */
 function RES_bit4_of_HL(this: CPU): number {
-  Instructions.map[0xa6].call(this);
+  Instructions.map['0xa6'].call(this);
   this.PC.add(2);
   return 16;
 }
@@ -5087,7 +5094,7 @@ function RES_bit4_of_HL(this: CPU): number {
  * Affected flags:
  */
 function RES_bit4_of_A(this: CPU): number {
-  Instructions.map[0xa7].call(this);
+  Instructions.map['0xa7'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5099,7 +5106,7 @@ function RES_bit4_of_A(this: CPU): number {
  * Affected flags:
  */
 function RES_bit5_of_B(this: CPU): number {
-  Instructions.map[0xa8].call(this);
+  Instructions.map['0xa8'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5111,7 +5118,7 @@ function RES_bit5_of_B(this: CPU): number {
  * Affected flags:
  */
 function RES_bit5_of_C(this: CPU): number {
-  Instructions.map[0xa9].call(this);
+  Instructions.map['0xa9'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5123,7 +5130,7 @@ function RES_bit5_of_C(this: CPU): number {
  * Affected flags:
  */
 function RES_bit5_of_D(this: CPU): number {
-  Instructions.map[0xaa].call(this);
+  Instructions.map['0xaa'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5135,7 +5142,7 @@ function RES_bit5_of_D(this: CPU): number {
  * Affected flags:
  */
 function RES_bit5_of_E(this: CPU): number {
-  Instructions.map[0xab].call(this);
+  Instructions.map['0xab'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5147,7 +5154,7 @@ function RES_bit5_of_E(this: CPU): number {
  * Affected flags:
  */
 function RES_bit5_of_H(this: CPU): number {
-  Instructions.map[0xac].call(this);
+  Instructions.map['0xac'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5159,7 +5166,7 @@ function RES_bit5_of_H(this: CPU): number {
  * Affected flags:
  */
 function RES_bit5_of_L(this: CPU): number {
-  Instructions.map[0xad].call(this);
+  Instructions.map['0xad'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5171,7 +5178,7 @@ function RES_bit5_of_L(this: CPU): number {
  * Affected flags:
  */
 function RES_bit5_of_HL(this: CPU): number {
-  Instructions.map[0xae].call(this);
+  Instructions.map['0xae'].call(this);
   this.PC.add(2);
   return 16;
 }
@@ -5183,7 +5190,7 @@ function RES_bit5_of_HL(this: CPU): number {
  * Affected flags:
  */
 function RES_bit5_of_A(this: CPU): number {
-  Instructions.map[0xaf].call(this);
+  Instructions.map['0xaf'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5195,7 +5202,7 @@ function RES_bit5_of_A(this: CPU): number {
  * Affected flags:
  */
 function RES_bit6_of_B(this: CPU): number {
-  Instructions.map[0xb0].call(this);
+  Instructions.map['0xb0'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5207,7 +5214,7 @@ function RES_bit6_of_B(this: CPU): number {
  * Affected flags:
  */
 function RES_bit6_of_C(this: CPU): number {
-  Instructions.map[0xb1].call(this);
+  Instructions.map['0xb1'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5219,7 +5226,7 @@ function RES_bit6_of_C(this: CPU): number {
  * Affected flags:
  */
 function RES_bit6_of_D(this: CPU): number {
-  Instructions.map[0xb2].call(this);
+  Instructions.map['0xb2'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5231,7 +5238,7 @@ function RES_bit6_of_D(this: CPU): number {
  * Affected flags:
  */
 function RES_bit6_of_E(this: CPU): number {
-  Instructions.map[0xb3].call(this);
+  Instructions.map['0xb3'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5243,7 +5250,7 @@ function RES_bit6_of_E(this: CPU): number {
  * Affected flags:
  */
 function RES_bit6_of_H(this: CPU): number {
-  Instructions.map[0xb4].call(this);
+  Instructions.map['0xb4'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5255,7 +5262,7 @@ function RES_bit6_of_H(this: CPU): number {
  * Affected flags:
  */
 function RES_bit6_of_L(this: CPU): number {
-  Instructions.map[0xb5].call(this);
+  Instructions.map['0xb5'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5267,7 +5274,7 @@ function RES_bit6_of_L(this: CPU): number {
  * Affected flags:
  */
 function RES_bit6_of_HL(this: CPU): number {
-  Instructions.map[0xb6].call(this);
+  Instructions.map['0xb6'].call(this);
   this.PC.add(2);
   return 16;
 }
@@ -5279,7 +5286,7 @@ function RES_bit6_of_HL(this: CPU): number {
  * Affected flags:
  */
 function RES_bit6_of_A(this: CPU): number {
-  Instructions.map[0xb7].call(this);
+  Instructions.map['0xb7'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5291,7 +5298,7 @@ function RES_bit6_of_A(this: CPU): number {
  * Affected flags:
  */
 function RES_bit7_of_B(this: CPU): number {
-  Instructions.map[0xb8].call(this);
+  Instructions.map['0xb8'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5303,7 +5310,7 @@ function RES_bit7_of_B(this: CPU): number {
  * Affected flags:
  */
 function RES_bit7_of_C(this: CPU): number {
-  Instructions.map[0xb9].call(this);
+  Instructions.map['0xb9'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5315,7 +5322,7 @@ function RES_bit7_of_C(this: CPU): number {
  * Affected flags:
  */
 function RES_bit7_of_D(this: CPU): number {
-  Instructions.map[0xba].call(this);
+  Instructions.map['0xba'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5327,7 +5334,7 @@ function RES_bit7_of_D(this: CPU): number {
  * Affected flags:
  */
 function RES_bit7_of_E(this: CPU): number {
-  Instructions.map[0xbb].call(this);
+  Instructions.map['0xbb'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5339,7 +5346,7 @@ function RES_bit7_of_E(this: CPU): number {
  * Affected flags:
  */
 function RES_bit7_of_H(this: CPU): number {
-  Instructions.map[0xbc].call(this);
+  Instructions.map['0xbc'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5351,7 +5358,7 @@ function RES_bit7_of_H(this: CPU): number {
  * Affected flags:
  */
 function RES_bit7_of_L(this: CPU): number {
-  Instructions.map[0xbd].call(this);
+  Instructions.map['0xbd'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5363,7 +5370,7 @@ function RES_bit7_of_L(this: CPU): number {
  * Affected flags:
  */
 function RES_bit7_of_HL(this: CPU): number {
-  Instructions.map[0xbe].call(this);
+  Instructions.map['0xbe'].call(this);
   this.PC.add(2);
   return 16;
 }
@@ -5375,7 +5382,7 @@ function RES_bit7_of_HL(this: CPU): number {
  * Affected flags:
  */
 function RES_bit7_of_A(this: CPU): number {
-  Instructions.map[0xbf].call(this);
+  Instructions.map['0xbf'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5387,7 +5394,7 @@ function RES_bit7_of_A(this: CPU): number {
  * Affected flags:
  */
 function SET_bit0_of_B(this: CPU): number {
-  Instructions.map[0xc0].call(this);
+  Instructions.map['0xc0'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5399,7 +5406,7 @@ function SET_bit0_of_B(this: CPU): number {
  * Affected flags:
  */
 function SET_bit0_of_C(this: CPU): number {
-  Instructions.map[0xc1].call(this);
+  Instructions.map['0xc1'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5411,7 +5418,7 @@ function SET_bit0_of_C(this: CPU): number {
  * Affected flags:
  */
 function SET_bit0_of_D(this: CPU): number {
-  Instructions.map[0xc2].call(this);
+  Instructions.map['0xc2'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5423,7 +5430,7 @@ function SET_bit0_of_D(this: CPU): number {
  * Affected flags:
  */
 function SET_bit0_of_E(this: CPU): number {
-  Instructions.map[0xc3].call(this);
+  Instructions.map['0xc3'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5435,7 +5442,7 @@ function SET_bit0_of_E(this: CPU): number {
  * Affected flags:
  */
 function SET_bit0_of_H(this: CPU): number {
-  Instructions.map[0xc4].call(this);
+  Instructions.map['0xc4'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5447,7 +5454,7 @@ function SET_bit0_of_H(this: CPU): number {
  * Affected flags:
  */
 function SET_bit0_of_L(this: CPU): number {
-  Instructions.map[0xc5].call(this);
+  Instructions.map['0xc5'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5459,7 +5466,7 @@ function SET_bit0_of_L(this: CPU): number {
  * Affected flags:
  */
 function SET_bit0_of_HL(this: CPU): number {
-  Instructions.map[0xc6].call(this);
+  Instructions.map['0xc6'].call(this);
   this.PC.add(2);
   return 16;
 }
@@ -5471,7 +5478,7 @@ function SET_bit0_of_HL(this: CPU): number {
  * Affected flags:
  */
 function SET_bit0_of_A(this: CPU): number {
-  Instructions.map[0xc7].call(this);
+  Instructions.map['0xc7'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5483,7 +5490,7 @@ function SET_bit0_of_A(this: CPU): number {
  * Affected flags:
  */
 function SET_bit1_of_B(this: CPU): number {
-  Instructions.map[0xc8].call(this);
+  Instructions.map['0xc8'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5495,7 +5502,7 @@ function SET_bit1_of_B(this: CPU): number {
  * Affected flags:
  */
 function SET_bit1_of_C(this: CPU): number {
-  Instructions.map[0xc9].call(this);
+  Instructions.map['0xc9'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5507,7 +5514,7 @@ function SET_bit1_of_C(this: CPU): number {
  * Affected flags:
  */
 function SET_bit1_of_D(this: CPU): number {
-  Instructions.map[0xca].call(this);
+  Instructions.map['0xca'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5519,7 +5526,7 @@ function SET_bit1_of_D(this: CPU): number {
  * Affected flags:
  */
 function SET_bit1_of_E(this: CPU): number {
-  Instructions.map[0xcb].call(this);
+  Instructions.map['0xcb'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5531,7 +5538,7 @@ function SET_bit1_of_E(this: CPU): number {
  * Affected flags:
  */
 function SET_bit1_of_H(this: CPU): number {
-  Instructions.map[0xcc].call(this);
+  Instructions.map['0xcc'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5543,7 +5550,7 @@ function SET_bit1_of_H(this: CPU): number {
  * Affected flags:
  */
 function SET_bit1_of_L(this: CPU): number {
-  Instructions.map[0xcd].call(this);
+  Instructions.map['0xcd'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5555,7 +5562,7 @@ function SET_bit1_of_L(this: CPU): number {
  * Affected flags:
  */
 function SET_bit1_of_HL(this: CPU): number {
-  Instructions.map[0xce].call(this);
+  Instructions.map['0xce'].call(this);
   this.PC.add(2);
   return 16;
 }
@@ -5567,7 +5574,7 @@ function SET_bit1_of_HL(this: CPU): number {
  * Affected flags:
  */
 function SET_bit1_of_A(this: CPU): number {
-  Instructions.map[0xcf].call(this);
+  Instructions.map['0xcf'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5579,7 +5586,7 @@ function SET_bit1_of_A(this: CPU): number {
  * Affected flags:
  */
 function SET_bit2_of_B(this: CPU): number {
-  Instructions.map[0xd0].call(this);
+  Instructions.map['0xd0'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5591,7 +5598,7 @@ function SET_bit2_of_B(this: CPU): number {
  * Affected flags:
  */
 function SET_bit2_of_C(this: CPU): number {
-  Instructions.map[0xd1].call(this);
+  Instructions.map['0xd1'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5603,7 +5610,7 @@ function SET_bit2_of_C(this: CPU): number {
  * Affected flags:
  */
 function SET_bit2_of_D(this: CPU): number {
-  Instructions.map[0xd2].call(this);
+  Instructions.map['0xd2'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5615,7 +5622,7 @@ function SET_bit2_of_D(this: CPU): number {
  * Affected flags:
  */
 function SET_bit2_of_E(this: CPU): number {
-  Instructions.map[0xd3].call(this);
+  Instructions.map['0xd3'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5627,7 +5634,7 @@ function SET_bit2_of_E(this: CPU): number {
  * Affected flags:
  */
 function SET_bit2_of_H(this: CPU): number {
-  Instructions.map[0xd4].call(this);
+  Instructions.map['0xd4'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5639,7 +5646,7 @@ function SET_bit2_of_H(this: CPU): number {
  * Affected flags:
  */
 function SET_bit2_of_L(this: CPU): number {
-  Instructions.map[0xd5].call(this);
+  Instructions.map['0xd5'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5651,7 +5658,7 @@ function SET_bit2_of_L(this: CPU): number {
  * Affected flags:
  */
 function SET_bit2_of_HL(this: CPU): number {
-  Instructions.map[0xd6].call(this);
+  Instructions.map['0xd6'].call(this);
   this.PC.add(2);
   return 16;
 }
@@ -5663,7 +5670,7 @@ function SET_bit2_of_HL(this: CPU): number {
  * Affected flags:
  */
 function SET_bit2_of_A(this: CPU): number {
-  Instructions.map[0xd7].call(this);
+  Instructions.map['0xd7'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5675,7 +5682,7 @@ function SET_bit2_of_A(this: CPU): number {
  * Affected flags:
  */
 function SET_bit3_of_B(this: CPU): number {
-  Instructions.map[0xd8].call(this);
+  Instructions.map['0xd8'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5687,7 +5694,7 @@ function SET_bit3_of_B(this: CPU): number {
  * Affected flags:
  */
 function SET_bit3_of_C(this: CPU): number {
-  Instructions.map[0xd9].call(this);
+  Instructions.map['0xd9'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5699,7 +5706,7 @@ function SET_bit3_of_C(this: CPU): number {
  * Affected flags:
  */
 function SET_bit3_of_D(this: CPU): number {
-  Instructions.map[0xda].call(this);
+  Instructions.map['0xda'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5711,7 +5718,7 @@ function SET_bit3_of_D(this: CPU): number {
  * Affected flags:
  */
 function SET_bit3_of_E(this: CPU): number {
-  Instructions.map[0xdb].call(this);
+  Instructions.map['0xdb'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5723,7 +5730,7 @@ function SET_bit3_of_E(this: CPU): number {
  * Affected flags:
  */
 function SET_bit3_of_H(this: CPU): number {
-  Instructions.map[0xdc].call(this);
+  Instructions.map['0xdc'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5735,7 +5742,7 @@ function SET_bit3_of_H(this: CPU): number {
  * Affected flags:
  */
 function SET_bit3_of_L(this: CPU): number {
-  Instructions.map[0xdd].call(this);
+  Instructions.map['0xdd'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5747,7 +5754,7 @@ function SET_bit3_of_L(this: CPU): number {
  * Affected flags:
  */
 function SET_bit3_of_HL(this: CPU): number {
-  Instructions.map[0xde].call(this);
+  Instructions.map['0xde'].call(this);
   this.PC.add(2);
   return 16;
 }
@@ -5759,7 +5766,7 @@ function SET_bit3_of_HL(this: CPU): number {
  * Affected flags:
  */
 function SET_bit3_of_A(this: CPU): number {
-  Instructions.map[0xdf].call(this);
+  Instructions.map['0xdf'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5771,7 +5778,7 @@ function SET_bit3_of_A(this: CPU): number {
  * Affected flags:
  */
 function SET_bit4_of_B(this: CPU): number {
-  Instructions.map[0xe0].call(this);
+  Instructions.map['0xe0'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5783,7 +5790,7 @@ function SET_bit4_of_B(this: CPU): number {
  * Affected flags:
  */
 function SET_bit4_of_C(this: CPU): number {
-  Instructions.map[0xe1].call(this);
+  Instructions.map['0xe1'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5795,7 +5802,7 @@ function SET_bit4_of_C(this: CPU): number {
  * Affected flags:
  */
 function SET_bit4_of_D(this: CPU): number {
-  Instructions.map[0xe2].call(this);
+  Instructions.map['0xe2'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5807,7 +5814,7 @@ function SET_bit4_of_D(this: CPU): number {
  * Affected flags:
  */
 function SET_bit4_of_E(this: CPU): number {
-  Instructions.map[0xe3].call(this);
+  Instructions.map['0xe3'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5819,7 +5826,7 @@ function SET_bit4_of_E(this: CPU): number {
  * Affected flags:
  */
 function SET_bit4_of_H(this: CPU): number {
-  Instructions.map[0xe4].call(this);
+  Instructions.map['0xe4'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5831,7 +5838,7 @@ function SET_bit4_of_H(this: CPU): number {
  * Affected flags:
  */
 function SET_bit4_of_L(this: CPU): number {
-  Instructions.map[0xe5].call(this);
+  Instructions.map['0xe5'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5843,7 +5850,7 @@ function SET_bit4_of_L(this: CPU): number {
  * Affected flags:
  */
 function SET_bit4_of_HL(this: CPU): number {
-  Instructions.map[0xe6].call(this);
+  Instructions.map['0xe6'].call(this);
   this.PC.add(2);
   return 16;
 }
@@ -5855,7 +5862,7 @@ function SET_bit4_of_HL(this: CPU): number {
  * Affected flags:
  */
 function SET_bit4_of_A(this: CPU): number {
-  Instructions.map[0xe7].call(this);
+  Instructions.map['0xe7'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5867,7 +5874,7 @@ function SET_bit4_of_A(this: CPU): number {
  * Affected flags:
  */
 function SET_bit5_of_B(this: CPU): number {
-  Instructions.map[0xe8].call(this);
+  Instructions.map['0xe8'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5879,7 +5886,7 @@ function SET_bit5_of_B(this: CPU): number {
  * Affected flags:
  */
 function SET_bit5_of_C(this: CPU): number {
-  Instructions.map[0xe9].call(this);
+  Instructions.map['0xe9'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5891,7 +5898,7 @@ function SET_bit5_of_C(this: CPU): number {
  * Affected flags:
  */
 function SET_bit5_of_D(this: CPU): number {
-  Instructions.map[0xea].call(this);
+  Instructions.map['0xea'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5903,7 +5910,7 @@ function SET_bit5_of_D(this: CPU): number {
  * Affected flags:
  */
 function SET_bit5_of_E(this: CPU): number {
-  Instructions.map[0xeb].call(this);
+  Instructions.map['0xeb'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5915,7 +5922,7 @@ function SET_bit5_of_E(this: CPU): number {
  * Affected flags:
  */
 function SET_bit5_of_H(this: CPU): number {
-  Instructions.map[0xec].call(this);
+  Instructions.map['0xec'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5927,7 +5934,7 @@ function SET_bit5_of_H(this: CPU): number {
  * Affected flags:
  */
 function SET_bit5_of_L(this: CPU): number {
-  Instructions.map[0xed].call(this);
+  Instructions.map['0xed'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5939,7 +5946,7 @@ function SET_bit5_of_L(this: CPU): number {
  * Affected flags:
  */
 function SET_bit5_of_HL(this: CPU): number {
-  Instructions.map[0xee].call(this);
+  Instructions.map['0xee'].call(this);
   this.PC.add(2);
   return 16;
 }
@@ -5951,7 +5958,7 @@ function SET_bit5_of_HL(this: CPU): number {
  * Affected flags:
  */
 function SET_bit5_of_A(this: CPU): number {
-  Instructions.map[0xef].call(this);
+  Instructions.map['0xef'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5963,7 +5970,7 @@ function SET_bit5_of_A(this: CPU): number {
  * Affected flags:
  */
 function SET_bit6_of_B(this: CPU): number {
-  Instructions.map[0xf0].call(this);
+  Instructions.map['0xf0'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5975,7 +5982,7 @@ function SET_bit6_of_B(this: CPU): number {
  * Affected flags:
  */
 function SET_bit6_of_C(this: CPU): number {
-  Instructions.map[0xf1].call(this);
+  Instructions.map['0xf1'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5987,7 +5994,7 @@ function SET_bit6_of_C(this: CPU): number {
  * Affected flags:
  */
 function SET_bit6_of_D(this: CPU): number {
-  Instructions.map[0xf2].call(this);
+  Instructions.map['0xf2'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -5999,7 +6006,7 @@ function SET_bit6_of_D(this: CPU): number {
  * Affected flags:
  */
 function SET_bit6_of_E(this: CPU): number {
-  Instructions.map[0xf3].call(this);
+  Instructions.map['0xf3'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -6011,7 +6018,7 @@ function SET_bit6_of_E(this: CPU): number {
  * Affected flags:
  */
 function SET_bit6_of_H(this: CPU): number {
-  Instructions.map[0xf4].call(this);
+  Instructions.map['0xf4'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -6023,7 +6030,7 @@ function SET_bit6_of_H(this: CPU): number {
  * Affected flags:
  */
 function SET_bit6_of_L(this: CPU): number {
-  Instructions.map[0xf5].call(this);
+  Instructions.map['0xf5'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -6035,7 +6042,7 @@ function SET_bit6_of_L(this: CPU): number {
  * Affected flags:
  */
 function SET_bit6_of_HL(this: CPU): number {
-  Instructions.map[0xf6].call(this);
+  Instructions.map['0xf6'].call(this);
   this.PC.add(2);
   return 16;
 }
@@ -6047,7 +6054,7 @@ function SET_bit6_of_HL(this: CPU): number {
  * Affected flags:
  */
 function SET_bit6_of_A(this: CPU): number {
-  Instructions.map[0xf7].call(this);
+  Instructions.map['0xf7'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -6059,7 +6066,7 @@ function SET_bit6_of_A(this: CPU): number {
  * Affected flags:
  */
 function SET_bit7_of_B(this: CPU): number {
-  Instructions.map[0xf8].call(this);
+  Instructions.map['0xf8'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -6071,7 +6078,7 @@ function SET_bit7_of_B(this: CPU): number {
  * Affected flags:
  */
 function SET_bit7_of_C(this: CPU): number {
-  Instructions.map[0xf9].call(this);
+  Instructions.map['0xf9'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -6083,7 +6090,7 @@ function SET_bit7_of_C(this: CPU): number {
  * Affected flags:
  */
 function SET_bit7_of_D(this: CPU): number {
-  Instructions.map[0xfa].call(this);
+  Instructions.map['0xfa'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -6095,7 +6102,7 @@ function SET_bit7_of_D(this: CPU): number {
  * Affected flags:
  */
 function SET_bit7_of_E(this: CPU): number {
-  Instructions.map[0xfb].call(this);
+  Instructions.map['0xfb'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -6107,7 +6114,7 @@ function SET_bit7_of_E(this: CPU): number {
  * Affected flags:
  */
 function SET_bit7_of_H(this: CPU): number {
-  Instructions.map[0xfc].call(this);
+  Instructions.map['0xfc'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -6119,7 +6126,7 @@ function SET_bit7_of_H(this: CPU): number {
  * Affected flags:
  */
 function SET_bit7_of_L(this: CPU): number {
-  Instructions.map[0xfd].call(this);
+  Instructions.map['0xfd'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -6131,7 +6138,7 @@ function SET_bit7_of_L(this: CPU): number {
  * Affected flags:
  */
 function SET_bit7_of_HL(this: CPU): number {
-  Instructions.map[0xfe].call(this);
+  Instructions.map['0xfe'].call(this);
   this.PC.add(2);
   return 16;
 }
@@ -6143,7 +6150,7 @@ function SET_bit7_of_HL(this: CPU): number {
  * Affected flags:
  */
 function SET_bit7_of_A(this: CPU): number {
-  Instructions.map[0xff].call(this);
+  Instructions.map['0xff'].call(this);
   this.PC.add(2);
   return 8;
 }
@@ -6181,7 +6188,7 @@ export default {
   0x1d: DEC_E_i,
   0x1e: LD_into_E_i_from_d8_i,
   0x1f: RRA,
-  0x20: JR_C_to_NZ_i__r8_i,
+  0x20: JR_to_NZ_i__r8_i,
   0x21: LD_into_HL_i_from_d16_i,
   0x22: LD_into_HL_incr_m_from_A_i,
   0x23: INC_HL_i,
@@ -6189,7 +6196,7 @@ export default {
   0x25: DEC_H_i,
   0x26: LD_into_H_i_from_d8_i,
   0x27: DAA_A,
-  0x28: JR_C_to_Z_i__r8_i,
+  0x28: JR_to_Z_i__r8_i,
   0x29: ADD_into_HL_i_from_HL_i,
   0x2a: LD_into_A_i_from_HL_incr_m,
   0x2b: DEC_HL_i,
@@ -6197,7 +6204,7 @@ export default {
   0x2d: DEC_L_i,
   0x2e: LD_into_L_i_from_d8_i,
   0x2f: CPL_A,
-  0x30: JR_C_to_NC_i__r8_i,
+  0x30: JR_to_NC_i__r8_i,
   0x31: LD_into_SP_i_from_d16_i,
   0x32: LD_into_HL_decr_m_from_A_i,
   0x33: INC_SP_i,
@@ -6205,7 +6212,7 @@ export default {
   0x35: DEC_HL_m,
   0x36: LD_into_HL_m_from_d8_i,
   0x37: SCF,
-  0x38: JR_C_to_C_i__r8_i,
+  0x38: JR_to_C_i__r8_i,
   0x39: ADD_into_HL_i_from_SP_i,
   0x3a: LD_into_A_i_from_HL_decr_m,
   0x3b: DEC_SP_i,
@@ -6343,7 +6350,7 @@ export default {
   0xbf: CP_A_with_A,
   0xc0: RET_to_A_i__NZ_i,
   0xc1: POP_off_SP_into_BC_i,
-  0xc2: JP_C_to_NZ_i__a16_i,
+  0xc2: JP_to_NZ_i__a16_i,
   0xc3: JP_to_A_i__a16_i,
   0xc4: CALL_to_NZ_i_from_a16_i,
   0xc5: PUSH_onto_SP_register_BC_i,
@@ -6351,7 +6358,7 @@ export default {
   0xc7: RST_to_A_i_from_00H_i,
   0xc8: RET_to_A_i__Z_i,
   0xc9: RET,
-  0xca: JP_C_to_Z_i__a16_i,
+  0xca: JP_to_Z_i__a16_i,
   0xcb: PREFIX,
   0xcc: CALL_to_Z_i_from_a16_i,
   0xcd: CALL_to_A_i_from_a16_i,
@@ -6359,7 +6366,7 @@ export default {
   0xcf: RST_to_A_i_from_08H_i,
   0xd0: RET_to_A_i__NC_i,
   0xd1: POP_off_SP_into_DE_i,
-  0xd2: JP_C_to_NC_i__a16_i,
+  0xd2: JP_to_NC_i__a16_i,
   0xd3: ILLEGAL_D3,
   0xd4: CALL_to_NC_i_from_a16_i,
   0xd5: PUSH_onto_SP_register_DE_i,
@@ -6367,7 +6374,7 @@ export default {
   0xd7: RST_to_A_i_from_10H_i,
   0xd8: RET_to_A_i__C_i,
   0xd9: RETI,
-  0xda: JP_C_to_C_i__a16_i,
+  0xda: JP_to_C_i__a16_i,
   0xdb: ILLEGAL_DB,
   0xdc: CALL_to_C_i_from_a16_i,
   0xdd: ILLEGAL_DD,
