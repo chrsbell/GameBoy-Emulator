@@ -16,12 +16,13 @@ class Emulator {
   }
   /**
    * Loads a bios and ROM file into the Memory module.
+   * @returns - boolean, whether ROM was loaded
    * Stops the currently updating function.
    */
-  public load(bios: ByteArray, rom: ByteArray) {
+  public load(bios: ByteArray, rom: ByteArray): boolean {
     Memory.load(bios, rom);
     clearTimeout(this.timerID);
-    this.update();
+    return true;
   }
   /**
    * Executes the next set of opcodes and calls renderer update method.

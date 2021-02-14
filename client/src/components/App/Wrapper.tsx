@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useRef, useEffect, useState, useContext, FormEvent, CSSProperties } from 'react';
 import Context from './Context';
 import axios, { AxiosRequestConfig } from 'axios';
+import './Wrapper.css';
 
 const FlexColumn: CSSProperties = {
   display: 'flex',
@@ -42,42 +43,46 @@ const Wrapper = () => {
   }, []);
 
   return (
-    <div style={FlexColumn}>
-      <div id="canvas" />
-      <button
-        onClick={() => {
-          hiddenROMRef.current.click();
-        }}
-      >
-        Upload ROM
-      </button>
-      <button
-        onClick={() => {
-          hiddenBIOSRef.current.click();
-        }}
-      >
-        BIOS File
-      </button>
-      <input
-        type="file"
-        name="rom"
-        ref={hiddenROMRef}
-        onChange={(e) => setROMFile(e.target.files[0])}
-        style={{ display: 'none' }}
-      />
-      <input
-        type="file"
-        name="bios"
-        ref={hiddenBIOSRef}
-        onChange={(e) => setBIOSFile(e.target.files[0])}
-        style={{ display: 'none' }}
-      />
-      <button type="button" onClick={onSubmit}>
-        Upload
-      </button>
-      {/* Use a LCD size similar to GameBoy's */}
-      <canvas width="787" height="720" ref={canvasRef} />
-    </div>
+    <section className="container">
+      <div className="flex-column">
+        <nav className="flex-row">
+          <button
+            onClick={() => {
+              hiddenROMRef.current.click();
+            }}
+          >
+            Upload ROM
+          </button>
+          <button
+            onClick={() => {
+              hiddenBIOSRef.current.click();
+            }}
+          >
+            BIOS File
+          </button>
+          <input
+            type="file"
+            name="rom"
+            ref={hiddenROMRef}
+            onChange={(e) => setROMFile(e.target.files[0])}
+            style={{ display: 'none' }}
+          />
+          <input
+            type="file"
+            name="bios"
+            ref={hiddenBIOSRef}
+            onChange={(e) => setBIOSFile(e.target.files[0])}
+            style={{ display: 'none' }}
+          />
+          <button type="button" onClick={onSubmit}>
+            Upload
+          </button>
+        </nav>
+        <div id="canvas" />
+        {/* Use a LCD size similar to GameBoy's */}
+        <canvas width="787" height="720" ref={canvasRef} />
+      </div>
+    </section>
   );
 };
 

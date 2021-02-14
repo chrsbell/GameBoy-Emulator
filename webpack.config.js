@@ -8,25 +8,29 @@ module.exports = (env, argv) => ({
   devtool: 'source-map',
   mode: argv.mode,
   entry: {
-    main: `${SRC_DIR}/components/React/App.tsx`,
+    main: path.join(SRC_DIR, 'index.tsx'),
   },
   output: {
     path: DIST_DIR,
     filename: 'bundle.js',
-    sourceMapFilename: 'source.js.map',
+    sourceMapFilename: '[name].[hash:8].map',
   },
   module: {
     rules: [
       {
         test: /\.tsx?/,
         exclude: /node_modules/,
-        loader: 'ts-loader',
+        use: ['ts-loader'],
       },
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         loader: 'babel-loader',
         options: { presets: ['@babel/preset-env', '@babel/preset-react'] },
+      },
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
       },
     ],
   },

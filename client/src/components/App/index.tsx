@@ -50,7 +50,9 @@ const App = () => {
   useEffect(() => {
     const { parsedROM, parsedBIOS } = appState;
     if (parsedROM && parsedBIOS) {
-      emulator.current.load(parsedBIOS, parsedROM);
+      if (emulator.current.load(parsedBIOS, parsedROM)) {
+        emulator.current.update();
+      }
     }
   }, [appState.parsedROM, appState.parsedBIOS]);
 
@@ -67,4 +69,4 @@ const App = () => {
   );
 };
 
-ReactDOM.render(<App />, document.getElementById('app'));
+export default App;
