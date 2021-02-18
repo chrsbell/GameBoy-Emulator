@@ -13,18 +13,18 @@ module.exports = (env, argv) => ({
   output: {
     path: DIST_DIR,
     filename: 'bundle.js',
-    sourceMapFilename: '[name].[hash:8].map',
+    sourceMapFilename: '[name].[contenthash].map',
   },
   module: {
     rules: [
       {
-        test: /\.tsx?/,
-        exclude: /node_modules/,
+        test: /\.(ts|tsx)$/,
+        exclude: [/\.test.ts$/, /\.test.tsx$/, /node_modules/],
         use: ['ts-loader'],
       },
       {
         test: /\.(js|jsx)$/,
-        exclude: /node_modules/,
+        exclude: [/\.test.js$/, /\.test.jsx$/, /node_modules/],
         loader: 'babel-loader',
         options: { presets: ['@babel/preset-env', '@babel/preset-react'] },
       },

@@ -1,7 +1,7 @@
 import { LoDashStatic } from 'lodash';
 import { Response, Request } from 'express';
 import * as express from 'express';
-import { Byte, ByteArray } from '../client/src/components/Types';
+import { ByteArray } from '../client/src/components/Types';
 const path = require('path');
 const multer = require('multer');
 
