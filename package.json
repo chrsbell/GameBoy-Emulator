@@ -5,10 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node server/index.ts",
-    "build-dev": "npx webpack --mode development --watch",
-    "build-tests": "python3 client/test/dump_pyboy.py tetris.gb",
-    "test": "jest",
-    "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand"
+    "build:dev": "npx webpack --mode development --watch",
+    "test": "python3 client/test/dump_pyboy.py tetris.gb && jest --watch",
+    "test:debug": "python3 client/test/dump_pyboy.py tetris.gb && node --inspect-brk node_modules/.bin/jest --runInBand --watch"
   },
   "keywords": [
     "gameboy",
@@ -38,6 +37,7 @@
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "babel-loader": "^8.2.2",
+    "canvas": "^2.6.1",
     "clean-webpack-plugin": "^3.0.0",
     "css-loader": "^5.0.2",
     "eslint": "^7.2.0",

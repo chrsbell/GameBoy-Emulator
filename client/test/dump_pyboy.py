@@ -13,7 +13,8 @@ def main():
     if not os.path.exists(rom_dir):
       os.makedirs(rom_dir)
 
-    pyboy = PyBoy(os.path.join(dirname, '..', '..', 'public', 'roms', rom), bootrom_file=os.path.join(dirname, '..', '..', 'public', 'roms', 'bios.bin'), disable_renderer=False, sound=False)
+    bootrom_file=os.path.join(dirname, '..', '..', 'public', 'roms', 'bios.bin')
+    pyboy = PyBoy(os.path.join(dirname, '..', '..', 'public', 'roms', rom), bootrom_file=None, disable_renderer=False, sound=False)
     f = open(os.path.join(dirname, 'generated', rom, 'save.state'), 'wb')
     for i in range(100):
       # save_state(f, pyboy.mb)

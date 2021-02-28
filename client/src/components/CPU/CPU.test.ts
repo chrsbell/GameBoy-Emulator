@@ -4,30 +4,22 @@ import _ from 'lodash';
 import CPU from '.';
 import Memory from '../Memory';
 import { Byte, Word, ByteArray } from '../Types';
-debugger;
 const ROM_FOLDER = path.join(__dirname, '..', '..', '..', '..', 'public', 'roms');
 const GENERATED_FOLDER = path.join(__dirname, '..', '..', '..', 'test', 'generated');
-// let server: http.Server;
-// beforeEach(function () {
-//   server = require('./server');
-// });
-// afterEach(function () {
-//   server.close();
-// });
 
 const VIDEO_RAM = 8192;
 const OBJECT_ATTRIBUTE_MEMORY = 0xa0;
 
 interface CPUInfo {
-  SP: Word;
-  PC: Word;
-  A: Byte;
-  F: Byte;
-  B: Byte;
-  C: Byte;
-  D: Byte;
-  E: Byte;
-  HL: Word;
+  SP: number,
+  PC: number,
+  A: number,
+  F: number,
+  B: number,
+  C: number,
+  D: number,
+  E: number,
+  HL: number,
   interrupt_master_enable: boolean;
   halted: boolean;
   stopped: boolean;
@@ -63,98 +55,111 @@ const NON_IO_INTERNAL_RAM1 = 0x34;
 const INTERNAL_RAM1 = 0x7f;
 const INTERRUPT_ENABLE_REGISTER = 1;
 
-const getCPUInfo = () => {};
+beforeAll(() => {
+  const BIOSFile: Buffer = fs.readFileSync(path.join(ROM_FOLDER, 'bios.bin'));
+  const ROMFile: Buffer = fs.readFileSync(path.join(ROM_FOLDER, 'tetris.gb'));
 
-describe('cpu functionality', () => {
+  Memory.load(new ByteArray([...BIOSFile]),new ByteArray([...ROMFile]));
+  Memory.inBios = false;
+  expect(Memory).toBeDefined();
+});
+
+describe('CPU', () => {
   it('matches the internal state of another emulator', async () => {
     const cpu = new CPU();
     expect(CPU).toBeDefined();
 
-    const BIOSFile: Buffer = fs.readFileSync(path.join(ROM_FOLDER, 'bios.bin'));
-    const ROMFile: Buffer = fs.readFileSync(path.join(ROM_FOLDER, 'tetris.gb'));
-
-    let buffer = await fs.promises.readFile(path.join(GENERATED_FOLDER, 'tetris.gb', 'save.state'));
+    let pyboySave = await fs.promises.readFile(path.join(GENERATED_FOLDER, 'tetris.gb', 'save.state'));
 
     let fileIndex = 0;
-    const stateVersion = buffer[fileIndex++];
-    const bootROMEnabled = buffer[fileIndex++];
 
-    Memory.load(new ByteArray([...BIOSFile]), new ByteArray([...ROMFile]));
-    expect(Memory).toBeDefined();
+    let cpuStates: Array<CPUInfo> = Array(100);
+
+    debugger;
 
     for (let i = 0; i < 100; i++) {
-      let cpuInfo: CPUInfo = {} as CPUInfo;
-      let screenInfo: ScreenInfo = {} as ScreenInfo;
-
-      // CPU Info
-      cpuInfo.A = buffer[fileIndex++];
-      cpuInfo.F = buffer[fileIndex++];
-      cpuInfo.B = buffer[fileIndex++];
-      cpuInfo.C = buffer[fileIndex++];
-      cpuInfo.D = buffer[fileIndex++];
-      cpuInfo.E = buffer[fileIndex++];
-      cpuInfo.HL = buffer[fileIndex++];
-      cpuInfo.HL += buffer[fileIndex++];
-      cpuInfo.SP = buffer[fileIndex++];
-      cpuInfo.SP += buffer[fileIndex++];
-      cpuInfo.PC = buffer[fileIndex++];
-      cpuInfo.PC += buffer[fileIndex++];
-
-      // LCD Info
-      screenInfo.VRAM = new ByteArray(VIDEO_RAM);
-      for (let i = 0; i < VIDEO_RAM; i++) {
-        screenInfo.VRAM[i] = buffer[fileIndex++];
-      }
-
-      screenInfo.OAM = new ByteArray(OBJECT_ATTRIBUTE_MEMORY);
-      for (let i = 0; i < OBJECT_ATTRIBUTE_MEMORY; i++) {
-        screenInfo.OAM[i] = buffer[fileIndex++];
-      }
-
-      screenInfo.LCDC = buffer[fileIndex++];
-      screenInfo.BGP = buffer[fileIndex++];
-      screenInfo.OBP0 = buffer[fileIndex++];
-      screenInfo.OBP1 = buffer[fileIndex++];
-      screenInfo.SCY = buffer[fileIndex++];
-      screenInfo.SCX = buffer[fileIndex++];
-      screenInfo.WY = buffer[fileIndex++];
-      screenInfo.WX = buffer[fileIndex++];
-
-      // Ignore scanline info for now
-      for (let i = 0; i < ROWS; i++) {
-        fileIndex++;
-      }
-
-      // Memory info
-      for (let i = 0; i < INTERNAL_RAM0; i++) {
-        buffer[fileIndex++];
-      }
-      for (let i = 0; i < NON_IO_INTERNAL_RAM0; i++) {
-        buffer[fileIndex++];
-      }
-      for (let i = 0; i < IO_PORTS; i++) {
-        buffer[fileIndex++];
-      }
-      for (let i = 0; i < INTERNAL_RAM1; i++) {
-        buffer[fileIndex++];
-      }
-      for (let i = 0; i < NON_IO_INTERNAL_RAM1; i++) {
-        buffer[fileIndex++];
-      }
-      for (let i = 0; i < INTERRUPT_ENABLE_REGISTER; i++) {
-        buffer[fileIndex++];
-      }
-
-      // Timer info
-
-      // DIV
-      // TIMA
-      // f.write_16bit(DIV_counter
-      // f.write_16bit(TIMA_counter
-      // TMA
-      // TAC
 
       cpu.executeInstruction();
+
+      cpuStates[i] = {} as CPUInfo;
+      const stateVersion = pyboySave[fileIndex++];
+      const bootROMEnabled = pyboySave[fileIndex++];
+      // CPU Info
+      cpuStates[i].A = pyboySave[fileIndex++];
+      cpuStates[i].F = pyboySave[fileIndex++];
+      cpuStates[i].B = pyboySave[fileIndex++];
+      cpuStates[i].C = pyboySave[fileIndex++];
+      cpuStates[i].D = pyboySave[fileIndex++];
+      cpuStates[i].E = pyboySave[fileIndex++];
+      let hl = pyboySave[fileIndex++];
+      hl |= pyboySave[fileIndex++] << 8;
+      cpuStates[i].HL = hl;
+      let sp = pyboySave[fileIndex++];
+      sp |= pyboySave[fileIndex++] << 8;
+      cpuStates[i].SP = pyboySave[fileIndex++];
+      cpuStates[i].SP = sp;
+      let pc = pyboySave[fileIndex++];
+      pc |= pyboySave[fileIndex++] << 8;
+      cpuStates[i].PC = pc;
+
+      cpuStates[i].interrupt_master_enable = pyboySave[fileIndex++];
+      cpuStates[i].halted = pyboySave[fileIndex++];
+      cpuStates[i].stopped = pyboySave[fileIndex++];
+
+      // // LCD Info
+      // screenInfo.VRAM= Array(VIDEO_RAM;
+      // for (let i = 0; i < VIDEO_RAM; i++) {
+      //   screenInfo.VRAM[i] = pyboySave[fileIndex++];
+      // }
+
+      // screenInfo.OAM= Array(OBJECT_ATTRIBUTE_MEMORY;
+      // for (let i = 0; i < OBJECT_ATTRIBUTE_MEMORY; i++) {
+      //   screenInfo.OAM[i] = pyboySave[fileIndex++];
+      // }
+
+      // screenInfo.LCDC = pyboySave[fileIndex++];
+      // screenInfo.BGP = pyboySave[fileIndex++];
+      // screenInfo.OBP0 = pyboySave[fileIndex++];
+      // screenInfo.OBP1 = pyboySave[fileIndex++];
+      // screenInfo.SCY = pyboySave[fileIndex++];
+      // screenInfo.SCX = pyboySave[fileIndex++];
+      // screenInfo.WY = pyboySave[fileIndex++];
+      // screenInfo.WX = pyboySave[fileIndex++];
+
+      // // Ignore scanline info for now
+      // for (let i = 0; i < ROWS; i++) {
+      //   fileIndex++;
+      // }
+
+      // // Memory info
+      // for (let i = 0; i < INTERNAL_RAM0; i++) {
+      //   pyboySave[fileIndex++];
+      // }
+      // for (let i = 0; i < NON_IO_INTERNAL_RAM0; i++) {
+      //   pyboySave[fileIndex++];
+      // }
+      // for (let i = 0; i < IO_PORTS; i++) {
+      //   pyboySave[fileIndex++];
+      // }
+      // for (let i = 0; i < INTERNAL_RAM1; i++) {
+      //   pyboySave[fileIndex++];
+      // }
+      // for (let i = 0; i < NON_IO_INTERNAL_RAM1; i++) {
+      //   pyboySave[fileIndex++];
+      // }
+      // for (let i = 0; i < INTERRUPT_ENABLE_REGISTER; i++) {
+      //   pyboySave[fileIndex++];
+      // }
+
+      // // Timer info
+
+      // timerInfo.DIV = pyboySave[fileIndex++];
+      // timerInfo.TIMA = pyboySave[fileIndex++];
+      // timerInfo.DIV_counter = pyboySave[fileIndex++];
+      // timerInfo.DIV_counter += pyboySave[fileIndex++];
+      // timerInfo.TMA = pyboySave[fileIndex++];
+      // timerInfo.TAC = pyboySave[fileIndex++];
+
     }
   });
 });

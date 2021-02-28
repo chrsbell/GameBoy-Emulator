@@ -150,20 +150,22 @@ class CPU {
    */
   public executeInstruction(): number {
     if (Memory.inBios) {
+      // fetch
       const opcode: number = Memory.readByte(this.PC.value());
-      console.log(`PC: ${this.PC.log()}`, opcode.toString(16));
-      this.PC.set(this.PC.value() + 0x0001);
+      // not doing any execution of bios instructions for now
+      this.PC.add(1);
       // check if finished bios execution
       if (!Memory.inBios) {
         this.initPowerSequence();
       }
-      return 1;
+      return 2;
     } else {
       // normal execution
+      // fetch
       const opcode: number = Memory.readByte(this.PC.value());
-      console.log(`PC: ${this.PC.log()}`, opcode.toString(16));
+      // execute
       const numCycles: number = this.opcodes[opcode].call(this);
-      this.opcodes[opcode].call(this);
+      return numCycles;
     }
   }
 }
