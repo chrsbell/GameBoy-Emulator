@@ -1,50 +1,27 @@
 import Memory from '../Memory';
-import { Byte, Word } from '../Types';
+import { toByte, toWord, byte, word, addByte } from '../Types';
 import Opcodes from './z80';
-
-// Using a class to prevent accidentally setting flag outside 0/1
-class Flag {
-  private f: number = 0;
-  public set(newValue: number): void {
-    if (newValue !== 0 && newValue !== 1) {
-      throw new Error('Tried to set flag outside range.');
-    }
-    this.f = newValue;
-  }
-  public value(): number {
-    return this.f;
-  }
-}
+import Flag from './Flag';
 
 interface Registers {
-  AF: Word;
-  BC: Word;
-  DE: Word;
-  HL: Word;
-  F: {
-    Z: Flag; // set if last op producted 0
-    N: Flag; // set if last op was subtraction
-    H: Flag; // set if result's lower half of last op overflowed past 15
-    CY: Flag; // set if last op produced a result over 255 or under 0
-  };
+  af: word;
+  bc: word;
+  de: word;
+  hl: word;
+  f: Flag;
 }
 
 class CPU {
   // 16-bit program counter
-  protected PC: Word;
+  protected pc: word;
   // stack pointer
-  protected SP: Word;
-  protected R: Registers = {
-    AF: null as Word,
-    BC: null as Word,
-    DE: null as Word,
-    HL: null as Word,
-    F: {
-      Z: new Flag(),
-      N: new Flag(),
-      H: new Flag(),
-      CY: new Flag(),
-    },
+  protected sp: word;
+  protected r: Registers = {
+    af: null as word,
+    bc: null as word,
+    de: null as word,
+    hl: null as word,
+    f: new Flag(),
   };
   protected halted: boolean;
   protected interruptsEnabled: boolean;
@@ -52,22 +29,22 @@ class CPU {
   // number of clock ticks per second
   static clock = 4194304;
   public constructor() {
-    this.PC = new Word(0);
-    this.SP = new Word(0);
+    this.pc = toWord(0);
+    this.sp = toWord(0);
     this.opcodes = Opcodes;
     this.halted = false;
     this.interruptsEnabled = true;
-    this.R.AF = new Word(0);
-    this.R.BC = new Word(0);
-    this.R.DE = new Word(0);
-    this.R.HL = new Word(0);
+    this.r.af = toWord(0);
+    this.r.bc = toWord(0);
+    this.r.de = toWord(0);
+    this.r.hl = toWord(0);
   }
   /**
    * Sets the Z flag if the register is 0
    */
-  protected checkZFlag(reg: Byte): void {
-    if (!reg.value()) {
-      this.R.F.Z.set(1);
+  protected checkZFlag(reg: byte): void {
+    if (!reg) {
+      this.r.f.z = 1;
     }
   }
   /**
@@ -78,71 +55,70 @@ class CPU {
    * https://stackoverflow.com/questions/8868396/game-boy-what-constitutes-a-half-carry
    * https://gbdev.io/gb-opcodes/optables/
    */
-  protected checkHalfCarry(op1: Byte, op2: Byte): void {
-    const carryBit = ((op1.value() & 0xf) + (op2.value() & 0xf)) & 0x10;
-    this.R.F.H.set(carryBit === 0x10 ? 1 : 0);
+  protected checkHalfCarry(op1: byte, op2: byte): void {
+    const carryBit = ((op1 & 0xf) + (op2 & 0xf)) & 0x10;
+    this.r.f.h = carryBit === 0x10 ? 1 : 0;
   }
   /**
    * Sets the carry flag if the sum will exceed the size of the data type.
    */
-  // protected checkFullCarry(op1: Word, op2: Word): void;
-  protected checkFullCarry(op1: Byte | Word, op2: Byte | Word): void {
-    let overflow: number = op1.value() + op2.value();
-    if (op1 instanceof Word) {
-      if (overflow > 65535) {
-        this.R.F.N.set(1);
-      } else {
-        this.R.F.N.set(0);
-      }
+  protected checkFullCarry16(op1: word, op2: word): void {
+    let overflow: number = op1 + op2;
+    if (overflow > 65535) {
+      this.r.f.n = 1;
     } else {
-      if (overflow > 255) {
-        this.R.F.N.set(1);
-      } else {
-        this.R.F.N.set(0);
-      }
+      this.r.f.n = 0;
+    }
+  }
+  protected checkFullCarry8(op1: byte, op2: byte): void {
+    let overflow: number = op1 + op2;
+    if (overflow > 255) {
+      this.r.f.n = 1;
+    } else {
+      this.r.f.n = 0;
     }
   }
   /**
    * Completes the GB power sequence
    */
   private initPowerSequence(): void {
-    this.PC.set(0x100);
-    this.R.AF.set(0x01b0);
-    this.R.BC.set(0x0013);
-    this.R.DE.set(0x00d8);
-    this.R.HL.set(0x014d);
-    this.SP.set(0xfffe);
-    Memory.writeByte(0xff05, new Byte(0x00));
-    Memory.writeByte(0xff06, new Byte(0x00));
-    Memory.writeByte(0xff07, new Byte(0x00));
-    Memory.writeByte(0xff10, new Byte(0x80));
-    Memory.writeByte(0xff11, new Byte(0xbf));
-    Memory.writeByte(0xff12, new Byte(0xf3));
-    Memory.writeByte(0xff14, new Byte(0xbf));
-    Memory.writeByte(0xff16, new Byte(0x3f));
-    Memory.writeByte(0xff17, new Byte(0x00));
-    Memory.writeByte(0xff19, new Byte(0xbf));
-    Memory.writeByte(0xff1a, new Byte(0x7f));
-    Memory.writeByte(0xff1b, new Byte(0xff));
-    Memory.writeByte(0xff1c, new Byte(0x9f));
-    Memory.writeByte(0xff1e, new Byte(0xbf));
-    Memory.writeByte(0xff20, new Byte(0xff));
-    Memory.writeByte(0xff21, new Byte(0x00));
-    Memory.writeByte(0xff22, new Byte(0x00));
-    Memory.writeByte(0xff23, new Byte(0xbf));
-    Memory.writeByte(0xff24, new Byte(0x77));
-    Memory.writeByte(0xff25, new Byte(0xf3));
-    Memory.writeByte(0xff26, new Byte(0xf1));
-    Memory.writeByte(0xff40, new Byte(0x91));
-    Memory.writeByte(0xff42, new Byte(0x00));
-    Memory.writeByte(0xff43, new Byte(0x00));
-    Memory.writeByte(0xff45, new Byte(0x00));
-    Memory.writeByte(0xff47, new Byte(0xfc));
-    Memory.writeByte(0xff48, new Byte(0xff));
-    Memory.writeByte(0xff49, new Byte(0xff));
-    Memory.writeByte(0xff4a, new Byte(0x00));
-    Memory.writeByte(0xff4b, new Byte(0x00));
-    Memory.writeByte(0xffff, new Byte(0x00));
+    this.pc = 0x100;
+    this.r.af = 0x01b0;
+    this.r.bc = 0x0013;
+    this.r.de = 0x00d8;
+    this.r.hl = 0x014d;
+    this.sp = 0xfffe;
+    Memory.writeByte(0xff05, toByte(0x00));
+    Memory.writeByte(0xff06, toByte(0x00));
+    Memory.writeByte(0xff07, toByte(0x00));
+    Memory.writeByte(0xff10, toByte(0x80));
+    Memory.writeByte(0xff11, toByte(0xbf));
+    Memory.writeByte(0xff12, toByte(0xf3));
+    Memory.writeByte(0xff14, toByte(0xbf));
+    Memory.writeByte(0xff16, toByte(0x3f));
+    Memory.writeByte(0xff17, toByte(0x00));
+    Memory.writeByte(0xff19, toByte(0xbf));
+    Memory.writeByte(0xff1a, toByte(0x7f));
+    Memory.writeByte(0xff1b, toByte(0xff));
+    Memory.writeByte(0xff1c, toByte(0x9f));
+    Memory.writeByte(0xff1e, toByte(0xbf));
+    Memory.writeByte(0xff20, toByte(0xff));
+    Memory.writeByte(0xff21, toByte(0x00));
+    Memory.writeByte(0xff22, toByte(0x00));
+    Memory.writeByte(0xff23, toByte(0xbf));
+    Memory.writeByte(0xff24, toByte(0x77));
+    Memory.writeByte(0xff25, toByte(0xf3));
+    Memory.writeByte(0xff26, toByte(0xf1));
+    Memory.writeByte(0xff40, toByte(0x91));
+    Memory.writeByte(0xff42, toByte(0x00));
+    Memory.writeByte(0xff43, toByte(0x00));
+    Memory.writeByte(0xff45, toByte(0x00));
+    Memory.writeByte(0xff47, toByte(0xfc));
+    Memory.writeByte(0xff48, toByte(0xff));
+    Memory.writeByte(0xff49, toByte(0xff));
+    Memory.writeByte(0xff4a, toByte(0x00));
+    Memory.writeByte(0xff4b, toByte(0x00));
+    Memory.writeByte(0xffff, toByte(0x00));
   }
   /**
    * Executes next opcode.
@@ -151,9 +127,9 @@ class CPU {
   public executeInstruction(): number {
     if (Memory.inBios) {
       // fetch
-      const opcode: number = Memory.readByte(this.PC.value());
+      const opcode: number = Memory.readByte(this.pc);
       // not doing any execution of bios instructions for now
-      this.PC.add(1);
+      this.pc = addByte(this.pc, 1);
       // check if finished bios execution
       if (!Memory.inBios) {
         this.initPowerSequence();
@@ -162,7 +138,7 @@ class CPU {
     } else {
       // normal execution
       // fetch
-      const opcode: number = Memory.readByte(this.PC.value());
+      const opcode: number = Memory.readByte(this.pc);
       // execute
       const numCycles: number = this.opcodes[opcode].call(this);
       return numCycles;

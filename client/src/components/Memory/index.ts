@@ -1,5 +1,5 @@
 import type { byte, word } from '../Types';
-import { ByteArray, toByte, addByte } from '../Types';
+import { ByteArray, toByte, addByte, toHex } from '../Types';
 
 interface CartridgeCode {
   [key: number]: string;
@@ -117,7 +117,7 @@ class Memory {
   /**
    * Writes the provided byte to the address
    */
-  public writetoByte(address: number, data: byte) {
+  public writeByte(address: number, data: byte) {
     if (this.inBios) {
       if (address <= 0xff) {
         this.bios[address] = data;
@@ -155,8 +155,8 @@ class Memory {
    * Writes the provided word to the address
    */
   public writeWord(address: number, data: Word) {
-    this.writetoByte(address, data.lower());
-    this.writetoByte(address + 1, data.upper());
+    this.writeByte(address, data.lower());
+    this.writeByte(address + 1, data.upper());
   }
   /**
    * Return the byte at the address as a number
@@ -245,7 +245,7 @@ class Memory {
       // MBC 0x00
       this.initialized = true;
     } else {
-      console.log(`No support for MBC ${this.cart.MBCType}.`);
+      console.log(`No support for MBC ${toHex(this.cart.MBCType)}.`);
     }
     console.log('Loaded file into ROM memory.');
     this.bios = bios;

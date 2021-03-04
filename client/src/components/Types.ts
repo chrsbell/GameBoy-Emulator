@@ -63,6 +63,23 @@ const addUpper = (value: word, operand: byte): word =>
 const addLower = (value: word, operand: byte): word =>
   setLower(value, addByte(value & 0xff, operand));
 
+/**
+ * Formats the byte/word as a hex value
+ */
+const toHex = (value: byte | word): string => `0x${pad(value.toString(16), 4)}`;
+
 export class ByteArray extends Uint8Array {}
 
-export { toByte, addByte, toWord, upper, lower, setUpper, setLower, addWord, addUpper, addLower };
+export {
+  toByte,
+  addByte,
+  toWord,
+  upper,
+  lower,
+  setUpper,
+  setLower,
+  addWord,
+  addUpper,
+  addLower,
+  toHex,
+};
