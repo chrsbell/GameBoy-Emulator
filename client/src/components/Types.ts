@@ -5,8 +5,14 @@ const pad = (str: string, width: number, replacement: string = '0'): string => {
   return Array(width - str.length).join(replacement) + str;
 };
 
-export type byte = number;
-export type word = number;
+interface Flavoring<FlavorT> {
+  _type?: FlavorT;
+}
+
+type Primitive<T, FlavorT> = T & Flavoring<FlavorT>;
+
+export type byte = Primitive<number, 'byte'>;
+export type word = Primitive<number, 'word'>;
 
 /**
  * Casts a number to a byte.
@@ -49,26 +55,24 @@ const setLower = (value: word, operand: byte): byte => (value & 0xff00) | operan
 /**
  * Adds the operand to the word.
  */
-const addWord = (opOne: word, opTwo: word): word => (opOne + opTwo) & 0xffff;
+const addWord = (opOne: word, opTwo: word): word => toWord(opOne + opTwo);
 
 /**
  * Adds the operand to the upper byte.
  */
 const addUpper = (value: word, operand: byte): word =>
-  setUpper(value, addByte(value >> 8, operand));
+  toWord(lower(value) | setUpper(value, addByte(upper(value), operand)));
 
 /**
  * Adds the operand to the lower byte.
  */
 const addLower = (value: word, operand: byte): word =>
-  setLower(value, addByte(value & 0xff, operand));
+  toWord(upper(value) | setLower(value, addByte(lower(value), operand)));
 
 /**
  * Formats the byte/word as a hex value
  */
 const toHex = (value: byte | word): string => `0x${pad(value.toString(16), 4)}`;
-
-export class ByteArray extends Uint8Array {}
 
 export {
   toByte,

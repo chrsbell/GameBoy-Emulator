@@ -5,7 +5,7 @@ import Emulator from '../Emulator';
 import GLRenderer from '../GLRenderer';
 import AppContext from './Context';
 import Wrapper from './Wrapper';
-import { Byte, ByteArray } from '../Types';
+import { byte, ByteArray } from '../Types';
 
 interface AppState {
   canvas: HTMLCanvasElement;

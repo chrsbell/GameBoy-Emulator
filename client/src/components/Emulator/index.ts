@@ -2,7 +2,6 @@ import axios from 'axios';
 import CPU from '../CPU';
 import Memory from '../Memory';
 import GLRenderer, { Colors } from '../GLRenderer';
-import { ByteArray } from '../Types';
 import * as _ from 'lodash';
 
 class Emulator {
@@ -19,7 +18,7 @@ class Emulator {
    * @returns - boolean, whether ROM was loaded
    * Stops the currently updating function.
    */
-  public load(bios: ByteArray, rom: ByteArray): boolean {
+  public load(bios: Uint8Array, rom: Uint8Array): boolean {
     Memory.load(bios, rom);
     clearTimeout(this.timerID);
     return true;
