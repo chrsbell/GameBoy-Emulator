@@ -1,15 +1,8 @@
 import * as React from 'react';
-import { useRef, useEffect, useState, useContext, FormEvent, CSSProperties } from 'react';
+import { useRef, useEffect, useState, useContext, FormEvent } from 'react';
 import Context from './Context';
 import axios, { AxiosRequestConfig } from 'axios';
 import './Wrapper.css';
-
-const FlexColumn: CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  marginTop: '5vh',
-};
 
 const Wrapper = () => {
   const { dispatch, appState } = useContext(Context);

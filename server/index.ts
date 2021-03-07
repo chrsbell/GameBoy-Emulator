@@ -1,12 +1,10 @@
-import { LoDashStatic } from 'lodash';
 import { Response, Request } from 'express';
 import * as express from 'express';
-const path = require('path');
-const multer = require('multer');
+import * as path from 'path';
+import * as multer from 'multer';
 
 const upload = multer();
 const app = express();
-const _: LoDashStatic = require('lodash');
 
 interface MulterRequest extends Request {
   files: any;

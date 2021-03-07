@@ -18,15 +18,9 @@ module.exports = (env, argv) => ({
   module: {
     rules: [
       {
-        test: /\.(ts|tsx)$/,
-        exclude: [/\.test.ts$/, /\.test.tsx$/, /node_modules/],
-        use: ['ts-loader'],
-      },
-      {
-        test: /\.(js|jsx)$/,
-        exclude: [/\.test.js$/, /\.test.jsx$/, /node_modules/],
+        test: /\.(ts|js)x?$/,
+        exclude: [/\.test.js$/, /\.test.jsx$/, /\.test.ts$/, /\.test.tsx$/, /node_modules/],
         loader: 'babel-loader',
-        options: { presets: ['@babel/preset-env', '@babel/preset-react'] },
       },
       {
         test: /\.css$/i,
@@ -35,7 +29,7 @@ module.exports = (env, argv) => ({
     ],
   },
   resolve: {
-    extensions: ['.ts', '.js', '.tsx'],
+    extensions: ['.ts', '.js', '.jsx', '.tsx'],
   },
   plugins: [new CleanWebpackPlugin()],
 });

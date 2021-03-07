@@ -153,6 +153,15 @@ class CPU {
       return numCycles;
     }
   }
+
+  /**
+   * Logs the internal state of the CPU.
+   */
+  public log(): void {
+    console.log(`JS GB Registers: ${this.r}`);
+    console.log(`JS GB PC: ${this.pc}`);
+    console.log(`JS GB SP: ${this.sp}`);
+  }
 }
 
 export default CPU;
