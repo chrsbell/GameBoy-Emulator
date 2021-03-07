@@ -50,7 +50,7 @@ const lower = (value: word): byte => value & 0xff;
 /**
  * Sets the lower byte of the word.
  */
-const setLower = (value: word, operand: byte): byte => (value & 0xff00) | operand;
+const setLower = (value: word, operand: byte): word => (value & 0xff00) | operand;
 
 /**
  * Adds the operand to the word.
@@ -74,6 +74,16 @@ const addLower = (value: word, operand: byte): word =>
  */
 const toHex = (value: byte | word): string => `0x${pad(value.toString(16), 4)}`;
 
+/**
+ * Converts the unsigned byte to its signed format using two's complement
+ */
+const toSigned = (value: byte) => {
+  if (value >= 128) {
+    return -((~value + 1) & 255);
+  }
+  return value;
+};
+
 export {
   toByte,
   addByte,
@@ -86,4 +96,5 @@ export {
   addUpper,
   addLower,
   toHex,
+  toSigned,
 };

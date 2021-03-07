@@ -13,7 +13,7 @@ module.exports = (env, argv) => ({
   output: {
     path: DIST_DIR,
     filename: 'bundle.js',
-    sourceMapFilename: '[name].[contenthash].map',
+    sourceMapFilename: 'bundle.map',
   },
   module: {
     rules: [

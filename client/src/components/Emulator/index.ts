@@ -1,4 +1,3 @@
-import axios from 'axios';
 import CPU from '../CPU';
 import Memory from '../Memory';
 import GLRenderer, { Colors } from '../GLRenderer';

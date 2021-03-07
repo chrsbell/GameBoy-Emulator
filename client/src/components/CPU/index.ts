@@ -1,5 +1,5 @@
 import Memory from '../Memory';
-import { toByte, toWord, byte, word, addByte } from '../Types';
+import { toByte, toWord, byte, word, addWord, toHex } from '../Types';
 import Opcodes from './z80';
 import Flag from './Flag';
 
@@ -125,20 +125,29 @@ class CPU {
    * @returns {number} the number of CPU cycles required.
    */
   public executeInstruction(): number {
+    // debugger;
     if (Memory.inBios) {
       // fetch
-      const opcode: number = Memory.readByte(this.pc);
+      const opcode: byte = Memory.readByte(this.pc);
+      console.log(`Executing opcode: ${toHex(opcode)}, PC is ${this.pc}`);
       // not doing any execution of bios instructions for now
-      this.pc = addByte(this.pc, 1);
+      // execute
+      const numCycles: number = this.opcodes[opcode].call(this);
+      // this.pc = addWord(this.pc, 1);
       // check if finished bios execution
       if (!Memory.inBios) {
+        debugger;
+        console.log('exiting bios');
         this.initPowerSequence();
       }
-      return 2;
+      return numCycles;
+      // return 2;
     } else {
       // normal execution
       // fetch
-      const opcode: number = Memory.readByte(this.pc);
+      const opcode: byte = Memory.readByte(this.pc);
+      console.log(`Executing opcode: ${toHex(opcode)}, PC is ${this.pc}`);
+
       // execute
       const numCycles: number = this.opcodes[opcode].call(this);
       return numCycles;

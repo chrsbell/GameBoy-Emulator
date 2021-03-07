@@ -3,7 +3,7 @@ const fs = require('fs');
 import _ from 'lodash';
 import CPU from '.';
 import Memory from '../Memory';
-import { Byte, Word, ByteArray } from '../Types';
+import { byte, word } from '../Types';
 const ROM_FOLDER = path.join(__dirname, '..', '..', '..', '..', 'public', 'roms');
 const GENERATED_FOLDER = path.join(__dirname, '..', '..', '..', 'test', 'generated');
 
@@ -11,40 +11,40 @@ const VIDEO_RAM = 8192;
 const OBJECT_ATTRIBUTE_MEMORY = 0xa0;
 
 interface CPUInfo {
-  SP: number,
-  PC: number,
-  A: number,
-  F: number,
-  B: number,
-  C: number,
-  D: number,
-  E: number,
-  HL: number,
+  sp: word;
+  pc: word;
+  a: byte;
+  f: byte;
+  b: byte;
+  c: byte;
+  d: byte;
+  e: byte;
+  hl: word;
   interrupt_master_enable: boolean;
   halted: boolean;
   stopped: boolean;
 }
 
 interface ScreenInfo {
-  VRAM: ByteArray;
-  OAM: ByteArray;
-  LCDC: Byte;
-  BGP: Byte;
-  OBP0: Byte;
-  OBP1: Byte;
-  SCY: Byte;
-  SCX: Byte;
-  WY: Byte;
-  WX: Byte;
+  VRAM: Uint8Array;
+  OAM: Uint8Array;
+  LCDC: byte;
+  BGP: byte;
+  OBP0: byte;
+  OBP1: byte;
+  SCY: byte;
+  SCX: byte;
+  WY: byte;
+  WX: byte;
 }
 
 interface TimerInfo {
-  DIV: Byte;
-  TIMA: Byte;
-  DIV_counter: Word;
-  TIMA_counter: Word;
-  TMA: Byte;
-  TAC: Byte;
+  DIV: byte;
+  TIMA: byte;
+  DIV_counter: word;
+  TIMA_counter: word;
+  TMA: byte;
+  TAC: byte;
 }
 
 const ROWS = 144;
@@ -59,7 +59,7 @@ beforeAll(() => {
   const BIOSFile: Buffer = fs.readFileSync(path.join(ROM_FOLDER, 'bios.bin'));
   const ROMFile: Buffer = fs.readFileSync(path.join(ROM_FOLDER, 'tetris.gb'));
 
-  Memory.load(new ByteArray([...BIOSFile]),new ByteArray([...ROMFile]));
+  Memory.load(new Uint8Array([...BIOSFile]), new Uint8Array([...ROMFile]));
   Memory.inBios = false;
   expect(Memory).toBeDefined();
 });
@@ -69,7 +69,9 @@ describe('CPU', () => {
     const cpu = new CPU();
     expect(CPU).toBeDefined();
 
-    let pyboySave = await fs.promises.readFile(path.join(GENERATED_FOLDER, 'tetris.gb', 'save.state'));
+    let pyboySave = await fs.promises.readFile(
+      path.join(GENERATED_FOLDER, 'tetris.gb', 'save.state')
+    );
 
     let fileIndex = 0;
 
@@ -78,29 +80,28 @@ describe('CPU', () => {
     debugger;
 
     for (let i = 0; i < 100; i++) {
-
       cpu.executeInstruction();
 
       cpuStates[i] = {} as CPUInfo;
       const stateVersion = pyboySave[fileIndex++];
       const bootROMEnabled = pyboySave[fileIndex++];
       // CPU Info
-      cpuStates[i].A = pyboySave[fileIndex++];
-      cpuStates[i].F = pyboySave[fileIndex++];
-      cpuStates[i].B = pyboySave[fileIndex++];
-      cpuStates[i].C = pyboySave[fileIndex++];
-      cpuStates[i].D = pyboySave[fileIndex++];
-      cpuStates[i].E = pyboySave[fileIndex++];
+      cpuStates[i].a = pyboySave[fileIndex++];
+      cpuStates[i].f = pyboySave[fileIndex++];
+      cpuStates[i].b = pyboySave[fileIndex++];
+      cpuStates[i].c = pyboySave[fileIndex++];
+      cpuStates[i].d = pyboySave[fileIndex++];
+      cpuStates[i].e = pyboySave[fileIndex++];
       let hl = pyboySave[fileIndex++];
       hl |= pyboySave[fileIndex++] << 8;
-      cpuStates[i].HL = hl;
+      cpuStates[i].hl = hl;
       let sp = pyboySave[fileIndex++];
       sp |= pyboySave[fileIndex++] << 8;
-      cpuStates[i].SP = pyboySave[fileIndex++];
-      cpuStates[i].SP = sp;
+      cpuStates[i].sp = pyboySave[fileIndex++];
+      cpuStates[i].sp = sp;
       let pc = pyboySave[fileIndex++];
       pc |= pyboySave[fileIndex++] << 8;
-      cpuStates[i].PC = pc;
+      cpuStates[i].pc = pc;
 
       cpuStates[i].interrupt_master_enable = pyboySave[fileIndex++];
       cpuStates[i].halted = pyboySave[fileIndex++];
@@ -159,7 +160,6 @@ describe('CPU', () => {
       // timerInfo.DIV_counter += pyboySave[fileIndex++];
       // timerInfo.TMA = pyboySave[fileIndex++];
       // timerInfo.TAC = pyboySave[fileIndex++];
-
     }
   });
 });

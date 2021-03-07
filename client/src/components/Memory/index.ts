@@ -1,5 +1,5 @@
 import type { byte, word } from '../Types';
-import { ByteArray, toByte, addByte, toHex } from '../Types';
+import { toByte, lower, upper, toHex } from '../Types';
 
 interface CartridgeCode {
   [key: number]: string;
@@ -48,7 +48,7 @@ const RAMSizeCodes: CartridgeCode = {
 
 interface Cartridge {
   // entire cartridge ROM
-  ROM: ByteArray;
+  ROM: Uint8Array;
   // the ROM size code
   ROMSize: byte;
   // external RAM size code
@@ -56,10 +56,10 @@ interface Cartridge {
   // the MBC type code
   MBCType: byte;
   // each ROM Bank is 16kB
-  ROMBanks: Array<ByteArray>;
+  ROMBanks: Array<Uint8Array>;
   // 4 banks for 32kB RAM sizes
   // https://gbdev.io/pandocs/#a000-bfff-ram-bank-00-03-if-any-read-write
-  RAMBanks: Array<ByteArray>;
+  RAMBanks: Array<Uint8Array>;
   R: {
     // enabled with 0Ah in lower 4 bits
     RAMEnabled: boolean;
@@ -75,35 +75,35 @@ interface Cartridge {
 }
 
 class Memory {
-  private bios: ByteArray;
+  private bios: Uint8Array;
   // whether bios execution has finished
   public inBios: boolean = false;
   private cart: Cartridge;
   // 8k vRAM
-  private vRAM: ByteArray;
+  private vRAM: Uint8Array;
   // 8k internal RAM
-  private wRAM: ByteArray;
+  private wRAM: Uint8Array;
   // shadow of working RAM, (8k - 512) bytes
-  private wRAMShadow: ByteArray;
+  private wRAMShadow: Uint8Array;
   // sprite attribute table
-  private OAM: ByteArray;
+  private OAM: Uint8Array;
   // 126 bytes high RAM
-  private hRAM: ByteArray;
+  private hRAM: Uint8Array;
   private initialized: boolean = false;
   public constructor() {
-    this.vRAM = new ByteArray(0x9fff - 0x8000);
-    this.wRAM = new ByteArray(0xdfff - 0xc000);
-    this.wRAMShadow = new ByteArray(0xfdff - 0xe000);
-    this.OAM = new ByteArray(0xfe9f - 0xfe00);
-    this.hRAM = new ByteArray(0xfffe - 0xff80);
+    this.vRAM = new Uint8Array(0x9fff - 0x8000);
+    this.wRAM = new Uint8Array(0xdfff - 0xc000);
+    this.wRAMShadow = new Uint8Array(0xfdff - 0xe000);
+    this.OAM = new Uint8Array(0xfe9f - 0xfe00);
+    this.hRAM = new Uint8Array(0xfffe - 0xff80);
     // defaults to bank 1 at power on
     this.cart = {
-      ROM: null as ByteArray,
+      ROM: null as Uint8Array,
       ROMSize: toByte(0),
       RAMSize: toByte(0),
       MBCType: toByte(0),
-      ROMBanks: null as Array<ByteArray>,
-      RAMBanks: null as Array<ByteArray>,
+      ROMBanks: null as Array<Uint8Array>,
+      RAMBanks: null as Array<Uint8Array>,
       R: {
         RAMEnabled: false,
         currROMBank: toByte(1),
@@ -117,7 +117,7 @@ class Memory {
   /**
    * Writes the provided byte to the address
    */
-  public writeByte(address: number, data: byte) {
+  public writeByte(address: word, data: byte) {
     if (this.inBios) {
       if (address <= 0xff) {
         this.bios[address] = data;
@@ -154,14 +154,14 @@ class Memory {
   /**
    * Writes the provided word to the address
    */
-  public writeWord(address: number, data: Word) {
-    this.writeByte(address, data.lower());
-    this.writeByte(address + 1, data.upper());
+  public writeWord(address: word, data: word) {
+    this.writeByte(address, lower(data));
+    this.writeByte(address + 1, upper(data));
   }
   /**
    * Return the byte at the address as a number
    */
-  public readByte(address: number): number {
+  public readByte(address: word): byte {
     if (this.inBios) {
       if (address <= 0xff) {
         return this.bios[address];
@@ -195,16 +195,16 @@ class Memory {
     }
   }
   /**
-   * Return the word at the address as a number
+   * Return the word at the address
    */
-  public readWord(address: number): number {
+  public readWord(address: word): word {
     return this.readByte(address) | (this.readByte(address + 1) << 8);
   }
 
   /**
    * Changes the ROM/RAM banks and associated registers
    */
-  private changeBank(address: number, data: byte) {
+  private changeBank(address: word, data: byte) {
     if (address < 0x2000) {
       // RAM enable register
       this.cart.R.RAMEnabled = (data & 0b00001111) === 0xa;
@@ -232,7 +232,7 @@ class Memory {
   /**
    * Loads parsed files into BIOS/ROM
    */
-  public load(bios: ByteArray, rom: ByteArray) {
+  public load(bios: Uint8Array, rom: Uint8Array) {
     this.cart.ROM = rom;
     this.cart.MBCType = this.readByte(0x147);
     this.cart.ROMSize = this.readByte(0x148);
