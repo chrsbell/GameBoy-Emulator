@@ -5,18 +5,17 @@ import Emulator from '../Emulator';
 import GLRenderer from '../GLRenderer';
 import AppContext from './Context';
 import Wrapper from './Wrapper';
-import { Byte, ByteArray } from '../Types';
 
 interface AppState {
   canvas: HTMLCanvasElement;
-  parsedROM: ByteArray;
-  parsedBIOS: ByteArray;
+  parsedROM: Uint8Array;
+  parsedBIOS: Uint8Array;
 }
 
 const initialState: AppState = {
   canvas: null as HTMLCanvasElement,
-  parsedROM: null as ByteArray,
-  parsedBIOS: null as ByteArray,
+  parsedROM: null as Uint8Array,
+  parsedBIOS: null as Uint8Array,
 };
 
 const reducer = (state: AppState, action: any) => {
@@ -50,7 +49,9 @@ const App = () => {
   useEffect(() => {
     const { parsedROM, parsedBIOS } = appState;
     if (parsedROM && parsedBIOS) {
-      emulator.current.load(parsedBIOS, parsedROM);
+      if (emulator.current.load(parsedBIOS, parsedROM)) {
+        emulator.current.update();
+      }
     }
   }, [appState.parsedROM, appState.parsedBIOS]);
 
@@ -67,4 +68,4 @@ const App = () => {
   );
 };
 
-ReactDOM.render(<App />, document.getElementById('app'));
+export default App;

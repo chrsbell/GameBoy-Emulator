@@ -1,13 +1,10 @@
-import { LoDashStatic } from 'lodash';
 import { Response, Request } from 'express';
 import * as express from 'express';
-import { Byte, ByteArray } from '../client/src/components/Types';
-const path = require('path');
-const multer = require('multer');
+import * as path from 'path';
+import * as multer from 'multer';
 
 const upload = multer();
 const app = express();
-const _: LoDashStatic = require('lodash');
 
 interface MulterRequest extends Request {
   files: any;
@@ -24,8 +21,8 @@ app.post(
   (req: MulterRequest, res: Response) => {
     if ('rom' in req.files && 'bios' in req.files) {
       res.status(201).json({
-        rom: new ByteArray([...req.files['rom'][0].buffer]),
-        bios: new ByteArray([...req.files['bios'][0].buffer]),
+        rom: new Uint8Array([...req.files['rom'][0].buffer]),
+        bios: new Uint8Array([...req.files['bios'][0].buffer]),
       });
     } else {
       res.sendStatus(400);

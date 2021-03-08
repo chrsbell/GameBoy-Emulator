@@ -7,9 +7,10 @@ Currently developing a Game Boy emulator using TypeScript. I'm referencing many 
 - https://gbdev.io/pandocs/
 - https://gekkio.fi/files/gb-docs/gbctr.pdf
 - http://imrannazar.com/How-Emulators-Work:-a-presentation
-- http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf
 - https://gbdev.io/gb-opcodes/optables/
 - http://imrannazar.com/content/files/jsgb.z80.js
+
+[Trello board](https://app.gitkraken.com/glo/board/YCdEVytKOgBi1bHO)
 
 ## Features
 
