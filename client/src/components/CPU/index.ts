@@ -13,7 +13,7 @@ interface Registers {
 
 class CPU {
   // 16-bit program counter
-  protected pc: word;
+  private _pc: word;
   // stack pointer
   protected sp: word;
   protected r: Registers = {
@@ -29,7 +29,7 @@ class CPU {
   // number of clock ticks per second
   static clock = 4194304;
   public constructor() {
-    this.pc = toWord(0);
+    this._pc = toWord(0);
     this.sp = toWord(0);
     this.opcodes = Opcodes;
     this.halted = false;
@@ -78,11 +78,17 @@ class CPU {
       this.r.f.n = 0;
     }
   }
+  public get pc(): word {
+    return this._pc;
+  }
+  public set pc(value: word) {
+    this._pc = value;
+  }
   /**
    * Completes the GB power sequence
    */
   private initPowerSequence(): void {
-    this.pc = 0x100;
+    this._pc = 0x100;
     this.r.af = 0x01b0;
     this.r.bc = 0x0013;
     this.r.de = 0x00d8;
@@ -128,14 +134,14 @@ class CPU {
     if (Memory.inBios) {
       // fetch
       debugger;
-      const opcode: byte = Memory.readByte(this.pc);
-      console.log(`Executing opcode: ${toHex(opcode)}, PC is ${this.pc}`);
+      const opcode: byte = Memory.readByte(this._pc);
+      console.log(`Executing opcode: ${toHex(opcode)}, PC is ${this._pc}`);
       this.log();
-      this.pc += 1;
+      this._pc += 1;
       // not doing any execution of bios instructions for now
       // execute
       const numCycles: number = this.opcodes[opcode].call(this);
-      // this.pc = addWord(this.pc, 1);
+      // this._pc = addWord(this._pc, 1);
       // check if finished bios execution
       if (!Memory.inBios) {
         console.log('exiting bios');
@@ -145,9 +151,9 @@ class CPU {
     } else {
       // normal execution
       // fetch
-      const opcode: byte = Memory.readByte(this.pc);
-      this.pc += 1;
-      console.log(`Executing opcode: ${toHex(opcode)}, PC is ${this.pc}`);
+      const opcode: byte = Memory.readByte(this._pc);
+      this._pc += 1;
+      console.log(`Executing opcode: ${toHex(opcode)}, PC is ${this._pc}`);
 
       // execute
       const numCycles: number = this.opcodes[opcode].call(this);
@@ -160,7 +166,7 @@ class CPU {
    */
   public log(): void {
     console.log(`JS GB Registers: ${JSON.stringify(this.r)}`);
-    console.log(`JS GB PC: ${this.pc}`);
+    console.log(`JS GB PC: ${this._pc}`);
     console.log(`JS GB SP: ${this.sp}`);
   }
 }
