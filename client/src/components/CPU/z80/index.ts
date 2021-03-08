@@ -363,11 +363,8 @@ function RRA(this: CPU): number {
 function JR_C_NZ_r8(this: CPU): number {
   let condition: boolean = OpcodeMap['0x20'].call(this);
   if (!condition) {
-    // add the default increment to PC
-    this.pc = addWord(this.pc, 2);
     return 8;
   }
-  // if condition passed, elapse larger number of m cycles
   return 12;
 }
 
@@ -462,6 +459,7 @@ function JR_C_Z_r8(this: CPU): number {
     return 8;
   }
   // if condition passed, elapse larger number of m cycles
+  this.pc += 1;
   return 12;
 }
 
@@ -556,6 +554,7 @@ function JR_C_NC_r8(this: CPU): number {
     return 8;
   }
   // if condition passed, elapse larger number of m cycles
+  this.pc += 1;
   return 12;
 }
 
@@ -645,11 +644,8 @@ function SCF(this: CPU): number {
 function JR_C_C_r8(this: CPU): number {
   let condition: boolean = OpcodeMap['0x38'].call(this);
   if (!condition) {
-    // add the default increment to PC
-    this.pc = addWord(this.pc, 2);
     return 8;
   }
-  // if condition passed, elapse larger number of m cycles
   return 12;
 }
 
@@ -2149,11 +2145,8 @@ function CP_A_with_A_i(this: CPU): number {
 function RET_C_NZ(this: CPU): number {
   let condition: boolean = OpcodeMap['0xc0'].call(this);
   if (!condition) {
-    // add the default increment to PC
-    this.pc = addWord(this.pc, 1);
     return 8;
   }
-  // if condition passed, elapse larger number of m cycles
   return 20;
 }
 
@@ -2177,11 +2170,8 @@ function POP_off_SP_into_BC_i(this: CPU): number {
 function JP_C_NZ_a16(this: CPU): number {
   let condition: boolean = OpcodeMap['0xc2'].call(this);
   if (!condition) {
-    // add the default increment to PC
-    this.pc = addWord(this.pc, 3);
     return 12;
   }
-  // if condition passed, elapse larger number of m cycles
   return 16;
 }
 
@@ -2205,11 +2195,8 @@ function JP_a16(this: CPU): number {
 function CALL_C_NZ_a16(this: CPU): number {
   let condition: boolean = OpcodeMap['0xc4'].call(this);
   if (!condition) {
-    // add the default increment to PC
-    this.pc = addWord(this.pc, 3);
     return 12;
   }
-  // if condition passed, elapse larger number of m cycles
   return 24;
 }
 
@@ -2255,11 +2242,8 @@ function RST_to_A_i_from_00H_i(this: CPU): number {
 function RET_C_Z(this: CPU): number {
   let condition: boolean = OpcodeMap['0xc8'].call(this);
   if (!condition) {
-    // add the default increment to PC
-    this.pc = addWord(this.pc, 1);
     return 8;
   }
-  // if condition passed, elapse larger number of m cycles
   return 20;
 }
 
@@ -2283,11 +2267,8 @@ function RET(this: CPU): number {
 function JP_C_Z_a16(this: CPU): number {
   let condition: boolean = OpcodeMap['0xca'].call(this);
   if (!condition) {
-    // add the default increment to PC
-    this.pc = addWord(this.pc, 3);
     return 12;
   }
-  // if condition passed, elapse larger number of m cycles
   return 16;
 }
 
@@ -2311,11 +2292,8 @@ function PREFIX(this: CPU): number {
 function CALL_C_Z_a16(this: CPU): number {
   let condition: boolean = OpcodeMap['0xcc'].call(this);
   if (!condition) {
-    // add the default increment to PC
-    this.pc = addWord(this.pc, 3);
     return 12;
   }
-  // if condition passed, elapse larger number of m cycles
   return 24;
 }
 
@@ -2361,11 +2339,8 @@ function RST_to_A_i_from_08H_i(this: CPU): number {
 function RET_C_NC(this: CPU): number {
   let condition: boolean = OpcodeMap['0xd0'].call(this);
   if (!condition) {
-    // add the default increment to PC
-    this.pc = addWord(this.pc, 1);
     return 8;
   }
-  // if condition passed, elapse larger number of m cycles
   return 20;
 }
 
@@ -2389,11 +2364,8 @@ function POP_off_SP_into_DE_i(this: CPU): number {
 function JP_C_NC_a16(this: CPU): number {
   let condition: boolean = OpcodeMap['0xd2'].call(this);
   if (!condition) {
-    // add the default increment to PC
-    this.pc = addWord(this.pc, 3);
     return 12;
   }
-  // if condition passed, elapse larger number of m cycles
   return 16;
 }
 
@@ -2415,11 +2387,8 @@ function ILLEGAL_D3(this: CPU): number {
 function CALL_C_NC_a16(this: CPU): number {
   let condition: boolean = OpcodeMap['0xd4'].call(this);
   if (!condition) {
-    // add the default increment to PC
-    this.pc = addWord(this.pc, 3);
     return 12;
   }
-  // if condition passed, elapse larger number of m cycles
   return 24;
 }
 
@@ -2465,11 +2434,8 @@ function RST_to_A_i_from_10H_i(this: CPU): number {
 function RET_C_C(this: CPU): number {
   let condition: boolean = OpcodeMap['0xd8'].call(this);
   if (!condition) {
-    // add the default increment to PC
-    this.pc = addWord(this.pc, 1);
     return 8;
   }
-  // if condition passed, elapse larger number of m cycles
   return 20;
 }
 
@@ -2493,11 +2459,8 @@ function RETI(this: CPU): number {
 function JP_C_C_a16(this: CPU): number {
   let condition: boolean = OpcodeMap['0xda'].call(this);
   if (!condition) {
-    // add the default increment to PC
-    this.pc = addWord(this.pc, 3);
     return 12;
   }
-  // if condition passed, elapse larger number of m cycles
   return 16;
 }
 
@@ -2519,11 +2482,8 @@ function ILLEGAL_DB(this: CPU): number {
 function CALL_C_C_a16(this: CPU): number {
   let condition: boolean = OpcodeMap['0xdc'].call(this);
   if (!condition) {
-    // add the default increment to PC
-    this.pc = addWord(this.pc, 3);
     return 12;
   }
-  // if condition passed, elapse larger number of m cycles
   return 24;
 }
 

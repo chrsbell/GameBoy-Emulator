@@ -132,8 +132,7 @@ function Jpcc(flag: boolean): boolean {
 
 function RET(flag: boolean): boolean {
   if (flag) {
-    const address = Memory.readWord(this.sp);
-    this.pc = address;
+    this.pc = Memory.readWord(this.sp);
     this.sp = addWord(this.sp, 2);
     return true;
   }
@@ -155,6 +154,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0x01': function (this: CPU): void {
     this.r.bc = Memory.readWord(this.pc);
+    this.pc += 2;
   },
 
   '0x02': function (this: CPU): void {
@@ -192,6 +192,7 @@ export const OpcodeMap: OpcodeList = {
   '0x06': function (this: CPU): void {
     // load into B from pc (immediate)
     this.r.bc = setUpper(this.r.bc, toByte(Memory.readByte(this.pc)));
+    this.pc += 1;
   },
 
   '0x07': function (this: CPU): void {
@@ -254,6 +255,7 @@ export const OpcodeMap: OpcodeList = {
   '0x0e': function (this: CPU): void {
     // load into C from pc (immediate)
     this.r.bc = setLower(this.r.bc, toByte(Memory.readByte(this.pc)));
+    this.pc += 1;
   },
 
   '0x0f': function (this: CPU): void {
@@ -276,6 +278,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0x11': function (this: CPU): void {
     this.r.de = Memory.readWord(this.pc);
+    this.pc += 2;
   },
 
   '0x12': function (this: CPU): void {
@@ -314,6 +317,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0x16': function (this: CPU): void {
     this.r.de = setUpper(this.r.de, toByte(Memory.readByte(this.pc)));
+    this.pc += 1;
   },
 
   '0x17': function (this: CPU): void {
@@ -330,6 +334,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0x18': function (this: CPU): void {
     this.pc = addWord(this.pc, toSigned(Memory.readByte(this.pc)));
+    this.pc += 1;
   },
 
   '0x19': function (this: CPU): void {
@@ -375,6 +380,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0x1e': function (this: CPU): void {
     this.r.de = setLower(this.r.de, toByte(Memory.readByte(this.pc)));
+    this.pc += 1;
   },
 
   '0x1f': function (this: CPU): void {
@@ -396,11 +402,13 @@ export const OpcodeMap: OpcodeList = {
       this.pc = addWord(this.pc, incr);
       return true;
     }
+    this.pc += 1;
     return false;
   },
 
   '0x21': function (this: CPU): void {
     this.r.hl = Memory.readWord(this.pc);
+    this.pc += 2;
   },
 
   '0x22': function (this: CPU): void {
@@ -440,6 +448,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0x26': function (this: CPU): void {
     this.r.hl = setUpper(this.r.hl, toByte(Memory.readByte(this.pc)));
+    this.pc += 1;
   },
 
   /**
@@ -516,6 +525,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0x2e': function (this: CPU): void {
     setLower(this.r.hl, toByte(Memory.readByte(this.pc)));
+    this.pc += 1;
   },
 
   '0x2f': function (this: CPU): void {
@@ -535,6 +545,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0x31': function (this: CPU): void {
     this.sp = Memory.readWord(this.pc);
+    this.pc += 2;
   },
 
   '0x32': function (this: CPU): void {
@@ -588,6 +599,7 @@ export const OpcodeMap: OpcodeList = {
       this.pc = addWord(this.pc, incr);
       return true;
     }
+    this.pc += 1;
     return false;
   },
 
@@ -627,6 +639,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0x3e': function (this: CPU): void {
     this.r.af = setUpper(this.r.af, toByte(Memory.readByte(this.pc)));
+    this.pc += 1;
   },
 
   '0x3f': function (this: CPU): void {
@@ -1160,7 +1173,11 @@ export const OpcodeMap: OpcodeList = {
   },
 
   '0xc2': function (this: CPU): boolean {
-    return Jpcc.call(this, !this.r.f.z);
+    if (Jpcc.call(this, !this.r.f.z)) {
+      return true;
+    }
+    this.pc += 2;
+    return false;
   },
 
   '0xc3': function (this: CPU): void {
@@ -1168,7 +1185,11 @@ export const OpcodeMap: OpcodeList = {
   },
 
   '0xc4': function (this: CPU): boolean {
-    return CALL.call(this, !this.r.f.z);
+    if (CALL.call(this, !this.r.f.z)) {
+      return true;
+    }
+    this.pc += 2;
+    return false;
   },
 
   '0xc5': function (this: CPU): void {
@@ -1181,6 +1202,7 @@ export const OpcodeMap: OpcodeList = {
     this.checkHalfCarry(upper(this.r.af), value);
     this.r.af = addUpper(this.r.af, value);
     this.checkZFlag(upper(this.r.af));
+    this.pc += 1;
     this.r.f.n = 0;
   },
 
@@ -1203,7 +1225,11 @@ export const OpcodeMap: OpcodeList = {
   },
 
   '0xca': function (this: CPU): boolean {
-    return Jpcc.call(this, this.r.f.z);
+    if (Jpcc.call(this, this.r.f.z)) {
+      return true;
+    }
+    this.pc += 2;
+    return false;
   },
 
   '0xcb': function (this: CPU): void {
@@ -1216,7 +1242,11 @@ export const OpcodeMap: OpcodeList = {
   },
 
   '0xcc': function (this: CPU): boolean {
-    return CALL.call(this, this.r.f.z);
+    if (CALL.call(this, this.r.f.z)) {
+      return true;
+    }
+    this.pc += 2;
+    return false;
   },
 
   '0xcd': function (this: CPU): void {
@@ -1225,6 +1255,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0xce': function (this: CPU): void {
     ADC.call(this, toByte(Memory.readByte(this.pc)));
+    this.pc += 1;
   },
 
   '0xcf': function (this: CPU): void {
@@ -1240,7 +1271,11 @@ export const OpcodeMap: OpcodeList = {
   },
 
   '0xd2': function (this: CPU): boolean {
-    return Jpcc.call(this, this.r.f.z);
+    if (Jpcc.call(this, this.r.f.z)) {
+      return true;
+    }
+    this.pc += 2;
+    return false;
   },
 
   '0xd3': function (this: CPU): void {
@@ -1248,7 +1283,11 @@ export const OpcodeMap: OpcodeList = {
   },
 
   '0xd4': function (this: CPU): boolean {
-    return CALL.call(this, !this.r.f.cy);
+    if (CALL.call(this, !this.r.f.cy)) {
+      return true;
+    }
+    this.pc += 2;
+    return false;
   },
 
   '0xd5': function (this: CPU): void {
@@ -1257,6 +1296,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0xd6': function (this: CPU): void {
     SUB.call(this, toByte(Memory.readByte(this.pc)));
+    this.pc += 1;
   },
 
   '0xd7': function (this: CPU): void {
@@ -1273,7 +1313,11 @@ export const OpcodeMap: OpcodeList = {
   },
 
   '0xda': function (this: CPU): boolean {
-    return Jpcc.call(this, this.r.f.cy);
+    if (Jpcc.call(this, this.r.f.cy)) {
+      return true;
+    }
+    this.pc += 2;
+    return false;
   },
 
   '0xdb': function (this: CPU): void {
@@ -1281,7 +1325,11 @@ export const OpcodeMap: OpcodeList = {
   },
 
   '0xdc': function (this: CPU): boolean {
-    return CALL.call(this, this.r.f.cy);
+    if (CALL.call(this, this.r.f.cy)) {
+      return true;
+    }
+    this.pc += 2;
+    return false;
   },
 
   '0xdd': function (this: CPU): void {
@@ -1290,6 +1338,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0xde': function (this: CPU): void {
     SBC.call(this, toByte(Memory.readByte(this.pc)));
+    this.pc += 1;
   },
 
   '0xdf': function (this: CPU): void {
@@ -1298,6 +1347,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0xe0': function (this: CPU): void {
     Memory.writeByte(0xff00 + Memory.readByte(this.pc), upper(this.r.af));
+    this.pc += 1;
   },
 
   '0xe1': function (this: CPU): void {
@@ -1322,6 +1372,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0xe6': function (this: CPU): void {
     AND.call(this, Memory.readByte(this.pc));
+    this.pc += 1;
   },
 
   '0xe7': function (this: CPU): void {
@@ -1333,6 +1384,7 @@ export const OpcodeMap: OpcodeList = {
     this.checkFullCarry16(this.sp, operand);
     this.checkHalfCarry(upper(this.sp), upper(operand));
     this.sp = addWord(this.sp, operand);
+    this.pc += 1;
     this.r.f.z = 0;
     this.r.f.n = 0;
   },
@@ -1343,6 +1395,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0xea': function (this: CPU): void {
     Memory.writeByte(Memory.readWord(this.pc), upper(this.r.af));
+    this.pc += 2;
   },
 
   '0xeb': function (this: CPU): void {
@@ -1359,6 +1412,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0xee': function (this: CPU): void {
     XOR.call(this, toByte(Memory.readByte(this.pc)));
+    this.pc += 1;
   },
 
   '0xef': function (this: CPU): void {
@@ -1366,8 +1420,9 @@ export const OpcodeMap: OpcodeList = {
   },
 
   '0xf0': function (this: CPU): void {
-    const address = toByte(Memory.readByte(0xff00 + Memory.readByte(this.pc)));
-    this.r.af = setUpper(this.r.af, address);
+    const data = toByte(Memory.readByte(0xff00 + Memory.readByte(this.pc)));
+    this.r.af = setUpper(this.r.af, data);
+    this.pc += 1;
   },
 
   '0xf1': function (this: CPU): void {
@@ -1375,8 +1430,8 @@ export const OpcodeMap: OpcodeList = {
   },
 
   '0xf2': function (this: CPU): void {
-    const address = toByte(0xff00 + lower(this.r.bc));
-    this.r.af = setUpper(this.r.af, address);
+    const data = toByte(0xff00 + lower(this.r.bc));
+    this.r.af = setUpper(this.r.af, data);
   },
 
   '0xf3': function (this: CPU): void {
@@ -1393,6 +1448,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0xf6': function (this: CPU): void {
     OR.call(this, Memory.readByte(this.pc));
+    this.pc += 1;
   },
 
   '0xf7': function (this: CPU): void {
@@ -1403,6 +1459,7 @@ export const OpcodeMap: OpcodeList = {
     let incr = toWord(toSigned(Memory.readByte(this.pc)));
     this.checkHalfCarry(upper(incr), upper(this.sp));
     this.checkFullCarry16(incr, this.sp);
+    this.pc += 1;
     incr = addWord(incr, this.sp);
     this.r.hl = incr;
     this.r.f.z = 0;
@@ -1415,6 +1472,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0xfa': function (this: CPU): void {
     this.r.af = setUpper(this.r.af, toByte(Memory.readByte(Memory.readWord(this.pc))));
+    this.pc += 2;
   },
 
   '0xfb': function (this: CPU): void {
@@ -1431,6 +1489,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0xfe': function (this: CPU): void {
     CP.call(this, toByte(Memory.readByte(this.pc)));
+    this.pc += 1;
   },
 
   '0xff': function (this: CPU): void {
