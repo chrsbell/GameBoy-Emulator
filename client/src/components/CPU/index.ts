@@ -125,27 +125,28 @@ class CPU {
    * @returns {number} the number of CPU cycles required.
    */
   public executeInstruction(): number {
-    // debugger;
     if (Memory.inBios) {
       // fetch
+      debugger;
       const opcode: byte = Memory.readByte(this.pc);
       console.log(`Executing opcode: ${toHex(opcode)}, PC is ${this.pc}`);
+      this.log();
+      this.pc += 1;
       // not doing any execution of bios instructions for now
       // execute
       const numCycles: number = this.opcodes[opcode].call(this);
       // this.pc = addWord(this.pc, 1);
       // check if finished bios execution
       if (!Memory.inBios) {
-        debugger;
         console.log('exiting bios');
         this.initPowerSequence();
       }
       return numCycles;
-      // return 2;
     } else {
       // normal execution
       // fetch
       const opcode: byte = Memory.readByte(this.pc);
+      this.pc += 1;
       console.log(`Executing opcode: ${toHex(opcode)}, PC is ${this.pc}`);
 
       // execute
@@ -158,7 +159,7 @@ class CPU {
    * Logs the internal state of the CPU.
    */
   public log(): void {
-    console.log(`JS GB Registers: ${this.r}`);
+    console.log(`JS GB Registers: ${JSON.stringify(this.r)}`);
     console.log(`JS GB PC: ${this.pc}`);
     console.log(`JS GB SP: ${this.sp}`);
   }

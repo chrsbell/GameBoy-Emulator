@@ -35,7 +35,6 @@ beforeAll(() => {
   const ROMFile: Buffer = fs.readFileSync(path.join(ROM_FOLDER, 'tetris.gb'));
 
   Memory.load(new Uint8Array([...BIOSFile]), new Uint8Array([...ROMFile]));
-  Memory.inBios = false;
   expect(Memory).toBeDefined();
 });
 
@@ -51,7 +50,7 @@ describe('CPU', () => {
     let fileIndex = 0;
 
     let cpuStates: Array<CPUInfo> = Array(100);
-
+    debugger;
     for (let i = 0; i < 100; i++) {
       cpu.executeInstruction();
 
@@ -80,8 +79,6 @@ describe('CPU', () => {
       cpuStates[i].halted = Boolean(pyboySave[fileIndex++]);
       cpuStates[i].stopped = Boolean(pyboySave[fileIndex++]);
 
-      cpu.log();
-      console.log(cpuStates[i]);
       debugger;
     }
   });

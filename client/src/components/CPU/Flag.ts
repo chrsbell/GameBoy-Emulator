@@ -13,8 +13,9 @@ export default class Flag {
   public set z(value: number) {
     if (value === 0 || value === 1) {
       this._z = value;
+    } else {
+      this.error();
     }
-    this.error();
   }
 
   public get z() {
@@ -24,8 +25,9 @@ export default class Flag {
   public set n(value: number) {
     if (value === 0 || value === 1) {
       this._n = value;
+    } else {
+      this.error();
     }
-    this.error();
   }
 
   public get n() {
@@ -35,8 +37,9 @@ export default class Flag {
   public set h(value: number) {
     if (value === 0 || value === 1) {
       this._n = value;
+    } else {
+      this.error();
     }
-    this.error();
   }
 
   public get h() {
@@ -46,8 +49,9 @@ export default class Flag {
   public set cy(value: number) {
     if (value === 0 || value === 1) {
       this._cy = value;
+    } else {
+      this.error();
     }
-    this.error();
   }
 
   public get cy() {

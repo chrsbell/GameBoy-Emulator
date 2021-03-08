@@ -16,16 +16,19 @@ export type word = Primitive<number, 'word'>;
 
 /**
  * Casts a number to a byte.
+ * @returns {byte}
  */
 const toByte = (value: number | byte): byte => value & 0xff;
 
 /**
  * Adds the operand to the byte.
+ * @returns {byte}
  */
 const addByte = (opOne: byte, opTwo: byte): byte => (opOne + opTwo) & 0xff;
 
 /**
  * Casts a number to a word.
+ * @returns {word}
  */
 const toWord = (value: number | word): word => value & 0xffff;
 
@@ -43,22 +46,25 @@ const setUpper = (value: word, operand: byte): word => (value & 0xff) | (operand
 
 /**
  * Returns the lower byte of the word.
- * @returns - byte
+ * @returns {byte}
  */
 const lower = (value: word): byte => value & 0xff;
 
 /**
  * Sets the lower byte of the word.
+ * @returns {word}
  */
 const setLower = (value: word, operand: byte): word => (value & 0xff00) | operand;
 
 /**
  * Adds the operand to the word.
+ * @returns {word}
  */
 const addWord = (opOne: word, opTwo: word): word => toWord(opOne + opTwo);
 
 /**
  * Adds the operand to the upper byte.
+ * @returns {word}
  */
 const addUpper = (value: word, operand: byte): word =>
   toWord(lower(value) | setUpper(value, addByte(upper(value), operand)));
