@@ -1,6 +1,6 @@
 import Memory from '../Memory';
 import { toByte, toWord, byte, word, addWord, toHex } from '../Types';
-import Opcodes from './z80';
+import Opcodes from './sm83';
 import Flag from './Flag';
 
 interface Registers {
