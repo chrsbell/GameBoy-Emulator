@@ -15,19 +15,7 @@ class CPU {
   // number of clock ticks per second
   static clock = 4194304;
   // 16-bit program counter
-<<<<<<< Updated upstream
   private _pc: word;
-<<<<<<< HEAD
-=======
-
->>>>>>> opcodes
-=======
-<<<<<<< Updated upstream
-  protected PC: Word;
-=======
-  private _pc: word;
->>>>>>> Stashed changes
->>>>>>> Stashed changes
   // stack pointer
   private _sp: word;
 
@@ -38,30 +26,15 @@ class CPU {
     hl: null as word,
     f: new Flag(),
   };
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-  protected opcodes: any;
-  // number of clock ticks per second
-  static clock = 4194304;
-=======
->>>>>>> Stashed changes
 
   private _halted: boolean;
   private opcodes: any;
   private _interruptsEnabled: boolean;
 
-<<<<<<< Updated upstream
-  protected get pc(): word {
-    return this._pc;
-  }
-  protected set pc(value: word) {
-=======
   public get pc(): word {
     return this._pc;
   }
   public set pc(value: word) {
->>>>>>> Stashed changes
     this._pc = value;
   }
   public get sp(): word {
@@ -82,15 +55,7 @@ class CPU {
   public set halted(value: boolean) {
     this._halted = value;
   }
-<<<<<<< Updated upstream
-  protected get interruptsEnabled(): boolean {
-    return this._interruptsEnabled;
-  }
-  protected set interruptsEnabled(value: boolean) {
-    this._interruptsEnabled = value;
-  }
 
-=======
   public get interruptsEnabled(): boolean {
     return this._interruptsEnabled;
   }
@@ -98,8 +63,6 @@ class CPU {
     this._interruptsEnabled = value;
   }
 
->>>>>>> Stashed changes
->>>>>>> Stashed changes
   public constructor() {
     this._pc = toWord(0);
     this.sp = toWord(0);
@@ -149,12 +112,6 @@ class CPU {
     } else {
       this.r.f.n = 0;
     }
-  }
-  public get pc(): word {
-    return this._pc;
-  }
-  public set pc(value: word) {
-    this._pc = value;
   }
   /**
    * Completes the GB power sequence
@@ -209,7 +166,7 @@ class CPU {
       const opcode: byte = Memory.readByte(this._pc);
       console.log(`Executing opcode: ${toHex(opcode)}, PC is ${this._pc}`);
       this.log();
-      this._pc += 1;
+      this.pc += 1;
       // not doing any execution of bios instructions for now
       // execute
       const numCycles: number = this.opcodes[opcode].call(this);

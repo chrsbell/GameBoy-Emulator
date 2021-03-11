@@ -1,19 +1,10 @@
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
 import * as path from 'path';
 import * as fs from 'fs';
 import * as _ from 'lodash';
 import CPU from '.';
 import Memory from '../Memory';
-<<<<<<< Updated upstream
-import { byte, word } from '../Types';
-import { parse } from '@babel/core';
-=======
+
 import { byte, word, upper, lower } from '../Types';
->>>>>>> Stashed changes
 const ROM_FOLDER = path.join(__dirname, '..', '..', '..', '..', 'public', 'roms');
 const GENERATED_FOLDER = path.join(__dirname, '..', '..', '..', 'test', 'generated');
 
@@ -43,10 +34,6 @@ beforeAll(() => {
 describe('CPU', () => {
   it('matches the internal state of another emulator', async () => {
     const cpu = new CPU();
-<<<<<<< Updated upstream
-    expect(CPU).toBeDefined();
-=======
->>>>>>> Stashed changes
 
     let pyboySave = await fs.promises.readFile(
       path.join(GENERATED_FOLDER, 'tetris.gb', 'cpu.state')
@@ -85,13 +72,6 @@ describe('CPU', () => {
     for (let i = 0; i < 100; i++) {
       cpu.executeInstruction();
       let expected: CPUInfo = parseCPUState();
-<<<<<<< Updated upstream
-      expect(cpu.pc).toEqual(expected.pc);
-      debugger;
-    }
-  });
-});
-=======
       expect(expected.pc).toEqual(cpu.pc);
       expect(expected.sp).toEqual(cpu.sp);
       expect(expected.hl).toEqual(cpu.r.hl);
@@ -105,5 +85,3 @@ describe('CPU', () => {
     }
   });
 });
->>>>>>> Stashed changes
->>>>>>> Stashed changes
