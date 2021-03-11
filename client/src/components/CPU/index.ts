@@ -12,22 +12,57 @@ interface Registers {
 }
 
 class CPU {
+  // number of clock ticks per second
+  static clock = 4194304;
   // 16-bit program counter
-  protected pc: word;
+  private _pc: word;
+
   // stack pointer
-  protected sp: word;
-  protected r: Registers = {
+  private _sp: word;
+
+  private _r: Registers = {
     af: null as word,
     bc: null as word,
     de: null as word,
     hl: null as word,
     f: new Flag(),
   };
-  protected halted: boolean;
-  protected interruptsEnabled: boolean;
-  protected opcodes: any;
-  // number of clock ticks per second
-  static clock = 4194304;
+
+  private _halted: boolean;
+  private opcodes: any;
+  private _interruptsEnabled: boolean;
+
+  protected get pc(): word {
+    return this._pc;
+  }
+  protected set pc(value: word) {
+    this._pc = value;
+  }
+  public get sp(): word {
+    return this._sp;
+  }
+  public set sp(value: word) {
+    this._sp = value;
+  }
+  public get r(): Registers {
+    return this._r;
+  }
+  public set r(value: Registers) {
+    this._r = value;
+  }
+  public get halted(): boolean {
+    return this._halted;
+  }
+  public set halted(value: boolean) {
+    this._halted = value;
+  }
+  protected get interruptsEnabled(): boolean {
+    return this._interruptsEnabled;
+  }
+  protected set interruptsEnabled(value: boolean) {
+    this._interruptsEnabled = value;
+  }
+
   public constructor() {
     this.pc = toWord(0);
     this.sp = toWord(0);
