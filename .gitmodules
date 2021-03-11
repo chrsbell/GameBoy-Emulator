@@ -1,6 +1,3 @@
-[submodule "client/src/components/CPU/z80-test"]
-	path = client/src/components/CPU/z80-test
-	url = https://github.com/lkesteloot/z80-test
 [submodule "client/test/PyBoy"]
 	path = client/test/PyBoy
 	url = https://github.com/Baekalfen/PyBoy.git
