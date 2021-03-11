@@ -5,9 +5,20 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node server/index.ts",
+<<<<<<< Updated upstream
     "build:dev": "npx webpack --mode development --watch",
     "test": "python3 client/test/dump_pyboy.py tetris.gb && jest --watch",
     "test:debug": "python3 client/test/dump_pyboy.py tetris.gb && node --inspect-brk node_modules/.bin/jest --runInBand --watch"
+=======
+<<<<<<< Updated upstream
+    "build-dev": "npx webpack --mode development --watch",
+    "test": "jest"
+=======
+    "build:dev": "npx webpack --mode development --watch",
+    "test": "python3 client/test/dump_pyboy.py tetris.gb && jest --silent --watch",
+    "test:debug": "python3 client/test/dump_pyboy.py tetris.gb && node --inspect-brk node_modules/.bin/jest --runInBand --silent --watch"
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
   },
   "keywords": [
     "gameboy",
