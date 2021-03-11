@@ -122,8 +122,8 @@ class Memory {
       if (address <= 0xff) {
         this.bios[address] = data;
       } else {
-        this.inBios = false;
-        console.log('Exited bios using write to memory.');
+        // this.inBios = false;
+        // console.log('Exited bios using write to memory.');
       }
     }
     if (address < 0x4000) {

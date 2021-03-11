@@ -65,7 +65,7 @@ function SBC(operand: byte): void {
   this.r.f.n = 1;
 }
 
-function OR(operand: number): void {
+function OR(operand: byte): void {
   const result = upper(this.r.af) | operand;
   this.r.af = setUpper(this.r.af, toByte(result));
   this.checkZFlag(upper(this.r.af));
@@ -74,7 +74,7 @@ function OR(operand: number): void {
   this.r.f.cy = 0;
 }
 
-function AND(operand: number): void {
+function AND(operand: byte): void {
   const result = upper(this.r.af) & operand;
   this.r.af = setUpper(this.r.af, toByte(result));
   this.checkZFlag(upper(this.r.af));
@@ -96,7 +96,7 @@ function CP(operand: byte): void {
   operand *= -1;
   this.checkFullCarry16(upper(this.r.af), operand);
   this.checkHalfCarry(upper(this.r.af), operand);
-  const result = toByte(upper(this.r.af) + operand);
+  const result: byte = toByte(upper(this.r.af) + operand);
   this.checkZFlag(result);
 }
 
@@ -132,15 +132,14 @@ function Jpcc(flag: boolean): boolean {
 
 function RET(flag: boolean): boolean {
   if (flag) {
-    const address = Memory.readWord(this.sp);
-    this.pc = address;
+    this.pc = Memory.readWord(this.sp);
     this.sp = addWord(this.sp, 2);
     return true;
   }
   return false;
 }
 
-function RST(address: number): void {
+function RST(address: byte): void {
   this.sp = addWord(this.sp, -2);
   Memory.writeWord(this.sp, this.pc);
   this.pc = address;
@@ -155,6 +154,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0x01': function (this: CPU): void {
     this.r.bc = Memory.readWord(this.pc);
+    this.pc += 2;
   },
 
   '0x02': function (this: CPU): void {
@@ -192,13 +192,14 @@ export const OpcodeMap: OpcodeList = {
   '0x06': function (this: CPU): void {
     // load into B from pc (immediate)
     this.r.bc = setUpper(this.r.bc, toByte(Memory.readByte(this.pc)));
+    this.pc += 1;
   },
 
   '0x07': function (this: CPU): void {
     // check carry flag
     this.r.f.cy = upper(this.r.af) >> 7;
     // left shift
-    const shifted: number = upper(this.r.af) << 1;
+    const shifted: byte = upper(this.r.af) << 1;
     this.r.af = setUpper(this.r.af, toByte(shifted | (shifted >> 8)));
     // flag resets
     this.r.f.n = 0;
@@ -254,6 +255,7 @@ export const OpcodeMap: OpcodeList = {
   '0x0e': function (this: CPU): void {
     // load into C from pc (immediate)
     this.r.bc = setLower(this.r.bc, toByte(Memory.readByte(this.pc)));
+    this.pc += 1;
   },
 
   '0x0f': function (this: CPU): void {
@@ -261,7 +263,7 @@ export const OpcodeMap: OpcodeList = {
     const bitZero = upper(this.r.af) & 1;
     this.r.f.cy = bitZero;
     // right shift
-    const shifted: number = upper(this.r.af) >> 1;
+    const shifted: byte = upper(this.r.af) >> 1;
     this.r.af = setUpper(this.r.af, toByte(shifted | (bitZero << 7)));
     // flag resets
     this.r.f.n = 0;
@@ -276,6 +278,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0x11': function (this: CPU): void {
     this.r.de = Memory.readWord(this.pc);
+    this.pc += 2;
   },
 
   '0x12': function (this: CPU): void {
@@ -314,6 +317,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0x16': function (this: CPU): void {
     this.r.de = setUpper(this.r.de, toByte(Memory.readByte(this.pc)));
+    this.pc += 1;
   },
 
   '0x17': function (this: CPU): void {
@@ -330,6 +334,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0x18': function (this: CPU): void {
     this.pc = addWord(this.pc, toSigned(Memory.readByte(this.pc)));
+    this.pc += 1;
   },
 
   '0x19': function (this: CPU): void {
@@ -375,6 +380,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0x1e': function (this: CPU): void {
     this.r.de = setLower(this.r.de, toByte(Memory.readByte(this.pc)));
+    this.pc += 1;
   },
 
   '0x1f': function (this: CPU): void {
@@ -396,11 +402,13 @@ export const OpcodeMap: OpcodeList = {
       this.pc = addWord(this.pc, incr);
       return true;
     }
+    this.pc += 1;
     return false;
   },
 
   '0x21': function (this: CPU): void {
     this.r.hl = Memory.readWord(this.pc);
+    this.pc += 2;
   },
 
   '0x22': function (this: CPU): void {
@@ -440,6 +448,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0x26': function (this: CPU): void {
     this.r.hl = setUpper(this.r.hl, toByte(Memory.readByte(this.pc)));
+    this.pc += 1;
   },
 
   /**
@@ -516,6 +525,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0x2e': function (this: CPU): void {
     setLower(this.r.hl, toByte(Memory.readByte(this.pc)));
+    this.pc += 1;
   },
 
   '0x2f': function (this: CPU): void {
@@ -535,6 +545,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0x31': function (this: CPU): void {
     this.sp = Memory.readWord(this.pc);
+    this.pc += 2;
   },
 
   '0x32': function (this: CPU): void {
@@ -588,6 +599,7 @@ export const OpcodeMap: OpcodeList = {
       this.pc = addWord(this.pc, incr);
       return true;
     }
+    this.pc += 1;
     return false;
   },
 
@@ -627,6 +639,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0x3e': function (this: CPU): void {
     this.r.af = setUpper(this.r.af, toByte(Memory.readByte(this.pc)));
+    this.pc += 1;
   },
 
   '0x3f': function (this: CPU): void {
@@ -1160,7 +1173,11 @@ export const OpcodeMap: OpcodeList = {
   },
 
   '0xc2': function (this: CPU): boolean {
-    return Jpcc.call(this, !this.r.f.z);
+    if (Jpcc.call(this, !this.r.f.z)) {
+      return true;
+    }
+    this.pc += 2;
+    return false;
   },
 
   '0xc3': function (this: CPU): void {
@@ -1168,7 +1185,11 @@ export const OpcodeMap: OpcodeList = {
   },
 
   '0xc4': function (this: CPU): boolean {
-    return CALL.call(this, !this.r.f.z);
+    if (CALL.call(this, !this.r.f.z)) {
+      return true;
+    }
+    this.pc += 2;
+    return false;
   },
 
   '0xc5': function (this: CPU): void {
@@ -1181,6 +1202,7 @@ export const OpcodeMap: OpcodeList = {
     this.checkHalfCarry(upper(this.r.af), value);
     this.r.af = addUpper(this.r.af, value);
     this.checkZFlag(upper(this.r.af));
+    this.pc += 1;
     this.r.f.n = 0;
   },
 
@@ -1203,11 +1225,15 @@ export const OpcodeMap: OpcodeList = {
   },
 
   '0xca': function (this: CPU): boolean {
-    return Jpcc.call(this, this.r.f.z);
+    if (Jpcc.call(this, this.r.f.z)) {
+      return true;
+    }
+    this.pc += 2;
+    return false;
   },
 
   '0xcb': function (this: CPU): void {
-    const opcode: number = Memory.readByte(this.pc);
+    const opcode: byte = Memory.readByte(this.pc);
     if (opcode in cbMap) {
       cbMap[opcode].call(this);
     } else {
@@ -1216,7 +1242,11 @@ export const OpcodeMap: OpcodeList = {
   },
 
   '0xcc': function (this: CPU): boolean {
-    return CALL.call(this, this.r.f.z);
+    if (CALL.call(this, this.r.f.z)) {
+      return true;
+    }
+    this.pc += 2;
+    return false;
   },
 
   '0xcd': function (this: CPU): void {
@@ -1225,6 +1255,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0xce': function (this: CPU): void {
     ADC.call(this, toByte(Memory.readByte(this.pc)));
+    this.pc += 1;
   },
 
   '0xcf': function (this: CPU): void {
@@ -1240,7 +1271,11 @@ export const OpcodeMap: OpcodeList = {
   },
 
   '0xd2': function (this: CPU): boolean {
-    return Jpcc.call(this, this.r.f.z);
+    if (Jpcc.call(this, this.r.f.z)) {
+      return true;
+    }
+    this.pc += 2;
+    return false;
   },
 
   '0xd3': function (this: CPU): void {
@@ -1248,7 +1283,11 @@ export const OpcodeMap: OpcodeList = {
   },
 
   '0xd4': function (this: CPU): boolean {
-    return CALL.call(this, !this.r.f.cy);
+    if (CALL.call(this, !this.r.f.cy)) {
+      return true;
+    }
+    this.pc += 2;
+    return false;
   },
 
   '0xd5': function (this: CPU): void {
@@ -1257,6 +1296,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0xd6': function (this: CPU): void {
     SUB.call(this, toByte(Memory.readByte(this.pc)));
+    this.pc += 1;
   },
 
   '0xd7': function (this: CPU): void {
@@ -1273,7 +1313,11 @@ export const OpcodeMap: OpcodeList = {
   },
 
   '0xda': function (this: CPU): boolean {
-    return Jpcc.call(this, this.r.f.cy);
+    if (Jpcc.call(this, this.r.f.cy)) {
+      return true;
+    }
+    this.pc += 2;
+    return false;
   },
 
   '0xdb': function (this: CPU): void {
@@ -1281,7 +1325,11 @@ export const OpcodeMap: OpcodeList = {
   },
 
   '0xdc': function (this: CPU): boolean {
-    return CALL.call(this, this.r.f.cy);
+    if (CALL.call(this, this.r.f.cy)) {
+      return true;
+    }
+    this.pc += 2;
+    return false;
   },
 
   '0xdd': function (this: CPU): void {
@@ -1290,6 +1338,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0xde': function (this: CPU): void {
     SBC.call(this, toByte(Memory.readByte(this.pc)));
+    this.pc += 1;
   },
 
   '0xdf': function (this: CPU): void {
@@ -1298,6 +1347,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0xe0': function (this: CPU): void {
     Memory.writeByte(0xff00 + Memory.readByte(this.pc), upper(this.r.af));
+    this.pc += 1;
   },
 
   '0xe1': function (this: CPU): void {
@@ -1322,6 +1372,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0xe6': function (this: CPU): void {
     AND.call(this, Memory.readByte(this.pc));
+    this.pc += 1;
   },
 
   '0xe7': function (this: CPU): void {
@@ -1333,6 +1384,7 @@ export const OpcodeMap: OpcodeList = {
     this.checkFullCarry16(this.sp, operand);
     this.checkHalfCarry(upper(this.sp), upper(operand));
     this.sp = addWord(this.sp, operand);
+    this.pc += 1;
     this.r.f.z = 0;
     this.r.f.n = 0;
   },
@@ -1343,6 +1395,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0xea': function (this: CPU): void {
     Memory.writeByte(Memory.readWord(this.pc), upper(this.r.af));
+    this.pc += 2;
   },
 
   '0xeb': function (this: CPU): void {
@@ -1359,6 +1412,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0xee': function (this: CPU): void {
     XOR.call(this, toByte(Memory.readByte(this.pc)));
+    this.pc += 1;
   },
 
   '0xef': function (this: CPU): void {
@@ -1366,8 +1420,9 @@ export const OpcodeMap: OpcodeList = {
   },
 
   '0xf0': function (this: CPU): void {
-    const address = toByte(Memory.readByte(0xff00 + Memory.readByte(this.pc)));
-    this.r.af = setUpper(this.r.af, address);
+    const data = toByte(Memory.readByte(0xff00 + Memory.readByte(this.pc)));
+    this.r.af = setUpper(this.r.af, data);
+    this.pc += 1;
   },
 
   '0xf1': function (this: CPU): void {
@@ -1375,8 +1430,8 @@ export const OpcodeMap: OpcodeList = {
   },
 
   '0xf2': function (this: CPU): void {
-    const address = toByte(0xff00 + lower(this.r.bc));
-    this.r.af = setUpper(this.r.af, address);
+    const data = toByte(0xff00 + lower(this.r.bc));
+    this.r.af = setUpper(this.r.af, data);
   },
 
   '0xf3': function (this: CPU): void {
@@ -1393,6 +1448,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0xf6': function (this: CPU): void {
     OR.call(this, Memory.readByte(this.pc));
+    this.pc += 1;
   },
 
   '0xf7': function (this: CPU): void {
@@ -1403,6 +1459,7 @@ export const OpcodeMap: OpcodeList = {
     let incr = toWord(toSigned(Memory.readByte(this.pc)));
     this.checkHalfCarry(upper(incr), upper(this.sp));
     this.checkFullCarry16(incr, this.sp);
+    this.pc += 1;
     incr = addWord(incr, this.sp);
     this.r.hl = incr;
     this.r.f.z = 0;
@@ -1415,6 +1472,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0xfa': function (this: CPU): void {
     this.r.af = setUpper(this.r.af, toByte(Memory.readByte(Memory.readWord(this.pc))));
+    this.pc += 2;
   },
 
   '0xfb': function (this: CPU): void {
@@ -1431,6 +1489,7 @@ export const OpcodeMap: OpcodeList = {
 
   '0xfe': function (this: CPU): void {
     CP.call(this, toByte(Memory.readByte(this.pc)));
+    this.pc += 1;
   },
 
   '0xff': function (this: CPU): void {
@@ -1439,5 +1498,404 @@ export const OpcodeMap: OpcodeList = {
 };
 
 const cbMap: OpcodeList = {
-  '0x00': function (this: CPU): void {},
+  '0x00': function (this: CPU): void {
+    // check carry flag
+    this.r.f.cy = upper(this.r.bc) >> 7;
+    // left shift
+    const shifted: byte = upper(this.r.bc) << 1;
+    const result: byte = toByte(shifted | (shifted >> 8));
+    this.checkZFlag(result);
+    this.r.bc = setUpper(this.r.bc, result);
+    // flag resets
+    this.r.f.n = 0;
+    this.r.f.h = 0;
+  },
+  '0x01': function (this: CPU): void {
+    this.r.f.cy = lower(this.r.bc) >> 7;
+    const shifted: byte = lower(this.r.bc) << 1;
+    const result: byte = toByte(shifted | (shifted >> 8));
+    this.checkZFlag(result);
+    this.r.bc = setLower(this.r.bc, result);
+    this.r.f.n = 0;
+    this.r.f.h = 0;
+  },
+  '0x02': function (this: CPU): void {
+    this.r.f.cy = upper(this.r.de) >> 7;
+    const shifted: byte = upper(this.r.de) << 1;
+    const result: byte = toByte(shifted | (shifted >> 8));
+    this.checkZFlag(result);
+    this.r.de = setUpper(this.r.de, result);
+    this.r.f.n = 0;
+    this.r.f.h = 0;
+  },
+  '0x03': function (this: CPU): void {
+    this.r.f.cy = lower(this.r.de) >> 7;
+    const shifted: byte = lower(this.r.de) << 1;
+    const result: byte = toByte(shifted | (shifted >> 8));
+    this.checkZFlag(result);
+    this.r.de = setLower(this.r.de, result);
+    this.r.f.n = 0;
+    this.r.f.h = 0;
+  },
+  '0x04': function (this: CPU): void {
+    this.r.f.cy = upper(this.r.hl) >> 7;
+    const shifted: byte = upper(this.r.hl) << 1;
+    const result: byte = toByte(shifted | (shifted >> 8));
+    this.checkZFlag(result);
+    this.r.hl = setUpper(this.r.hl, result);
+    this.r.f.n = 0;
+    this.r.f.h = 0;
+  },
+  '0x05': function (this: CPU): void {
+    this.r.f.cy = lower(this.r.hl) >> 7;
+    const shifted: byte = lower(this.r.hl) << 1;
+    const result: byte = toByte(shifted | (shifted >> 8));
+    this.checkZFlag(result);
+    this.r.hl = setLower(this.r.hl, result);
+    this.r.f.n = 0;
+    this.r.f.h = 0;
+  },
+  '0x06': function (this: CPU): void {
+    const value: byte = Memory.readByte(this.r.hl);
+    this.r.f.cy = value >> 7;
+    const shifted: byte = value << 1;
+    const result: byte = toByte(shifted | (shifted >> 8));
+    this.checkZFlag(result);
+    Memory.writeByte(this.r.hl, result);
+    this.r.f.n = 0;
+    this.r.f.h = 0;
+  },
+  '0x07': function (this: CPU): void {
+    this.r.f.cy = upper(this.r.af) >> 7;
+    const shifted: byte = upper(this.r.af) << 1;
+    const result: byte = toByte(shifted | (shifted >> 8));
+    this.checkZFlag(result);
+    this.r.af = setUpper(this.r.af, result);
+    this.r.f.n = 0;
+    this.r.f.h = 0;
+  },
+  '0x08': function (this: CPU): void {
+    // check carry flag
+    const bitZero = upper(this.r.bc) & 1;
+    this.r.f.cy = bitZero;
+    // right shift
+    const shifted: byte = upper(this.r.bc) >> 1;
+    const result: byte = toByte(shifted | (bitZero << 7));
+    this.checkZFlag(result);
+    this.r.bc = setUpper(this.r.bc, result);
+    // flag resets
+    this.r.f.n = 0;
+    this.r.f.h = 0;
+  },
+  '0x09': function (this: CPU): void {
+    const bitZero = lower(this.r.bc) & 1;
+    this.r.f.cy = bitZero;
+    const shifted: byte = lower(this.r.bc) >> 1;
+    const result: byte = toByte(shifted | (bitZero << 7));
+    this.checkZFlag(result);
+    this.r.bc = setLower(this.r.bc, result);
+    this.r.f.n = 0;
+    this.r.f.h = 0;
+  },
+  '0x0a': function (this: CPU): void {
+    const bitZero = upper(this.r.de) & 1;
+    this.r.f.cy = bitZero;
+    const shifted: byte = upper(this.r.de) >> 1;
+    const result: byte = toByte(shifted | (bitZero << 7));
+    this.checkZFlag(result);
+    this.r.de = setUpper(this.r.de, result);
+    this.r.f.n = 0;
+    this.r.f.h = 0;
+  },
+  '0x0b': function (this: CPU): void {
+    const bitZero = lower(this.r.de) & 1;
+    this.r.f.cy = bitZero;
+    const shifted: byte = lower(this.r.de) >> 1;
+    const result: byte = toByte(shifted | (bitZero << 7));
+    this.checkZFlag(result);
+    this.r.de = setLower(this.r.de, result);
+    this.r.f.n = 0;
+    this.r.f.h = 0;
+  },
+  '0x0c': function (this: CPU): void {
+    const bitZero = upper(this.r.hl) & 1;
+    this.r.f.cy = bitZero;
+    const shifted: byte = upper(this.r.hl) >> 1;
+    const result: byte = toByte(shifted | (bitZero << 7));
+    this.checkZFlag(result);
+    this.r.hl = setUpper(this.r.hl, result);
+    this.r.f.n = 0;
+    this.r.f.h = 0;
+  },
+  '0x0d': function (this: CPU): void {
+    const bitZero = lower(this.r.hl) & 1;
+    this.r.f.cy = bitZero;
+    const shifted: byte = lower(this.r.hl) >> 1;
+    const result: byte = toByte(shifted | (bitZero << 7));
+    this.checkZFlag(result);
+    this.r.hl = setLower(this.r.hl, result);
+    this.r.f.n = 0;
+    this.r.f.h = 0;
+  },
+  '0x0e': function (this: CPU): void {
+    const value: byte = Memory.readByte(this.r.hl);
+    const bitZero = value & 1;
+    this.r.f.cy = bitZero;
+    const shifted: byte = value >> 1;
+    const result: byte = toByte(shifted | (bitZero << 7));
+    this.checkZFlag(result);
+    Memory.writeByte(this.r.hl, value);
+    this.r.f.n = 0;
+    this.r.f.h = 0;
+  },
+  '0x0f': function (this: CPU): void {
+    const bitZero = upper(this.r.af) & 1;
+    this.r.f.cy = bitZero;
+    const shifted: byte = upper(this.r.af) >> 1;
+    const result: byte = toByte(shifted | (bitZero << 7));
+    this.checkZFlag(result);
+    this.r.af = setUpper(this.r.af, result);
+    this.r.f.n = 0;
+    this.r.f.h = 0;
+  },
+  '0x10': function (this: CPU): void {},
+  '0x11': function (this: CPU): void {},
+  '0x12': function (this: CPU): void {},
+  '0x13': function (this: CPU): void {},
+  '0x14': function (this: CPU): void {},
+  '0x15': function (this: CPU): void {},
+  '0x16': function (this: CPU): void {},
+  '0x17': function (this: CPU): void {},
+  '0x18': function (this: CPU): void {},
+  '0x19': function (this: CPU): void {},
+  '0x1a': function (this: CPU): void {},
+  '0x1b': function (this: CPU): void {},
+  '0x1c': function (this: CPU): void {},
+  '0x1d': function (this: CPU): void {},
+  '0x1e': function (this: CPU): void {},
+  '0x1f': function (this: CPU): void {},
+  '0x20': function (this: CPU): void {},
+  '0x21': function (this: CPU): void {},
+  '0x22': function (this: CPU): void {},
+  '0x23': function (this: CPU): void {},
+  '0x24': function (this: CPU): void {},
+  '0x25': function (this: CPU): void {},
+  '0x26': function (this: CPU): void {},
+  '0x27': function (this: CPU): void {},
+  '0x28': function (this: CPU): void {},
+  '0x29': function (this: CPU): void {},
+  '0x2a': function (this: CPU): void {},
+  '0x2b': function (this: CPU): void {},
+  '0x2c': function (this: CPU): void {},
+  '0x2d': function (this: CPU): void {},
+  '0x2e': function (this: CPU): void {},
+  '0x2f': function (this: CPU): void {},
+  '0x30': function (this: CPU): void {},
+  '0x31': function (this: CPU): void {},
+  '0x32': function (this: CPU): void {},
+  '0x33': function (this: CPU): void {},
+  '0x34': function (this: CPU): void {},
+  '0x35': function (this: CPU): void {},
+  '0x36': function (this: CPU): void {},
+  '0x37': function (this: CPU): void {},
+  '0x38': function (this: CPU): void {},
+  '0x39': function (this: CPU): void {},
+  '0x3a': function (this: CPU): void {},
+  '0x3b': function (this: CPU): void {},
+  '0x3c': function (this: CPU): void {},
+  '0x3d': function (this: CPU): void {},
+  '0x3e': function (this: CPU): void {},
+  '0x3f': function (this: CPU): void {},
+  '0x40': function (this: CPU): void {},
+  '0x41': function (this: CPU): void {},
+  '0x42': function (this: CPU): void {},
+  '0x43': function (this: CPU): void {},
+  '0x44': function (this: CPU): void {},
+  '0x45': function (this: CPU): void {},
+  '0x46': function (this: CPU): void {},
+  '0x47': function (this: CPU): void {},
+  '0x48': function (this: CPU): void {},
+  '0x49': function (this: CPU): void {},
+  '0x4a': function (this: CPU): void {},
+  '0x4b': function (this: CPU): void {},
+  '0x4c': function (this: CPU): void {},
+  '0x4d': function (this: CPU): void {},
+  '0x4e': function (this: CPU): void {},
+  '0x4f': function (this: CPU): void {},
+  '0x50': function (this: CPU): void {},
+  '0x51': function (this: CPU): void {},
+  '0x52': function (this: CPU): void {},
+  '0x53': function (this: CPU): void {},
+  '0x54': function (this: CPU): void {},
+  '0x55': function (this: CPU): void {},
+  '0x56': function (this: CPU): void {},
+  '0x57': function (this: CPU): void {},
+  '0x58': function (this: CPU): void {},
+  '0x59': function (this: CPU): void {},
+  '0x5a': function (this: CPU): void {},
+  '0x5b': function (this: CPU): void {},
+  '0x5c': function (this: CPU): void {},
+  '0x5d': function (this: CPU): void {},
+  '0x5e': function (this: CPU): void {},
+  '0x5f': function (this: CPU): void {},
+  '0x60': function (this: CPU): void {},
+  '0x61': function (this: CPU): void {},
+  '0x62': function (this: CPU): void {},
+  '0x63': function (this: CPU): void {},
+  '0x64': function (this: CPU): void {},
+  '0x65': function (this: CPU): void {},
+  '0x66': function (this: CPU): void {},
+  '0x67': function (this: CPU): void {},
+  '0x68': function (this: CPU): void {},
+  '0x69': function (this: CPU): void {},
+  '0x6a': function (this: CPU): void {},
+  '0x6b': function (this: CPU): void {},
+  '0x6c': function (this: CPU): void {},
+  '0x6d': function (this: CPU): void {},
+  '0x6e': function (this: CPU): void {},
+  '0x6f': function (this: CPU): void {},
+  '0x70': function (this: CPU): void {},
+  '0x71': function (this: CPU): void {},
+  '0x72': function (this: CPU): void {},
+  '0x73': function (this: CPU): void {},
+  '0x74': function (this: CPU): void {},
+  '0x75': function (this: CPU): void {},
+  '0x76': function (this: CPU): void {},
+  '0x77': function (this: CPU): void {},
+  '0x78': function (this: CPU): void {},
+  '0x79': function (this: CPU): void {},
+  '0x7a': function (this: CPU): void {},
+  '0x7b': function (this: CPU): void {},
+  '0x7c': function (this: CPU): void {},
+  '0x7d': function (this: CPU): void {},
+  '0x7e': function (this: CPU): void {},
+  '0x7f': function (this: CPU): void {},
+  '0x80': function (this: CPU): void {},
+  '0x81': function (this: CPU): void {},
+  '0x82': function (this: CPU): void {},
+  '0x83': function (this: CPU): void {},
+  '0x84': function (this: CPU): void {},
+  '0x85': function (this: CPU): void {},
+  '0x86': function (this: CPU): void {},
+  '0x87': function (this: CPU): void {},
+  '0x88': function (this: CPU): void {},
+  '0x89': function (this: CPU): void {},
+  '0x8a': function (this: CPU): void {},
+  '0x8b': function (this: CPU): void {},
+  '0x8c': function (this: CPU): void {},
+  '0x8d': function (this: CPU): void {},
+  '0x8e': function (this: CPU): void {},
+  '0x8f': function (this: CPU): void {},
+  '0x90': function (this: CPU): void {},
+  '0x91': function (this: CPU): void {},
+  '0x92': function (this: CPU): void {},
+  '0x93': function (this: CPU): void {},
+  '0x94': function (this: CPU): void {},
+  '0x95': function (this: CPU): void {},
+  '0x96': function (this: CPU): void {},
+  '0x97': function (this: CPU): void {},
+  '0x98': function (this: CPU): void {},
+  '0x99': function (this: CPU): void {},
+  '0x9a': function (this: CPU): void {},
+  '0x9b': function (this: CPU): void {},
+  '0x9c': function (this: CPU): void {},
+  '0x9d': function (this: CPU): void {},
+  '0x9e': function (this: CPU): void {},
+  '0x9f': function (this: CPU): void {},
+  '0xa0': function (this: CPU): void {},
+  '0xa1': function (this: CPU): void {},
+  '0xa2': function (this: CPU): void {},
+  '0xa3': function (this: CPU): void {},
+  '0xa4': function (this: CPU): void {},
+  '0xa5': function (this: CPU): void {},
+  '0xa6': function (this: CPU): void {},
+  '0xa7': function (this: CPU): void {},
+  '0xa8': function (this: CPU): void {},
+  '0xa9': function (this: CPU): void {},
+  '0xaa': function (this: CPU): void {},
+  '0xab': function (this: CPU): void {},
+  '0xac': function (this: CPU): void {},
+  '0xad': function (this: CPU): void {},
+  '0xae': function (this: CPU): void {},
+  '0xaf': function (this: CPU): void {},
+  '0xb0': function (this: CPU): void {},
+  '0xb1': function (this: CPU): void {},
+  '0xb2': function (this: CPU): void {},
+  '0xb3': function (this: CPU): void {},
+  '0xb4': function (this: CPU): void {},
+  '0xb5': function (this: CPU): void {},
+  '0xb6': function (this: CPU): void {},
+  '0xb7': function (this: CPU): void {},
+  '0xb8': function (this: CPU): void {},
+  '0xb9': function (this: CPU): void {},
+  '0xba': function (this: CPU): void {},
+  '0xbb': function (this: CPU): void {},
+  '0xbc': function (this: CPU): void {},
+  '0xbd': function (this: CPU): void {},
+  '0xbe': function (this: CPU): void {},
+  '0xbf': function (this: CPU): void {},
+  '0xc0': function (this: CPU): void {},
+  '0xc1': function (this: CPU): void {},
+  '0xc2': function (this: CPU): void {},
+  '0xc3': function (this: CPU): void {},
+  '0xc4': function (this: CPU): void {},
+  '0xc5': function (this: CPU): void {},
+  '0xc6': function (this: CPU): void {},
+  '0xc7': function (this: CPU): void {},
+  '0xc8': function (this: CPU): void {},
+  '0xc9': function (this: CPU): void {},
+  '0xca': function (this: CPU): void {},
+  '0xcb': function (this: CPU): void {},
+  '0xcc': function (this: CPU): void {},
+  '0xcd': function (this: CPU): void {},
+  '0xce': function (this: CPU): void {},
+  '0xcf': function (this: CPU): void {},
+  '0xd0': function (this: CPU): void {},
+  '0xd1': function (this: CPU): void {},
+  '0xd2': function (this: CPU): void {},
+  '0xd3': function (this: CPU): void {},
+  '0xd4': function (this: CPU): void {},
+  '0xd5': function (this: CPU): void {},
+  '0xd6': function (this: CPU): void {},
+  '0xd7': function (this: CPU): void {},
+  '0xd8': function (this: CPU): void {},
+  '0xd9': function (this: CPU): void {},
+  '0xda': function (this: CPU): void {},
+  '0xdb': function (this: CPU): void {},
+  '0xdc': function (this: CPU): void {},
+  '0xdd': function (this: CPU): void {},
+  '0xde': function (this: CPU): void {},
+  '0xdf': function (this: CPU): void {},
+  '0xe0': function (this: CPU): void {},
+  '0xe1': function (this: CPU): void {},
+  '0xe2': function (this: CPU): void {},
+  '0xe3': function (this: CPU): void {},
+  '0xe4': function (this: CPU): void {},
+  '0xe5': function (this: CPU): void {},
+  '0xe6': function (this: CPU): void {},
+  '0xe7': function (this: CPU): void {},
+  '0xe8': function (this: CPU): void {},
+  '0xe9': function (this: CPU): void {},
+  '0xea': function (this: CPU): void {},
+  '0xeb': function (this: CPU): void {},
+  '0xec': function (this: CPU): void {},
+  '0xed': function (this: CPU): void {},
+  '0xee': function (this: CPU): void {},
+  '0xef': function (this: CPU): void {},
+  '0xf0': function (this: CPU): void {},
+  '0xf1': function (this: CPU): void {},
+  '0xf2': function (this: CPU): void {},
+  '0xf3': function (this: CPU): void {},
+  '0xf4': function (this: CPU): void {},
+  '0xf5': function (this: CPU): void {},
+  '0xf6': function (this: CPU): void {},
+  '0xf7': function (this: CPU): void {},
+  '0xf8': function (this: CPU): void {},
+  '0xf9': function (this: CPU): void {},
+  '0xfa': function (this: CPU): void {},
+  '0xfb': function (this: CPU): void {},
+  '0xfc': function (this: CPU): void {},
+  '0xfd': function (this: CPU): void {},
+  '0xfe': function (this: CPU): void {},
+  '0xff': function (this: CPU): void {},
 };
