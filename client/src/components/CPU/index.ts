@@ -1,5 +1,5 @@
 import Memory from '../Memory';
-import { toByte, toWord, byte, word, addWord, toHex } from '../Types';
+import { toByte, toWord, byte, word, toHex } from '../Types';
 import Opcodes from './sm83';
 import Flag from './Flag';
 
@@ -16,9 +16,20 @@ class CPU {
   static clock = 4194304;
   // 16-bit program counter
   private _pc: word;
+  public get pc(): word {
+    return this._pc;
+  }
+  public set pc(value: word) {
+    this._pc = value;
+  }
   // stack pointer
   private _sp: word;
-
+  public get sp(): word {
+    return this._sp;
+  }
+  public set sp(value: word) {
+    this._sp = value;
+  }
   private _r: Registers = {
     af: null as word,
     bc: null as word,
@@ -26,45 +37,23 @@ class CPU {
     hl: null as word,
     f: new Flag(),
   };
-
-  private _halted: boolean;
-  private opcodes: any;
-  private _interruptsEnabled: boolean;
-
-  public get pc(): word {
-    return this._pc;
-  }
-  public set pc(value: word) {
-    this._pc = value;
-  }
-  public get sp(): word {
-    return this._sp;
-  }
-  public set sp(value: word) {
-    this._sp = value;
-  }
   public get r(): Registers {
     return this._r;
   }
   public set r(value: Registers) {
     this._r = value;
   }
+  private _halted: boolean;
   public get halted(): boolean {
     return this._halted;
   }
   public set halted(value: boolean) {
     this._halted = value;
   }
-
-  public get interruptsEnabled(): boolean {
-    return this._interruptsEnabled;
-  }
-  public set interruptsEnabled(value: boolean) {
-    this._interruptsEnabled = value;
-  }
-
+  protected interruptsEnabled: boolean;
+  protected opcodes: any;
   public constructor() {
-    this._pc = toWord(0);
+    this.pc = toWord(0);
     this.sp = toWord(0);
     this.opcodes = Opcodes;
     this.halted = false;
@@ -117,7 +106,7 @@ class CPU {
    * Completes the GB power sequence
    */
   private initPowerSequence(): void {
-    this._pc = 0x100;
+    this.pc = 0x100;
     this.r.af = 0x01b0;
     this.r.bc = 0x0013;
     this.r.de = 0x00d8;
@@ -162,15 +151,14 @@ class CPU {
   public executeInstruction(): number {
     if (Memory.inBios) {
       // fetch
-      debugger;
-      const opcode: byte = Memory.readByte(this._pc);
-      console.log(`Executing opcode: ${toHex(opcode)}, PC is ${this._pc}`);
+      const opcode: byte = Memory.readByte(this.pc);
+      console.log(`Executing opcode: ${toHex(opcode)}, PC is ${this.pc}`);
       this.log();
       this.pc += 1;
       // not doing any execution of bios instructions for now
       // execute
       const numCycles: number = this.opcodes[opcode].call(this);
-      // this._pc = addWord(this._pc, 1);
+      // this.pc = addWord(this.pc, 1);
       // check if finished bios execution
       if (!Memory.inBios) {
         console.log('exiting bios');
@@ -180,9 +168,9 @@ class CPU {
     } else {
       // normal execution
       // fetch
-      const opcode: byte = Memory.readByte(this._pc);
-      this._pc += 1;
-      console.log(`Executing opcode: ${toHex(opcode)}, PC is ${this._pc}`);
+      const opcode: byte = Memory.readByte(this.pc);
+      this.pc += 1;
+      console.log(`Executing opcode: ${toHex(opcode)}, PC is ${this.pc}`);
 
       // execute
       const numCycles: number = this.opcodes[opcode].call(this);
@@ -195,7 +183,7 @@ class CPU {
    */
   public log(): void {
     console.log(`JS GB Registers: ${JSON.stringify(this.r)}`);
-    console.log(`JS GB PC: ${this._pc}`);
+    console.log(`JS GB PC: ${this.pc}`);
     console.log(`JS GB SP: ${this.sp}`);
   }
 }

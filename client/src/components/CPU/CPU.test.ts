@@ -3,8 +3,8 @@ import * as fs from 'fs';
 import * as _ from 'lodash';
 import CPU from '.';
 import Memory from '../Memory';
-
 import { byte, word, upper, lower } from '../Types';
+
 const ROM_FOLDER = path.join(__dirname, '..', '..', '..', '..', 'public', 'roms');
 const GENERATED_FOLDER = path.join(__dirname, '..', '..', '..', 'test', 'generated');
 
@@ -32,10 +32,10 @@ beforeAll(() => {
 });
 
 describe('CPU', () => {
-  it('matches the internal state of another emulator', async () => {
+  it(`matches the internal state of another emulator's cpu`, async () => {
+    // Arrange
     const cpu = new CPU();
-
-    let pyboySave = await fs.promises.readFile(
+    const pyboySave = await fs.promises.readFile(
       path.join(GENERATED_FOLDER, 'tetris.gb', 'cpu.state')
     );
 
@@ -70,8 +70,11 @@ describe('CPU', () => {
     parseCPUState();
 
     for (let i = 0; i < 100; i++) {
+      // Act
       cpu.executeInstruction();
       let expected: CPUInfo = parseCPUState();
+
+      // Assert
       expect(expected.pc).toEqual(cpu.pc);
       expect(expected.sp).toEqual(cpu.sp);
       expect(expected.hl).toEqual(cpu.r.hl);
@@ -80,7 +83,6 @@ describe('CPU', () => {
       expect(expected.c).toEqual(lower(cpu.r.bc));
       expect(expected.d).toEqual(upper(cpu.r.de));
       expect(expected.e).toEqual(lower(cpu.r.de));
-      debugger;
       expect(expected.f).toEqual(cpu.r.f.value());
     }
   });

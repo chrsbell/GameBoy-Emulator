@@ -1,6 +1,5 @@
 // Using a class to prevent accidentally setting flag outside 0/1
-
-import { byte } from '../Types';
+import { byte, word } from '../Types';
 
 export default class Flag {
   private _z: byte = 0; // set if last op producted 0
@@ -13,7 +12,7 @@ export default class Flag {
   }
 
   public value(): byte {
-    return (this.z << 0x80) | (this.n << 0x40) | (this.h << 0x20) | (this.cy << 10);
+    return (this.z << 7) | (this.n << 6) | (this.h << 5) | (this.cy << 4);
   }
 
   public set z(value: byte) {
