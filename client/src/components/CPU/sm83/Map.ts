@@ -327,9 +327,12 @@ export const OpcodeMap: OpcodeList = {
     // set the carry flag to the 7th bit of A
     this.r.f.cy = upper(this.r.af) >> 7;
     // rotate left
-    let shifted = upper(this.r.af) << 1;
+    const shifted = upper(this.r.af) << 1;
     // combine old flag and shifted, set to A
     this.r.af = setUpper(this.r.af, toByte(shifted | oldCY));
+    this.r.f.h = 0;
+    this.r.f.n = 0;
+    this.r.f.z = 0;
   },
 
   '0x18': function (this: CPU): void {
@@ -390,9 +393,12 @@ export const OpcodeMap: OpcodeList = {
     // set the carry flag to the 0th bit of A
     this.r.f.cy = upper(this.r.af) & 1;
     // rotate right
-    let shifted = upper(this.r.af) >> 1;
+    const shifted = upper(this.r.af) >> 1;
     // combine old flag and shifted, set to A
     this.r.af = setUpper(this.r.af, toByte(shifted | (oldCY << 7)));
+    this.r.f.h = 0;
+    this.r.f.n = 0;
+    this.r.f.z = 0;
   },
 
   '0x20': function (this: CPU): boolean {
@@ -1497,191 +1503,179 @@ export const OpcodeMap: OpcodeList = {
   },
 };
 
+function RLCn(reg: byte): byte {
+  this.r.f.cy = reg >> 7;
+  const shifted: byte = reg << 1;
+  const result: byte = toByte(shifted | (shifted >> 8));
+  this.checkZFlag(result);
+  this.r.f.n = 0;
+  this.r.f.h = 0;
+  return result;
+}
+
+function RLn(reg: byte): byte {
+  const oldCY = this.r.f.cy;
+  this.r.f.cy = reg >> 7;
+  const shifted = reg << 1;
+  const result = toByte(shifted | oldCY);
+  this.checkZFlag(result);
+  this.r.f.h = 0;
+  this.r.f.n = 0;
+  return result;
+}
+
+function RRCn(reg: byte): byte {
+  const bitZero = reg & 1;
+  this.r.f.cy = bitZero;
+  const shifted: byte = reg >> 1;
+  const result: byte = toByte(shifted | (bitZero << 7));
+  this.checkZFlag(result);
+  this.r.f.n = 0;
+  this.r.f.h = 0;
+  return result;
+}
+
+function RRn(reg: byte): byte {
+  const oldCY = this.r.f.cy;
+  this.r.f.cy = reg & 1;
+  const shifted = reg >> 1;
+  const result: byte = toByte(shifted | (oldCY << 7));
+  this.checkZFlag(result);
+  this.r.f.h = 0;
+  this.r.f.n = 0;
+  return result;
+}
+
+function SLAn(reg: byte): byte {
+  this.r.f.cy = reg >> 7;
+  const result = toByte(reg << 1);
+  this.checkZFlag(result);
+  this.r.f.h = 0;
+  this.r.f.n = 0;
+  return result;
+}
+
 const cbMap: OpcodeList = {
   '0x00': function (this: CPU): void {
-    // check carry flag
-    this.r.f.cy = upper(this.r.bc) >> 7;
-    // left shift
-    const shifted: byte = upper(this.r.bc) << 1;
-    const result: byte = toByte(shifted | (shifted >> 8));
-    this.checkZFlag(result);
-    this.r.bc = setUpper(this.r.bc, result);
-    // flag resets
-    this.r.f.n = 0;
-    this.r.f.h = 0;
+    this.r.bc = setUpper(this.r.bc, RLCn(upper(this.r.bc)));
   },
   '0x01': function (this: CPU): void {
-    this.r.f.cy = lower(this.r.bc) >> 7;
-    const shifted: byte = lower(this.r.bc) << 1;
-    const result: byte = toByte(shifted | (shifted >> 8));
-    this.checkZFlag(result);
-    this.r.bc = setLower(this.r.bc, result);
-    this.r.f.n = 0;
-    this.r.f.h = 0;
+    this.r.bc = setLower(this.r.bc, RLCn(lower(this.r.bc)));
   },
   '0x02': function (this: CPU): void {
-    this.r.f.cy = upper(this.r.de) >> 7;
-    const shifted: byte = upper(this.r.de) << 1;
-    const result: byte = toByte(shifted | (shifted >> 8));
-    this.checkZFlag(result);
-    this.r.de = setUpper(this.r.de, result);
-    this.r.f.n = 0;
-    this.r.f.h = 0;
+    this.r.de = setUpper(this.r.de, RLCn(upper(this.r.de)));
   },
   '0x03': function (this: CPU): void {
-    this.r.f.cy = lower(this.r.de) >> 7;
-    const shifted: byte = lower(this.r.de) << 1;
-    const result: byte = toByte(shifted | (shifted >> 8));
-    this.checkZFlag(result);
-    this.r.de = setLower(this.r.de, result);
-    this.r.f.n = 0;
-    this.r.f.h = 0;
+    this.r.de = setLower(this.r.de, RLCn(lower(this.r.de)));
   },
   '0x04': function (this: CPU): void {
-    this.r.f.cy = upper(this.r.hl) >> 7;
-    const shifted: byte = upper(this.r.hl) << 1;
-    const result: byte = toByte(shifted | (shifted >> 8));
-    this.checkZFlag(result);
-    this.r.hl = setUpper(this.r.hl, result);
-    this.r.f.n = 0;
-    this.r.f.h = 0;
+    this.r.hl = setUpper(this.r.hl, RLCn(upper(this.r.hl)));
   },
   '0x05': function (this: CPU): void {
-    this.r.f.cy = lower(this.r.hl) >> 7;
-    const shifted: byte = lower(this.r.hl) << 1;
-    const result: byte = toByte(shifted | (shifted >> 8));
-    this.checkZFlag(result);
-    this.r.hl = setLower(this.r.hl, result);
-    this.r.f.n = 0;
-    this.r.f.h = 0;
+    this.r.hl = setLower(this.r.hl, RLCn(lower(this.r.hl)));
   },
   '0x06': function (this: CPU): void {
-    const value: byte = Memory.readByte(this.r.hl);
-    this.r.f.cy = value >> 7;
-    const shifted: byte = value << 1;
-    const result: byte = toByte(shifted | (shifted >> 8));
-    this.checkZFlag(result);
-    Memory.writeByte(this.r.hl, result);
-    this.r.f.n = 0;
-    this.r.f.h = 0;
+    Memory.writeByte(this.r.hl, RLCn(Memory.readByte(this.r.hl)));
   },
   '0x07': function (this: CPU): void {
-    this.r.f.cy = upper(this.r.af) >> 7;
-    const shifted: byte = upper(this.r.af) << 1;
-    const result: byte = toByte(shifted | (shifted >> 8));
-    this.checkZFlag(result);
-    this.r.af = setUpper(this.r.af, result);
-    this.r.f.n = 0;
-    this.r.f.h = 0;
+    this.r.af = setUpper(this.r.af, RLCn(upper(this.r.af)));
   },
   '0x08': function (this: CPU): void {
-    // check carry flag
-    const bitZero = upper(this.r.bc) & 1;
-    this.r.f.cy = bitZero;
-    // right shift
-    const shifted: byte = upper(this.r.bc) >> 1;
-    const result: byte = toByte(shifted | (bitZero << 7));
-    this.checkZFlag(result);
-    this.r.bc = setUpper(this.r.bc, result);
-    // flag resets
-    this.r.f.n = 0;
-    this.r.f.h = 0;
+    this.r.bc = setUpper(this.r.bc, RRCn(upper(this.r.bc)));
   },
   '0x09': function (this: CPU): void {
-    const bitZero = lower(this.r.bc) & 1;
-    this.r.f.cy = bitZero;
-    const shifted: byte = lower(this.r.bc) >> 1;
-    const result: byte = toByte(shifted | (bitZero << 7));
-    this.checkZFlag(result);
-    this.r.bc = setLower(this.r.bc, result);
-    this.r.f.n = 0;
-    this.r.f.h = 0;
+    this.r.bc = setLower(this.r.bc, RRCn(lower(this.r.bc)));
   },
   '0x0a': function (this: CPU): void {
-    const bitZero = upper(this.r.de) & 1;
-    this.r.f.cy = bitZero;
-    const shifted: byte = upper(this.r.de) >> 1;
-    const result: byte = toByte(shifted | (bitZero << 7));
-    this.checkZFlag(result);
-    this.r.de = setUpper(this.r.de, result);
-    this.r.f.n = 0;
-    this.r.f.h = 0;
+    this.r.de = setUpper(this.r.de, RRCn(upper(this.r.de)));
   },
   '0x0b': function (this: CPU): void {
-    const bitZero = lower(this.r.de) & 1;
-    this.r.f.cy = bitZero;
-    const shifted: byte = lower(this.r.de) >> 1;
-    const result: byte = toByte(shifted | (bitZero << 7));
-    this.checkZFlag(result);
-    this.r.de = setLower(this.r.de, result);
-    this.r.f.n = 0;
-    this.r.f.h = 0;
+    this.r.de = setLower(this.r.de, RRCn(lower(this.r.de)));
   },
   '0x0c': function (this: CPU): void {
-    const bitZero = upper(this.r.hl) & 1;
-    this.r.f.cy = bitZero;
-    const shifted: byte = upper(this.r.hl) >> 1;
-    const result: byte = toByte(shifted | (bitZero << 7));
-    this.checkZFlag(result);
-    this.r.hl = setUpper(this.r.hl, result);
-    this.r.f.n = 0;
-    this.r.f.h = 0;
+    this.r.hl = setUpper(this.r.hl, RRCn(upper(this.r.hl)));
   },
   '0x0d': function (this: CPU): void {
-    const bitZero = lower(this.r.hl) & 1;
-    this.r.f.cy = bitZero;
-    const shifted: byte = lower(this.r.hl) >> 1;
-    const result: byte = toByte(shifted | (bitZero << 7));
-    this.checkZFlag(result);
-    this.r.hl = setLower(this.r.hl, result);
-    this.r.f.n = 0;
-    this.r.f.h = 0;
+    this.r.hl = setLower(this.r.hl, RRCn(lower(this.r.hl)));
   },
   '0x0e': function (this: CPU): void {
-    const value: byte = Memory.readByte(this.r.hl);
-    const bitZero = value & 1;
-    this.r.f.cy = bitZero;
-    const shifted: byte = value >> 1;
-    const result: byte = toByte(shifted | (bitZero << 7));
-    this.checkZFlag(result);
-    Memory.writeByte(this.r.hl, value);
-    this.r.f.n = 0;
-    this.r.f.h = 0;
+    Memory.writeByte(this.r.hl, RRCn(Memory.readByte(this.r.hl)));
   },
   '0x0f': function (this: CPU): void {
-    const bitZero = upper(this.r.af) & 1;
-    this.r.f.cy = bitZero;
-    const shifted: byte = upper(this.r.af) >> 1;
-    const result: byte = toByte(shifted | (bitZero << 7));
-    this.checkZFlag(result);
-    this.r.af = setUpper(this.r.af, result);
-    this.r.f.n = 0;
-    this.r.f.h = 0;
+    this.r.af = setUpper(this.r.af, RRCn(upper(this.r.af)));
   },
-  '0x10': function (this: CPU): void {},
-  '0x11': function (this: CPU): void {},
-  '0x12': function (this: CPU): void {},
-  '0x13': function (this: CPU): void {},
-  '0x14': function (this: CPU): void {},
-  '0x15': function (this: CPU): void {},
-  '0x16': function (this: CPU): void {},
-  '0x17': function (this: CPU): void {},
-  '0x18': function (this: CPU): void {},
-  '0x19': function (this: CPU): void {},
-  '0x1a': function (this: CPU): void {},
-  '0x1b': function (this: CPU): void {},
-  '0x1c': function (this: CPU): void {},
-  '0x1d': function (this: CPU): void {},
-  '0x1e': function (this: CPU): void {},
-  '0x1f': function (this: CPU): void {},
-  '0x20': function (this: CPU): void {},
-  '0x21': function (this: CPU): void {},
-  '0x22': function (this: CPU): void {},
-  '0x23': function (this: CPU): void {},
-  '0x24': function (this: CPU): void {},
-  '0x25': function (this: CPU): void {},
-  '0x26': function (this: CPU): void {},
-  '0x27': function (this: CPU): void {},
+  '0x10': function (this: CPU): void {
+    this.r.bc = setUpper(this.r.bc, RLn(upper(this.r.bc)));
+  },
+  '0x11': function (this: CPU): void {
+    this.r.bc = setLower(this.r.bc, RLn(lower(this.r.bc)));
+  },
+  '0x12': function (this: CPU): void {
+    this.r.de = setUpper(this.r.de, RLn(upper(this.r.de)));
+  },
+  '0x13': function (this: CPU): void {
+    this.r.de = setLower(this.r.de, RLn(lower(this.r.de)));
+  },
+  '0x14': function (this: CPU): void {
+    this.r.hl = setUpper(this.r.hl, RLn(upper(this.r.hl)));
+  },
+  '0x15': function (this: CPU): void {
+    this.r.hl = setLower(this.r.hl, RLn(lower(this.r.hl)));
+  },
+  '0x16': function (this: CPU): void {
+    Memory.writeByte(this.r.hl, RLn(Memory.readByte(this.r.hl)));
+  },
+  '0x17': function (this: CPU): void {
+    this.r.af = setUpper(this.r.af, RLn(upper(this.r.af)));
+  },
+  '0x18': function (this: CPU): void {
+    this.r.bc = setUpper(this.r.bc, RLn(upper(this.r.bc)));
+  },
+  '0x19': function (this: CPU): void {
+    this.r.bc = setLower(this.r.bc, RRn(lower(this.r.bc)));
+  },
+  '0x1a': function (this: CPU): void {
+    this.r.de = setUpper(this.r.de, RRn(upper(this.r.de)));
+  },
+  '0x1b': function (this: CPU): void {
+    this.r.de = setLower(this.r.de, RRn(lower(this.r.de)));
+  },
+  '0x1c': function (this: CPU): void {
+    this.r.hl = setUpper(this.r.hl, RRn(upper(this.r.hl)));
+  },
+  '0x1d': function (this: CPU): void {
+    this.r.hl = setLower(this.r.hl, RRn(lower(this.r.hl)));
+  },
+  '0x1e': function (this: CPU): void {
+    Memory.writeByte(this.r.hl, RRn(Memory.readByte(this.r.hl)));
+  },
+  '0x1f': function (this: CPU): void {
+    this.r.af = setUpper(this.r.af, RRn(upper(this.r.af)));
+  },
+  '0x20': function (this: CPU): void {
+    this.r.bc = setUpper(this.r.bc, SLAn(upper(this.r.bc)));
+  },
+  '0x21': function (this: CPU): void {
+    this.r.bc = setLower(this.r.bc, SLAn(lower(this.r.bc)));
+  },
+  '0x22': function (this: CPU): void {
+    this.r.de = setUpper(this.r.de, SLAn(upper(this.r.de)));
+  },
+  '0x23': function (this: CPU): void {
+    this.r.de = setLower(this.r.de, SLAn(lower(this.r.de)));
+  },
+  '0x24': function (this: CPU): void {
+    this.r.hl = setUpper(this.r.hl, SLAn(upper(this.r.hl)));
+  },
+  '0x25': function (this: CPU): void {
+    this.r.hl = setLower(this.r.hl, SLAn(lower(this.r.hl)));
+  },
+  '0x26': function (this: CPU): void {
+    Memory.writeByte(this.r.hl, SLAn(Memory.readByte(this.r.hl)));
+  },
+  '0x27': function (this: CPU): void {
+    this.r.af = setUpper(this.r.af, SLAn(upper(this.r.af)));
+  },
   '0x28': function (this: CPU): void {},
   '0x29': function (this: CPU): void {},
   '0x2a': function (this: CPU): void {},
