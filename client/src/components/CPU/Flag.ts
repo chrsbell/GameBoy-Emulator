@@ -41,7 +41,7 @@ export default class Flag {
 
   public set h(value: byte) {
     if (value === 0 || value === 1) {
-      this._n = value;
+      this._h = value;
     } else {
       this.error();
     }

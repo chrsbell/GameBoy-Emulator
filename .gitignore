@@ -1,11 +1,11 @@
 node_modules
 **bundle.js
 **source.js.map
-**roms
-**dist
-**uploads
-**generated
-**PyBoy
+**/roms
+**/dist
+**/uploads
+**/generated
+**/PyBoy
 cpu.txt
 **.jar
 **.state

@@ -64,11 +64,13 @@ class CPU {
     this.r.hl = toWord(0);
   }
   /**
-   * Sets the Z flag if the register is 0
+   * Sets the Z flag if the register is 0, otherwise resets it.
    */
   protected checkZFlag(reg: byte): void {
     if (!reg) {
       this.r.f.z = 1;
+    } else {
+      this.r.f.z = 0;
     }
   }
   /**
@@ -152,7 +154,6 @@ class CPU {
     if (Memory.inBios) {
       // fetch
       const opcode: byte = Memory.readByte(this.pc);
-      console.log(`Executing opcode: ${toHex(opcode)}, PC is ${this.pc}`);
       this.log();
       this.pc += 1;
       // not doing any execution of bios instructions for now
@@ -170,7 +171,6 @@ class CPU {
       // fetch
       const opcode: byte = Memory.readByte(this.pc);
       this.pc += 1;
-      console.log(`Executing opcode: ${toHex(opcode)}, PC is ${this.pc}`);
 
       // execute
       const numCycles: number = this.opcodes[opcode].call(this);

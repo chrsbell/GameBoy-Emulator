@@ -32,58 +32,58 @@ beforeAll(() => {
 });
 
 describe('CPU', () => {
-  it(`matches the internal state of another emulator's cpu`, async () => {
+  it(`matches the internal state of another emulator's cpu during bios`, async () => {
     // Arrange
     const cpu = new CPU();
-    const pyboySave = await fs.promises.readFile(
+    const saveState: Buffer = await fs.promises.readFile(
       path.join(GENERATED_FOLDER, 'tetris.gb', 'cpu.state')
     );
 
     let fileIndex = 0;
 
-    const parseCPUState = (): CPUInfo => {
+    const readSaveState = (): CPUInfo => {
       const cpuState = {} as CPUInfo;
       // CPU Info
-      cpuState.a = pyboySave[fileIndex++];
-      cpuState.f = pyboySave[fileIndex++];
-      cpuState.b = pyboySave[fileIndex++];
-      cpuState.c = pyboySave[fileIndex++];
-      cpuState.d = pyboySave[fileIndex++];
-      cpuState.e = pyboySave[fileIndex++];
-      let hl = pyboySave[fileIndex++];
-      hl |= pyboySave[fileIndex++] << 8;
+      cpuState.a = saveState[fileIndex++];
+      cpuState.f = saveState[fileIndex++];
+      cpuState.b = saveState[fileIndex++];
+      cpuState.c = saveState[fileIndex++];
+      cpuState.d = saveState[fileIndex++];
+      cpuState.e = saveState[fileIndex++];
+      let hl = saveState[fileIndex++];
+      hl |= saveState[fileIndex++] << 8;
       cpuState.hl = hl;
-      let sp = pyboySave[fileIndex++];
-      sp |= pyboySave[fileIndex++] << 8;
+      let sp = saveState[fileIndex++];
+      sp |= saveState[fileIndex++] << 8;
       cpuState.sp = sp;
-      let pc = pyboySave[fileIndex++];
-      pc |= pyboySave[fileIndex++] << 8;
+      let pc = saveState[fileIndex++];
+      pc |= saveState[fileIndex++] << 8;
       cpuState.pc = pc;
 
-      cpuState.interrupt_master_enable = Boolean(pyboySave[fileIndex++]);
-      cpuState.halted = Boolean(pyboySave[fileIndex++]);
-      cpuState.stopped = Boolean(pyboySave[fileIndex++]);
+      cpuState.interrupt_master_enable = Boolean(saveState[fileIndex++]);
+      cpuState.halted = Boolean(saveState[fileIndex++]);
+      cpuState.stopped = Boolean(saveState[fileIndex++]);
       return cpuState;
     };
 
     // skip initial state
-    parseCPUState();
+    readSaveState();
 
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < saveState.length; i++) {
+      debugger;
       // Act
       cpu.executeInstruction();
-      let expected: CPUInfo = parseCPUState();
-
+      const expected: CPUInfo = readSaveState();
       // Assert
-      expect(expected.pc).toEqual(cpu.pc);
-      expect(expected.sp).toEqual(cpu.sp);
-      expect(expected.hl).toEqual(cpu.r.hl);
-      expect(expected.a).toEqual(upper(cpu.r.af));
-      expect(expected.b).toEqual(upper(cpu.r.bc));
-      expect(expected.c).toEqual(lower(cpu.r.bc));
-      expect(expected.d).toEqual(upper(cpu.r.de));
-      expect(expected.e).toEqual(lower(cpu.r.de));
-      expect(expected.f).toEqual(cpu.r.f.value());
+      expect(cpu.pc).toEqual(expected.pc);
+      expect(cpu.sp).toEqual(expected.sp);
+      expect(cpu.r.hl).toEqual(expected.hl);
+      expect(upper(cpu.r.af)).toEqual(expected.a);
+      expect(upper(cpu.r.bc)).toEqual(expected.b);
+      expect(lower(cpu.r.bc)).toEqual(expected.c);
+      expect(upper(cpu.r.de)).toEqual(expected.d);
+      expect(lower(cpu.r.de)).toEqual(expected.e);
+      expect(cpu.r.f.value()).toEqual(expected.f);
     }
   });
 });
