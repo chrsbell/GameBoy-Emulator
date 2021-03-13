@@ -1555,6 +1555,22 @@ function SLAn(reg: byte): byte {
   return result;
 }
 
+function SRAn(reg: byte): byte {
+  this.r.f.cy = reg & 1;
+  const result: byte = reg >> 1;
+  this.checkZFlag(result);
+  this.r.f.h = 0;
+  this.r.f.n = 0;
+  return result;
+}
+
+function BIT(bit: number, reg: byte): void {
+  this.checkZFlag((reg >> bit) & 1);
+  this.r.f.n = 0;
+  this.r.f.h = 1;
+  this.r.f.c = 0;
+}
+
 const cbMap: OpcodeList = {
   '0x00': function (this: CPU): void {
     this.r.bc = setUpper(this.r.bc, RLCn(upper(this.r.bc)));
@@ -1676,94 +1692,222 @@ const cbMap: OpcodeList = {
   '0x27': function (this: CPU): void {
     this.r.af = setUpper(this.r.af, SLAn(upper(this.r.af)));
   },
-  '0x28': function (this: CPU): void {},
-  '0x29': function (this: CPU): void {},
-  '0x2a': function (this: CPU): void {},
-  '0x2b': function (this: CPU): void {},
-  '0x2c': function (this: CPU): void {},
-  '0x2d': function (this: CPU): void {},
-  '0x2e': function (this: CPU): void {},
-  '0x2f': function (this: CPU): void {},
-  '0x30': function (this: CPU): void {},
-  '0x31': function (this: CPU): void {},
-  '0x32': function (this: CPU): void {},
-  '0x33': function (this: CPU): void {},
-  '0x34': function (this: CPU): void {},
-  '0x35': function (this: CPU): void {},
-  '0x36': function (this: CPU): void {},
-  '0x37': function (this: CPU): void {},
-  '0x38': function (this: CPU): void {},
-  '0x39': function (this: CPU): void {},
-  '0x3a': function (this: CPU): void {},
-  '0x3b': function (this: CPU): void {},
-  '0x3c': function (this: CPU): void {},
-  '0x3d': function (this: CPU): void {},
-  '0x3e': function (this: CPU): void {},
-  '0x3f': function (this: CPU): void {},
-  '0x40': function (this: CPU): void {},
-  '0x41': function (this: CPU): void {},
-  '0x42': function (this: CPU): void {},
-  '0x43': function (this: CPU): void {},
-  '0x44': function (this: CPU): void {},
-  '0x45': function (this: CPU): void {},
-  '0x46': function (this: CPU): void {},
-  '0x47': function (this: CPU): void {},
-  '0x48': function (this: CPU): void {},
-  '0x49': function (this: CPU): void {},
-  '0x4a': function (this: CPU): void {},
-  '0x4b': function (this: CPU): void {},
-  '0x4c': function (this: CPU): void {},
-  '0x4d': function (this: CPU): void {},
-  '0x4e': function (this: CPU): void {},
-  '0x4f': function (this: CPU): void {},
-  '0x50': function (this: CPU): void {},
-  '0x51': function (this: CPU): void {},
-  '0x52': function (this: CPU): void {},
-  '0x53': function (this: CPU): void {},
-  '0x54': function (this: CPU): void {},
-  '0x55': function (this: CPU): void {},
-  '0x56': function (this: CPU): void {},
-  '0x57': function (this: CPU): void {},
-  '0x58': function (this: CPU): void {},
-  '0x59': function (this: CPU): void {},
-  '0x5a': function (this: CPU): void {},
-  '0x5b': function (this: CPU): void {},
-  '0x5c': function (this: CPU): void {},
-  '0x5d': function (this: CPU): void {},
-  '0x5e': function (this: CPU): void {},
-  '0x5f': function (this: CPU): void {},
-  '0x60': function (this: CPU): void {},
-  '0x61': function (this: CPU): void {},
-  '0x62': function (this: CPU): void {},
-  '0x63': function (this: CPU): void {},
-  '0x64': function (this: CPU): void {},
-  '0x65': function (this: CPU): void {},
-  '0x66': function (this: CPU): void {},
-  '0x67': function (this: CPU): void {},
-  '0x68': function (this: CPU): void {},
-  '0x69': function (this: CPU): void {},
-  '0x6a': function (this: CPU): void {},
-  '0x6b': function (this: CPU): void {},
-  '0x6c': function (this: CPU): void {},
-  '0x6d': function (this: CPU): void {},
-  '0x6e': function (this: CPU): void {},
-  '0x6f': function (this: CPU): void {},
-  '0x70': function (this: CPU): void {},
-  '0x71': function (this: CPU): void {},
-  '0x72': function (this: CPU): void {},
-  '0x73': function (this: CPU): void {},
-  '0x74': function (this: CPU): void {},
-  '0x75': function (this: CPU): void {},
-  '0x76': function (this: CPU): void {},
-  '0x77': function (this: CPU): void {},
-  '0x78': function (this: CPU): void {},
-  '0x79': function (this: CPU): void {},
-  '0x7a': function (this: CPU): void {},
-  '0x7b': function (this: CPU): void {},
-  '0x7c': function (this: CPU): void {},
-  '0x7d': function (this: CPU): void {},
-  '0x7e': function (this: CPU): void {},
-  '0x7f': function (this: CPU): void {},
+  '0x28': function (this: CPU): void {
+    this.r.bc = setUpper(this.r.bc, SRAn(upper(this.r.bc)));
+  },
+  '0x29': function (this: CPU): void {
+    this.r.bc = setLower(this.r.bc, SRAn(lower(this.r.bc)));
+  },
+  '0x2a': function (this: CPU): void {
+    this.r.de = setUpper(this.r.de, SRAn(upper(this.r.de)));
+  },
+  '0x2b': function (this: CPU): void {
+    this.r.de = setLower(this.r.de, SRAn(lower(this.r.de)));
+  },
+  '0x2c': function (this: CPU): void {
+    this.r.hl = setUpper(this.r.hl, SRAn(upper(this.r.hl)));
+  },
+  '0x2d': function (this: CPU): void {
+    this.r.hl = setLower(this.r.hl, SRAn(lower(this.r.hl)));
+  },
+  '0x2e': function (this: CPU): void {
+    Memory.writeByte(this.r.hl, SRAn(Memory.readByte(this.r.hl)));
+  },
+  '0x2f': function (this: CPU): void {
+    this.r.af = setUpper(this.r.af, SRAn(upper(this.r.af)));
+  },
+  '0x40': function (this: CPU): void {
+    BIT.call(this, 0, upper(this.r.bc));
+  },
+  '0x41': function (this: CPU): void {
+    BIT.call(this, 0, lower(this.r.bc));
+  },
+  '0x42': function (this: CPU): void {
+    BIT.call(this, 0, upper(this.r.de));
+  },
+  '0x43': function (this: CPU): void {
+    BIT.call(this, 0, lower(this.r.de));
+  },
+  '0x44': function (this: CPU): void {
+    BIT.call(this, 0, upper(this.r.hl));
+  },
+  '0x45': function (this: CPU): void {
+    BIT.call(this, 0, lower(this.r.hl));
+  },
+  '0x46': function (this: CPU): void {
+    BIT.call(this, 0, Memory.readByte(this.r.hl));
+  },
+  '0x47': function (this: CPU): void {
+    BIT.call(this, 0, upper(this.r.af));
+  },
+  '0x48': function (this: CPU): void {
+    BIT.call(this, 1, upper(this.r.bc));
+  },
+  '0x49': function (this: CPU): void {
+    BIT.call(this, 1, lower(this.r.bc));
+  },
+  '0x4a': function (this: CPU): void {
+    BIT.call(this, 1, upper(this.r.de));
+  },
+  '0x4b': function (this: CPU): void {
+    BIT.call(this, 1, lower(this.r.de));
+  },
+  '0x4c': function (this: CPU): void {
+    BIT.call(this, 1, upper(this.r.hl));
+  },
+  '0x4d': function (this: CPU): void {
+    BIT.call(this, 1, lower(this.r.hl));
+  },
+  '0x4e': function (this: CPU): void {
+    BIT.call(this, 1, Memory.readByte(this.r.hl));
+  },
+  '0x4f': function (this: CPU): void {
+    BIT.call(this, 1, upper(this.r.af));
+  },
+  '0x50': function (this: CPU): void {
+    BIT.call(this, 2, upper(this.r.bc));
+  },
+  '0x51': function (this: CPU): void {
+    BIT.call(this, 2, lower(this.r.bc));
+  },
+  '0x52': function (this: CPU): void {
+    BIT.call(this, 2, upper(this.r.de));
+  },
+  '0x53': function (this: CPU): void {
+    BIT.call(this, 2, lower(this.r.de));
+  },
+  '0x54': function (this: CPU): void {
+    BIT.call(this, 2, upper(this.r.hl));
+  },
+  '0x55': function (this: CPU): void {
+    BIT.call(this, 2, lower(this.r.hl));
+  },
+  '0x56': function (this: CPU): void {
+    BIT.call(this, 2, Memory.readByte(this.r.hl));
+  },
+  '0x57': function (this: CPU): void {
+    BIT.call(this, 2, upper(this.r.af));
+  },
+  '0x58': function (this: CPU): void {
+    BIT.call(this, 3, upper(this.r.bc));
+  },
+  '0x59': function (this: CPU): void {
+    BIT.call(this, 3, lower(this.r.bc));
+  },
+  '0x5a': function (this: CPU): void {
+    BIT.call(this, 3, upper(this.r.de));
+  },
+  '0x5b': function (this: CPU): void {
+    BIT.call(this, 3, lower(this.r.de));
+  },
+  '0x5c': function (this: CPU): void {
+    BIT.call(this, 3, upper(this.r.hl));
+  },
+  '0x5d': function (this: CPU): void {
+    BIT.call(this, 3, lower(this.r.hl));
+  },
+  '0x5e': function (this: CPU): void {
+    BIT.call(this, 3, Memory.readByte(this.r.hl));
+  },
+  '0x5f': function (this: CPU): void {
+    BIT.call(this, 3, upper(this.r.af));
+  },
+  '0x60': function (this: CPU): void {
+    BIT.call(this, 4, upper(this.r.bc));
+  },
+  '0x61': function (this: CPU): void {
+    BIT.call(this, 4, lower(this.r.bc));
+  },
+  '0x62': function (this: CPU): void {
+    BIT.call(this, 4, upper(this.r.de));
+  },
+  '0x63': function (this: CPU): void {
+    BIT.call(this, 4, lower(this.r.de));
+  },
+  '0x64': function (this: CPU): void {
+    BIT.call(this, 4, upper(this.r.hl));
+  },
+  '0x65': function (this: CPU): void {
+    BIT.call(this, 4, lower(this.r.hl));
+  },
+  '0x66': function (this: CPU): void {
+    BIT.call(this, 4, Memory.readByte(this.r.hl));
+  },
+  '0x67': function (this: CPU): void {
+    BIT.call(this, 4, upper(this.r.af));
+  },
+  '0x68': function (this: CPU): void {
+    BIT.call(this, 5, upper(this.r.bc));
+  },
+  '0x69': function (this: CPU): void {
+    BIT.call(this, 5, lower(this.r.bc));
+  },
+  '0x6a': function (this: CPU): void {
+    BIT.call(this, 5, upper(this.r.de));
+  },
+  '0x6b': function (this: CPU): void {
+    BIT.call(this, 5, lower(this.r.de));
+  },
+  '0x6c': function (this: CPU): void {
+    BIT.call(this, 5, upper(this.r.hl));
+  },
+  '0x6d': function (this: CPU): void {
+    BIT.call(this, 5, lower(this.r.hl));
+  },
+  '0x6e': function (this: CPU): void {
+    BIT.call(this, 5, Memory.readByte(this.r.hl));
+  },
+  '0x6f': function (this: CPU): void {
+    BIT.call(this, 5, upper(this.r.af));
+  },
+  '0x70': function (this: CPU): void {
+    BIT.call(this, 6, upper(this.r.bc));
+  },
+  '0x71': function (this: CPU): void {
+    BIT.call(this, 6, lower(this.r.bc));
+  },
+  '0x72': function (this: CPU): void {
+    BIT.call(this, 6, upper(this.r.de));
+  },
+  '0x73': function (this: CPU): void {
+    BIT.call(this, 6, lower(this.r.de));
+  },
+  '0x74': function (this: CPU): void {
+    BIT.call(this, 6, upper(this.r.hl));
+  },
+  '0x75': function (this: CPU): void {
+    BIT.call(this, 6, lower(this.r.hl));
+  },
+  '0x76': function (this: CPU): void {
+    BIT.call(this, 6, Memory.readByte(this.r.hl));
+  },
+  '0x77': function (this: CPU): void {
+    BIT.call(this, 6, upper(this.r.af));
+  },
+  '0x78': function (this: CPU): void {
+    BIT.call(this, 7, upper(this.r.bc));
+  },
+  '0x79': function (this: CPU): void {
+    BIT.call(this, 7, lower(this.r.bc));
+  },
+  '0x7a': function (this: CPU): void {
+    BIT.call(this, 7, upper(this.r.de));
+  },
+  '0x7b': function (this: CPU): void {
+    BIT.call(this, 7, lower(this.r.de));
+  },
+  '0x7c': function (this: CPU): void {
+    BIT.call(this, 7, upper(this.r.hl));
+  },
+  '0x7d': function (this: CPU): void {
+    BIT.call(this, 7, lower(this.r.hl));
+  },
+  '0x7e': function (this: CPU): void {
+    BIT.call(this, 7, Memory.readByte(this.r.hl));
+  },
+  '0x7f': function (this: CPU): void {
+    BIT.call(this, 7, upper(this.r.af));
+  },
   '0x80': function (this: CPU): void {},
   '0x81': function (this: CPU): void {},
   '0x82': function (this: CPU): void {},
