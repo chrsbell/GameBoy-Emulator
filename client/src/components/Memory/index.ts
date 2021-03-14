@@ -78,7 +78,7 @@ class Memory {
   private bios: Uint8Array;
   // whether bios execution has finished
   public inBios: boolean = false;
-  private cart: Cartridge;
+  public cart: Cartridge;
   // 8k vRAM
   private vRAM: Uint8Array;
   // 8k internal RAM
@@ -91,6 +91,12 @@ class Memory {
   private hRAM: Uint8Array;
   private initialized: boolean = false;
   public constructor() {
+    this.reset();
+  }
+  /**
+   * Resets the Memory module.
+   */
+  public reset(): void {
     this.vRAM = new Uint8Array(0x9fff - 0x8000);
     this.wRAM = new Uint8Array(0xdfff - 0xc000);
     this.wRAMShadow = new Uint8Array(0xfdff - 0xe000);
@@ -117,7 +123,7 @@ class Memory {
   /**
    * Writes the provided byte to the address
    */
-  public writeByte(address: word, data: byte) {
+  public writeByte(address: word, data: byte): void {
     if (this.inBios) {
       if (address <= 0xff) {
         this.bios[address] = data;
@@ -154,7 +160,7 @@ class Memory {
   /**
    * Writes the provided word to the address
    */
-  public writeWord(address: word, data: word) {
+  public writeWord(address: word, data: word): void {
     this.writeByte(address, lower(data));
     this.writeByte(address + 1, upper(data));
   }
@@ -174,9 +180,7 @@ class Memory {
       return this.cart.ROM[address];
     } else if (address <= 0x7fff) {
       // Reading from ROM bank of cartridge
-      if (this.cart.MBCType === 0) {
-        return this.cart.ROM[address];
-      }
+      return this.cart.ROM[address];
     } else if (address <= 0x9fff) {
       return this.vRAM[address - 0x8000];
     } else if (address <= 0xbfff) {
@@ -204,7 +208,7 @@ class Memory {
   /**
    * Changes the ROM/RAM banks and associated registers
    */
-  private changeBank(address: word, data: byte) {
+  private changeBank(address: word, data: byte): void {
     if (address < 0x2000) {
       // RAM enable register
       this.cart.R.RAMEnabled = (data & 0b00001111) === 0xa;
@@ -232,7 +236,7 @@ class Memory {
   /**
    * Loads parsed files into BIOS/ROM
    */
-  public load(bios: Uint8Array, rom: Uint8Array) {
+  public load(bios: Uint8Array, rom: Uint8Array): void {
     this.cart.ROM = rom;
     this.cart.MBCType = this.readByte(0x147);
     this.cart.ROMSize = this.readByte(0x148);
@@ -248,8 +252,10 @@ class Memory {
       console.log(`No support for MBC ${toHex(this.cart.MBCType)}.`);
     }
     console.log('Loaded file into ROM memory.');
-    this.bios = bios;
-    this.inBios = true;
+    if (bios) {
+      this.bios = bios;
+      this.inBios = true;
+    }
     console.log('Loaded bios.');
   }
 }

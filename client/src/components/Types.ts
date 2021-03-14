@@ -78,7 +78,7 @@ const addLower = (value: word, operand: byte): word =>
 /**
  * Formats the byte/word as a hex value
  */
-const toHex = (value: byte | word): string => `0x${pad(value.toString(16), 4)}`;
+const toHex = (value: byte | word): string => `0x${pad(value.toString(16), 2)}`;
 
 /**
  * Converts the unsigned byte to its signed format using two's complement

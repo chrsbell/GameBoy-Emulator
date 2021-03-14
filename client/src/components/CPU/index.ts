@@ -1,5 +1,5 @@
 import Memory from '../Memory';
-import { toByte, toWord, byte, word, toHex } from '../Types';
+import { byte, word, toHex } from '../Types';
 import Opcodes from './sm83';
 import Flag from './Flag';
 
@@ -13,7 +13,10 @@ interface Registers {
 
 class CPU {
   // number of clock ticks per second
-  static clock = 4194304;
+  private static _clock: number = 4194304;
+  public get clock(): number {
+    return CPU._clock;
+  }
   // 16-bit program counter
   private _pc: word;
   public get pc(): word {
@@ -50,23 +53,37 @@ class CPU {
   public set halted(value: boolean) {
     this._halted = value;
   }
-  protected interruptsEnabled: boolean;
+  protected _interruptsEnabled: boolean;
   protected opcodes: any;
+  private _lastExecuted: byte;
+  public get lastExecuted(): byte {
+    return this._lastExecuted;
+  }
+  public set lastExecuted(value: byte) {
+    this._lastExecuted = value;
+  }
   public constructor() {
-    this.pc = toWord(0);
-    this.sp = toWord(0);
+    this.reset();
+  }
+  /**
+   * Resets the CPU.
+   */
+  public reset(): void {
+    this.pc = 0;
+    this.sp = 0;
     this.opcodes = Opcodes;
     this.halted = false;
-    this.interruptsEnabled = true;
-    this.r.af = toWord(0);
-    this.r.bc = toWord(0);
-    this.r.de = toWord(0);
-    this.r.hl = toWord(0);
+    this._interruptsEnabled = true;
+    this.r.af = 0;
+    this.r.bc = 0;
+    this.r.de = 0;
+    this.r.hl = 0;
+    this.lastExecuted = 0;
   }
   /**
    * Sets the Z flag if the register is 0, otherwise resets it.
    */
-  protected checkZFlag(reg: byte): void {
+  public checkZFlag(reg: byte): void {
     if (!reg) {
       this.r.f.z = 1;
     } else {
@@ -81,14 +98,14 @@ class CPU {
    * https://stackoverflow.com/questions/8868396/game-boy-what-constitutes-a-half-carry
    * https://gbdev.io/gb-opcodes/optables/
    */
-  protected checkHalfCarry(op1: byte, op2: byte): void {
+  public checkHalfCarry(op1: byte, op2: byte): void {
     const carryBit = ((op1 & 0xf) + (op2 & 0xf)) & 0x10;
     this.r.f.h = carryBit === 0x10 ? 1 : 0;
   }
   /**
    * Sets the carry flag if the sum will exceed the size of the data type.
    */
-  protected checkFullCarry16(op1: word, op2: word): void {
+  public checkFullCarry16(op1: word, op2: word): void {
     let overflow: number = op1 + op2;
     if (overflow > 65535) {
       this.r.f.n = 1;
@@ -96,13 +113,16 @@ class CPU {
       this.r.f.n = 0;
     }
   }
-  protected checkFullCarry8(op1: byte, op2: byte): void {
+  public checkFullCarry8(op1: byte, op2: byte): void {
     let overflow: number = op1 + op2;
     if (overflow > 255) {
       this.r.f.n = 1;
     } else {
       this.r.f.n = 0;
     }
+  }
+  public setInterruptsEnabled(enabled: boolean): void {
+    this._interruptsEnabled = enabled;
   }
   /**
    * Completes the GB power sequence
@@ -114,37 +134,37 @@ class CPU {
     this.r.de = 0x00d8;
     this.r.hl = 0x014d;
     this.sp = 0xfffe;
-    Memory.writeByte(0xff05, toByte(0x00));
-    Memory.writeByte(0xff06, toByte(0x00));
-    Memory.writeByte(0xff07, toByte(0x00));
-    Memory.writeByte(0xff10, toByte(0x80));
-    Memory.writeByte(0xff11, toByte(0xbf));
-    Memory.writeByte(0xff12, toByte(0xf3));
-    Memory.writeByte(0xff14, toByte(0xbf));
-    Memory.writeByte(0xff16, toByte(0x3f));
-    Memory.writeByte(0xff17, toByte(0x00));
-    Memory.writeByte(0xff19, toByte(0xbf));
-    Memory.writeByte(0xff1a, toByte(0x7f));
-    Memory.writeByte(0xff1b, toByte(0xff));
-    Memory.writeByte(0xff1c, toByte(0x9f));
-    Memory.writeByte(0xff1e, toByte(0xbf));
-    Memory.writeByte(0xff20, toByte(0xff));
-    Memory.writeByte(0xff21, toByte(0x00));
-    Memory.writeByte(0xff22, toByte(0x00));
-    Memory.writeByte(0xff23, toByte(0xbf));
-    Memory.writeByte(0xff24, toByte(0x77));
-    Memory.writeByte(0xff25, toByte(0xf3));
-    Memory.writeByte(0xff26, toByte(0xf1));
-    Memory.writeByte(0xff40, toByte(0x91));
-    Memory.writeByte(0xff42, toByte(0x00));
-    Memory.writeByte(0xff43, toByte(0x00));
-    Memory.writeByte(0xff45, toByte(0x00));
-    Memory.writeByte(0xff47, toByte(0xfc));
-    Memory.writeByte(0xff48, toByte(0xff));
-    Memory.writeByte(0xff49, toByte(0xff));
-    Memory.writeByte(0xff4a, toByte(0x00));
-    Memory.writeByte(0xff4b, toByte(0x00));
-    Memory.writeByte(0xffff, toByte(0x00));
+    Memory.writeByte(0xff05, 0x00);
+    Memory.writeByte(0xff06, 0x00);
+    Memory.writeByte(0xff07, 0x00);
+    Memory.writeByte(0xff10, 0x80);
+    Memory.writeByte(0xff11, 0xbf);
+    Memory.writeByte(0xff12, 0xf3);
+    Memory.writeByte(0xff14, 0xbf);
+    Memory.writeByte(0xff16, 0x3f);
+    Memory.writeByte(0xff17, 0x00);
+    Memory.writeByte(0xff19, 0xbf);
+    Memory.writeByte(0xff1a, 0x7f);
+    Memory.writeByte(0xff1b, 0xff);
+    Memory.writeByte(0xff1c, 0x9f);
+    Memory.writeByte(0xff1e, 0xbf);
+    Memory.writeByte(0xff20, 0xff);
+    Memory.writeByte(0xff21, 0x00);
+    Memory.writeByte(0xff22, 0x00);
+    Memory.writeByte(0xff23, 0xbf);
+    Memory.writeByte(0xff24, 0x77);
+    Memory.writeByte(0xff25, 0xf3);
+    Memory.writeByte(0xff26, 0xf1);
+    Memory.writeByte(0xff40, 0x91);
+    Memory.writeByte(0xff42, 0x00);
+    Memory.writeByte(0xff43, 0x00);
+    Memory.writeByte(0xff45, 0x00);
+    Memory.writeByte(0xff47, 0xfc);
+    Memory.writeByte(0xff48, 0xff);
+    Memory.writeByte(0xff49, 0xff);
+    Memory.writeByte(0xff4a, 0x00);
+    Memory.writeByte(0xff4b, 0x00);
+    Memory.writeByte(0xffff, 0x00);
   }
   /**
    * Executes next opcode.
@@ -170,6 +190,7 @@ class CPU {
       // normal execution
       // fetch
       const opcode: byte = Memory.readByte(this.pc);
+      this.lastExecuted = opcode;
       this.pc += 1;
 
       // execute
@@ -188,4 +209,4 @@ class CPU {
   }
 }
 
-export default CPU;
+export default new CPU();

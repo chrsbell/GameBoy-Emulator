@@ -4,12 +4,10 @@ import GLRenderer, { Colors } from '../GLRenderer';
 import * as _ from 'lodash';
 
 class Emulator {
-  private cpu: CPU;
   private i: number = 0;
   private j: number = 0;
   private timerID: ReturnType<typeof setTimeout>;
   public constructor() {
-    this.cpu = new CPU();
     this.update = this.update.bind(this);
   }
   /**
@@ -34,7 +32,7 @@ class Emulator {
 
     // elapse time according to number of cpu cycles used
     while (cycles < cyclesPerUpdate) {
-      elapsed = this.cpu.executeInstruction();
+      elapsed = CPU.executeInstruction();
       cycles += elapsed;
       // need to update timers using elapsed cpu cycles
     }
