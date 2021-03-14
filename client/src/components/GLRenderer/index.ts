@@ -35,7 +35,7 @@ class GLRenderer {
   /**
    * Initializes the renderer.
    */
-  public initialize(canvas: HTMLCanvasElement) {
+  public initialize(canvas: any) {
     if (canvas && !this.initialized) {
       this.gl = canvas.getContext('webgl2');
       const gl: WebGL2RenderingContext = this.gl;

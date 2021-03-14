@@ -80,6 +80,7 @@ const setupTestROM = (testROM: string): Buffer => {
 
 /**
  * Extracts the next expected CPU state from a save state.
+ * @returns {Array}
  */
 const readSaveState = (saveState: Buffer, fileIndex: number): [CPUInfo, number] => {
   const cpuState = {} as CPUInfo;
@@ -121,11 +122,14 @@ describe('CPU', () => {
     expect(cycles).toEqual(4);
   });
 
-  test('SP and HL instructions', () => {
+  /**
+   * Compares save states from a test ROM to the cpu's state
+   */
+  const checkRegisters = (testROM: string) => {
     let fileIndex = 0;
-    let expected;
+    let expected: CPUInfo;
     // Arrange
-    const saveState: Buffer = setupTestROM('03-op sp,hl.gb');
+    const saveState: Buffer = setupTestROM(testROM);
     // skip initial state
     [expected, fileIndex] = readSaveState(saveState, fileIndex);
     for (let i = 0; i < saveState.length; i++) {
@@ -143,5 +147,37 @@ describe('CPU', () => {
       expect(lower(CPU.r.de)).toMatchRegister(expected.e, 'E', expected);
       expect(CPU.r.f.value()).toMatchRegister(expected.f, 'F', expected);
     }
+  };
+
+  test('SP and HL instructions', () => {
+    checkRegisters('03-op sp,hl.gb');
+  });
+
+  test('Immediate instructions', () => {
+    checkRegisters('04-op r,imm.gb');
+  });
+
+  test('BC/DE/HL arithmetic', () => {
+    checkRegisters('05-op rp.gb');
+  });
+
+  test('LD r,r ($40-$7F)', () => {
+    checkRegisters('06-ld r,r.gb');
+  });
+
+  test('Miscellaneous instructions', () => {
+    checkRegisters('08-misc instrs.gb');
+  });
+
+  test('Register instructions pt. 1', () => {
+    checkRegisters('09-op r,r.gb');
+  });
+
+  test('Register instructions pt. 2', () => {
+    checkRegisters('10-bit ops.gb');
+  });
+
+  test('HL/BC/DE instructions.', () => {
+    checkRegisters('11-op a,(hl).gb');
   });
 });

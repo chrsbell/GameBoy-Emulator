@@ -11,7 +11,7 @@ describe('Memory', () => {
     Memory.load(null, new Uint8Array([...Array(8192).fill(0)]));
     expect(Memory.cart.MBCType).toEqual(0);
   });
-  it('identifies MBC type 0 carts', () => {
+  it('identifies MBC type 1 carts', () => {
     const rom = new Uint8Array([...Array(8192).fill(0)]);
     rom[0x147] = 1;
     Memory.load(null, rom);
