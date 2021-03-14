@@ -69,6 +69,11 @@ describe('CPU', () => {
     // skip initial state
     readSaveState();
 
+  const errorMessage = (opcode: byte, reg: string, expected: CPUInfo) => {
+    return `Register ${reg} comparison failed after opcode ${toHex(
+      opcode
+    )}, expected state: ${JSON.stringify(expected)}`;
+  };
     for (let i = 0; i < saveState.length; i++) {
       debugger;
       // Act
@@ -86,4 +91,13 @@ describe('CPU', () => {
       expect(cpu.r.f.value()).toEqual(expected.f);
     }
   });
+    assert.equal(CPU.pc, expected.pc, errorMessage(CPU.lastExecuted, 'PC', expected));
+    assert.equal(CPU.sp, expected.sp, errorMessage(CPU.lastExecuted, 'SP', expected));
+    assert.equal(CPU.r.hl, expected.hl, errorMessage(CPU.lastExecuted, 'HL', expected));
+    assert.equal(upper(CPU.r.af), expected.a, errorMessage(CPU.lastExecuted, 'A', expected));
+    assert.equal(upper(CPU.r.bc), expected.b, errorMessage(CPU.lastExecuted, 'B', expected));
+    assert.equal(lower(CPU.r.bc), expected.c, errorMessage(CPU.lastExecuted, 'C', expected));
+    assert.equal(upper(CPU.r.de), expected.d, errorMessage(CPU.lastExecuted, 'D', expected));
+    assert.equal(lower(CPU.r.de), expected.e, errorMessage(CPU.lastExecuted, 'E', expected));
+    assert.equal(CPU.r.f.value(), expected.f, errorMessage(CPU.lastExecuted, 'F', expected));
 });
