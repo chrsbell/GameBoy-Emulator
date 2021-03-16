@@ -2,6 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as _ from 'lodash';
 import CPU from '.';
+import Flag from './Flag';
 import Memory from '../Memory';
 import { byte, word, upper, lower, toHex } from '../Types';
 
@@ -57,11 +58,21 @@ expect.extend({
         pass: true,
       };
     } else {
+      let logged: any = received;
+      if (register === 'F') {
+        logged = JSON.stringify(new Flag(received as byte), null, '\n');
+      }
       return {
         message: () =>
-          `Expected register ${register} value ${received} to equal ${expected} after instruction ${toHex(
-            CPU.lastExecuted
-          )}, Expected CPU State: ${JSON.stringify(expectedState)}`,
+          `Expected register ${register} value ${logged} to equal ${expected} after instruction ${CPU.lastExecuted
+            .map((instr) => toHex(instr))
+            .reverse()}, Expected CPU State: ${JSON.stringify(
+            {
+              ...expectedState,
+            },
+            null,
+            '\n'
+          )}, \nExpected Flag: ${JSON.stringify(new Flag(expectedState.f), null, '\n')}`,
         pass: false,
       };
     }

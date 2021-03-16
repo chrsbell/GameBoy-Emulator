@@ -2154,7 +2154,7 @@ export function POP_off_SP_into_BC_i(): byte {
 }
 
 /**
- * Unconditional jump to the absolute address specified by the 16-bit operand.
+ * Jump to the absolute address specified by the 16-bit operand.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags:
@@ -2168,7 +2168,7 @@ export function JP_C_NZ_a16(): byte {
 }
 
 /**
- * Unconditional jump to the absolute address specified by the 16-bit operand.
+ * Jump to the absolute address specified by the 16-bit operand.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags:
@@ -2251,7 +2251,7 @@ export function RET(): byte {
 }
 
 /**
- * Unconditional jump to the absolute address specified by the 16-bit operand.
+ * Jump to the absolute address specified by the 16-bit operand.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags:
@@ -2348,7 +2348,7 @@ export function POP_off_SP_into_DE_i(): byte {
 }
 
 /**
- * Unconditional jump to the absolute address specified by the 16-bit operand.
+ * Jump to the absolute address specified by the 16-bit operand.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags:
@@ -2443,7 +2443,7 @@ export function RETI(): byte {
 }
 
 /**
- * Unconditional jump to the absolute address specified by the 16-bit operand.
+ * Jump to the absolute address specified by the 16-bit operand.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags:
@@ -2606,7 +2606,7 @@ export function ADD_into_SP_i_from_r8_i(): byte {
 }
 
 /**
- * Unconditional jump to the absolute address specified by the 16-bit operand.
+ * Jump to the absolute address specified by the 16-bit operand.
  * @param - CPU class.
  * @returns - Number of system clock ticks used.
  * Affected flags:

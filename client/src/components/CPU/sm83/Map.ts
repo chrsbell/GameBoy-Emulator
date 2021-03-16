@@ -11,6 +11,7 @@ import {
   setLower,
   addWord,
   addUpper,
+  addLower,
   toSigned,
 } from '../../Types';
 import CPU from '..';
@@ -45,21 +46,19 @@ function ADC(operand: byte): void {
 }
 
 function SUB(operand: byte): void {
-  operand *= -1;
-  CPU.checkFullCarry8(upper(CPU.r.af), operand);
-  CPU.checkHalfCarry(upper(CPU.r.af), operand);
-  CPU.r.af = addUpper(CPU.r.af, operand);
+  CPU.checkFullCarry8(upper(CPU.r.af), operand, -1);
+  CPU.checkHalfCarry(upper(CPU.r.af), operand, -1);
+  CPU.r.af = toWord(addUpper(CPU.r.af, -operand));
   CPU.checkZFlag(upper(CPU.r.af));
   CPU.r.f.n = 1;
 }
 
 function SBC(operand: byte): void {
-  operand *= -1;
   const carry = CPU.r.f.cy ? -1 : 0;
   operand = addByte(operand, carry);
-  CPU.checkFullCarry8(upper(CPU.r.af), operand);
-  CPU.checkHalfCarry(upper(CPU.r.af), operand);
-  CPU.r.af = addUpper(CPU.r.af, operand);
+  CPU.checkFullCarry8(upper(CPU.r.af), operand, -1);
+  CPU.checkHalfCarry(upper(CPU.r.af), operand, -1);
+  CPU.r.af = toWord(addUpper(CPU.r.af, -operand));
   CPU.checkZFlag(upper(CPU.r.af));
   CPU.r.f.n = 1;
 }
@@ -92,10 +91,9 @@ function XOR(operand: byte): void {
 }
 
 function CP(operand: byte): void {
-  operand *= -1;
-  CPU.checkFullCarry8(upper(CPU.r.af), operand);
-  CPU.checkHalfCarry(upper(CPU.r.af), operand);
-  const result: byte = toByte(upper(CPU.r.af) + operand);
+  CPU.checkFullCarry8(upper(CPU.r.af), operand, -1);
+  CPU.checkHalfCarry(upper(CPU.r.af), operand, -1);
+  const result: byte = addByte(upper(CPU.r.af), -operand);
   CPU.checkZFlag(result);
 }
 
@@ -116,9 +114,10 @@ function PUSH(register: word): void {
   Memory.writeByte(CPU.sp, lower(register));
 }
 
-function POP(register: word): void {
-  register = Memory.readWord(CPU.pc);
+function POP(register: word): word {
+  const value: word = Memory.readWord(CPU.sp);
   CPU.sp = addWord(CPU.sp, 2);
+  return value;
 }
 
 function Jpcc(flag: boolean): boolean {
@@ -166,7 +165,7 @@ export const OpcodeMap: OpcodeList = {
 
   0x04: function (): void {
     // convert operand to unsigned
-    let operand: byte = toByte(1);
+    let operand: byte = 1;
     // check for half carry on affected byte only
     CPU.checkHalfCarry(upper(CPU.r.bc), operand);
     // perform addition
@@ -178,12 +177,8 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0x05: function (): void {
-    // convert operand to unsigned
-    let operand: byte = toByte(-1);
-    CPU.checkHalfCarry(upper(CPU.r.bc), operand);
-    operand = addByte(operand, upper(CPU.r.bc));
-    CPU.r.bc = setUpper(CPU.r.bc, operand);
-
+    CPU.checkHalfCarry(upper(CPU.r.bc), 1, -1);
+    CPU.r.bc = addUpper(CPU.r.bc, toByte(-1));
     CPU.checkZFlag(upper(CPU.r.bc));
     CPU.r.f.n = 1;
   },
@@ -227,7 +222,7 @@ export const OpcodeMap: OpcodeList = {
 
   0x0c: function (): void {
     // convert operand to unsigned
-    let operand: byte = toByte(1);
+    let operand: byte = 1;
     // check for half carry on affected byte only
     CPU.checkHalfCarry(lower(CPU.r.bc), operand);
     // perform addition
@@ -239,16 +234,10 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0x0d: function (): void {
-    debugger;
     // convert operand to unsigned
-    let operand: byte = toByte(-1);
-    // check for half carry on affected byte only
-    CPU.checkHalfCarry(lower(CPU.r.bc), operand);
-    // perform addition
-    operand = addByte(operand, lower(CPU.r.bc));
-    CPU.r.bc = setLower(CPU.r.bc, operand);
-
-    CPU.checkZFlag(lower(CPU.r.bc));
+    CPU.checkHalfCarry(lower(CPU.r.bc), 1, -1);
+    CPU.r.bc = addLower(CPU.r.bc, toByte(-1));
+    CPU.checkZFlag(lower(this.r.bc));
     CPU.r.f.n = 1;
   },
 
@@ -291,7 +280,7 @@ export const OpcodeMap: OpcodeList = {
 
   0x14: function (): void {
     // convert operand to unsigned
-    let operand: byte = toByte(1);
+    let operand: byte = 1;
     // check for half carry on affected byte only
     CPU.checkHalfCarry(upper(CPU.r.de), operand);
     // perform addition
@@ -303,14 +292,9 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0x15: function (): void {
-    // convert operand to unsigned
-    let operand: byte = toByte(-1);
     // check for half carry on affected byte only
-    CPU.checkHalfCarry(upper(CPU.r.de), operand);
-    // perform addition
-    operand = addByte(operand, upper(CPU.r.de));
-    CPU.r.de = setUpper(CPU.r.de, operand);
-
+    CPU.checkHalfCarry(upper(CPU.r.de), 1, -1);
+    CPU.r.de = addUpper(CPU.r.de, toByte(-1));
     CPU.checkZFlag(upper(CPU.r.de));
     CPU.r.f.n = 1;
   },
@@ -357,7 +341,7 @@ export const OpcodeMap: OpcodeList = {
 
   0x1c: function (): void {
     // convert operand to unsigned
-    let operand: byte = toByte(1);
+    let operand: byte = 1;
     // check for half carry on affected byte only
     CPU.checkHalfCarry(lower(CPU.r.de), operand);
     // perform addition
@@ -369,14 +353,9 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0x1d: function (): void {
-    // convert operand to unsigned
-    let operand: byte = toByte(-1);
     // check for half carry on affected byte only
-    CPU.checkHalfCarry(lower(CPU.r.de), operand);
-    // perform addition
-    operand = addByte(operand, lower(CPU.r.de));
-    CPU.r.de = setLower(CPU.r.de, operand);
-
+    CPU.checkHalfCarry(lower(CPU.r.de), 1, -1);
+    CPU.r.de = addLower(CPU.r.de, toByte(-1));
     CPU.checkZFlag(lower(CPU.r.de));
     CPU.r.f.n = 1;
   },
@@ -428,7 +407,7 @@ export const OpcodeMap: OpcodeList = {
 
   0x24: function (): void {
     // convert operand to unsigned
-    let operand: byte = toByte(1);
+    let operand: byte = 1;
     // check for half carry on affected byte only
     CPU.checkHalfCarry(upper(CPU.r.hl), operand);
     // perform addition
@@ -440,15 +419,9 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0x25: function (): void {
-    // convert operand to unsigned
-    let operand: byte = toByte(-1);
-    // check for half carry on affected byte only
-    CPU.checkHalfCarry(upper(CPU.r.hl), operand);
-    // perform addition
-    operand = addByte(operand, upper(CPU.r.hl));
-    CPU.r.hl = setUpper(CPU.r.hl, operand);
-
-    CPU.checkZFlag(operand);
+    CPU.checkHalfCarry(upper(CPU.r.hl), 1, -1);
+    CPU.r.hl = addUpper(CPU.r.hl, toByte(-1));
+    CPU.checkZFlag(upper(this.r.hl));
     CPU.r.f.n = 1;
   },
 
@@ -488,6 +461,7 @@ export const OpcodeMap: OpcodeList = {
   0x28: function (): boolean {
     const incr = toSigned(Memory.readByte(CPU.pc));
     // increment pc if zero flag was set
+    CPU.pc += 1;
     if (CPU.r.f.z) {
       CPU.pc = addWord(CPU.pc, incr);
       return true;
@@ -512,7 +486,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0x2c: function (): void {
-    let operand: byte = toByte(1);
+    let operand: byte = 1;
     CPU.checkHalfCarry(lower(CPU.r.hl), operand);
     operand = addByte(operand, lower(CPU.r.hl));
     setLower(CPU.r.hl, operand);
@@ -521,11 +495,9 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0x2d: function (): void {
-    let operand: byte = toByte(-1);
-    CPU.checkHalfCarry(lower(CPU.r.hl), operand);
-    operand = addByte(operand, lower(CPU.r.hl));
-    setLower(CPU.r.hl, operand);
-    CPU.checkZFlag(operand);
+    CPU.checkHalfCarry(lower(CPU.r.hl), 1, -1);
+    CPU.r.hl = addLower(CPU.r.hl, toByte(-1));
+    CPU.checkZFlag(lower(this.r.hl));
     CPU.r.f.n = 1;
   },
 
@@ -565,7 +537,7 @@ export const OpcodeMap: OpcodeList = {
 
   0x34: function (): void {
     // convert operand to unsigned
-    let operand: byte = toByte(1);
+    let operand: byte = 1;
     const newVal: byte = toByte(Memory.readByte(CPU.r.hl));
     // check for half carry on affected byte only
     CPU.checkHalfCarry(newVal, operand);
@@ -578,14 +550,12 @@ export const OpcodeMap: OpcodeList = {
 
   0x35: function (): void {
     // convert operand to unsigned
-    let operand: byte = toByte(-1);
-    const newVal: byte = toByte(Memory.readByte(CPU.r.hl));
+    let newVal: byte = toByte(Memory.readByte(CPU.r.hl));
     // check for half carry on affected byte only
-    CPU.checkHalfCarry(newVal, operand);
-    operand = addByte(operand, newVal);
-    Memory.writeByte(CPU.r.hl, operand);
-
-    CPU.checkZFlag(operand);
+    CPU.checkHalfCarry(newVal, 1, -1);
+    newVal = addByte(newVal, toByte(-1));
+    Memory.writeByte(CPU.r.hl, newVal);
+    CPU.checkZFlag(newVal);
     CPU.r.f.n = 1;
   },
 
@@ -626,7 +596,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0x3c: function (): void {
-    let operand: byte = toByte(1);
+    let operand: byte = 1;
     CPU.checkHalfCarry(upper(CPU.r.af), operand);
     operand = addByte(operand, upper(CPU.r.af));
     CPU.r.af = setUpper(CPU.r.af, operand);
@@ -635,11 +605,9 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0x3d: function (): void {
-    let operand: byte = toByte(-1);
-    CPU.checkHalfCarry(upper(CPU.r.af), operand);
-    operand = addByte(operand, upper(CPU.r.af));
-    CPU.r.af = setUpper(CPU.r.af, operand);
-    CPU.checkZFlag(operand);
+    CPU.checkHalfCarry(upper(CPU.r.af), 1, -1);
+    CPU.r.af = addUpper(CPU.r.af, toByte(-1));
+    CPU.checkZFlag(upper(this.r.af));
     CPU.r.f.n = 1;
   },
 
@@ -915,271 +883,271 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0x80: function (): void {
-    ADD.call(upper(CPU.r.bc));
+    ADD(upper(CPU.r.bc));
   },
 
   0x81: function (): void {
-    ADD.call(lower(CPU.r.bc));
+    ADD(lower(CPU.r.bc));
   },
 
   0x82: function (): void {
-    ADD.call(upper(CPU.r.de));
+    ADD(upper(CPU.r.de));
   },
 
   0x83: function (): void {
-    ADD.call(lower(CPU.r.de));
+    ADD(lower(CPU.r.de));
   },
 
   0x84: function (): void {
-    ADD.call(upper(CPU.r.hl));
+    ADD(upper(CPU.r.hl));
   },
 
   0x85: function (): void {
-    ADD.call(lower(CPU.r.hl));
+    ADD(lower(CPU.r.hl));
   },
 
   0x86: function (): void {
-    ADD.call(toByte(Memory.readByte(CPU.r.hl)));
+    ADD(toByte(Memory.readByte(CPU.r.hl)));
   },
 
   0x87: function (): void {
-    ADD.call(upper(CPU.r.af));
+    ADD(upper(CPU.r.af));
   },
 
   0x88: function (): void {
-    ADC.call(upper(CPU.r.bc));
+    ADC(upper(CPU.r.bc));
   },
 
   0x89: function (): void {
-    ADC.call(lower(CPU.r.bc));
+    ADC(lower(CPU.r.bc));
   },
 
   0x8a: function (): void {
-    ADC.call(upper(CPU.r.de));
+    ADC(upper(CPU.r.de));
   },
 
   0x8b: function (): void {
-    ADC.call(lower(CPU.r.de));
+    ADC(lower(CPU.r.de));
   },
 
   0x8c: function (): void {
-    ADC.call(upper(CPU.r.hl));
+    ADC(upper(CPU.r.hl));
   },
 
   0x8d: function (): void {
-    ADC.call(lower(CPU.r.hl));
+    ADC(lower(CPU.r.hl));
   },
 
   0x8e: function (): void {
-    ADC.call(toByte(Memory.readByte(CPU.r.hl)));
+    ADC(toByte(Memory.readByte(CPU.r.hl)));
   },
 
   0x8f: function (): void {
-    ADC.call(upper(CPU.r.af));
+    ADC(upper(CPU.r.af));
   },
 
   0x90: function (): void {
-    SUB.call(upper(CPU.r.bc));
+    SUB(upper(CPU.r.bc));
   },
 
   0x91: function (): void {
-    SUB.call(lower(CPU.r.bc));
+    SUB(lower(CPU.r.bc));
   },
 
   0x92: function (): void {
-    SUB.call(upper(CPU.r.de));
+    SUB(upper(CPU.r.de));
   },
 
   0x93: function (): void {
-    SUB.call(lower(CPU.r.de));
+    SUB(lower(CPU.r.de));
   },
 
   0x94: function (): void {
-    SUB.call(upper(CPU.r.hl));
+    SUB(upper(CPU.r.hl));
   },
 
   0x95: function (): void {
-    SUB.call(lower(CPU.r.hl));
+    SUB(lower(CPU.r.hl));
   },
 
   0x96: function (): void {
-    SUB.call(toByte(Memory.readByte(CPU.r.hl)));
+    SUB(toByte(Memory.readByte(CPU.r.hl)));
   },
 
   0x97: function (): void {
-    SUB.call(upper(CPU.r.af));
+    SUB(upper(CPU.r.af));
   },
 
   0x98: function (): void {
-    SBC.call(upper(CPU.r.bc));
+    SBC(upper(CPU.r.bc));
   },
 
   0x99: function (): void {
-    SBC.call(lower(CPU.r.bc));
+    SBC(lower(CPU.r.bc));
   },
 
   0x9a: function (): void {
-    SBC.call(upper(CPU.r.de));
+    SBC(upper(CPU.r.de));
   },
 
   0x9b: function (): void {
-    SBC.call(lower(CPU.r.de));
+    SBC(lower(CPU.r.de));
   },
 
   0x9c: function (): void {
-    SBC.call(upper(CPU.r.hl));
+    SBC(upper(CPU.r.hl));
   },
 
   0x9d: function (): void {
-    SBC.call(lower(CPU.r.hl));
+    SBC(lower(CPU.r.hl));
   },
 
   0x9e: function (): void {
-    SBC.call(toByte(Memory.readByte(CPU.r.hl)));
+    SBC(toByte(Memory.readByte(CPU.r.hl)));
   },
 
   0x9f: function (): void {
-    SBC.call(upper(CPU.r.af));
+    SBC(upper(CPU.r.af));
   },
 
   0xa0: function (): void {
-    AND.call(upper(CPU.r.bc));
+    AND(upper(CPU.r.bc));
   },
 
   0xa1: function (): void {
-    AND.call(lower(CPU.r.bc));
+    AND(lower(CPU.r.bc));
   },
 
   0xa2: function (): void {
-    AND.call(upper(CPU.r.de));
+    AND(upper(CPU.r.de));
   },
 
   0xa3: function (): void {
-    AND.call(lower(CPU.r.de));
+    AND(lower(CPU.r.de));
   },
 
   0xa4: function (): void {
-    AND.call(upper(CPU.r.hl));
+    AND(upper(CPU.r.hl));
   },
 
   0xa5: function (): void {
-    AND.call(lower(CPU.r.hl));
+    AND(lower(CPU.r.hl));
   },
 
   0xa6: function (): void {
-    AND.call(Memory.readByte(CPU.r.hl));
+    AND(Memory.readByte(CPU.r.hl));
   },
 
   0xa7: function (): void {
-    AND.call(upper(CPU.r.af));
+    AND(upper(CPU.r.af));
   },
 
   0xa8: function (): void {
-    XOR.call(upper(CPU.r.bc));
+    XOR(upper(CPU.r.bc));
   },
 
   0xa9: function (): void {
-    XOR.call(lower(CPU.r.bc));
+    XOR(lower(CPU.r.bc));
   },
 
   0xaa: function (): void {
-    XOR.call(upper(CPU.r.de));
+    XOR(upper(CPU.r.de));
   },
 
   0xab: function (): void {
-    XOR.call(lower(CPU.r.de));
+    XOR(lower(CPU.r.de));
   },
 
   0xac: function (): void {
-    XOR.call(upper(CPU.r.hl));
+    XOR(upper(CPU.r.hl));
   },
 
   0xad: function (): void {
-    XOR.call(lower(CPU.r.hl));
+    XOR(lower(CPU.r.hl));
   },
 
   0xae: function (): void {
-    XOR.call(Memory.readByte(CPU.r.hl));
+    XOR(Memory.readByte(CPU.r.hl));
   },
 
   0xaf: function (): void {
-    XOR.call(upper(CPU.r.af));
+    XOR(upper(CPU.r.af));
   },
 
   0xb0: function (): void {
-    OR.call(upper(CPU.r.bc));
+    OR(upper(CPU.r.bc));
   },
 
   0xb1: function (): void {
-    OR.call(lower(CPU.r.bc));
+    OR(lower(CPU.r.bc));
   },
 
   0xb2: function (): void {
-    OR.call(upper(CPU.r.de));
+    OR(upper(CPU.r.de));
   },
 
   0xb3: function (): void {
-    OR.call(lower(CPU.r.de));
+    OR(lower(CPU.r.de));
   },
 
   0xb4: function (): void {
-    OR.call(upper(CPU.r.hl));
+    OR(upper(CPU.r.hl));
   },
 
   0xb5: function (): void {
-    OR.call(lower(CPU.r.hl));
+    OR(lower(CPU.r.hl));
   },
 
   0xb6: function (): void {
-    OR.call(Memory.readByte(CPU.r.hl));
+    OR(Memory.readByte(CPU.r.hl));
   },
 
   0xb7: function (): void {
-    OR.call(upper(CPU.r.af));
+    OR(upper(CPU.r.af));
   },
 
   0xb8: function (): void {
-    CP.call(upper(CPU.r.bc));
+    CP(upper(CPU.r.bc));
   },
 
   0xb9: function (): void {
-    CP.call(lower(CPU.r.bc));
+    CP(lower(CPU.r.bc));
   },
 
   0xba: function (): void {
-    CP.call(upper(CPU.r.de));
+    CP(upper(CPU.r.de));
   },
 
   0xbb: function (): void {
-    CP.call(lower(CPU.r.de));
+    CP(lower(CPU.r.de));
   },
 
   0xbc: function (): void {
-    CP.call(upper(CPU.r.hl));
+    CP(upper(CPU.r.hl));
   },
 
   0xbd: function (): void {
-    CP.call(lower(CPU.r.hl));
+    CP(lower(CPU.r.hl));
   },
 
   0xbe: function (): void {
-    CP.call(toByte(Memory.readByte(CPU.r.hl)));
+    CP(toByte(Memory.readByte(CPU.r.hl)));
   },
 
   0xbf: function (): void {
-    CP.call(upper(CPU.r.af));
+    CP(upper(CPU.r.af));
   },
 
   0xc0: function (): boolean {
-    return RET.call(!CPU.r.f.z);
+    return RET(!CPU.r.f.z);
   },
 
   0xc1: function (): void {
-    POP.call(CPU.r.bc);
+    CPU.r.bc = POP(CPU.r.bc);
   },
 
   0xc2: function (): boolean {
-    if (Jpcc.call(!CPU.r.f.z)) {
+    if (Jpcc(!CPU.r.f.z)) {
       return true;
     }
     CPU.pc += 2;
@@ -1191,7 +1159,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xc4: function (): boolean {
-    if (CALL.call(!CPU.r.f.z)) {
+    if (CALL(!CPU.r.f.z)) {
       return true;
     }
     CPU.pc += 2;
@@ -1199,7 +1167,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xc5: function (): void {
-    PUSH.call(CPU.r.bc);
+    PUSH(CPU.r.bc);
   },
 
   0xc6: function (): void {
@@ -1213,7 +1181,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xc7: function (): void {
-    RST.call(0x00);
+    RST(0x00);
   },
 
   0xc8: function (): boolean {
@@ -1227,11 +1195,11 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xc9: function (): void {
-    RET.call(true);
+    RET(true);
   },
 
   0xca: function (): boolean {
-    if (Jpcc.call(CPU.r.f.z)) {
+    if (Jpcc(CPU.r.f.z === 0)) {
       return true;
     }
     CPU.pc += 2;
@@ -1241,12 +1209,12 @@ export const OpcodeMap: OpcodeList = {
   0xcb: function (): void {
     const opcode: byte = Memory.readByte(CPU.pc);
     console.log(opcode);
-    cbMap[opcode].call(CPU);
+    cbMap[opcode](CPU);
     CPU.pc += 1;
   },
 
   0xcc: function (): boolean {
-    if (CALL.call(CPU.r.f.z)) {
+    if (CALL(CPU.r.f.z === 1)) {
       return true;
     }
     CPU.pc += 2;
@@ -1254,28 +1222,28 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xcd: function (): void {
-    CALL.call(true);
+    CALL(true);
   },
 
   0xce: function (): void {
-    ADC.call(toByte(Memory.readByte(CPU.pc)));
+    ADC(toByte(Memory.readByte(CPU.pc)));
     CPU.pc += 1;
   },
 
   0xcf: function (): void {
-    RST.call(0x08);
+    RST(0x08);
   },
 
   0xd0: function (): boolean {
-    return RET.call(!CPU.r.f.cy);
+    return RET(!CPU.r.f.cy);
   },
 
   0xd1: function (): void {
-    POP.call(CPU.r.de);
+    CPU.r.de = POP(CPU.r.de);
   },
 
   0xd2: function (): boolean {
-    if (Jpcc.call(CPU.r.f.z)) {
+    if (Jpcc(CPU.r.f.z === 0)) {
       return true;
     }
     CPU.pc += 2;
@@ -1287,7 +1255,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xd4: function (): boolean {
-    if (CALL.call(!CPU.r.f.cy)) {
+    if (CALL(!CPU.r.f.cy)) {
       return true;
     }
     CPU.pc += 2;
@@ -1295,29 +1263,29 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xd5: function (): void {
-    PUSH.call(CPU.r.de);
+    PUSH(CPU.r.de);
   },
 
   0xd6: function (): void {
-    SUB.call(toByte(Memory.readByte(CPU.pc)));
+    SUB(toByte(Memory.readByte(CPU.pc)));
     CPU.pc += 1;
   },
 
   0xd7: function (): void {
-    RST.call(0x10);
+    RST(0x10);
   },
 
-  0xd8: function (): void {
-    return RET.call(CPU.r.f.cy);
+  0xd8: function (): boolean {
+    return RET(CPU.r.f.cy === 1);
   },
 
   0xd9: function (): void {
-    RET.call(true);
+    RET(true);
     CPU.setInterruptsEnabled(true);
   },
 
   0xda: function (): boolean {
-    if (Jpcc.call(CPU.r.f.cy)) {
+    if (Jpcc(CPU.r.f.cy === 0)) {
       return true;
     }
     CPU.pc += 2;
@@ -1329,7 +1297,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xdc: function (): boolean {
-    if (CALL.call(CPU.r.f.cy)) {
+    if (CALL(CPU.r.f.cy === 1)) {
       return true;
     }
     CPU.pc += 2;
@@ -1341,12 +1309,12 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xde: function (): void {
-    SBC.call(toByte(Memory.readByte(CPU.pc)));
+    SBC(toByte(Memory.readByte(CPU.pc)));
     CPU.pc += 1;
   },
 
   0xdf: function (): void {
-    RST.call(0x18);
+    RST(0x18);
   },
 
   0xe0: function (): void {
@@ -1355,7 +1323,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xe1: function (): void {
-    POP.call(CPU.r.hl);
+    CPU.r.hl = POP(CPU.r.hl);
   },
 
   0xe2: function (): void {
@@ -1371,16 +1339,16 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xe5: function (): void {
-    PUSH.call(CPU.r.hl);
+    PUSH(CPU.r.hl);
   },
 
   0xe6: function (): void {
-    AND.call(Memory.readByte(CPU.pc));
+    AND(Memory.readByte(CPU.pc));
     CPU.pc += 1;
   },
 
   0xe7: function (): void {
-    RST.call(0x20);
+    RST(0x20);
   },
 
   0xe8: function (): void {
@@ -1415,12 +1383,12 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xee: function (): void {
-    XOR.call(toByte(Memory.readByte(CPU.pc)));
+    XOR(toByte(Memory.readByte(CPU.pc)));
     CPU.pc += 1;
   },
 
   0xef: function (): void {
-    RST.call(0x28);
+    RST(0x28);
   },
 
   0xf0: function (): void {
@@ -1430,7 +1398,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xf1: function (): void {
-    POP.call(CPU.r.af);
+    CPU.r.af = POP(CPU.r.af);
   },
 
   0xf2: function (): void {
@@ -1447,16 +1415,16 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xf5: function (): void {
-    PUSH.call(CPU.r.af);
+    PUSH(CPU.r.af);
   },
 
   0xf6: function (): void {
-    OR.call(Memory.readByte(CPU.pc));
+    OR(Memory.readByte(CPU.pc));
     CPU.pc += 1;
   },
 
   0xf7: function (): void {
-    RST.call(0x30);
+    RST(0x30);
   },
 
   0xf8: function (): void {
@@ -1492,12 +1460,13 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xfe: function (): void {
-    CP.call(toByte(Memory.readByte(CPU.pc)));
+    debugger;
+    CP(Memory.readByte(CPU.pc));
     CPU.pc += 1;
   },
 
   0xff: function (): void {
-    RST.call(0x38);
+    RST(0x38);
   },
 };
 
@@ -1625,532 +1594,532 @@ function SWAP(reg: byte) {
 
 const cbMap: OpcodeList = {
   0x00: function (): void {
-    CPU.r.bc = setUpper(CPU.r.bc, RLCn.call(upper(CPU.r.bc)));
+    CPU.r.bc = setUpper(CPU.r.bc, RLCn(upper(CPU.r.bc)));
   },
   0x01: function (): void {
-    CPU.r.bc = setLower(CPU.r.bc, RLCn.call(lower(CPU.r.bc)));
+    CPU.r.bc = setLower(CPU.r.bc, RLCn(lower(CPU.r.bc)));
   },
   0x02: function (): void {
-    CPU.r.de = setUpper(CPU.r.de, RLCn.call(upper(CPU.r.de)));
+    CPU.r.de = setUpper(CPU.r.de, RLCn(upper(CPU.r.de)));
   },
   0x03: function (): void {
-    CPU.r.de = setLower(CPU.r.de, RLCn.call(lower(CPU.r.de)));
+    CPU.r.de = setLower(CPU.r.de, RLCn(lower(CPU.r.de)));
   },
   0x04: function (): void {
-    CPU.r.hl = setUpper(CPU.r.hl, RLCn.call(upper(CPU.r.hl)));
+    CPU.r.hl = setUpper(CPU.r.hl, RLCn(upper(CPU.r.hl)));
   },
   0x05: function (): void {
-    CPU.r.hl = setLower(CPU.r.hl, RLCn.call(lower(CPU.r.hl)));
+    CPU.r.hl = setLower(CPU.r.hl, RLCn(lower(CPU.r.hl)));
   },
   0x06: function (): void {
-    Memory.writeByte(CPU.r.hl, RLCn.call(Memory.readByte(CPU.r.hl)));
+    Memory.writeByte(CPU.r.hl, RLCn(Memory.readByte(CPU.r.hl)));
   },
   0x07: function (): void {
-    CPU.r.af = setUpper(CPU.r.af, RLCn.call(upper(CPU.r.af)));
+    CPU.r.af = setUpper(CPU.r.af, RLCn(upper(CPU.r.af)));
   },
   0x08: function (): void {
-    CPU.r.bc = setUpper(CPU.r.bc, RRCn.call(upper(CPU.r.bc)));
+    CPU.r.bc = setUpper(CPU.r.bc, RRCn(upper(CPU.r.bc)));
   },
   0x09: function (): void {
-    CPU.r.bc = setLower(CPU.r.bc, RRCn.call(lower(CPU.r.bc)));
+    CPU.r.bc = setLower(CPU.r.bc, RRCn(lower(CPU.r.bc)));
   },
   0x0a: function (): void {
-    CPU.r.de = setUpper(CPU.r.de, RRCn.call(upper(CPU.r.de)));
+    CPU.r.de = setUpper(CPU.r.de, RRCn(upper(CPU.r.de)));
   },
   0x0b: function (): void {
-    CPU.r.de = setLower(CPU.r.de, RRCn.call(lower(CPU.r.de)));
+    CPU.r.de = setLower(CPU.r.de, RRCn(lower(CPU.r.de)));
   },
   0x0c: function (): void {
-    CPU.r.hl = setUpper(CPU.r.hl, RRCn.call(upper(CPU.r.hl)));
+    CPU.r.hl = setUpper(CPU.r.hl, RRCn(upper(CPU.r.hl)));
   },
   0x0d: function (): void {
-    CPU.r.hl = setLower(CPU.r.hl, RRCn.call(lower(CPU.r.hl)));
+    CPU.r.hl = setLower(CPU.r.hl, RRCn(lower(CPU.r.hl)));
   },
   0x0e: function (): void {
-    Memory.writeByte(CPU.r.hl, RRCn.call(Memory.readByte(CPU.r.hl)));
+    Memory.writeByte(CPU.r.hl, RRCn(Memory.readByte(CPU.r.hl)));
   },
   0x0f: function (): void {
-    CPU.r.af = setUpper(CPU.r.af, RRCn.call(upper(CPU.r.af)));
+    CPU.r.af = setUpper(CPU.r.af, RRCn(upper(CPU.r.af)));
   },
   0x10: function (): void {
-    CPU.r.bc = setUpper(CPU.r.bc, RLn.call(upper(CPU.r.bc)));
+    CPU.r.bc = setUpper(CPU.r.bc, RLn(upper(CPU.r.bc)));
   },
   0x11: function (): void {
-    CPU.r.bc = setLower(CPU.r.bc, RLn.call(lower(CPU.r.bc)));
+    CPU.r.bc = setLower(CPU.r.bc, RLn(lower(CPU.r.bc)));
   },
   0x12: function (): void {
-    CPU.r.de = setUpper(CPU.r.de, RLn.call(upper(CPU.r.de)));
+    CPU.r.de = setUpper(CPU.r.de, RLn(upper(CPU.r.de)));
   },
   0x13: function (): void {
-    CPU.r.de = setLower(CPU.r.de, RLn.call(lower(CPU.r.de)));
+    CPU.r.de = setLower(CPU.r.de, RLn(lower(CPU.r.de)));
   },
   0x14: function (): void {
-    CPU.r.hl = setUpper(CPU.r.hl, RLn.call(upper(CPU.r.hl)));
+    CPU.r.hl = setUpper(CPU.r.hl, RLn(upper(CPU.r.hl)));
   },
   0x15: function (): void {
-    CPU.r.hl = setLower(CPU.r.hl, RLn.call(lower(CPU.r.hl)));
+    CPU.r.hl = setLower(CPU.r.hl, RLn(lower(CPU.r.hl)));
   },
   0x16: function (): void {
-    Memory.writeByte(CPU.r.hl, RLn.call(Memory.readByte(CPU.r.hl)));
+    Memory.writeByte(CPU.r.hl, RLn(Memory.readByte(CPU.r.hl)));
   },
   0x17: function (): void {
-    CPU.r.af = setUpper(CPU.r.af, RLn.call(upper(CPU.r.af)));
+    CPU.r.af = setUpper(CPU.r.af, RLn(upper(CPU.r.af)));
   },
   0x18: function (): void {
-    CPU.r.bc = setUpper(CPU.r.bc, RLn.call(upper(CPU.r.bc)));
+    CPU.r.bc = setUpper(CPU.r.bc, RLn(upper(CPU.r.bc)));
   },
   0x19: function (): void {
-    CPU.r.bc = setLower(CPU.r.bc, RRn.call(lower(CPU.r.bc)));
+    CPU.r.bc = setLower(CPU.r.bc, RRn(lower(CPU.r.bc)));
   },
   0x1a: function (): void {
-    CPU.r.de = setUpper(CPU.r.de, RRn.call(upper(CPU.r.de)));
+    CPU.r.de = setUpper(CPU.r.de, RRn(upper(CPU.r.de)));
   },
   0x1b: function (): void {
-    CPU.r.de = setLower(CPU.r.de, RRn.call(lower(CPU.r.de)));
+    CPU.r.de = setLower(CPU.r.de, RRn(lower(CPU.r.de)));
   },
   0x1c: function (): void {
-    CPU.r.hl = setUpper(CPU.r.hl, RRn.call(upper(CPU.r.hl)));
+    CPU.r.hl = setUpper(CPU.r.hl, RRn(upper(CPU.r.hl)));
   },
   0x1d: function (): void {
-    CPU.r.hl = setLower(CPU.r.hl, RRn.call(lower(CPU.r.hl)));
+    CPU.r.hl = setLower(CPU.r.hl, RRn(lower(CPU.r.hl)));
   },
   0x1e: function (): void {
-    Memory.writeByte(CPU.r.hl, RRn.call(Memory.readByte(CPU.r.hl)));
+    Memory.writeByte(CPU.r.hl, RRn(Memory.readByte(CPU.r.hl)));
   },
   0x1f: function (): void {
-    CPU.r.af = setUpper(CPU.r.af, RRn.call(upper(CPU.r.af)));
+    CPU.r.af = setUpper(CPU.r.af, RRn(upper(CPU.r.af)));
   },
   0x20: function (): void {
-    CPU.r.bc = setUpper(CPU.r.bc, SLAn.call(upper(CPU.r.bc)));
+    CPU.r.bc = setUpper(CPU.r.bc, SLAn(upper(CPU.r.bc)));
   },
   0x21: function (): void {
-    CPU.r.bc = setLower(CPU.r.bc, SLAn.call(lower(CPU.r.bc)));
+    CPU.r.bc = setLower(CPU.r.bc, SLAn(lower(CPU.r.bc)));
   },
   0x22: function (): void {
-    CPU.r.de = setUpper(CPU.r.de, SLAn.call(upper(CPU.r.de)));
+    CPU.r.de = setUpper(CPU.r.de, SLAn(upper(CPU.r.de)));
   },
   0x23: function (): void {
-    CPU.r.de = setLower(CPU.r.de, SLAn.call(lower(CPU.r.de)));
+    CPU.r.de = setLower(CPU.r.de, SLAn(lower(CPU.r.de)));
   },
   0x24: function (): void {
-    CPU.r.hl = setUpper(CPU.r.hl, SLAn.call(upper(CPU.r.hl)));
+    CPU.r.hl = setUpper(CPU.r.hl, SLAn(upper(CPU.r.hl)));
   },
   0x25: function (): void {
-    CPU.r.hl = setLower(CPU.r.hl, SLAn.call(lower(CPU.r.hl)));
+    CPU.r.hl = setLower(CPU.r.hl, SLAn(lower(CPU.r.hl)));
   },
   0x26: function (): void {
-    Memory.writeByte(CPU.r.hl, SLAn.call(Memory.readByte(CPU.r.hl)));
+    Memory.writeByte(CPU.r.hl, SLAn(Memory.readByte(CPU.r.hl)));
   },
   0x27: function (): void {
-    CPU.r.af = setUpper(CPU.r.af, SLAn.call(upper(CPU.r.af)));
+    CPU.r.af = setUpper(CPU.r.af, SLAn(upper(CPU.r.af)));
   },
   0x28: function (): void {
-    CPU.r.bc = setUpper(CPU.r.bc, SRAn.call(upper(CPU.r.bc)));
+    CPU.r.bc = setUpper(CPU.r.bc, SRAn(upper(CPU.r.bc)));
   },
   0x29: function (): void {
-    CPU.r.bc = setLower(CPU.r.bc, SRAn.call(lower(CPU.r.bc)));
+    CPU.r.bc = setLower(CPU.r.bc, SRAn(lower(CPU.r.bc)));
   },
   0x2a: function (): void {
-    CPU.r.de = setUpper(CPU.r.de, SRAn.call(upper(CPU.r.de)));
+    CPU.r.de = setUpper(CPU.r.de, SRAn(upper(CPU.r.de)));
   },
   0x2b: function (): void {
-    CPU.r.de = setLower(CPU.r.de, SRAn.call(lower(CPU.r.de)));
+    CPU.r.de = setLower(CPU.r.de, SRAn(lower(CPU.r.de)));
   },
   0x2c: function (): void {
-    CPU.r.hl = setUpper(CPU.r.hl, SRAn.call(upper(CPU.r.hl)));
+    CPU.r.hl = setUpper(CPU.r.hl, SRAn(upper(CPU.r.hl)));
   },
   0x2d: function (): void {
-    CPU.r.hl = setLower(CPU.r.hl, SRAn.call(lower(CPU.r.hl)));
+    CPU.r.hl = setLower(CPU.r.hl, SRAn(lower(CPU.r.hl)));
   },
   0x2e: function (): void {
-    Memory.writeByte(CPU.r.hl, SRAn.call(Memory.readByte(CPU.r.hl)));
+    Memory.writeByte(CPU.r.hl, SRAn(Memory.readByte(CPU.r.hl)));
   },
   0x2f: function (): void {
-    CPU.r.af = setUpper(CPU.r.af, SRAn.call(upper(CPU.r.af)));
+    CPU.r.af = setUpper(CPU.r.af, SRAn(upper(CPU.r.af)));
   },
   0x30: function (): void {
-    CPU.r.bc = setUpper(CPU.r.bc, SWAP.call(upper(CPU.r.bc)));
+    CPU.r.bc = setUpper(CPU.r.bc, SWAP(upper(CPU.r.bc)));
   },
   0x31: function (): void {
-    CPU.r.bc = setLower(CPU.r.bc, SWAP.call(lower(CPU.r.bc)));
+    CPU.r.bc = setLower(CPU.r.bc, SWAP(lower(CPU.r.bc)));
   },
   0x32: function (): void {
-    CPU.r.de = setUpper(CPU.r.de, SWAP.call(upper(CPU.r.de)));
+    CPU.r.de = setUpper(CPU.r.de, SWAP(upper(CPU.r.de)));
   },
   0x33: function (): void {
-    CPU.r.de = setLower(CPU.r.de, SWAP.call(lower(CPU.r.de)));
+    CPU.r.de = setLower(CPU.r.de, SWAP(lower(CPU.r.de)));
   },
   0x34: function (): void {
-    CPU.r.hl = setUpper(CPU.r.hl, SWAP.call(upper(CPU.r.hl)));
+    CPU.r.hl = setUpper(CPU.r.hl, SWAP(upper(CPU.r.hl)));
   },
   0x35: function (): void {
-    CPU.r.hl = setLower(CPU.r.hl, SWAP.call(lower(CPU.r.hl)));
+    CPU.r.hl = setLower(CPU.r.hl, SWAP(lower(CPU.r.hl)));
   },
   0x36: function (): void {
-    Memory.writeByte(CPU.r.hl, SWAP.call(Memory.readByte(CPU.r.hl)));
+    Memory.writeByte(CPU.r.hl, SWAP(Memory.readByte(CPU.r.hl)));
   },
   0x37: function (): void {
-    CPU.r.af = setUpper(CPU.r.af, SWAP.call(upper(CPU.r.af)));
+    CPU.r.af = setUpper(CPU.r.af, SWAP(upper(CPU.r.af)));
   },
   0x38: function (): void {
-    CPU.r.bc = setUpper(CPU.r.bc, SRLn.call(upper(CPU.r.bc)));
+    CPU.r.bc = setUpper(CPU.r.bc, SRLn(upper(CPU.r.bc)));
   },
   0x39: function (): void {
-    CPU.r.bc = setLower(CPU.r.bc, SRLn.call(lower(CPU.r.bc)));
+    CPU.r.bc = setLower(CPU.r.bc, SRLn(lower(CPU.r.bc)));
   },
   0x3a: function (): void {
-    CPU.r.de = setUpper(CPU.r.de, SRLn.call(upper(CPU.r.de)));
+    CPU.r.de = setUpper(CPU.r.de, SRLn(upper(CPU.r.de)));
   },
   0x3b: function (): void {
-    CPU.r.de = setLower(CPU.r.de, SRLn.call(lower(CPU.r.de)));
+    CPU.r.de = setLower(CPU.r.de, SRLn(lower(CPU.r.de)));
   },
   0x3c: function (): void {
-    CPU.r.hl = setUpper(CPU.r.hl, SRLn.call(upper(CPU.r.hl)));
+    CPU.r.hl = setUpper(CPU.r.hl, SRLn(upper(CPU.r.hl)));
   },
   0x3d: function (): void {
-    CPU.r.hl = setLower(CPU.r.hl, SRLn.call(lower(CPU.r.hl)));
+    CPU.r.hl = setLower(CPU.r.hl, SRLn(lower(CPU.r.hl)));
   },
   0x3e: function (): void {
-    Memory.writeByte(CPU.r.hl, SRLn.call(Memory.readByte(CPU.r.hl)));
+    Memory.writeByte(CPU.r.hl, SRLn(Memory.readByte(CPU.r.hl)));
   },
   0x3f: function (): void {
-    CPU.r.af = setUpper(CPU.r.af, SRLn.call(upper(CPU.r.af)));
+    CPU.r.af = setUpper(CPU.r.af, SRLn(upper(CPU.r.af)));
   },
   0x40: function (): void {
-    BIT.call(0, upper(CPU.r.bc));
+    BIT(0, upper(CPU.r.bc));
   },
   0x41: function (): void {
-    BIT.call(0, lower(CPU.r.bc));
+    BIT(0, lower(CPU.r.bc));
   },
   0x42: function (): void {
-    BIT.call(0, upper(CPU.r.de));
+    BIT(0, upper(CPU.r.de));
   },
   0x43: function (): void {
-    BIT.call(0, lower(CPU.r.de));
+    BIT(0, lower(CPU.r.de));
   },
   0x44: function (): void {
-    BIT.call(0, upper(CPU.r.hl));
+    BIT(0, upper(CPU.r.hl));
   },
   0x45: function (): void {
-    BIT.call(0, lower(CPU.r.hl));
+    BIT(0, lower(CPU.r.hl));
   },
   0x46: function (): void {
-    BIT.call(0, Memory.readByte(CPU.r.hl));
+    BIT(0, Memory.readByte(CPU.r.hl));
   },
   0x47: function (): void {
-    BIT.call(0, upper(CPU.r.af));
+    BIT(0, upper(CPU.r.af));
   },
   0x48: function (): void {
-    BIT.call(1, upper(CPU.r.bc));
+    BIT(1, upper(CPU.r.bc));
   },
   0x49: function (): void {
-    BIT.call(1, lower(CPU.r.bc));
+    BIT(1, lower(CPU.r.bc));
   },
   0x4a: function (): void {
-    BIT.call(1, upper(CPU.r.de));
+    BIT(1, upper(CPU.r.de));
   },
   0x4b: function (): void {
-    BIT.call(1, lower(CPU.r.de));
+    BIT(1, lower(CPU.r.de));
   },
   0x4c: function (): void {
-    BIT.call(1, upper(CPU.r.hl));
+    BIT(1, upper(CPU.r.hl));
   },
   0x4d: function (): void {
-    BIT.call(1, lower(CPU.r.hl));
+    BIT(1, lower(CPU.r.hl));
   },
   0x4e: function (): void {
-    BIT.call(1, Memory.readByte(CPU.r.hl));
+    BIT(1, Memory.readByte(CPU.r.hl));
   },
   0x4f: function (): void {
-    BIT.call(1, upper(CPU.r.af));
+    BIT(1, upper(CPU.r.af));
   },
   0x50: function (): void {
-    BIT.call(2, upper(CPU.r.bc));
+    BIT(2, upper(CPU.r.bc));
   },
   0x51: function (): void {
-    BIT.call(2, lower(CPU.r.bc));
+    BIT(2, lower(CPU.r.bc));
   },
   0x52: function (): void {
-    BIT.call(2, upper(CPU.r.de));
+    BIT(2, upper(CPU.r.de));
   },
   0x53: function (): void {
-    BIT.call(2, lower(CPU.r.de));
+    BIT(2, lower(CPU.r.de));
   },
   0x54: function (): void {
-    BIT.call(2, upper(CPU.r.hl));
+    BIT(2, upper(CPU.r.hl));
   },
   0x55: function (): void {
-    BIT.call(2, lower(CPU.r.hl));
+    BIT(2, lower(CPU.r.hl));
   },
   0x56: function (): void {
-    BIT.call(2, Memory.readByte(CPU.r.hl));
+    BIT(2, Memory.readByte(CPU.r.hl));
   },
   0x57: function (): void {
-    BIT.call(2, upper(CPU.r.af));
+    BIT(2, upper(CPU.r.af));
   },
   0x58: function (): void {
-    BIT.call(3, upper(CPU.r.bc));
+    BIT(3, upper(CPU.r.bc));
   },
   0x59: function (): void {
-    BIT.call(3, lower(CPU.r.bc));
+    BIT(3, lower(CPU.r.bc));
   },
   0x5a: function (): void {
-    BIT.call(3, upper(CPU.r.de));
+    BIT(3, upper(CPU.r.de));
   },
   0x5b: function (): void {
-    BIT.call(3, lower(CPU.r.de));
+    BIT(3, lower(CPU.r.de));
   },
   0x5c: function (): void {
-    BIT.call(3, upper(CPU.r.hl));
+    BIT(3, upper(CPU.r.hl));
   },
   0x5d: function (): void {
-    BIT.call(3, lower(CPU.r.hl));
+    BIT(3, lower(CPU.r.hl));
   },
   0x5e: function (): void {
-    BIT.call(3, Memory.readByte(CPU.r.hl));
+    BIT(3, Memory.readByte(CPU.r.hl));
   },
   0x5f: function (): void {
-    BIT.call(3, upper(CPU.r.af));
+    BIT(3, upper(CPU.r.af));
   },
   0x60: function (): void {
-    BIT.call(4, upper(CPU.r.bc));
+    BIT(4, upper(CPU.r.bc));
   },
   0x61: function (): void {
-    BIT.call(4, lower(CPU.r.bc));
+    BIT(4, lower(CPU.r.bc));
   },
   0x62: function (): void {
-    BIT.call(4, upper(CPU.r.de));
+    BIT(4, upper(CPU.r.de));
   },
   0x63: function (): void {
-    BIT.call(4, lower(CPU.r.de));
+    BIT(4, lower(CPU.r.de));
   },
   0x64: function (): void {
-    BIT.call(4, upper(CPU.r.hl));
+    BIT(4, upper(CPU.r.hl));
   },
   0x65: function (): void {
-    BIT.call(4, lower(CPU.r.hl));
+    BIT(4, lower(CPU.r.hl));
   },
   0x66: function (): void {
-    BIT.call(4, Memory.readByte(CPU.r.hl));
+    BIT(4, Memory.readByte(CPU.r.hl));
   },
   0x67: function (): void {
-    BIT.call(4, upper(CPU.r.af));
+    BIT(4, upper(CPU.r.af));
   },
   0x68: function (): void {
-    BIT.call(5, upper(CPU.r.bc));
+    BIT(5, upper(CPU.r.bc));
   },
   0x69: function (): void {
-    BIT.call(5, lower(CPU.r.bc));
+    BIT(5, lower(CPU.r.bc));
   },
   0x6a: function (): void {
-    BIT.call(5, upper(CPU.r.de));
+    BIT(5, upper(CPU.r.de));
   },
   0x6b: function (): void {
-    BIT.call(5, lower(CPU.r.de));
+    BIT(5, lower(CPU.r.de));
   },
   0x6c: function (): void {
-    BIT.call(5, upper(CPU.r.hl));
+    BIT(5, upper(CPU.r.hl));
   },
   0x6d: function (): void {
-    BIT.call(5, lower(CPU.r.hl));
+    BIT(5, lower(CPU.r.hl));
   },
   0x6e: function (): void {
-    BIT.call(5, Memory.readByte(CPU.r.hl));
+    BIT(5, Memory.readByte(CPU.r.hl));
   },
   0x6f: function (): void {
-    BIT.call(5, upper(CPU.r.af));
+    BIT(5, upper(CPU.r.af));
   },
   0x70: function (): void {
-    BIT.call(6, upper(CPU.r.bc));
+    BIT(6, upper(CPU.r.bc));
   },
   0x71: function (): void {
-    BIT.call(6, lower(CPU.r.bc));
+    BIT(6, lower(CPU.r.bc));
   },
   0x72: function (): void {
-    BIT.call(6, upper(CPU.r.de));
+    BIT(6, upper(CPU.r.de));
   },
   0x73: function (): void {
-    BIT.call(6, lower(CPU.r.de));
+    BIT(6, lower(CPU.r.de));
   },
   0x74: function (): void {
-    BIT.call(6, upper(CPU.r.hl));
+    BIT(6, upper(CPU.r.hl));
   },
   0x75: function (): void {
-    BIT.call(6, lower(CPU.r.hl));
+    BIT(6, lower(CPU.r.hl));
   },
   0x76: function (): void {
-    BIT.call(6, Memory.readByte(CPU.r.hl));
+    BIT(6, Memory.readByte(CPU.r.hl));
   },
   0x77: function (): void {
-    BIT.call(6, upper(CPU.r.af));
+    BIT(6, upper(CPU.r.af));
   },
   0x78: function (): void {
-    BIT.call(7, upper(CPU.r.bc));
+    BIT(7, upper(CPU.r.bc));
   },
   0x79: function (): void {
-    BIT.call(7, lower(CPU.r.bc));
+    BIT(7, lower(CPU.r.bc));
   },
   0x7a: function (): void {
-    BIT.call(7, upper(CPU.r.de));
+    BIT(7, upper(CPU.r.de));
   },
   0x7b: function (): void {
-    BIT.call(7, lower(CPU.r.de));
+    BIT(7, lower(CPU.r.de));
   },
   0x7c: function (): void {
-    BIT.call(7, upper(CPU.r.hl));
+    BIT(7, upper(CPU.r.hl));
   },
   0x7d: function (): void {
-    BIT.call(7, lower(CPU.r.hl));
+    BIT(7, lower(CPU.r.hl));
   },
   0x7e: function (): void {
-    BIT.call(7, Memory.readByte(CPU.r.hl));
+    BIT(7, Memory.readByte(CPU.r.hl));
   },
   0x7f: function (): void {
-    BIT.call(7, upper(CPU.r.af));
+    BIT(7, upper(CPU.r.af));
   },
   0x80: function (): void {
-    CPU.r.bc = setUpper(CPU.r.bc, RES0.call(upper(CPU.r.bc)));
+    CPU.r.bc = setUpper(CPU.r.bc, RES0(upper(CPU.r.bc)));
   },
   0x81: function (): void {
-    CPU.r.bc = setLower(CPU.r.bc, RES0.call(lower(CPU.r.bc)));
+    CPU.r.bc = setLower(CPU.r.bc, RES0(lower(CPU.r.bc)));
   },
   0x82: function (): void {
-    CPU.r.de = setUpper(CPU.r.de, RES0.call(upper(CPU.r.de)));
+    CPU.r.de = setUpper(CPU.r.de, RES0(upper(CPU.r.de)));
   },
   0x83: function (): void {
-    CPU.r.de = setLower(CPU.r.de, RES0.call(lower(CPU.r.de)));
+    CPU.r.de = setLower(CPU.r.de, RES0(lower(CPU.r.de)));
   },
   0x84: function (): void {
-    CPU.r.hl = setUpper(CPU.r.hl, RES0.call(upper(CPU.r.hl)));
+    CPU.r.hl = setUpper(CPU.r.hl, RES0(upper(CPU.r.hl)));
   },
   0x85: function (): void {
-    CPU.r.hl = setLower(CPU.r.hl, RES0.call(lower(CPU.r.hl)));
+    CPU.r.hl = setLower(CPU.r.hl, RES0(lower(CPU.r.hl)));
   },
   0x86: function (): void {
-    Memory.writeByte(CPU.r.hl, RES0.call(Memory.readByte(CPU.r.hl)));
+    Memory.writeByte(CPU.r.hl, RES0(Memory.readByte(CPU.r.hl)));
   },
   0x87: function (): void {
-    CPU.r.af = setUpper(CPU.r.af, RES0.call(upper(CPU.r.af)));
+    CPU.r.af = setUpper(CPU.r.af, RES0(upper(CPU.r.af)));
   },
   0x88: function (): void {
-    CPU.r.bc = setUpper(CPU.r.bc, RES1.call(upper(CPU.r.bc)));
+    CPU.r.bc = setUpper(CPU.r.bc, RES1(upper(CPU.r.bc)));
   },
   0x89: function (): void {
-    CPU.r.bc = setLower(CPU.r.bc, RES1.call(lower(CPU.r.bc)));
+    CPU.r.bc = setLower(CPU.r.bc, RES1(lower(CPU.r.bc)));
   },
   0x8a: function (): void {
-    CPU.r.de = setUpper(CPU.r.de, RES1.call(upper(CPU.r.de)));
+    CPU.r.de = setUpper(CPU.r.de, RES1(upper(CPU.r.de)));
   },
   0x8b: function (): void {
-    CPU.r.de = setLower(CPU.r.de, RES1.call(lower(CPU.r.de)));
+    CPU.r.de = setLower(CPU.r.de, RES1(lower(CPU.r.de)));
   },
   0x8c: function (): void {
-    CPU.r.hl = setUpper(CPU.r.hl, RES1.call(upper(CPU.r.hl)));
+    CPU.r.hl = setUpper(CPU.r.hl, RES1(upper(CPU.r.hl)));
   },
   0x8d: function (): void {
-    CPU.r.hl = setLower(CPU.r.hl, RES1.call(lower(CPU.r.hl)));
+    CPU.r.hl = setLower(CPU.r.hl, RES1(lower(CPU.r.hl)));
   },
   0x8e: function (): void {
-    Memory.writeByte(CPU.r.hl, RES1.call(Memory.readByte(CPU.r.hl)));
+    Memory.writeByte(CPU.r.hl, RES1(Memory.readByte(CPU.r.hl)));
   },
   0x8f: function (): void {
-    CPU.r.af = setUpper(CPU.r.af, RES1.call(upper(CPU.r.af)));
+    CPU.r.af = setUpper(CPU.r.af, RES1(upper(CPU.r.af)));
   },
   0x90: function (): void {
-    CPU.r.bc = setUpper(CPU.r.bc, RES2.call(upper(CPU.r.bc)));
+    CPU.r.bc = setUpper(CPU.r.bc, RES2(upper(CPU.r.bc)));
   },
   0x91: function (): void {
-    CPU.r.bc = setLower(CPU.r.bc, RES2.call(lower(CPU.r.bc)));
+    CPU.r.bc = setLower(CPU.r.bc, RES2(lower(CPU.r.bc)));
   },
   0x92: function (): void {
-    CPU.r.de = setUpper(CPU.r.de, RES2.call(upper(CPU.r.de)));
+    CPU.r.de = setUpper(CPU.r.de, RES2(upper(CPU.r.de)));
   },
   0x93: function (): void {
-    CPU.r.de = setLower(CPU.r.de, RES2.call(lower(CPU.r.de)));
+    CPU.r.de = setLower(CPU.r.de, RES2(lower(CPU.r.de)));
   },
   0x94: function (): void {
-    CPU.r.hl = setUpper(CPU.r.hl, RES2.call(upper(CPU.r.hl)));
+    CPU.r.hl = setUpper(CPU.r.hl, RES2(upper(CPU.r.hl)));
   },
   0x95: function (): void {
-    CPU.r.hl = setLower(CPU.r.hl, RES2.call(lower(CPU.r.hl)));
+    CPU.r.hl = setLower(CPU.r.hl, RES2(lower(CPU.r.hl)));
   },
   0x96: function (): void {
-    Memory.writeByte(CPU.r.hl, RES2.call(Memory.readByte(CPU.r.hl)));
+    Memory.writeByte(CPU.r.hl, RES2(Memory.readByte(CPU.r.hl)));
   },
   0x97: function (): void {
-    CPU.r.af = setUpper(CPU.r.af, RES2.call(upper(CPU.r.af)));
+    CPU.r.af = setUpper(CPU.r.af, RES2(upper(CPU.r.af)));
   },
   0x98: function (): void {
-    CPU.r.bc = setUpper(CPU.r.bc, RES3.call(upper(CPU.r.bc)));
+    CPU.r.bc = setUpper(CPU.r.bc, RES3(upper(CPU.r.bc)));
   },
   0x99: function (): void {
-    CPU.r.bc = setLower(CPU.r.bc, RES3.call(lower(CPU.r.bc)));
+    CPU.r.bc = setLower(CPU.r.bc, RES3(lower(CPU.r.bc)));
   },
   0x9a: function (): void {
-    CPU.r.de = setUpper(CPU.r.de, RES3.call(upper(CPU.r.de)));
+    CPU.r.de = setUpper(CPU.r.de, RES3(upper(CPU.r.de)));
   },
   0x9b: function (): void {
-    CPU.r.de = setLower(CPU.r.de, RES3.call(lower(CPU.r.de)));
+    CPU.r.de = setLower(CPU.r.de, RES3(lower(CPU.r.de)));
   },
   0x9c: function (): void {
-    CPU.r.hl = setUpper(CPU.r.hl, RES3.call(upper(CPU.r.hl)));
+    CPU.r.hl = setUpper(CPU.r.hl, RES3(upper(CPU.r.hl)));
   },
   0x9d: function (): void {
-    CPU.r.hl = setLower(CPU.r.hl, RES3.call(lower(CPU.r.hl)));
+    CPU.r.hl = setLower(CPU.r.hl, RES3(lower(CPU.r.hl)));
   },
   0x9e: function (): void {
-    Memory.writeByte(CPU.r.hl, RES3.call(Memory.readByte(CPU.r.hl)));
+    Memory.writeByte(CPU.r.hl, RES3(Memory.readByte(CPU.r.hl)));
   },
   0x9f: function (): void {
-    CPU.r.af = setUpper(CPU.r.af, RES3.call(upper(CPU.r.af)));
+    CPU.r.af = setUpper(CPU.r.af, RES3(upper(CPU.r.af)));
   },
   0xa0: function (): void {
-    CPU.r.bc = setUpper(CPU.r.bc, RES4.call(upper(CPU.r.bc)));
+    CPU.r.bc = setUpper(CPU.r.bc, RES4(upper(CPU.r.bc)));
   },
   0xa1: function (): void {
-    CPU.r.bc = setLower(CPU.r.bc, RES4.call(lower(CPU.r.bc)));
+    CPU.r.bc = setLower(CPU.r.bc, RES4(lower(CPU.r.bc)));
   },
   0xa2: function (): void {
-    CPU.r.de = setUpper(CPU.r.de, RES4.call(upper(CPU.r.de)));
+    CPU.r.de = setUpper(CPU.r.de, RES4(upper(CPU.r.de)));
   },
   0xa3: function (): void {
-    CPU.r.de = setLower(CPU.r.de, RES4.call(lower(CPU.r.de)));
+    CPU.r.de = setLower(CPU.r.de, RES4(lower(CPU.r.de)));
   },
   0xa4: function (): void {
-    CPU.r.hl = setUpper(CPU.r.hl, RES4.call(upper(CPU.r.hl)));
+    CPU.r.hl = setUpper(CPU.r.hl, RES4(upper(CPU.r.hl)));
   },
   0xa5: function (): void {
-    CPU.r.hl = setLower(CPU.r.hl, RES4.call(lower(CPU.r.hl)));
+    CPU.r.hl = setLower(CPU.r.hl, RES4(lower(CPU.r.hl)));
   },
   0xa6: function (): void {
-    Memory.writeByte(CPU.r.hl, RES4.call(Memory.readByte(CPU.r.hl)));
+    Memory.writeByte(CPU.r.hl, RES4(Memory.readByte(CPU.r.hl)));
   },
   0xa7: function (): void {
-    CPU.r.af = setUpper(CPU.r.af, RES4.call(upper(CPU.r.af)));
+    CPU.r.af = setUpper(CPU.r.af, RES4(upper(CPU.r.af)));
   },
   0xa8: function (): void {
-    CPU.r.bc = setUpper(CPU.r.bc, RES5.call(upper(CPU.r.bc)));
+    CPU.r.bc = setUpper(CPU.r.bc, RES5(upper(CPU.r.bc)));
   },
   0xa9: function (): void {
-    CPU.r.bc = setLower(CPU.r.bc, RES5.call(lower(CPU.r.bc)));
+    CPU.r.bc = setLower(CPU.r.bc, RES5(lower(CPU.r.bc)));
   },
   0xaa: function (): void {
-    CPU.r.de = setUpper(CPU.r.de, RES5.call(upper(CPU.r.de)));
+    CPU.r.de = setUpper(CPU.r.de, RES5(upper(CPU.r.de)));
   },
   0xab: function (): void {
-    CPU.r.de = setLower(CPU.r.de, RES5.call(lower(CPU.r.de)));
+    CPU.r.de = setLower(CPU.r.de, RES5(lower(CPU.r.de)));
   },
   0xac: function (): void {
-    CPU.r.hl = setUpper(CPU.r.hl, RES5.call(upper(CPU.r.hl)));
+    CPU.r.hl = setUpper(CPU.r.hl, RES5(upper(CPU.r.hl)));
   },
   0xad: function (): void {
-    CPU.r.hl = setLower(CPU.r.hl, RES5.call(lower(CPU.r.hl)));
+    CPU.r.hl = setLower(CPU.r.hl, RES5(lower(CPU.r.hl)));
   },
   0xae: function (): void {
-    Memory.writeByte(CPU.r.hl, RES5.call(Memory.readByte(CPU.r.hl)));
+    Memory.writeByte(CPU.r.hl, RES5(Memory.readByte(CPU.r.hl)));
   },
   0xaf: function (): void {
-    CPU.r.af = setUpper(CPU.r.af, RES5.call(upper(CPU.r.af)));
+    CPU.r.af = setUpper(CPU.r.af, RES5(upper(CPU.r.af)));
   },
   0xb0: function (): void {
     CPU.r.bc = setUpper(CPU.r.bc, RES6(upper(CPU.r.bc)));
@@ -2201,195 +2170,195 @@ const cbMap: OpcodeList = {
     CPU.r.af = setUpper(CPU.r.af, RES7(upper(CPU.r.af)));
   },
   0xc0: function (): void {
-    CPU.r.bc = setUpper(CPU.r.bc, SET.call(0, upper(CPU.r.bc)));
+    CPU.r.bc = setUpper(CPU.r.bc, SET(0, upper(CPU.r.bc)));
   },
   0xc1: function (): void {
-    CPU.r.bc = setLower(CPU.r.bc, SET.call(0, lower(CPU.r.bc)));
+    CPU.r.bc = setLower(CPU.r.bc, SET(0, lower(CPU.r.bc)));
   },
   0xc2: function (): void {
-    CPU.r.de = setUpper(CPU.r.de, SET.call(0, upper(CPU.r.de)));
+    CPU.r.de = setUpper(CPU.r.de, SET(0, upper(CPU.r.de)));
   },
   0xc3: function (): void {
-    CPU.r.de = setLower(CPU.r.de, SET.call(0, lower(CPU.r.de)));
+    CPU.r.de = setLower(CPU.r.de, SET(0, lower(CPU.r.de)));
   },
   0xc4: function (): void {
-    CPU.r.hl = setUpper(CPU.r.hl, SET.call(0, upper(CPU.r.hl)));
+    CPU.r.hl = setUpper(CPU.r.hl, SET(0, upper(CPU.r.hl)));
   },
   0xc5: function (): void {
-    CPU.r.hl = setLower(CPU.r.hl, SET.call(0, lower(CPU.r.hl)));
+    CPU.r.hl = setLower(CPU.r.hl, SET(0, lower(CPU.r.hl)));
   },
   0xc6: function (): void {
-    Memory.writeByte(CPU.r.hl, SET.call(0, Memory.readByte(CPU.r.hl)));
+    Memory.writeByte(CPU.r.hl, SET(0, Memory.readByte(CPU.r.hl)));
   },
   0xc7: function (): void {
-    CPU.r.af = setUpper(CPU.r.af, SET.call(0, lower(CPU.r.af)));
+    CPU.r.af = setUpper(CPU.r.af, SET(0, lower(CPU.r.af)));
   },
   0xc8: function (): void {
-    CPU.r.bc = setUpper(CPU.r.bc, SET.call(1, upper(CPU.r.bc)));
+    CPU.r.bc = setUpper(CPU.r.bc, SET(1, upper(CPU.r.bc)));
   },
   0xc9: function (): void {
-    CPU.r.bc = setLower(CPU.r.bc, SET.call(1, lower(CPU.r.bc)));
+    CPU.r.bc = setLower(CPU.r.bc, SET(1, lower(CPU.r.bc)));
   },
   0xca: function (): void {
-    CPU.r.de = setUpper(CPU.r.de, SET.call(1, upper(CPU.r.de)));
+    CPU.r.de = setUpper(CPU.r.de, SET(1, upper(CPU.r.de)));
   },
   0xcb: function (): void {
-    CPU.r.de = setLower(CPU.r.de, SET.call(1, lower(CPU.r.de)));
+    CPU.r.de = setLower(CPU.r.de, SET(1, lower(CPU.r.de)));
   },
   0xcc: function (): void {
-    CPU.r.hl = setUpper(CPU.r.hl, SET.call(1, upper(CPU.r.hl)));
+    CPU.r.hl = setUpper(CPU.r.hl, SET(1, upper(CPU.r.hl)));
   },
   0xcd: function (): void {
-    CPU.r.hl = setLower(CPU.r.hl, SET.call(1, lower(CPU.r.hl)));
+    CPU.r.hl = setLower(CPU.r.hl, SET(1, lower(CPU.r.hl)));
   },
   0xce: function (): void {
-    Memory.writeByte(CPU.r.hl, SET.call(1, Memory.readByte(CPU.r.hl)));
+    Memory.writeByte(CPU.r.hl, SET(1, Memory.readByte(CPU.r.hl)));
   },
   0xcf: function (): void {
-    CPU.r.af = setUpper(CPU.r.af, SET.call(1, upper(CPU.r.af)));
+    CPU.r.af = setUpper(CPU.r.af, SET(1, upper(CPU.r.af)));
   },
   0xd0: function (): void {
-    CPU.r.bc = setUpper(CPU.r.bc, SET.call(2, upper(CPU.r.bc)));
+    CPU.r.bc = setUpper(CPU.r.bc, SET(2, upper(CPU.r.bc)));
   },
   0xd1: function (): void {
-    CPU.r.bc = setUpper(CPU.r.bc, SET.call(2, lower(CPU.r.bc)));
+    CPU.r.bc = setUpper(CPU.r.bc, SET(2, lower(CPU.r.bc)));
   },
   0xd2: function (): void {
-    CPU.r.de = SET.call(2, upper(CPU.r.de));
+    CPU.r.de = setUpper(CPU.r.de, SET(2, upper(CPU.r.de)));
   },
   0xd3: function (): void {
-    CPU.r.de = SET.call(2, lower(CPU.r.de));
+    CPU.r.de = setLower(CPU.r.de, SET(2, lower(CPU.r.de)));
   },
   0xd4: function (): void {
-    CPU.r.hl = setUpper(CPU.r.hl, SET.call(2, upper(CPU.r.hl)));
+    CPU.r.hl = setUpper(CPU.r.hl, SET(2, upper(CPU.r.hl)));
   },
   0xd5: function (): void {
-    CPU.r.hl = setLower(CPU.r.hl, SET.call(2, lower(CPU.r.hl)));
+    CPU.r.hl = setLower(CPU.r.hl, SET(2, lower(CPU.r.hl)));
   },
   0xd6: function (): void {
-    Memory.writeByte(CPU.r.hl, SET.call(2, Memory.readByte(CPU.r.hl)));
+    Memory.writeByte(CPU.r.hl, SET(2, Memory.readByte(CPU.r.hl)));
   },
   0xd7: function (): void {
-    CPU.r.af = setUpper(CPU.r.af, SET.call(2, upper(CPU.r.af)));
+    CPU.r.af = setUpper(CPU.r.af, SET(2, upper(CPU.r.af)));
   },
   0xd8: function (): void {
-    CPU.r.bc = setUpper(CPU.r.bc, SET.call(3, upper(CPU.r.bc)));
+    CPU.r.bc = setUpper(CPU.r.bc, SET(3, upper(CPU.r.bc)));
   },
   0xd9: function (): void {
-    CPU.r.bc = setLower(CPU.r.bc, SET.call(3, lower(CPU.r.bc)));
+    CPU.r.bc = setLower(CPU.r.bc, SET(3, lower(CPU.r.bc)));
   },
   0xda: function (): void {
-    CPU.r.de = setUpper(CPU.r.de, SET.call(3, upper(CPU.r.de)));
+    CPU.r.de = setUpper(CPU.r.de, SET(3, upper(CPU.r.de)));
   },
   0xdb: function (): void {
-    CPU.r.de = setLower(CPU.r.de, SET.call(3, lower(CPU.r.de)));
+    CPU.r.de = setLower(CPU.r.de, SET(3, lower(CPU.r.de)));
   },
   0xdc: function (): void {
-    CPU.r.hl = setUpper(CPU.r.hl, SET.call(3, upper(CPU.r.hl)));
+    CPU.r.hl = setUpper(CPU.r.hl, SET(3, upper(CPU.r.hl)));
   },
   0xdd: function (): void {
-    CPU.r.hl = setLower(CPU.r.hl, SET.call(3, lower(CPU.r.hl)));
+    CPU.r.hl = setLower(CPU.r.hl, SET(3, lower(CPU.r.hl)));
   },
   0xde: function (): void {
-    Memory.writeByte(CPU.r.hl, SET.call(3, Memory.readByte(CPU.r.hl)));
+    Memory.writeByte(CPU.r.hl, SET(3, Memory.readByte(CPU.r.hl)));
   },
   0xdf: function (): void {
-    CPU.r.af = setUpper(CPU.r.af, SET.call(3, upper(CPU.r.af)));
+    CPU.r.af = setUpper(CPU.r.af, SET(3, upper(CPU.r.af)));
   },
   0xe0: function (): void {
-    CPU.r.bc = setUpper(CPU.r.bc, SET.call(4, upper(CPU.r.bc)));
+    CPU.r.bc = setUpper(CPU.r.bc, SET(4, upper(CPU.r.bc)));
   },
   0xe1: function (): void {
-    CPU.r.bc = setLower(CPU.r.bc, SET.call(4, lower(CPU.r.bc)));
+    CPU.r.bc = setLower(CPU.r.bc, SET(4, lower(CPU.r.bc)));
   },
   0xe2: function (): void {
-    CPU.r.de = setUpper(CPU.r.de, SET.call(4, upper(CPU.r.de)));
+    CPU.r.de = setUpper(CPU.r.de, SET(4, upper(CPU.r.de)));
   },
   0xe3: function (): void {
-    CPU.r.de = setLower(CPU.r.de, SET.call(4, lower(CPU.r.de)));
+    CPU.r.de = setLower(CPU.r.de, SET(4, lower(CPU.r.de)));
   },
   0xe4: function (): void {
-    CPU.r.hl = setUpper(CPU.r.hl, SET.call(4, upper(CPU.r.hl)));
+    CPU.r.hl = setUpper(CPU.r.hl, SET(4, upper(CPU.r.hl)));
   },
   0xe5: function (): void {
-    CPU.r.hl = setLower(CPU.r.hl, SET.call(4, lower(CPU.r.hl)));
+    CPU.r.hl = setLower(CPU.r.hl, SET(4, lower(CPU.r.hl)));
   },
   0xe6: function (): void {
-    Memory.writeByte(CPU.r.hl, SET.call(4, Memory.readByte(CPU.r.hl)));
+    Memory.writeByte(CPU.r.hl, SET(4, Memory.readByte(CPU.r.hl)));
   },
   0xe7: function (): void {
-    CPU.r.af = setUpper(CPU.r.af, SET.call(4, upper(CPU.r.af)));
+    CPU.r.af = setUpper(CPU.r.af, SET(4, upper(CPU.r.af)));
   },
   0xe8: function (): void {
-    CPU.r.bc = setUpper(CPU.r.bc, SET.call(5, upper(CPU.r.bc)));
+    CPU.r.bc = setUpper(CPU.r.bc, SET(5, upper(CPU.r.bc)));
   },
   0xe9: function (): void {
-    CPU.r.bc = setLower(CPU.r.bc, SET.call(5, lower(CPU.r.bc)));
+    CPU.r.bc = setLower(CPU.r.bc, SET(5, lower(CPU.r.bc)));
   },
   0xea: function (): void {
-    CPU.r.de = setUpper(CPU.r.de, SET.call(5, upper(CPU.r.de)));
+    CPU.r.de = setUpper(CPU.r.de, SET(5, upper(CPU.r.de)));
   },
   0xeb: function (): void {
-    CPU.r.de = setLower(CPU.r.de, SET.call(5, lower(CPU.r.de)));
+    CPU.r.de = setLower(CPU.r.de, SET(5, lower(CPU.r.de)));
   },
   0xec: function (): void {
-    CPU.r.hl = setUpper(CPU.r.hl, SET.call(5, upper(CPU.r.hl)));
+    CPU.r.hl = setUpper(CPU.r.hl, SET(5, upper(CPU.r.hl)));
   },
   0xed: function (): void {
-    CPU.r.hl = setUpper(CPU.r.hl, SET.call(5, lower(CPU.r.hl)));
+    CPU.r.hl = setUpper(CPU.r.hl, SET(5, lower(CPU.r.hl)));
   },
   0xee: function (): void {
-    Memory.writeByte(CPU.r.hl, SET.call(5, Memory.readByte(CPU.r.hl)));
+    Memory.writeByte(CPU.r.hl, SET(5, Memory.readByte(CPU.r.hl)));
   },
   0xef: function (): void {
-    CPU.r.af = setUpper(CPU.r.af, SET.call(5, upper(CPU.r.af)));
+    CPU.r.af = setUpper(CPU.r.af, SET(5, upper(CPU.r.af)));
   },
   0xf0: function (): void {
-    CPU.r.bc = setUpper(CPU.r.bc, SET.call(6, upper(CPU.r.bc)));
+    CPU.r.bc = setUpper(CPU.r.bc, SET(6, upper(CPU.r.bc)));
   },
   0xf1: function (): void {
-    CPU.r.bc = setLower(CPU.r.bc, SET.call(6, lower(CPU.r.bc)));
+    CPU.r.bc = setLower(CPU.r.bc, SET(6, lower(CPU.r.bc)));
   },
   0xf2: function (): void {
-    CPU.r.de = setUpper(CPU.r.de, SET.call(6, upper(CPU.r.de)));
+    CPU.r.de = setUpper(CPU.r.de, SET(6, upper(CPU.r.de)));
   },
   0xf3: function (): void {
-    CPU.r.de = setLower(CPU.r.de, SET.call(6, lower(CPU.r.de)));
+    CPU.r.de = setLower(CPU.r.de, SET(6, lower(CPU.r.de)));
   },
   0xf4: function (): void {
-    CPU.r.hl = setUpper(CPU.r.hl, SET.call(6, upper(CPU.r.hl)));
+    CPU.r.hl = setUpper(CPU.r.hl, SET(6, upper(CPU.r.hl)));
   },
   0xf5: function (): void {
-    CPU.r.hl = setLower(CPU.r.hl, SET.call(6, lower(CPU.r.hl)));
+    CPU.r.hl = setLower(CPU.r.hl, SET(6, lower(CPU.r.hl)));
   },
   0xf6: function (): void {
-    Memory.writeByte(CPU.r.hl, SET.call(6, Memory.readByte(CPU.r.hl)));
+    Memory.writeByte(CPU.r.hl, SET(6, Memory.readByte(CPU.r.hl)));
   },
   0xf7: function (): void {
-    CPU.r.af = setUpper(CPU.r.af, SET.call(6, upper(CPU.r.af)));
+    CPU.r.af = setUpper(CPU.r.af, SET(6, upper(CPU.r.af)));
   },
   0xf8: function (): void {
-    CPU.r.bc = setUpper(CPU.r.bc, SET.call(7, upper(CPU.r.bc)));
+    CPU.r.bc = setUpper(CPU.r.bc, SET(7, upper(CPU.r.bc)));
   },
   0xf9: function (): void {
-    CPU.r.bc = setLower(CPU.r.bc, SET.call(7, lower(CPU.r.bc)));
+    CPU.r.bc = setLower(CPU.r.bc, SET(7, lower(CPU.r.bc)));
   },
   0xfa: function (): void {
-    CPU.r.de = setUpper(CPU.r.de, SET.call(7, upper(CPU.r.de)));
+    CPU.r.de = setUpper(CPU.r.de, SET(7, upper(CPU.r.de)));
   },
   0xfb: function (): void {
-    CPU.r.de = setLower(CPU.r.de, SET.call(7, lower(CPU.r.de)));
+    CPU.r.de = setLower(CPU.r.de, SET(7, lower(CPU.r.de)));
   },
   0xfc: function (): void {
-    CPU.r.hl = setUpper(CPU.r.hl, SET.call(7, upper(CPU.r.hl)));
+    CPU.r.hl = setUpper(CPU.r.hl, SET(7, upper(CPU.r.hl)));
   },
   0xfd: function (): void {
-    CPU.r.hl = setLower(CPU.r.hl, SET.call(7, lower(CPU.r.hl)));
+    CPU.r.hl = setLower(CPU.r.hl, SET(7, lower(CPU.r.hl)));
   },
   0xfe: function (): void {
-    Memory.writeByte(CPU.r.hl, SET.call(7, Memory.readByte(CPU.r.hl)));
+    Memory.writeByte(CPU.r.hl, SET(7, Memory.readByte(CPU.r.hl)));
   },
   0xff: function (): void {
-    CPU.r.af = setUpper(CPU.r.af, SET.call(7, upper(CPU.r.af)));
+    CPU.r.af = setUpper(CPU.r.af, SET(7, upper(CPU.r.af)));
   },
 };

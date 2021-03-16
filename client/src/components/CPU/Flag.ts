@@ -7,6 +7,13 @@ export default class Flag {
   private _h: byte = 0; // set if result's lower half of last op overflowed past 15
   private _cy: byte = 0; // set if last op produced a result over 255 or under 0
 
+  constructor(value: byte = 0) {
+    this.z = (value >> 7) & 1;
+    this.n = (value >> 6) & 1;
+    this.h = (value >> 5) & 1;
+    this.cy = (value >> 4) & 1;
+  }
+
   private error(): void {
     throw new Error('Tried to set flag outside range.');
   }

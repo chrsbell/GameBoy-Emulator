@@ -55,11 +55,11 @@ class CPU {
   }
   protected _interruptsEnabled: boolean;
   protected opcodes: any;
-  private _lastExecuted: byte;
-  public get lastExecuted(): byte {
+  private _lastExecuted: Array<byte>;
+  public get lastExecuted(): Array<byte> {
     return this._lastExecuted;
   }
-  public set lastExecuted(value: byte) {
+  public set lastExecuted(value: Array<byte>) {
     this._lastExecuted = value;
   }
   public constructor() {
@@ -78,7 +78,7 @@ class CPU {
     this.r.bc = 0;
     this.r.de = 0;
     this.r.hl = 0;
-    this.lastExecuted = 0;
+    this.lastExecuted = [];
   }
   /**
    * Sets the Z flag if the register is 0, otherwise resets it.
@@ -98,23 +98,23 @@ class CPU {
    * https://stackoverflow.com/questions/8868396/game-boy-what-constitutes-a-half-carry
    * https://gbdev.io/gb-opcodes/optables/
    */
-  public checkHalfCarry(op1: byte, op2: byte): void {
-    const carryBit = ((op1 & 0xf) + (op2 & 0xf)) & 0x10;
+  public checkHalfCarry(op1: byte, op2: byte, multiplier: number = 1): void {
+    const carryBit = ((op1 & 0xf) + multiplier * (op2 & 0xf)) & 0x10;
     this.r.f.h = carryBit === 0x10 ? 1 : 0;
   }
   /**
    * Sets the carry flag if the sum will exceed the size of the data type.
    */
-  public checkFullCarry16(op1: word, op2: word): void {
-    let overflow: number = op1 + op2;
+  public checkFullCarry16(op1: word, op2: word, multiplier: number = 1): void {
+    let overflow: byte = op1 + multiplier * op2;
     if (overflow > 65535) {
       this.r.f.n = 1;
     } else {
       this.r.f.n = 0;
     }
   }
-  public checkFullCarry8(op1: byte, op2: byte): void {
-    let overflow: number = op1 + op2;
+  public checkFullCarry8(op1: byte, op2: byte, multiplier: number = 1): void {
+    let overflow: byte = op1 + multiplier * op2;
     if (overflow > 255) {
       this.r.f.n = 1;
     } else {
@@ -190,11 +190,18 @@ class CPU {
       // normal execution
       // fetch
       const opcode: byte = Memory.readByte(this.pc);
-      this.lastExecuted = opcode;
       this.pc += 1;
-
+      // const oldbc = this.r.bc;
       // execute
       const numCycles: number = this.opcodes[opcode].call(this);
+      // const newbc = this.r.bc;
+      // if (oldbc !== newbc) {
+      //   debugger;
+      // }
+      this.lastExecuted.push(opcode);
+      if (this.lastExecuted.length > 40) {
+        this.lastExecuted.shift();
+      }
       return numCycles;
     }
   }
