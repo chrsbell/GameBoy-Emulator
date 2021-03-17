@@ -1,21 +1,21 @@
-import type { byte, word } from '../Types';
-import { toByte, lower, upper, toHex } from '../Types';
+import type {byte, word} from '../Types';
+import {toByte, lower, upper, toHex} from '../Types';
 
 interface CartridgeCode {
   [key: number]: string;
 }
 
 interface ROMCode {
-  [key: number]: { size: string; numBanks: number };
+  [key: number]: {size: string; numBanks: number};
 }
 
 const ROMSizeCodes: ROMCode = {
-  0x00: { size: '32kB', numBanks: 2 },
-  0x01: { size: '64kB', numBanks: 4 },
-  0x02: { size: '128kB', numBanks: 8 },
-  0x03: { size: '256kB', numBanks: 16 },
-  0x04: { size: '512kB', numBanks: 32 },
-  0x05: { size: '1MB', numBanks: 64 },
+  0x00: {size: '32kB', numBanks: 2},
+  0x01: {size: '64kB', numBanks: 4},
+  0x02: {size: '128kB', numBanks: 8},
+  0x03: {size: '256kB', numBanks: 16},
+  0x04: {size: '512kB', numBanks: 32},
+  0x05: {size: '1MB', numBanks: 64},
 };
 
 const CartridgeTypes: CartridgeCode = {
@@ -77,7 +77,7 @@ interface Cartridge {
 class Memory {
   private bios: Uint8Array;
   // whether bios execution has finished
-  public inBios: boolean = false;
+  public inBios = false;
   public cart: Cartridge;
   // 8k vRAM
   private vRAM: Uint8Array;
@@ -89,7 +89,7 @@ class Memory {
   private OAM: Uint8Array;
   // 126 bytes high RAM
   private hRAM: Uint8Array;
-  private initialized: boolean = false;
+  private initialized = false;
   public constructor() {
     this.reset();
   }
@@ -148,7 +148,7 @@ class Memory {
     } else if (address <= 0xdfff) {
       this.wRAM[address - 0xc000] = data;
     } else if (address <= 0xfdff) {
-      console.error(`Can't write to prohibited address.`);
+      console.error("Can't write to prohibited address.");
     } else if (address <= 0xfe9f) {
       this.OAM[address - 0xfe00] = data;
     } else if (address <= 0xff7f) {
@@ -224,7 +224,7 @@ class Memory {
       }
       if (this.cart.R.bankingMode === 0 && this.cart.ROMSize >= 0x05) {
         // for 1MB ROM or larger carts, set upper 2 bits (5-6) of ROM bank number
-        const { currROMBank } = this.cart.R;
+        const {currROMBank} = this.cart.R;
         this.cart.R.currROMBank = currROMBank | (register << 4);
       }
       // for 1MB ROM multi carts, apply same operation but only to bits 4-5
@@ -241,7 +241,9 @@ class Memory {
     this.cart.MBCType = this.readByte(0x147);
     this.cart.ROMSize = this.readByte(0x148);
     this.cart.RAMSize = this.readByte(0x149);
-    console.log(`ROM Size: $${JSON.stringify(ROMSizeCodes[this.cart.ROMSize])}`);
+    console.log(
+      `ROM Size: $${JSON.stringify(ROMSizeCodes[this.cart.ROMSize])}`
+    );
     console.log(`RAM Size: ${RAMSizeCodes[this.cart.RAMSize]}`);
     console.log(`Cartridge Type: ${CartridgeTypes[this.cart.MBCType]}`);
 

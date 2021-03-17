@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { useEffect, useReducer, useRef } from 'react';
+import {useEffect, useReducer, useRef} from 'react';
 import Emulator from '../Emulator';
-import GLRenderer from '../GLRenderer';
 import AppContext from './Context';
+import GLRenderer from '../GLRenderer';
 import Wrapper from './Wrapper';
 
 interface AppState {
@@ -11,25 +11,30 @@ interface AppState {
   parsedBIOS: Uint8Array;
 }
 
+type Action =
+  | {type: 'canvas'; canvas: HTMLCanvasElement}
+  | {type: 'parsedROM'; parsedROM: Uint8Array}
+  | {type: 'parsedBIOS'; parsedBIOS: Uint8Array};
+
 const initialState: AppState = {
   canvas: null as HTMLCanvasElement,
   parsedROM: null as Uint8Array,
   parsedBIOS: null as Uint8Array,
 };
 
-const reducer = (state: AppState, action: any) => {
+const reducer = (state: AppState, action: Action) => {
   switch (action.type) {
     case 'canvas':
       return {
         ...state,
         canvas: action.canvas,
       };
-    case 'parsed_rom':
+    case 'parsedROM':
       return {
         ...state,
         parsedROM: action.parsedROM,
       };
-    case 'parsed_bios':
+    case 'parsedBIOS':
       return {
         ...state,
         parsedBIOS: action.parsedBIOS,
@@ -46,7 +51,7 @@ const App = () => {
   const emulator = useRef(new Emulator());
 
   useEffect(() => {
-    const { parsedROM, parsedBIOS } = appState;
+    const {parsedROM, parsedBIOS} = appState;
     if (parsedROM && parsedBIOS) {
       if (emulator.current.load(parsedBIOS, parsedROM)) {
         emulator.current.update();
@@ -61,7 +66,7 @@ const App = () => {
   }, [appState.canvas]);
 
   return (
-    <AppContext.Provider value={{ appState, dispatch }}>
+    <AppContext.Provider value={{appState, dispatch}}>
       <Wrapper />
     </AppContext.Provider>
   );

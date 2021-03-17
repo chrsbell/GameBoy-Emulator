@@ -1,5 +1,5 @@
 import Memory from '../Memory';
-import { byte, word, toHex } from '../Types';
+import {byte, word} from '../Types';
 import Opcodes from './sm83';
 import Flag from './Flag';
 
@@ -13,7 +13,7 @@ interface Registers {
 
 class CPU {
   // number of clock ticks per second
-  private static _clock: number = 4194304;
+  private static _clock = 4194304;
   public get clock(): number {
     return CPU._clock;
   }
@@ -98,27 +98,41 @@ class CPU {
    * https://stackoverflow.com/questions/8868396/game-boy-what-constitutes-a-half-carry
    * https://gbdev.io/gb-opcodes/optables/
    */
-  public checkHalfCarry(op1: byte, op2: byte, multiplier: number = 1): void {
+  public checkHalfCarry(op1: byte, op2: byte, multiplier = 1): void {
     const carryBit = ((op1 & 0xf) + multiplier * (op2 & 0xf)) & 0x10;
     this.r.f.h = carryBit === 0x10 ? 1 : 0;
   }
   /**
    * Sets the carry flag if the sum will exceed the size of the data type.
    */
-  public checkFullCarry16(op1: word, op2: word, multiplier: number = 1): void {
-    let overflow: byte = op1 + multiplier * op2;
-    if (overflow > 65535) {
-      this.r.f.n = 1;
+  public checkFullCarry16(op1: word, op2: word, multiplier = 1): void {
+    if (multiplier === 1) {
+      if (op1 + op2 > 65535) {
+        this.r.f.cy = 1;
+      } else {
+        this.r.f.cy = 0;
+      }
     } else {
-      this.r.f.n = 0;
+      if (op1 - op2 < 0) {
+        this.r.f.cy = 1;
+      } else {
+        this.r.f.cy = 0;
+      }
     }
   }
-  public checkFullCarry8(op1: byte, op2: byte, multiplier: number = 1): void {
-    let overflow: byte = op1 + multiplier * op2;
-    if (overflow > 255) {
-      this.r.f.n = 1;
+  public checkFullCarry8(op1: byte, op2: byte, multiplier = 1): void {
+    if (multiplier === 1) {
+      if (op1 + op2 > 255) {
+        this.r.f.cy = 1;
+      } else {
+        this.r.f.cy = 0;
+      }
     } else {
-      this.r.f.n = 0;
+      if (op1 - op2 < 0) {
+        this.r.f.cy = 1;
+      } else {
+        this.r.f.cy = 0;
+      }
     }
   }
   public setInterruptsEnabled(enabled: boolean): void {

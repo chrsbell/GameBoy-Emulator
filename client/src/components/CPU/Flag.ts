@@ -1,5 +1,5 @@
 // Using a class to prevent accidentally setting flag outside 0/1
-import { byte, word } from '../Types';
+import {byte} from '../Types';
 
 export default class Flag {
   private _z: byte = 0; // set if last op producted 0

@@ -1,4 +1,4 @@
-const pad = (str: string, width: number, replacement: string = '0'): string => {
+const pad = (str: string, width: number, replacement = '0'): string => {
   if (str.length >= width) {
     return str;
   }
@@ -42,7 +42,8 @@ const upper = (value: word): byte => value >> 8;
  * Sets the upper byte of the word.
  * @returns {word}
  */
-const setUpper = (value: word, operand: byte): word => (value & 0xff) | (operand << 8);
+const setUpper = (value: word, operand: byte): word =>
+  (value & 0xff) | (operand << 8);
 
 /**
  * Returns the lower byte of the word.
@@ -54,7 +55,8 @@ const lower = (value: word): byte => value & 0xff;
  * Sets the lower byte of the word.
  * @returns {word}
  */
-const setLower = (value: word, operand: byte): word => (value & 0xff00) | operand;
+const setLower = (value: word, operand: byte): word =>
+  (value & 0xff00) | operand;
 
 /**
  * Adds the operand to the word.

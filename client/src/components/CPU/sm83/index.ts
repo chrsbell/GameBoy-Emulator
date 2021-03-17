@@ -1,6 +1,6 @@
-import { OpcodeMap } from './Map';
+import {OpcodeMap} from './Map';
 import CPU from '../';
-import { byte } from '../../Types';
+import {byte} from '../../Types';
 
 /**
  * No operation.
@@ -8,7 +8,7 @@ import { byte } from '../../Types';
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function NOP(): byte {
+function NOP(): byte {
   OpcodeMap[0x00].call(this);
   return 4;
 }
@@ -19,7 +19,7 @@ export function NOP(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_BC_i_from_d16_i(): byte {
+function LD_into_BC_i_from_d16_i(): byte {
   OpcodeMap[0x01].call(this);
   return 12;
 }
@@ -30,7 +30,7 @@ export function LD_into_BC_i_from_d16_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_BC_m_from_A_i(): byte {
+function LD_into_BC_m_from_A_i(): byte {
   OpcodeMap[0x02].call(this);
   return 8;
 }
@@ -41,7 +41,7 @@ export function LD_into_BC_m_from_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function INC_BC_i(): byte {
+function INC_BC_i(): byte {
   OpcodeMap[0x03].call(this);
   return 8;
 }
@@ -52,7 +52,7 @@ export function INC_BC_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function INC_B_i(): byte {
+function INC_B_i(): byte {
   OpcodeMap[0x04].call(this);
   return 4;
 }
@@ -63,7 +63,7 @@ export function INC_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function DEC_B_i(): byte {
+function DEC_B_i(): byte {
   OpcodeMap[0x05].call(this);
   return 4;
 }
@@ -74,7 +74,7 @@ export function DEC_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_B_i_from_d8_i(): byte {
+function LD_into_B_i_from_d8_i(): byte {
   OpcodeMap[0x06].call(this);
   return 8;
 }
@@ -85,7 +85,7 @@ export function LD_into_B_i_from_d8_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RLCA(): byte {
+function RLCA(): byte {
   OpcodeMap[0x07].call(this);
   return 4;
 }
@@ -96,7 +96,7 @@ export function RLCA(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_a16_m_from_SP_i(): byte {
+function LD_into_a16_m_from_SP_i(): byte {
   OpcodeMap[0x08].call(this);
   return 20;
 }
@@ -107,7 +107,7 @@ export function LD_into_a16_m_from_SP_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: N, H, C
  */
-export function ADD_into_HL_i_from_BC_i(): byte {
+function ADD_into_HL_i_from_BC_i(): byte {
   OpcodeMap[0x09].call(this);
   return 8;
 }
@@ -118,7 +118,7 @@ export function ADD_into_HL_i_from_BC_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_A_i_from_BC_m(): byte {
+function LD_into_A_i_from_BC_m(): byte {
   OpcodeMap[0x0a].call(this);
   return 8;
 }
@@ -129,7 +129,7 @@ export function LD_into_A_i_from_BC_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function DEC_BC_i(): byte {
+function DEC_BC_i(): byte {
   OpcodeMap[0x0b].call(this);
   return 8;
 }
@@ -140,7 +140,7 @@ export function DEC_BC_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function INC_C_i(): byte {
+function INC_C_i(): byte {
   OpcodeMap[0x0c].call(this);
   return 4;
 }
@@ -151,7 +151,7 @@ export function INC_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function DEC_C_i(): byte {
+function DEC_C_i(): byte {
   OpcodeMap[0x0d].call(this);
   return 4;
 }
@@ -162,7 +162,7 @@ export function DEC_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_C_i_from_d8_i(): byte {
+function LD_into_C_i_from_d8_i(): byte {
   OpcodeMap[0x0e].call(this);
   return 8;
 }
@@ -173,7 +173,7 @@ export function LD_into_C_i_from_d8_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RRCA(): byte {
+function RRCA(): byte {
   OpcodeMap[0x0f].call(this);
   return 4;
 }
@@ -184,7 +184,7 @@ export function RRCA(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function STOP(): byte {
+function STOP(): byte {
   OpcodeMap[0x10].call(this);
   return 4;
 }
@@ -195,7 +195,7 @@ export function STOP(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_DE_i_from_d16_i(): byte {
+function LD_into_DE_i_from_d16_i(): byte {
   OpcodeMap[0x11].call(this);
   return 12;
 }
@@ -206,7 +206,7 @@ export function LD_into_DE_i_from_d16_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_DE_m_from_A_i(): byte {
+function LD_into_DE_m_from_A_i(): byte {
   OpcodeMap[0x12].call(this);
   return 8;
 }
@@ -217,7 +217,7 @@ export function LD_into_DE_m_from_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function INC_DE_i(): byte {
+function INC_DE_i(): byte {
   OpcodeMap[0x13].call(this);
   return 8;
 }
@@ -228,7 +228,7 @@ export function INC_DE_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function INC_D_i(): byte {
+function INC_D_i(): byte {
   OpcodeMap[0x14].call(this);
   return 4;
 }
@@ -239,7 +239,7 @@ export function INC_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function DEC_D_i(): byte {
+function DEC_D_i(): byte {
   OpcodeMap[0x15].call(this);
   return 4;
 }
@@ -250,7 +250,7 @@ export function DEC_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_D_i_from_d8_i(): byte {
+function LD_into_D_i_from_d8_i(): byte {
   OpcodeMap[0x16].call(this);
   return 8;
 }
@@ -261,7 +261,7 @@ export function LD_into_D_i_from_d8_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RLA(): byte {
+function RLA(): byte {
   OpcodeMap[0x17].call(this);
   return 4;
 }
@@ -272,7 +272,7 @@ export function RLA(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function JR_r8(): byte {
+function JR_r8(): byte {
   OpcodeMap[0x18].call(this);
   return 12;
 }
@@ -283,7 +283,7 @@ export function JR_r8(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: N, H, C
  */
-export function ADD_into_HL_i_from_DE_i(): byte {
+function ADD_into_HL_i_from_DE_i(): byte {
   OpcodeMap[0x19].call(this);
   return 8;
 }
@@ -294,7 +294,7 @@ export function ADD_into_HL_i_from_DE_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_A_i_from_DE_m(): byte {
+function LD_into_A_i_from_DE_m(): byte {
   OpcodeMap[0x1a].call(this);
   return 8;
 }
@@ -305,7 +305,7 @@ export function LD_into_A_i_from_DE_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function DEC_DE_i(): byte {
+function DEC_DE_i(): byte {
   OpcodeMap[0x1b].call(this);
   return 8;
 }
@@ -316,7 +316,7 @@ export function DEC_DE_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function INC_E_i(): byte {
+function INC_E_i(): byte {
   OpcodeMap[0x1c].call(this);
   return 4;
 }
@@ -327,7 +327,7 @@ export function INC_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function DEC_E_i(): byte {
+function DEC_E_i(): byte {
   OpcodeMap[0x1d].call(this);
   return 4;
 }
@@ -338,7 +338,7 @@ export function DEC_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_E_i_from_d8_i(): byte {
+function LD_into_E_i_from_d8_i(): byte {
   OpcodeMap[0x1e].call(this);
   return 8;
 }
@@ -349,7 +349,7 @@ export function LD_into_E_i_from_d8_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RRA(): byte {
+function RRA(): byte {
   OpcodeMap[0x1f].call(this);
   return 4;
 }
@@ -361,7 +361,7 @@ export function RRA(): byte {
  * Affected flags:
  */
 export function JR_C_NZ_r8(): byte {
-  let condition: boolean = OpcodeMap[0x20].call(this);
+  const condition: boolean = OpcodeMap[0x20].call(this);
   if (!condition) {
     return 8;
   }
@@ -374,7 +374,7 @@ export function JR_C_NZ_r8(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_HL_i_from_d16_i(): byte {
+function LD_into_HL_i_from_d16_i(): byte {
   OpcodeMap[0x21].call(this);
   return 12;
 }
@@ -385,7 +385,7 @@ export function LD_into_HL_i_from_d16_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_HL_incr_m_from_A_i(): byte {
+function LD_into_HL_incr_m_from_A_i(): byte {
   OpcodeMap[0x22].call(this);
   return 8;
 }
@@ -396,7 +396,7 @@ export function LD_into_HL_incr_m_from_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function INC_HL_i(): byte {
+function INC_HL_i(): byte {
   OpcodeMap[0x23].call(this);
   return 8;
 }
@@ -407,7 +407,7 @@ export function INC_HL_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function INC_H_i(): byte {
+function INC_H_i(): byte {
   OpcodeMap[0x24].call(this);
   return 4;
 }
@@ -418,7 +418,7 @@ export function INC_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function DEC_H_i(): byte {
+function DEC_H_i(): byte {
   OpcodeMap[0x25].call(this);
   return 4;
 }
@@ -429,7 +429,7 @@ export function DEC_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_H_i_from_d8_i(): byte {
+function LD_into_H_i_from_d8_i(): byte {
   OpcodeMap[0x26].call(this);
   return 8;
 }
@@ -440,7 +440,7 @@ export function LD_into_H_i_from_d8_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, H, C
  */
-export function DAA_A(): byte {
+function DAA_A(): byte {
   OpcodeMap[0x27].call(this);
   return 4;
 }
@@ -452,7 +452,7 @@ export function DAA_A(): byte {
  * Affected flags:
  */
 export function JR_C_Z_r8(): byte {
-  let condition: boolean = OpcodeMap[0x28].call(this);
+  const condition: boolean = OpcodeMap[0x28].call(this);
   if (!condition) {
     return 8;
   }
@@ -465,7 +465,7 @@ export function JR_C_Z_r8(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: N, H, C
  */
-export function ADD_into_HL_i_from_HL_i(): byte {
+function ADD_into_HL_i_from_HL_i(): byte {
   OpcodeMap[0x29].call(this);
   return 8;
 }
@@ -476,7 +476,7 @@ export function ADD_into_HL_i_from_HL_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_A_i_from_HL_incr_m(): byte {
+function LD_into_A_i_from_HL_incr_m(): byte {
   OpcodeMap[0x2a].call(this);
   return 8;
 }
@@ -487,7 +487,7 @@ export function LD_into_A_i_from_HL_incr_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function DEC_HL_i(): byte {
+function DEC_HL_i(): byte {
   OpcodeMap[0x2b].call(this);
   return 8;
 }
@@ -498,7 +498,7 @@ export function DEC_HL_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function INC_L_i(): byte {
+function INC_L_i(): byte {
   OpcodeMap[0x2c].call(this);
   return 4;
 }
@@ -509,7 +509,7 @@ export function INC_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function DEC_L_i(): byte {
+function DEC_L_i(): byte {
   OpcodeMap[0x2d].call(this);
   return 4;
 }
@@ -520,7 +520,7 @@ export function DEC_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_L_i_from_d8_i(): byte {
+function LD_into_L_i_from_d8_i(): byte {
   OpcodeMap[0x2e].call(this);
   return 8;
 }
@@ -531,7 +531,7 @@ export function LD_into_L_i_from_d8_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: N, H
  */
-export function CPL_A(): byte {
+function CPL_A(): byte {
   OpcodeMap[0x2f].call(this);
   return 4;
 }
@@ -543,7 +543,7 @@ export function CPL_A(): byte {
  * Affected flags:
  */
 export function JR_C_NC_r8(): byte {
-  let condition: boolean = OpcodeMap[0x30].call(this);
+  const condition: boolean = OpcodeMap[0x30].call(this);
   if (!condition) {
     return 8;
   }
@@ -556,7 +556,7 @@ export function JR_C_NC_r8(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_SP_i_from_d16_i(): byte {
+function LD_into_SP_i_from_d16_i(): byte {
   OpcodeMap[0x31].call(this);
   return 12;
 }
@@ -567,7 +567,7 @@ export function LD_into_SP_i_from_d16_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_HL_decr_m_from_A_i(): byte {
+function LD_into_HL_decr_m_from_A_i(): byte {
   OpcodeMap[0x32].call(this);
   return 8;
 }
@@ -578,7 +578,7 @@ export function LD_into_HL_decr_m_from_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function INC_SP_i(): byte {
+function INC_SP_i(): byte {
   OpcodeMap[0x33].call(this);
   return 8;
 }
@@ -589,7 +589,7 @@ export function INC_SP_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function INC_HL_m(): byte {
+function INC_HL_m(): byte {
   OpcodeMap[0x34].call(this);
   return 12;
 }
@@ -600,7 +600,7 @@ export function INC_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function DEC_HL_m(): byte {
+function DEC_HL_m(): byte {
   OpcodeMap[0x35].call(this);
   return 12;
 }
@@ -611,7 +611,7 @@ export function DEC_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_HL_m_from_d8_i(): byte {
+function LD_into_HL_m_from_d8_i(): byte {
   OpcodeMap[0x36].call(this);
   return 12;
 }
@@ -622,7 +622,7 @@ export function LD_into_HL_m_from_d8_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: N, H, C
  */
-export function SCF(): byte {
+function SCF(): byte {
   OpcodeMap[0x37].call(this);
   return 4;
 }
@@ -634,7 +634,7 @@ export function SCF(): byte {
  * Affected flags:
  */
 export function JR_C_C_r8(): byte {
-  let condition: boolean = OpcodeMap[0x38].call(this);
+  const condition: boolean = OpcodeMap[0x38].call(this);
   if (!condition) {
     return 8;
   }
@@ -647,7 +647,7 @@ export function JR_C_C_r8(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: N, H, C
  */
-export function ADD_into_HL_i_from_SP_i(): byte {
+function ADD_into_HL_i_from_SP_i(): byte {
   OpcodeMap[0x39].call(this);
   return 8;
 }
@@ -658,7 +658,7 @@ export function ADD_into_HL_i_from_SP_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_A_i_from_HL_decr_m(): byte {
+function LD_into_A_i_from_HL_decr_m(): byte {
   OpcodeMap[0x3a].call(this);
   return 8;
 }
@@ -669,7 +669,7 @@ export function LD_into_A_i_from_HL_decr_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function DEC_SP_i(): byte {
+function DEC_SP_i(): byte {
   OpcodeMap[0x3b].call(this);
   return 8;
 }
@@ -680,7 +680,7 @@ export function DEC_SP_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function INC_A_i(): byte {
+function INC_A_i(): byte {
   OpcodeMap[0x3c].call(this);
   return 4;
 }
@@ -691,7 +691,7 @@ export function INC_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function DEC_A_i(): byte {
+function DEC_A_i(): byte {
   OpcodeMap[0x3d].call(this);
   return 4;
 }
@@ -702,7 +702,7 @@ export function DEC_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_A_i_from_d8_i(): byte {
+function LD_into_A_i_from_d8_i(): byte {
   OpcodeMap[0x3e].call(this);
   return 8;
 }
@@ -715,7 +715,7 @@ export function LD_into_A_i_from_d8_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: N, H, C
  */
-export function CCF(): byte {
+function CCF(): byte {
   OpcodeMap[0x3f].call(this);
   return 4;
 }
@@ -726,7 +726,7 @@ export function CCF(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_B_i_from_B_i(): byte {
+function LD_into_B_i_from_B_i(): byte {
   OpcodeMap[0x40].call(this);
   return 4;
 }
@@ -737,7 +737,7 @@ export function LD_into_B_i_from_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_B_i_from_C_i(): byte {
+function LD_into_B_i_from_C_i(): byte {
   OpcodeMap[0x41].call(this);
   return 4;
 }
@@ -748,7 +748,7 @@ export function LD_into_B_i_from_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_B_i_from_D_i(): byte {
+function LD_into_B_i_from_D_i(): byte {
   OpcodeMap[0x42].call(this);
   return 4;
 }
@@ -759,7 +759,7 @@ export function LD_into_B_i_from_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_B_i_from_E_i(): byte {
+function LD_into_B_i_from_E_i(): byte {
   OpcodeMap[0x43].call(this);
   return 4;
 }
@@ -770,7 +770,7 @@ export function LD_into_B_i_from_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_B_i_from_H_i(): byte {
+function LD_into_B_i_from_H_i(): byte {
   OpcodeMap[0x44].call(this);
   return 4;
 }
@@ -781,7 +781,7 @@ export function LD_into_B_i_from_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_B_i_from_L_i(): byte {
+function LD_into_B_i_from_L_i(): byte {
   OpcodeMap[0x45].call(this);
   return 4;
 }
@@ -792,7 +792,7 @@ export function LD_into_B_i_from_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_B_i_from_HL_m(): byte {
+function LD_into_B_i_from_HL_m(): byte {
   OpcodeMap[0x46].call(this);
   return 8;
 }
@@ -803,7 +803,7 @@ export function LD_into_B_i_from_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_B_i_from_A_i(): byte {
+function LD_into_B_i_from_A_i(): byte {
   OpcodeMap[0x47].call(this);
   return 4;
 }
@@ -814,7 +814,7 @@ export function LD_into_B_i_from_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_C_i_from_B_i(): byte {
+function LD_into_C_i_from_B_i(): byte {
   OpcodeMap[0x48].call(this);
   return 4;
 }
@@ -825,7 +825,7 @@ export function LD_into_C_i_from_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_C_i_from_C_i(): byte {
+function LD_into_C_i_from_C_i(): byte {
   OpcodeMap[0x49].call(this);
   return 4;
 }
@@ -836,7 +836,7 @@ export function LD_into_C_i_from_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_C_i_from_D_i(): byte {
+function LD_into_C_i_from_D_i(): byte {
   OpcodeMap[0x4a].call(this);
   return 4;
 }
@@ -847,7 +847,7 @@ export function LD_into_C_i_from_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_C_i_from_E_i(): byte {
+function LD_into_C_i_from_E_i(): byte {
   OpcodeMap[0x4b].call(this);
   return 4;
 }
@@ -858,7 +858,7 @@ export function LD_into_C_i_from_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_C_i_from_H_i(): byte {
+function LD_into_C_i_from_H_i(): byte {
   OpcodeMap[0x4c].call(this);
   return 4;
 }
@@ -869,7 +869,7 @@ export function LD_into_C_i_from_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_C_i_from_L_i(): byte {
+function LD_into_C_i_from_L_i(): byte {
   OpcodeMap[0x4d].call(this);
   return 4;
 }
@@ -880,7 +880,7 @@ export function LD_into_C_i_from_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_C_i_from_HL_m(): byte {
+function LD_into_C_i_from_HL_m(): byte {
   OpcodeMap[0x4e].call(this);
   return 8;
 }
@@ -891,7 +891,7 @@ export function LD_into_C_i_from_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_C_i_from_A_i(): byte {
+function LD_into_C_i_from_A_i(): byte {
   OpcodeMap[0x4f].call(this);
   return 4;
 }
@@ -902,7 +902,7 @@ export function LD_into_C_i_from_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_D_i_from_B_i(): byte {
+function LD_into_D_i_from_B_i(): byte {
   OpcodeMap[0x50].call(this);
   return 4;
 }
@@ -913,7 +913,7 @@ export function LD_into_D_i_from_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_D_i_from_C_i(): byte {
+function LD_into_D_i_from_C_i(): byte {
   OpcodeMap[0x51].call(this);
   return 4;
 }
@@ -924,7 +924,7 @@ export function LD_into_D_i_from_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_D_i_from_D_i(): byte {
+function LD_into_D_i_from_D_i(): byte {
   OpcodeMap[0x52].call(this);
   return 4;
 }
@@ -935,7 +935,7 @@ export function LD_into_D_i_from_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_D_i_from_E_i(): byte {
+function LD_into_D_i_from_E_i(): byte {
   OpcodeMap[0x53].call(this);
   return 4;
 }
@@ -946,7 +946,7 @@ export function LD_into_D_i_from_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_D_i_from_H_i(): byte {
+function LD_into_D_i_from_H_i(): byte {
   OpcodeMap[0x54].call(this);
   return 4;
 }
@@ -957,7 +957,7 @@ export function LD_into_D_i_from_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_D_i_from_L_i(): byte {
+function LD_into_D_i_from_L_i(): byte {
   OpcodeMap[0x55].call(this);
   return 4;
 }
@@ -968,7 +968,7 @@ export function LD_into_D_i_from_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_D_i_from_HL_m(): byte {
+function LD_into_D_i_from_HL_m(): byte {
   OpcodeMap[0x56].call(this);
   return 8;
 }
@@ -979,7 +979,7 @@ export function LD_into_D_i_from_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_D_i_from_A_i(): byte {
+function LD_into_D_i_from_A_i(): byte {
   OpcodeMap[0x57].call(this);
   return 4;
 }
@@ -990,7 +990,7 @@ export function LD_into_D_i_from_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_E_i_from_B_i(): byte {
+function LD_into_E_i_from_B_i(): byte {
   OpcodeMap[0x58].call(this);
   return 4;
 }
@@ -1001,7 +1001,7 @@ export function LD_into_E_i_from_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_E_i_from_C_i(): byte {
+function LD_into_E_i_from_C_i(): byte {
   OpcodeMap[0x59].call(this);
   return 4;
 }
@@ -1012,7 +1012,7 @@ export function LD_into_E_i_from_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_E_i_from_D_i(): byte {
+function LD_into_E_i_from_D_i(): byte {
   OpcodeMap[0x5a].call(this);
   return 4;
 }
@@ -1023,7 +1023,7 @@ export function LD_into_E_i_from_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_E_i_from_E_i(): byte {
+function LD_into_E_i_from_E_i(): byte {
   OpcodeMap[0x5b].call(this);
   return 4;
 }
@@ -1034,7 +1034,7 @@ export function LD_into_E_i_from_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_E_i_from_H_i(): byte {
+function LD_into_E_i_from_H_i(): byte {
   OpcodeMap[0x5c].call(this);
   return 4;
 }
@@ -1045,7 +1045,7 @@ export function LD_into_E_i_from_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_E_i_from_L_i(): byte {
+function LD_into_E_i_from_L_i(): byte {
   OpcodeMap[0x5d].call(this);
   return 4;
 }
@@ -1056,7 +1056,7 @@ export function LD_into_E_i_from_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_E_i_from_HL_m(): byte {
+function LD_into_E_i_from_HL_m(): byte {
   OpcodeMap[0x5e].call(this);
   return 8;
 }
@@ -1067,7 +1067,7 @@ export function LD_into_E_i_from_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_E_i_from_A_i(): byte {
+function LD_into_E_i_from_A_i(): byte {
   OpcodeMap[0x5f].call(this);
   return 4;
 }
@@ -1078,7 +1078,7 @@ export function LD_into_E_i_from_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_H_i_from_B_i(): byte {
+function LD_into_H_i_from_B_i(): byte {
   OpcodeMap[0x60].call(this);
   return 4;
 }
@@ -1089,7 +1089,7 @@ export function LD_into_H_i_from_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_H_i_from_C_i(): byte {
+function LD_into_H_i_from_C_i(): byte {
   OpcodeMap[0x61].call(this);
   return 4;
 }
@@ -1100,7 +1100,7 @@ export function LD_into_H_i_from_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_H_i_from_D_i(): byte {
+function LD_into_H_i_from_D_i(): byte {
   OpcodeMap[0x62].call(this);
   return 4;
 }
@@ -1111,7 +1111,7 @@ export function LD_into_H_i_from_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_H_i_from_E_i(): byte {
+function LD_into_H_i_from_E_i(): byte {
   OpcodeMap[0x63].call(this);
   return 4;
 }
@@ -1122,7 +1122,7 @@ export function LD_into_H_i_from_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_H_i_from_H_i(): byte {
+function LD_into_H_i_from_H_i(): byte {
   OpcodeMap[0x64].call(this);
   return 4;
 }
@@ -1133,7 +1133,7 @@ export function LD_into_H_i_from_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_H_i_from_L_i(): byte {
+function LD_into_H_i_from_L_i(): byte {
   OpcodeMap[0x65].call(this);
   return 4;
 }
@@ -1144,7 +1144,7 @@ export function LD_into_H_i_from_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_H_i_from_HL_m(): byte {
+function LD_into_H_i_from_HL_m(): byte {
   OpcodeMap[0x66].call(this);
   return 8;
 }
@@ -1155,7 +1155,7 @@ export function LD_into_H_i_from_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_H_i_from_A_i(): byte {
+function LD_into_H_i_from_A_i(): byte {
   OpcodeMap[0x67].call(this);
   return 4;
 }
@@ -1166,7 +1166,7 @@ export function LD_into_H_i_from_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_L_i_from_B_i(): byte {
+function LD_into_L_i_from_B_i(): byte {
   OpcodeMap[0x68].call(this);
   return 4;
 }
@@ -1177,7 +1177,7 @@ export function LD_into_L_i_from_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_L_i_from_C_i(): byte {
+function LD_into_L_i_from_C_i(): byte {
   OpcodeMap[0x69].call(this);
   return 4;
 }
@@ -1188,7 +1188,7 @@ export function LD_into_L_i_from_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_L_i_from_D_i(): byte {
+function LD_into_L_i_from_D_i(): byte {
   OpcodeMap[0x6a].call(this);
   return 4;
 }
@@ -1199,7 +1199,7 @@ export function LD_into_L_i_from_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_L_i_from_E_i(): byte {
+function LD_into_L_i_from_E_i(): byte {
   OpcodeMap[0x6b].call(this);
   return 4;
 }
@@ -1210,7 +1210,7 @@ export function LD_into_L_i_from_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_L_i_from_H_i(): byte {
+function LD_into_L_i_from_H_i(): byte {
   OpcodeMap[0x6c].call(this);
   return 4;
 }
@@ -1221,7 +1221,7 @@ export function LD_into_L_i_from_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_L_i_from_L_i(): byte {
+function LD_into_L_i_from_L_i(): byte {
   OpcodeMap[0x6d].call(this);
   return 4;
 }
@@ -1232,7 +1232,7 @@ export function LD_into_L_i_from_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_L_i_from_HL_m(): byte {
+function LD_into_L_i_from_HL_m(): byte {
   OpcodeMap[0x6e].call(this);
   return 8;
 }
@@ -1243,7 +1243,7 @@ export function LD_into_L_i_from_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_L_i_from_A_i(): byte {
+function LD_into_L_i_from_A_i(): byte {
   OpcodeMap[0x6f].call(this);
   return 4;
 }
@@ -1254,7 +1254,7 @@ export function LD_into_L_i_from_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_HL_m_from_B_i(): byte {
+function LD_into_HL_m_from_B_i(): byte {
   OpcodeMap[0x70].call(this);
   return 8;
 }
@@ -1265,7 +1265,7 @@ export function LD_into_HL_m_from_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_HL_m_from_C_i(): byte {
+function LD_into_HL_m_from_C_i(): byte {
   OpcodeMap[0x71].call(this);
   return 8;
 }
@@ -1276,7 +1276,7 @@ export function LD_into_HL_m_from_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_HL_m_from_D_i(): byte {
+function LD_into_HL_m_from_D_i(): byte {
   OpcodeMap[0x72].call(this);
   return 8;
 }
@@ -1287,7 +1287,7 @@ export function LD_into_HL_m_from_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_HL_m_from_E_i(): byte {
+function LD_into_HL_m_from_E_i(): byte {
   OpcodeMap[0x73].call(this);
   return 8;
 }
@@ -1298,7 +1298,7 @@ export function LD_into_HL_m_from_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_HL_m_from_H_i(): byte {
+function LD_into_HL_m_from_H_i(): byte {
   OpcodeMap[0x74].call(this);
   return 8;
 }
@@ -1309,7 +1309,7 @@ export function LD_into_HL_m_from_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_HL_m_from_L_i(): byte {
+function LD_into_HL_m_from_L_i(): byte {
   OpcodeMap[0x75].call(this);
   return 8;
 }
@@ -1320,7 +1320,7 @@ export function LD_into_HL_m_from_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function HALT(): byte {
+function HALT(): byte {
   OpcodeMap[0x76].call(this);
   return 4;
 }
@@ -1331,7 +1331,7 @@ export function HALT(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_HL_m_from_A_i(): byte {
+function LD_into_HL_m_from_A_i(): byte {
   OpcodeMap[0x77].call(this);
   return 8;
 }
@@ -1342,7 +1342,7 @@ export function LD_into_HL_m_from_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_A_i_from_B_i(): byte {
+function LD_into_A_i_from_B_i(): byte {
   OpcodeMap[0x78].call(this);
   return 4;
 }
@@ -1353,7 +1353,7 @@ export function LD_into_A_i_from_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_A_i_from_C_i(): byte {
+function LD_into_A_i_from_C_i(): byte {
   OpcodeMap[0x79].call(this);
   return 4;
 }
@@ -1364,7 +1364,7 @@ export function LD_into_A_i_from_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_A_i_from_D_i(): byte {
+function LD_into_A_i_from_D_i(): byte {
   OpcodeMap[0x7a].call(this);
   return 4;
 }
@@ -1375,7 +1375,7 @@ export function LD_into_A_i_from_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_A_i_from_E_i(): byte {
+function LD_into_A_i_from_E_i(): byte {
   OpcodeMap[0x7b].call(this);
   return 4;
 }
@@ -1386,7 +1386,7 @@ export function LD_into_A_i_from_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_A_i_from_H_i(): byte {
+function LD_into_A_i_from_H_i(): byte {
   OpcodeMap[0x7c].call(this);
   return 4;
 }
@@ -1397,7 +1397,7 @@ export function LD_into_A_i_from_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_A_i_from_L_i(): byte {
+function LD_into_A_i_from_L_i(): byte {
   OpcodeMap[0x7d].call(this);
   return 4;
 }
@@ -1408,7 +1408,7 @@ export function LD_into_A_i_from_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_A_i_from_HL_m(): byte {
+function LD_into_A_i_from_HL_m(): byte {
   OpcodeMap[0x7e].call(this);
   return 8;
 }
@@ -1419,7 +1419,7 @@ export function LD_into_A_i_from_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_A_i_from_A_i(): byte {
+function LD_into_A_i_from_A_i(): byte {
   OpcodeMap[0x7f].call(this);
   return 4;
 }
@@ -1430,7 +1430,7 @@ export function LD_into_A_i_from_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function ADD_into_A_i_from_B_i(): byte {
+function ADD_into_A_i_from_B_i(): byte {
   OpcodeMap[0x80].call(this);
   return 4;
 }
@@ -1441,7 +1441,7 @@ export function ADD_into_A_i_from_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function ADD_into_A_i_from_C_i(): byte {
+function ADD_into_A_i_from_C_i(): byte {
   OpcodeMap[0x81].call(this);
   return 4;
 }
@@ -1452,7 +1452,7 @@ export function ADD_into_A_i_from_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function ADD_into_A_i_from_D_i(): byte {
+function ADD_into_A_i_from_D_i(): byte {
   OpcodeMap[0x82].call(this);
   return 4;
 }
@@ -1463,7 +1463,7 @@ export function ADD_into_A_i_from_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function ADD_into_A_i_from_E_i(): byte {
+function ADD_into_A_i_from_E_i(): byte {
   OpcodeMap[0x83].call(this);
   return 4;
 }
@@ -1474,7 +1474,7 @@ export function ADD_into_A_i_from_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function ADD_into_A_i_from_H_i(): byte {
+function ADD_into_A_i_from_H_i(): byte {
   OpcodeMap[0x84].call(this);
   return 4;
 }
@@ -1485,7 +1485,7 @@ export function ADD_into_A_i_from_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function ADD_into_A_i_from_L_i(): byte {
+function ADD_into_A_i_from_L_i(): byte {
   OpcodeMap[0x85].call(this);
   return 4;
 }
@@ -1496,7 +1496,7 @@ export function ADD_into_A_i_from_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function ADD_into_A_i_from_HL_m(): byte {
+function ADD_into_A_i_from_HL_m(): byte {
   OpcodeMap[0x86].call(this);
   return 8;
 }
@@ -1507,7 +1507,7 @@ export function ADD_into_A_i_from_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function ADD_into_A_i_from_A_i(): byte {
+function ADD_into_A_i_from_A_i(): byte {
   OpcodeMap[0x87].call(this);
   return 4;
 }
@@ -1518,7 +1518,7 @@ export function ADD_into_A_i_from_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function ADC_into_A_i_from_B_i(): byte {
+function ADC_into_A_i_from_B_i(): byte {
   OpcodeMap[0x88].call(this);
   return 4;
 }
@@ -1529,7 +1529,7 @@ export function ADC_into_A_i_from_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function ADC_into_A_i_from_C_i(): byte {
+function ADC_into_A_i_from_C_i(): byte {
   OpcodeMap[0x89].call(this);
   return 4;
 }
@@ -1540,7 +1540,7 @@ export function ADC_into_A_i_from_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function ADC_into_A_i_from_D_i(): byte {
+function ADC_into_A_i_from_D_i(): byte {
   OpcodeMap[0x8a].call(this);
   return 4;
 }
@@ -1551,7 +1551,7 @@ export function ADC_into_A_i_from_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function ADC_into_A_i_from_E_i(): byte {
+function ADC_into_A_i_from_E_i(): byte {
   OpcodeMap[0x8b].call(this);
   return 4;
 }
@@ -1562,7 +1562,7 @@ export function ADC_into_A_i_from_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function ADC_into_A_i_from_H_i(): byte {
+function ADC_into_A_i_from_H_i(): byte {
   OpcodeMap[0x8c].call(this);
   return 4;
 }
@@ -1573,7 +1573,7 @@ export function ADC_into_A_i_from_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function ADC_into_A_i_from_L_i(): byte {
+function ADC_into_A_i_from_L_i(): byte {
   OpcodeMap[0x8d].call(this);
   return 4;
 }
@@ -1584,7 +1584,7 @@ export function ADC_into_A_i_from_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function ADC_into_A_i_from_HL_m(): byte {
+function ADC_into_A_i_from_HL_m(): byte {
   OpcodeMap[0x8e].call(this);
   return 8;
 }
@@ -1595,7 +1595,7 @@ export function ADC_into_A_i_from_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function ADC_into_A_i_from_A_i(): byte {
+function ADC_into_A_i_from_A_i(): byte {
   OpcodeMap[0x8f].call(this);
   return 4;
 }
@@ -1606,7 +1606,7 @@ export function ADC_into_A_i_from_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SUB_from_A_i_value_B_i(): byte {
+function SUB_from_A_i_value_B_i(): byte {
   OpcodeMap[0x90].call(this);
   return 4;
 }
@@ -1617,7 +1617,7 @@ export function SUB_from_A_i_value_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SUB_from_A_i_value_C_i(): byte {
+function SUB_from_A_i_value_C_i(): byte {
   OpcodeMap[0x91].call(this);
   return 4;
 }
@@ -1628,7 +1628,7 @@ export function SUB_from_A_i_value_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SUB_from_A_i_value_D_i(): byte {
+function SUB_from_A_i_value_D_i(): byte {
   OpcodeMap[0x92].call(this);
   return 4;
 }
@@ -1639,7 +1639,7 @@ export function SUB_from_A_i_value_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SUB_from_A_i_value_E_i(): byte {
+function SUB_from_A_i_value_E_i(): byte {
   OpcodeMap[0x93].call(this);
   return 4;
 }
@@ -1650,7 +1650,7 @@ export function SUB_from_A_i_value_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SUB_from_A_i_value_H_i(): byte {
+function SUB_from_A_i_value_H_i(): byte {
   OpcodeMap[0x94].call(this);
   return 4;
 }
@@ -1661,7 +1661,7 @@ export function SUB_from_A_i_value_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SUB_from_A_i_value_L_i(): byte {
+function SUB_from_A_i_value_L_i(): byte {
   OpcodeMap[0x95].call(this);
   return 4;
 }
@@ -1672,7 +1672,7 @@ export function SUB_from_A_i_value_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SUB_from_A_i_value_HL_m(): byte {
+function SUB_from_A_i_value_HL_m(): byte {
   OpcodeMap[0x96].call(this);
   return 8;
 }
@@ -1683,7 +1683,7 @@ export function SUB_from_A_i_value_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SUB_from_A_i_value_A_i(): byte {
+function SUB_from_A_i_value_A_i(): byte {
   OpcodeMap[0x97].call(this);
   return 4;
 }
@@ -1694,7 +1694,7 @@ export function SUB_from_A_i_value_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SBC_from_A_i_value_B_i(): byte {
+function SBC_from_A_i_value_B_i(): byte {
   OpcodeMap[0x98].call(this);
   return 4;
 }
@@ -1705,7 +1705,7 @@ export function SBC_from_A_i_value_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SBC_from_A_i_value_C_i(): byte {
+function SBC_from_A_i_value_C_i(): byte {
   OpcodeMap[0x99].call(this);
   return 4;
 }
@@ -1716,7 +1716,7 @@ export function SBC_from_A_i_value_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SBC_from_A_i_value_D_i(): byte {
+function SBC_from_A_i_value_D_i(): byte {
   OpcodeMap[0x9a].call(this);
   return 4;
 }
@@ -1727,7 +1727,7 @@ export function SBC_from_A_i_value_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SBC_from_A_i_value_E_i(): byte {
+function SBC_from_A_i_value_E_i(): byte {
   OpcodeMap[0x9b].call(this);
   return 4;
 }
@@ -1738,7 +1738,7 @@ export function SBC_from_A_i_value_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SBC_from_A_i_value_H_i(): byte {
+function SBC_from_A_i_value_H_i(): byte {
   OpcodeMap[0x9c].call(this);
   return 4;
 }
@@ -1749,7 +1749,7 @@ export function SBC_from_A_i_value_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SBC_from_A_i_value_L_i(): byte {
+function SBC_from_A_i_value_L_i(): byte {
   OpcodeMap[0x9d].call(this);
   return 4;
 }
@@ -1760,7 +1760,7 @@ export function SBC_from_A_i_value_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SBC_from_A_i_value_HL_m(): byte {
+function SBC_from_A_i_value_HL_m(): byte {
   OpcodeMap[0x9e].call(this);
   return 8;
 }
@@ -1771,7 +1771,7 @@ export function SBC_from_A_i_value_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SBC_from_A_i_value_A_i(): byte {
+function SBC_from_A_i_value_A_i(): byte {
   OpcodeMap[0x9f].call(this);
   return 4;
 }
@@ -1782,7 +1782,7 @@ export function SBC_from_A_i_value_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function AND_A_with_B_i(): byte {
+function AND_A_with_B_i(): byte {
   OpcodeMap[0xa0].call(this);
   return 4;
 }
@@ -1793,7 +1793,7 @@ export function AND_A_with_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function AND_A_with_C_i(): byte {
+function AND_A_with_C_i(): byte {
   OpcodeMap[0xa1].call(this);
   return 4;
 }
@@ -1804,7 +1804,7 @@ export function AND_A_with_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function AND_A_with_D_i(): byte {
+function AND_A_with_D_i(): byte {
   OpcodeMap[0xa2].call(this);
   return 4;
 }
@@ -1815,7 +1815,7 @@ export function AND_A_with_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function AND_A_with_E_i(): byte {
+function AND_A_with_E_i(): byte {
   OpcodeMap[0xa3].call(this);
   return 4;
 }
@@ -1826,7 +1826,7 @@ export function AND_A_with_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function AND_A_with_H_i(): byte {
+function AND_A_with_H_i(): byte {
   OpcodeMap[0xa4].call(this);
   return 4;
 }
@@ -1837,7 +1837,7 @@ export function AND_A_with_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function AND_A_with_L_i(): byte {
+function AND_A_with_L_i(): byte {
   OpcodeMap[0xa5].call(this);
   return 4;
 }
@@ -1848,7 +1848,7 @@ export function AND_A_with_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function AND_A_with_HL_m(): byte {
+function AND_A_with_HL_m(): byte {
   OpcodeMap[0xa6].call(this);
   return 8;
 }
@@ -1859,7 +1859,7 @@ export function AND_A_with_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function AND_A_with_A_i(): byte {
+function AND_A_with_A_i(): byte {
   OpcodeMap[0xa7].call(this);
   return 4;
 }
@@ -1870,7 +1870,7 @@ export function AND_A_with_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function XOR_A_with_B_i(): byte {
+function XOR_A_with_B_i(): byte {
   OpcodeMap[0xa8].call(this);
   return 4;
 }
@@ -1881,7 +1881,7 @@ export function XOR_A_with_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function XOR_A_with_C_i(): byte {
+function XOR_A_with_C_i(): byte {
   OpcodeMap[0xa9].call(this);
   return 4;
 }
@@ -1892,7 +1892,7 @@ export function XOR_A_with_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function XOR_A_with_D_i(): byte {
+function XOR_A_with_D_i(): byte {
   OpcodeMap[0xaa].call(this);
   return 4;
 }
@@ -1903,7 +1903,7 @@ export function XOR_A_with_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function XOR_A_with_E_i(): byte {
+function XOR_A_with_E_i(): byte {
   OpcodeMap[0xab].call(this);
   return 4;
 }
@@ -1914,7 +1914,7 @@ export function XOR_A_with_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function XOR_A_with_H_i(): byte {
+function XOR_A_with_H_i(): byte {
   OpcodeMap[0xac].call(this);
   return 4;
 }
@@ -1925,7 +1925,7 @@ export function XOR_A_with_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function XOR_A_with_L_i(): byte {
+function XOR_A_with_L_i(): byte {
   OpcodeMap[0xad].call(this);
   return 4;
 }
@@ -1936,7 +1936,7 @@ export function XOR_A_with_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function XOR_A_with_HL_m(): byte {
+function XOR_A_with_HL_m(): byte {
   OpcodeMap[0xae].call(this);
   return 8;
 }
@@ -1947,7 +1947,7 @@ export function XOR_A_with_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function XOR_A_with_A_i(): byte {
+function XOR_A_with_A_i(): byte {
   OpcodeMap[0xaf].call(this);
   return 4;
 }
@@ -1958,7 +1958,7 @@ export function XOR_A_with_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function OR_A_with_B_i(): byte {
+function OR_A_with_B_i(): byte {
   OpcodeMap[0xb0].call(this);
   return 4;
 }
@@ -1969,7 +1969,7 @@ export function OR_A_with_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function OR_A_with_C_i(): byte {
+function OR_A_with_C_i(): byte {
   OpcodeMap[0xb1].call(this);
   return 4;
 }
@@ -1980,7 +1980,7 @@ export function OR_A_with_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function OR_A_with_D_i(): byte {
+function OR_A_with_D_i(): byte {
   OpcodeMap[0xb2].call(this);
   return 4;
 }
@@ -1991,7 +1991,7 @@ export function OR_A_with_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function OR_A_with_E_i(): byte {
+function OR_A_with_E_i(): byte {
   OpcodeMap[0xb3].call(this);
   return 4;
 }
@@ -2002,7 +2002,7 @@ export function OR_A_with_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function OR_A_with_H_i(): byte {
+function OR_A_with_H_i(): byte {
   OpcodeMap[0xb4].call(this);
   return 4;
 }
@@ -2013,7 +2013,7 @@ export function OR_A_with_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function OR_A_with_L_i(): byte {
+function OR_A_with_L_i(): byte {
   OpcodeMap[0xb5].call(this);
   return 4;
 }
@@ -2024,7 +2024,7 @@ export function OR_A_with_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function OR_A_with_HL_m(): byte {
+function OR_A_with_HL_m(): byte {
   OpcodeMap[0xb6].call(this);
   return 8;
 }
@@ -2035,7 +2035,7 @@ export function OR_A_with_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function OR_A_with_A_i(): byte {
+function OR_A_with_A_i(): byte {
   OpcodeMap[0xb7].call(this);
   return 4;
 }
@@ -2046,7 +2046,7 @@ export function OR_A_with_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function CP_A_with_B_i(): byte {
+function CP_A_with_B_i(): byte {
   OpcodeMap[0xb8].call(this);
   return 4;
 }
@@ -2057,7 +2057,7 @@ export function CP_A_with_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function CP_A_with_C_i(): byte {
+function CP_A_with_C_i(): byte {
   OpcodeMap[0xb9].call(this);
   return 4;
 }
@@ -2068,7 +2068,7 @@ export function CP_A_with_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function CP_A_with_D_i(): byte {
+function CP_A_with_D_i(): byte {
   OpcodeMap[0xba].call(this);
   return 4;
 }
@@ -2079,7 +2079,7 @@ export function CP_A_with_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function CP_A_with_E_i(): byte {
+function CP_A_with_E_i(): byte {
   OpcodeMap[0xbb].call(this);
   return 4;
 }
@@ -2090,7 +2090,7 @@ export function CP_A_with_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function CP_A_with_H_i(): byte {
+function CP_A_with_H_i(): byte {
   OpcodeMap[0xbc].call(this);
   return 4;
 }
@@ -2101,7 +2101,7 @@ export function CP_A_with_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function CP_A_with_L_i(): byte {
+function CP_A_with_L_i(): byte {
   OpcodeMap[0xbd].call(this);
   return 4;
 }
@@ -2112,7 +2112,7 @@ export function CP_A_with_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function CP_A_with_HL_m(): byte {
+function CP_A_with_HL_m(): byte {
   OpcodeMap[0xbe].call(this);
   return 8;
 }
@@ -2123,7 +2123,7 @@ export function CP_A_with_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function CP_A_with_A_i(): byte {
+function CP_A_with_A_i(): byte {
   OpcodeMap[0xbf].call(this);
   return 4;
 }
@@ -2135,7 +2135,7 @@ export function CP_A_with_A_i(): byte {
  * Affected flags:
  */
 export function RET_C_NZ(): byte {
-  let condition: boolean = OpcodeMap[0xc0].call(this);
+  const condition: boolean = OpcodeMap[0xc0].call(this);
   if (!condition) {
     return 8;
   }
@@ -2148,7 +2148,7 @@ export function RET_C_NZ(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function POP_off_SP_into_BC_i(): byte {
+function POP_off_SP_into_BC_i(): byte {
   OpcodeMap[0xc1].call(this);
   return 12;
 }
@@ -2160,7 +2160,7 @@ export function POP_off_SP_into_BC_i(): byte {
  * Affected flags:
  */
 export function JP_C_NZ_a16(): byte {
-  let condition: boolean = OpcodeMap[0xc2].call(this);
+  const condition: boolean = OpcodeMap[0xc2].call(this);
   if (!condition) {
     return 12;
   }
@@ -2173,7 +2173,7 @@ export function JP_C_NZ_a16(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function JP_a16(): byte {
+function JP_a16(): byte {
   OpcodeMap[0xc3].call(this);
   return 16;
 }
@@ -2185,7 +2185,7 @@ export function JP_a16(): byte {
  * Affected flags:
  */
 export function CALL_C_NZ_a16(): byte {
-  let condition: boolean = OpcodeMap[0xc4].call(this);
+  const condition: boolean = OpcodeMap[0xc4].call(this);
   if (!condition) {
     return 12;
   }
@@ -2198,7 +2198,7 @@ export function CALL_C_NZ_a16(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function PUSH_onto_SP_register_BC_i(): byte {
+function PUSH_onto_SP_register_BC_i(): byte {
   OpcodeMap[0xc5].call(this);
   return 16;
 }
@@ -2209,7 +2209,7 @@ export function PUSH_onto_SP_register_BC_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function ADD_into_A_i_from_d8_i(): byte {
+function ADD_into_A_i_from_d8_i(): byte {
   OpcodeMap[0xc6].call(this);
   return 8;
 }
@@ -2220,7 +2220,7 @@ export function ADD_into_A_i_from_d8_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RST_to_A_i_from_00H_i(): byte {
+function RST_to_A_i_from_00H_i(): byte {
   OpcodeMap[0xc7].call(this);
   return 16;
 }
@@ -2232,7 +2232,7 @@ export function RST_to_A_i_from_00H_i(): byte {
  * Affected flags:
  */
 export function RET_C_Z(): byte {
-  let condition: boolean = OpcodeMap[0xc8].call(this);
+  const condition: boolean = OpcodeMap[0xc8].call(this);
   if (!condition) {
     return 8;
   }
@@ -2245,7 +2245,7 @@ export function RET_C_Z(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RET(): byte {
+function RET(): byte {
   OpcodeMap[0xc9].call(this);
   return 16;
 }
@@ -2257,7 +2257,7 @@ export function RET(): byte {
  * Affected flags:
  */
 export function JP_C_Z_a16(): byte {
-  let condition: boolean = OpcodeMap[0xca].call(this);
+  const condition: boolean = OpcodeMap[0xca].call(this);
   if (!condition) {
     return 12;
   }
@@ -2270,7 +2270,7 @@ export function JP_C_Z_a16(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function PREFIX(): byte {
+function PREFIX(): byte {
   OpcodeMap[0xcb].call(this);
   return 4;
 }
@@ -2282,7 +2282,7 @@ export function PREFIX(): byte {
  * Affected flags:
  */
 export function CALL_C_Z_a16(): byte {
-  let condition: boolean = OpcodeMap[0xcc].call(this);
+  const condition: boolean = OpcodeMap[0xcc].call(this);
   if (!condition) {
     return 12;
   }
@@ -2295,7 +2295,7 @@ export function CALL_C_Z_a16(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function CALL(): byte {
+function CALL(): byte {
   OpcodeMap[0xcd].call(this);
   return 24;
 }
@@ -2306,7 +2306,7 @@ export function CALL(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function ADC_into_A_i_from_d8_i(): byte {
+function ADC_into_A_i_from_d8_i(): byte {
   OpcodeMap[0xce].call(this);
   return 8;
 }
@@ -2317,7 +2317,7 @@ export function ADC_into_A_i_from_d8_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RST_to_A_i_from_08H_i(): byte {
+function RST_to_A_i_from_08H_i(): byte {
   OpcodeMap[0xcf].call(this);
   return 16;
 }
@@ -2329,7 +2329,7 @@ export function RST_to_A_i_from_08H_i(): byte {
  * Affected flags:
  */
 export function RET_C_NC(): byte {
-  let condition: boolean = OpcodeMap[0xd0].call(this);
+  const condition: boolean = OpcodeMap[0xd0].call(this);
   if (!condition) {
     return 8;
   }
@@ -2342,7 +2342,7 @@ export function RET_C_NC(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function POP_off_SP_into_DE_i(): byte {
+function POP_off_SP_into_DE_i(): byte {
   OpcodeMap[0xd1].call(this);
   return 12;
 }
@@ -2354,7 +2354,7 @@ export function POP_off_SP_into_DE_i(): byte {
  * Affected flags:
  */
 export function JP_C_NC_a16(): byte {
-  let condition: boolean = OpcodeMap[0xd2].call(this);
+  const condition: boolean = OpcodeMap[0xd2].call(this);
   if (!condition) {
     return 12;
   }
@@ -2365,7 +2365,7 @@ export function JP_C_NC_a16(): byte {
  * Invalid opcode.
  * Affected flags:
  */
-export function ILLEGAL_D3(): byte {
+function ILLEGAL_D3(): byte {
   OpcodeMap[0xd3].call(this);
   return 4;
 }
@@ -2377,7 +2377,7 @@ export function ILLEGAL_D3(): byte {
  * Affected flags:
  */
 export function CALL_C_NC_a16(): byte {
-  let condition: boolean = OpcodeMap[0xd4].call(this);
+  const condition: boolean = OpcodeMap[0xd4].call(this);
   if (!condition) {
     return 12;
   }
@@ -2390,7 +2390,7 @@ export function CALL_C_NC_a16(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function PUSH_onto_SP_register_DE_i(): byte {
+function PUSH_onto_SP_register_DE_i(): byte {
   OpcodeMap[0xd5].call(this);
   return 16;
 }
@@ -2401,7 +2401,7 @@ export function PUSH_onto_SP_register_DE_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SUB_from_A_i_value_d8_i(): byte {
+function SUB_from_A_i_value_d8_i(): byte {
   OpcodeMap[0xd6].call(this);
   return 8;
 }
@@ -2412,7 +2412,7 @@ export function SUB_from_A_i_value_d8_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RST_to_A_i_from_10H_i(): byte {
+function RST_to_A_i_from_10H_i(): byte {
   OpcodeMap[0xd7].call(this);
   return 16;
 }
@@ -2424,7 +2424,7 @@ export function RST_to_A_i_from_10H_i(): byte {
  * Affected flags:
  */
 export function RET_C_C(): byte {
-  let condition: boolean = OpcodeMap[0xd8].call(this);
+  const condition: boolean = OpcodeMap[0xd8].call(this);
   if (!condition) {
     return 8;
   }
@@ -2437,7 +2437,7 @@ export function RET_C_C(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RETI(): byte {
+function RETI(): byte {
   OpcodeMap[0xd9].call(this);
   return 16;
 }
@@ -2449,7 +2449,7 @@ export function RETI(): byte {
  * Affected flags:
  */
 export function JP_C_C_a16(): byte {
-  let condition: boolean = OpcodeMap[0xda].call(this);
+  const condition: boolean = OpcodeMap[0xda].call(this);
   if (!condition) {
     return 12;
   }
@@ -2460,7 +2460,7 @@ export function JP_C_C_a16(): byte {
  * Invalid opcode.
  * Affected flags:
  */
-export function ILLEGAL_DB(): byte {
+function ILLEGAL_DB(): byte {
   OpcodeMap[0xdb].call(this);
   return 4;
 }
@@ -2472,7 +2472,7 @@ export function ILLEGAL_DB(): byte {
  * Affected flags:
  */
 export function CALL_C_C_a16(): byte {
-  let condition: boolean = OpcodeMap[0xdc].call(this);
+  const condition: boolean = OpcodeMap[0xdc].call(this);
   if (!condition) {
     return 12;
   }
@@ -2483,7 +2483,7 @@ export function CALL_C_C_a16(): byte {
  * Invalid opcode.
  * Affected flags:
  */
-export function ILLEGAL_DD(): byte {
+function ILLEGAL_DD(): byte {
   OpcodeMap[0xdd].call(this);
   return 4;
 }
@@ -2494,7 +2494,7 @@ export function ILLEGAL_DD(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SBC_from_A_i_value_d8_i(): byte {
+function SBC_from_A_i_value_d8_i(): byte {
   OpcodeMap[0xde].call(this);
   return 8;
 }
@@ -2505,7 +2505,7 @@ export function SBC_from_A_i_value_d8_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RST_to_A_i_from_18H_i(): byte {
+function RST_to_A_i_from_18H_i(): byte {
   OpcodeMap[0xdf].call(this);
   return 16;
 }
@@ -2516,7 +2516,7 @@ export function RST_to_A_i_from_18H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LDH_into_a8_m_from_A_i(): byte {
+function LDH_into_a8_m_from_A_i(): byte {
   OpcodeMap[0xe0].call(this);
   return 12;
 }
@@ -2527,7 +2527,7 @@ export function LDH_into_a8_m_from_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function POP_off_SP_into_HL_i(): byte {
+function POP_off_SP_into_HL_i(): byte {
   OpcodeMap[0xe1].call(this);
   return 12;
 }
@@ -2538,7 +2538,7 @@ export function POP_off_SP_into_HL_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_C_m_from_A_i(): byte {
+function LD_into_C_m_from_A_i(): byte {
   OpcodeMap[0xe2].call(this);
   return 8;
 }
@@ -2547,7 +2547,7 @@ export function LD_into_C_m_from_A_i(): byte {
  * Invalid opcode.
  * Affected flags:
  */
-export function ILLEGAL_E3(): byte {
+function ILLEGAL_E3(): byte {
   OpcodeMap[0xe3].call(this);
   return 4;
 }
@@ -2556,7 +2556,7 @@ export function ILLEGAL_E3(): byte {
  * Invalid opcode.
  * Affected flags:
  */
-export function ILLEGAL_E4(): byte {
+function ILLEGAL_E4(): byte {
   OpcodeMap[0xe4].call(this);
   return 4;
 }
@@ -2567,7 +2567,7 @@ export function ILLEGAL_E4(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function PUSH_onto_SP_register_HL_i(): byte {
+function PUSH_onto_SP_register_HL_i(): byte {
   OpcodeMap[0xe5].call(this);
   return 16;
 }
@@ -2578,7 +2578,7 @@ export function PUSH_onto_SP_register_HL_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function AND_A_with_d8_i(): byte {
+function AND_A_with_d8_i(): byte {
   OpcodeMap[0xe6].call(this);
   return 8;
 }
@@ -2589,7 +2589,7 @@ export function AND_A_with_d8_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RST_to_A_i_from_20H_i(): byte {
+function RST_to_A_i_from_20H_i(): byte {
   OpcodeMap[0xe7].call(this);
   return 16;
 }
@@ -2600,7 +2600,7 @@ export function RST_to_A_i_from_20H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function ADD_into_SP_i_from_r8_i(): byte {
+function ADD_into_SP_i_from_r8_i(): byte {
   OpcodeMap[0xe8].call(this);
   return 16;
 }
@@ -2611,7 +2611,7 @@ export function ADD_into_SP_i_from_r8_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function JP_HL(): byte {
+function JP_HL(): byte {
   OpcodeMap[0xe9].call(this);
   return 4;
 }
@@ -2622,7 +2622,7 @@ export function JP_HL(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_a16_m_from_A_i(): byte {
+function LD_into_a16_m_from_A_i(): byte {
   OpcodeMap[0xea].call(this);
   return 16;
 }
@@ -2631,7 +2631,7 @@ export function LD_into_a16_m_from_A_i(): byte {
  * Invalid opcode.
  * Affected flags:
  */
-export function ILLEGAL_EB(): byte {
+function ILLEGAL_EB(): byte {
   OpcodeMap[0xeb].call(this);
   return 4;
 }
@@ -2640,7 +2640,7 @@ export function ILLEGAL_EB(): byte {
  * Invalid opcode.
  * Affected flags:
  */
-export function ILLEGAL_EC(): byte {
+function ILLEGAL_EC(): byte {
   OpcodeMap[0xec].call(this);
   return 4;
 }
@@ -2649,7 +2649,7 @@ export function ILLEGAL_EC(): byte {
  * Invalid opcode.
  * Affected flags:
  */
-export function ILLEGAL_ED(): byte {
+function ILLEGAL_ED(): byte {
   OpcodeMap[0xed].call(this);
   return 4;
 }
@@ -2660,7 +2660,7 @@ export function ILLEGAL_ED(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function XOR_A_with_d8_i(): byte {
+function XOR_A_with_d8_i(): byte {
   OpcodeMap[0xee].call(this);
   return 8;
 }
@@ -2671,7 +2671,7 @@ export function XOR_A_with_d8_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RST_to_A_i_from_28H_i(): byte {
+function RST_to_A_i_from_28H_i(): byte {
   OpcodeMap[0xef].call(this);
   return 16;
 }
@@ -2682,7 +2682,7 @@ export function RST_to_A_i_from_28H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LDH_into_A_i_from_a8_m(): byte {
+function LDH_into_A_i_from_a8_m(): byte {
   OpcodeMap[0xf0].call(this);
   return 12;
 }
@@ -2693,7 +2693,7 @@ export function LDH_into_A_i_from_a8_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function POP_off_SP_into_AF_i(): byte {
+function POP_off_SP_into_AF_i(): byte {
   OpcodeMap[0xf1].call(this);
   return 12;
 }
@@ -2704,7 +2704,7 @@ export function POP_off_SP_into_AF_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_A_i_from_C_m(): byte {
+function LD_into_A_i_from_C_m(): byte {
   OpcodeMap[0xf2].call(this);
   return 8;
 }
@@ -2715,7 +2715,7 @@ export function LD_into_A_i_from_C_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function DI(): byte {
+function DI(): byte {
   OpcodeMap[0xf3].call(this);
   return 4;
 }
@@ -2724,7 +2724,7 @@ export function DI(): byte {
  * Invalid opcode.
  * Affected flags:
  */
-export function ILLEGAL_F4(): byte {
+function ILLEGAL_F4(): byte {
   OpcodeMap[0xf4].call(this);
   return 4;
 }
@@ -2735,7 +2735,7 @@ export function ILLEGAL_F4(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function PUSH_onto_SP_register_AF_i(): byte {
+function PUSH_onto_SP_register_AF_i(): byte {
   OpcodeMap[0xf5].call(this);
   return 16;
 }
@@ -2746,7 +2746,7 @@ export function PUSH_onto_SP_register_AF_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function OR_A_with_d8_i(): byte {
+function OR_A_with_d8_i(): byte {
   OpcodeMap[0xf6].call(this);
   return 8;
 }
@@ -2757,7 +2757,7 @@ export function OR_A_with_d8_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RST_to_A_i_from_30H_i(): byte {
+function RST_to_A_i_from_30H_i(): byte {
   OpcodeMap[0xf7].call(this);
   return 16;
 }
@@ -2768,7 +2768,7 @@ export function RST_to_A_i_from_30H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function LD_into_HL_i_from_SP_incr_i(): byte {
+function LD_into_HL_i_from_SP_incr_i(): byte {
   OpcodeMap[0xf8].call(this);
   return 12;
 }
@@ -2779,7 +2779,7 @@ export function LD_into_HL_i_from_SP_incr_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_SP_i_from_HL_i(): byte {
+function LD_into_SP_i_from_HL_i(): byte {
   OpcodeMap[0xf9].call(this);
   return 8;
 }
@@ -2790,7 +2790,7 @@ export function LD_into_SP_i_from_HL_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function LD_into_A_i_from_a16_m(): byte {
+function LD_into_A_i_from_a16_m(): byte {
   OpcodeMap[0xfa].call(this);
   return 16;
 }
@@ -2801,7 +2801,7 @@ export function LD_into_A_i_from_a16_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function EI(): byte {
+function EI(): byte {
   OpcodeMap[0xfb].call(this);
   return 4;
 }
@@ -2810,7 +2810,7 @@ export function EI(): byte {
  * Invalid opcode.
  * Affected flags:
  */
-export function ILLEGAL_FC(): byte {
+function ILLEGAL_FC(): byte {
   OpcodeMap[0xfc].call(this);
   return 4;
 }
@@ -2819,7 +2819,7 @@ export function ILLEGAL_FC(): byte {
  * Invalid opcode.
  * Affected flags:
  */
-export function ILLEGAL_FD(): byte {
+function ILLEGAL_FD(): byte {
   OpcodeMap[0xfd].call(this);
   return 4;
 }
@@ -2830,7 +2830,7 @@ export function ILLEGAL_FD(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function CP_A_with_d8_i(): byte {
+function CP_A_with_d8_i(): byte {
   OpcodeMap[0xfe].call(this);
   return 8;
 }
@@ -2841,7 +2841,7 @@ export function CP_A_with_d8_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RST_to_A_i_from_38H_i(): byte {
+function RST_to_A_i_from_38H_i(): byte {
   OpcodeMap[0xff].call(this);
   return 16;
 }
@@ -2852,7 +2852,7 @@ export function RST_to_A_i_from_38H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RLC_B_i(): byte {
+function RLC_B_i(): byte {
   OpcodeMap[0x00].call(this);
   return 8;
 }
@@ -2863,7 +2863,7 @@ export function RLC_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RLC_C_i(): byte {
+function RLC_C_i(): byte {
   OpcodeMap[0x01].call(this);
   return 8;
 }
@@ -2874,7 +2874,7 @@ export function RLC_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RLC_D_i(): byte {
+function RLC_D_i(): byte {
   OpcodeMap[0x02].call(this);
   return 8;
 }
@@ -2885,7 +2885,7 @@ export function RLC_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RLC_E_i(): byte {
+function RLC_E_i(): byte {
   OpcodeMap[0x03].call(this);
   return 8;
 }
@@ -2896,7 +2896,7 @@ export function RLC_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RLC_H_i(): byte {
+function RLC_H_i(): byte {
   OpcodeMap[0x04].call(this);
   return 8;
 }
@@ -2907,7 +2907,7 @@ export function RLC_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RLC_L_i(): byte {
+function RLC_L_i(): byte {
   OpcodeMap[0x05].call(this);
   return 8;
 }
@@ -2918,7 +2918,7 @@ export function RLC_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RLC_HL_m(): byte {
+function RLC_HL_m(): byte {
   OpcodeMap[0x06].call(this);
   return 16;
 }
@@ -2929,7 +2929,7 @@ export function RLC_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RLC_A_i(): byte {
+function RLC_A_i(): byte {
   OpcodeMap[0x07].call(this);
   return 8;
 }
@@ -2940,7 +2940,7 @@ export function RLC_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RRC_B_i(): byte {
+function RRC_B_i(): byte {
   OpcodeMap[0x08].call(this);
   return 8;
 }
@@ -2951,7 +2951,7 @@ export function RRC_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RRC_C_i(): byte {
+function RRC_C_i(): byte {
   OpcodeMap[0x09].call(this);
   return 8;
 }
@@ -2962,7 +2962,7 @@ export function RRC_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RRC_D_i(): byte {
+function RRC_D_i(): byte {
   OpcodeMap[0x0a].call(this);
   return 8;
 }
@@ -2973,7 +2973,7 @@ export function RRC_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RRC_E_i(): byte {
+function RRC_E_i(): byte {
   OpcodeMap[0x0b].call(this);
   return 8;
 }
@@ -2984,7 +2984,7 @@ export function RRC_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RRC_H_i(): byte {
+function RRC_H_i(): byte {
   OpcodeMap[0x0c].call(this);
   return 8;
 }
@@ -2995,7 +2995,7 @@ export function RRC_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RRC_L_i(): byte {
+function RRC_L_i(): byte {
   OpcodeMap[0x0d].call(this);
   return 8;
 }
@@ -3006,7 +3006,7 @@ export function RRC_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RRC_HL_m(): byte {
+function RRC_HL_m(): byte {
   OpcodeMap[0x0e].call(this);
   return 16;
 }
@@ -3017,7 +3017,7 @@ export function RRC_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RRC_A_i(): byte {
+function RRC_A_i(): byte {
   OpcodeMap[0x0f].call(this);
   return 8;
 }
@@ -3028,7 +3028,7 @@ export function RRC_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RL_B_i(): byte {
+function RL_B_i(): byte {
   OpcodeMap[0x10].call(this);
   return 8;
 }
@@ -3039,7 +3039,7 @@ export function RL_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RL_C_i(): byte {
+function RL_C_i(): byte {
   OpcodeMap[0x11].call(this);
   return 8;
 }
@@ -3050,7 +3050,7 @@ export function RL_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RL_D_i(): byte {
+function RL_D_i(): byte {
   OpcodeMap[0x12].call(this);
   return 8;
 }
@@ -3061,7 +3061,7 @@ export function RL_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RL_E_i(): byte {
+function RL_E_i(): byte {
   OpcodeMap[0x13].call(this);
   return 8;
 }
@@ -3072,7 +3072,7 @@ export function RL_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RL_H_i(): byte {
+function RL_H_i(): byte {
   OpcodeMap[0x14].call(this);
   return 8;
 }
@@ -3083,7 +3083,7 @@ export function RL_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RL_L_i(): byte {
+function RL_L_i(): byte {
   OpcodeMap[0x15].call(this);
   return 8;
 }
@@ -3094,7 +3094,7 @@ export function RL_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RL_HL_m(): byte {
+function RL_HL_m(): byte {
   OpcodeMap[0x16].call(this);
   return 16;
 }
@@ -3105,7 +3105,7 @@ export function RL_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RL_A_i(): byte {
+function RL_A_i(): byte {
   OpcodeMap[0x17].call(this);
   return 8;
 }
@@ -3116,7 +3116,7 @@ export function RL_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RR_B_i(): byte {
+function RR_B_i(): byte {
   OpcodeMap[0x18].call(this);
   return 8;
 }
@@ -3127,7 +3127,7 @@ export function RR_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RR_C_i(): byte {
+function RR_C_i(): byte {
   OpcodeMap[0x19].call(this);
   return 8;
 }
@@ -3138,7 +3138,7 @@ export function RR_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RR_D_i(): byte {
+function RR_D_i(): byte {
   OpcodeMap[0x1a].call(this);
   return 8;
 }
@@ -3149,7 +3149,7 @@ export function RR_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RR_E_i(): byte {
+function RR_E_i(): byte {
   OpcodeMap[0x1b].call(this);
   return 8;
 }
@@ -3160,7 +3160,7 @@ export function RR_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RR_H_i(): byte {
+function RR_H_i(): byte {
   OpcodeMap[0x1c].call(this);
   return 8;
 }
@@ -3171,7 +3171,7 @@ export function RR_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RR_L_i(): byte {
+function RR_L_i(): byte {
   OpcodeMap[0x1d].call(this);
   return 8;
 }
@@ -3182,7 +3182,7 @@ export function RR_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RR_HL_m(): byte {
+function RR_HL_m(): byte {
   OpcodeMap[0x1e].call(this);
   return 16;
 }
@@ -3193,7 +3193,7 @@ export function RR_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function RR_A_i(): byte {
+function RR_A_i(): byte {
   OpcodeMap[0x1f].call(this);
   return 8;
 }
@@ -3204,7 +3204,7 @@ export function RR_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SLA_B_i(): byte {
+function SLA_B_i(): byte {
   OpcodeMap[0x20].call(this);
   return 8;
 }
@@ -3215,7 +3215,7 @@ export function SLA_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SLA_C_i(): byte {
+function SLA_C_i(): byte {
   OpcodeMap[0x21].call(this);
   return 8;
 }
@@ -3226,7 +3226,7 @@ export function SLA_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SLA_D_i(): byte {
+function SLA_D_i(): byte {
   OpcodeMap[0x22].call(this);
   return 8;
 }
@@ -3237,7 +3237,7 @@ export function SLA_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SLA_E_i(): byte {
+function SLA_E_i(): byte {
   OpcodeMap[0x23].call(this);
   return 8;
 }
@@ -3248,7 +3248,7 @@ export function SLA_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SLA_H_i(): byte {
+function SLA_H_i(): byte {
   OpcodeMap[0x24].call(this);
   return 8;
 }
@@ -3259,7 +3259,7 @@ export function SLA_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SLA_L_i(): byte {
+function SLA_L_i(): byte {
   OpcodeMap[0x25].call(this);
   return 8;
 }
@@ -3270,7 +3270,7 @@ export function SLA_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SLA_HL_m(): byte {
+function SLA_HL_m(): byte {
   OpcodeMap[0x26].call(this);
   return 16;
 }
@@ -3281,7 +3281,7 @@ export function SLA_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SLA_A_i(): byte {
+function SLA_A_i(): byte {
   OpcodeMap[0x27].call(this);
   return 8;
 }
@@ -3292,7 +3292,7 @@ export function SLA_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SRA_B_i(): byte {
+function SRA_B_i(): byte {
   OpcodeMap[0x28].call(this);
   return 8;
 }
@@ -3303,7 +3303,7 @@ export function SRA_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SRA_C_i(): byte {
+function SRA_C_i(): byte {
   OpcodeMap[0x29].call(this);
   return 8;
 }
@@ -3314,7 +3314,7 @@ export function SRA_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SRA_D_i(): byte {
+function SRA_D_i(): byte {
   OpcodeMap[0x2a].call(this);
   return 8;
 }
@@ -3325,7 +3325,7 @@ export function SRA_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SRA_E_i(): byte {
+function SRA_E_i(): byte {
   OpcodeMap[0x2b].call(this);
   return 8;
 }
@@ -3336,7 +3336,7 @@ export function SRA_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SRA_H_i(): byte {
+function SRA_H_i(): byte {
   OpcodeMap[0x2c].call(this);
   return 8;
 }
@@ -3347,7 +3347,7 @@ export function SRA_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SRA_L_i(): byte {
+function SRA_L_i(): byte {
   OpcodeMap[0x2d].call(this);
   return 8;
 }
@@ -3358,7 +3358,7 @@ export function SRA_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SRA_HL_m(): byte {
+function SRA_HL_m(): byte {
   OpcodeMap[0x2e].call(this);
   return 16;
 }
@@ -3369,7 +3369,7 @@ export function SRA_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SRA_A_i(): byte {
+function SRA_A_i(): byte {
   OpcodeMap[0x2f].call(this);
   return 8;
 }
@@ -3380,7 +3380,7 @@ export function SRA_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SWAP_B_i(): byte {
+function SWAP_B_i(): byte {
   OpcodeMap[0x30].call(this);
   return 8;
 }
@@ -3391,7 +3391,7 @@ export function SWAP_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SWAP_C_i(): byte {
+function SWAP_C_i(): byte {
   OpcodeMap[0x31].call(this);
   return 8;
 }
@@ -3402,7 +3402,7 @@ export function SWAP_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SWAP_D_i(): byte {
+function SWAP_D_i(): byte {
   OpcodeMap[0x32].call(this);
   return 8;
 }
@@ -3413,7 +3413,7 @@ export function SWAP_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SWAP_E_i(): byte {
+function SWAP_E_i(): byte {
   OpcodeMap[0x33].call(this);
   return 8;
 }
@@ -3424,7 +3424,7 @@ export function SWAP_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SWAP_H_i(): byte {
+function SWAP_H_i(): byte {
   OpcodeMap[0x34].call(this);
   return 8;
 }
@@ -3435,7 +3435,7 @@ export function SWAP_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SWAP_L_i(): byte {
+function SWAP_L_i(): byte {
   OpcodeMap[0x35].call(this);
   return 8;
 }
@@ -3446,7 +3446,7 @@ export function SWAP_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SWAP_HL_m(): byte {
+function SWAP_HL_m(): byte {
   OpcodeMap[0x36].call(this);
   return 16;
 }
@@ -3457,7 +3457,7 @@ export function SWAP_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SWAP_A_i(): byte {
+function SWAP_A_i(): byte {
   OpcodeMap[0x37].call(this);
   return 8;
 }
@@ -3468,7 +3468,7 @@ export function SWAP_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SRL_B_i(): byte {
+function SRL_B_i(): byte {
   OpcodeMap[0x38].call(this);
   return 8;
 }
@@ -3479,7 +3479,7 @@ export function SRL_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SRL_C_i(): byte {
+function SRL_C_i(): byte {
   OpcodeMap[0x39].call(this);
   return 8;
 }
@@ -3490,7 +3490,7 @@ export function SRL_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SRL_D_i(): byte {
+function SRL_D_i(): byte {
   OpcodeMap[0x3a].call(this);
   return 8;
 }
@@ -3501,7 +3501,7 @@ export function SRL_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SRL_E_i(): byte {
+function SRL_E_i(): byte {
   OpcodeMap[0x3b].call(this);
   return 8;
 }
@@ -3512,7 +3512,7 @@ export function SRL_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SRL_H_i(): byte {
+function SRL_H_i(): byte {
   OpcodeMap[0x3c].call(this);
   return 8;
 }
@@ -3523,7 +3523,7 @@ export function SRL_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SRL_L_i(): byte {
+function SRL_L_i(): byte {
   OpcodeMap[0x3d].call(this);
   return 8;
 }
@@ -3534,7 +3534,7 @@ export function SRL_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SRL_HL_m(): byte {
+function SRL_HL_m(): byte {
   OpcodeMap[0x3e].call(this);
   return 16;
 }
@@ -3545,7 +3545,7 @@ export function SRL_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H, C
  */
-export function SRL_A_i(): byte {
+function SRL_A_i(): byte {
   OpcodeMap[0x3f].call(this);
   return 8;
 }
@@ -3556,7 +3556,7 @@ export function SRL_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_0_i_of_B_i(): byte {
+function BIT_test_0_i_of_B_i(): byte {
   OpcodeMap[0x40].call(this);
   return 8;
 }
@@ -3567,7 +3567,7 @@ export function BIT_test_0_i_of_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_0_i_of_C_i(): byte {
+function BIT_test_0_i_of_C_i(): byte {
   OpcodeMap[0x41].call(this);
   return 8;
 }
@@ -3578,7 +3578,7 @@ export function BIT_test_0_i_of_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_0_i_of_D_i(): byte {
+function BIT_test_0_i_of_D_i(): byte {
   OpcodeMap[0x42].call(this);
   return 8;
 }
@@ -3589,7 +3589,7 @@ export function BIT_test_0_i_of_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_0_i_of_E_i(): byte {
+function BIT_test_0_i_of_E_i(): byte {
   OpcodeMap[0x43].call(this);
   return 8;
 }
@@ -3600,7 +3600,7 @@ export function BIT_test_0_i_of_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_0_i_of_H_i(): byte {
+function BIT_test_0_i_of_H_i(): byte {
   OpcodeMap[0x44].call(this);
   return 8;
 }
@@ -3611,7 +3611,7 @@ export function BIT_test_0_i_of_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_0_i_of_L_i(): byte {
+function BIT_test_0_i_of_L_i(): byte {
   OpcodeMap[0x45].call(this);
   return 8;
 }
@@ -3622,7 +3622,7 @@ export function BIT_test_0_i_of_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_0_i_of_HL_m(): byte {
+function BIT_test_0_i_of_HL_m(): byte {
   OpcodeMap[0x46].call(this);
   return 12;
 }
@@ -3633,7 +3633,7 @@ export function BIT_test_0_i_of_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_0_i_of_A_i(): byte {
+function BIT_test_0_i_of_A_i(): byte {
   OpcodeMap[0x47].call(this);
   return 8;
 }
@@ -3644,7 +3644,7 @@ export function BIT_test_0_i_of_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_1_i_of_B_i(): byte {
+function BIT_test_1_i_of_B_i(): byte {
   OpcodeMap[0x48].call(this);
   return 8;
 }
@@ -3655,7 +3655,7 @@ export function BIT_test_1_i_of_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_1_i_of_C_i(): byte {
+function BIT_test_1_i_of_C_i(): byte {
   OpcodeMap[0x49].call(this);
   return 8;
 }
@@ -3666,7 +3666,7 @@ export function BIT_test_1_i_of_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_1_i_of_D_i(): byte {
+function BIT_test_1_i_of_D_i(): byte {
   OpcodeMap[0x4a].call(this);
   return 8;
 }
@@ -3677,7 +3677,7 @@ export function BIT_test_1_i_of_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_1_i_of_E_i(): byte {
+function BIT_test_1_i_of_E_i(): byte {
   OpcodeMap[0x4b].call(this);
   return 8;
 }
@@ -3688,7 +3688,7 @@ export function BIT_test_1_i_of_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_1_i_of_H_i(): byte {
+function BIT_test_1_i_of_H_i(): byte {
   OpcodeMap[0x4c].call(this);
   return 8;
 }
@@ -3699,7 +3699,7 @@ export function BIT_test_1_i_of_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_1_i_of_L_i(): byte {
+function BIT_test_1_i_of_L_i(): byte {
   OpcodeMap[0x4d].call(this);
   return 8;
 }
@@ -3710,7 +3710,7 @@ export function BIT_test_1_i_of_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_1_i_of_HL_m(): byte {
+function BIT_test_1_i_of_HL_m(): byte {
   OpcodeMap[0x4e].call(this);
   return 12;
 }
@@ -3721,7 +3721,7 @@ export function BIT_test_1_i_of_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_1_i_of_A_i(): byte {
+function BIT_test_1_i_of_A_i(): byte {
   OpcodeMap[0x4f].call(this);
   return 8;
 }
@@ -3732,7 +3732,7 @@ export function BIT_test_1_i_of_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_2_i_of_B_i(): byte {
+function BIT_test_2_i_of_B_i(): byte {
   OpcodeMap[0x50].call(this);
   return 8;
 }
@@ -3743,7 +3743,7 @@ export function BIT_test_2_i_of_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_2_i_of_C_i(): byte {
+function BIT_test_2_i_of_C_i(): byte {
   OpcodeMap[0x51].call(this);
   return 8;
 }
@@ -3754,7 +3754,7 @@ export function BIT_test_2_i_of_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_2_i_of_D_i(): byte {
+function BIT_test_2_i_of_D_i(): byte {
   OpcodeMap[0x52].call(this);
   return 8;
 }
@@ -3765,7 +3765,7 @@ export function BIT_test_2_i_of_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_2_i_of_E_i(): byte {
+function BIT_test_2_i_of_E_i(): byte {
   OpcodeMap[0x53].call(this);
   return 8;
 }
@@ -3776,7 +3776,7 @@ export function BIT_test_2_i_of_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_2_i_of_H_i(): byte {
+function BIT_test_2_i_of_H_i(): byte {
   OpcodeMap[0x54].call(this);
   return 8;
 }
@@ -3787,7 +3787,7 @@ export function BIT_test_2_i_of_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_2_i_of_L_i(): byte {
+function BIT_test_2_i_of_L_i(): byte {
   OpcodeMap[0x55].call(this);
   return 8;
 }
@@ -3798,7 +3798,7 @@ export function BIT_test_2_i_of_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_2_i_of_HL_m(): byte {
+function BIT_test_2_i_of_HL_m(): byte {
   OpcodeMap[0x56].call(this);
   return 12;
 }
@@ -3809,7 +3809,7 @@ export function BIT_test_2_i_of_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_2_i_of_A_i(): byte {
+function BIT_test_2_i_of_A_i(): byte {
   OpcodeMap[0x57].call(this);
   return 8;
 }
@@ -3820,7 +3820,7 @@ export function BIT_test_2_i_of_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_3_i_of_B_i(): byte {
+function BIT_test_3_i_of_B_i(): byte {
   OpcodeMap[0x58].call(this);
   return 8;
 }
@@ -3831,7 +3831,7 @@ export function BIT_test_3_i_of_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_3_i_of_C_i(): byte {
+function BIT_test_3_i_of_C_i(): byte {
   OpcodeMap[0x59].call(this);
   return 8;
 }
@@ -3842,7 +3842,7 @@ export function BIT_test_3_i_of_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_3_i_of_D_i(): byte {
+function BIT_test_3_i_of_D_i(): byte {
   OpcodeMap[0x5a].call(this);
   return 8;
 }
@@ -3853,7 +3853,7 @@ export function BIT_test_3_i_of_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_3_i_of_E_i(): byte {
+function BIT_test_3_i_of_E_i(): byte {
   OpcodeMap[0x5b].call(this);
   return 8;
 }
@@ -3864,7 +3864,7 @@ export function BIT_test_3_i_of_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_3_i_of_H_i(): byte {
+function BIT_test_3_i_of_H_i(): byte {
   OpcodeMap[0x5c].call(this);
   return 8;
 }
@@ -3875,7 +3875,7 @@ export function BIT_test_3_i_of_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_3_i_of_L_i(): byte {
+function BIT_test_3_i_of_L_i(): byte {
   OpcodeMap[0x5d].call(this);
   return 8;
 }
@@ -3886,7 +3886,7 @@ export function BIT_test_3_i_of_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_3_i_of_HL_m(): byte {
+function BIT_test_3_i_of_HL_m(): byte {
   OpcodeMap[0x5e].call(this);
   return 12;
 }
@@ -3897,7 +3897,7 @@ export function BIT_test_3_i_of_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_3_i_of_A_i(): byte {
+function BIT_test_3_i_of_A_i(): byte {
   OpcodeMap[0x5f].call(this);
   return 8;
 }
@@ -3908,7 +3908,7 @@ export function BIT_test_3_i_of_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_4_i_of_B_i(): byte {
+function BIT_test_4_i_of_B_i(): byte {
   OpcodeMap[0x60].call(this);
   return 8;
 }
@@ -3919,7 +3919,7 @@ export function BIT_test_4_i_of_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_4_i_of_C_i(): byte {
+function BIT_test_4_i_of_C_i(): byte {
   OpcodeMap[0x61].call(this);
   return 8;
 }
@@ -3930,7 +3930,7 @@ export function BIT_test_4_i_of_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_4_i_of_D_i(): byte {
+function BIT_test_4_i_of_D_i(): byte {
   OpcodeMap[0x62].call(this);
   return 8;
 }
@@ -3941,7 +3941,7 @@ export function BIT_test_4_i_of_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_4_i_of_E_i(): byte {
+function BIT_test_4_i_of_E_i(): byte {
   OpcodeMap[0x63].call(this);
   return 8;
 }
@@ -3952,7 +3952,7 @@ export function BIT_test_4_i_of_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_4_i_of_H_i(): byte {
+function BIT_test_4_i_of_H_i(): byte {
   OpcodeMap[0x64].call(this);
   return 8;
 }
@@ -3963,7 +3963,7 @@ export function BIT_test_4_i_of_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_4_i_of_L_i(): byte {
+function BIT_test_4_i_of_L_i(): byte {
   OpcodeMap[0x65].call(this);
   return 8;
 }
@@ -3974,7 +3974,7 @@ export function BIT_test_4_i_of_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_4_i_of_HL_m(): byte {
+function BIT_test_4_i_of_HL_m(): byte {
   OpcodeMap[0x66].call(this);
   return 12;
 }
@@ -3985,7 +3985,7 @@ export function BIT_test_4_i_of_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_4_i_of_A_i(): byte {
+function BIT_test_4_i_of_A_i(): byte {
   OpcodeMap[0x67].call(this);
   return 8;
 }
@@ -3996,7 +3996,7 @@ export function BIT_test_4_i_of_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_5_i_of_B_i(): byte {
+function BIT_test_5_i_of_B_i(): byte {
   OpcodeMap[0x68].call(this);
   return 8;
 }
@@ -4007,7 +4007,7 @@ export function BIT_test_5_i_of_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_5_i_of_C_i(): byte {
+function BIT_test_5_i_of_C_i(): byte {
   OpcodeMap[0x69].call(this);
   return 8;
 }
@@ -4018,7 +4018,7 @@ export function BIT_test_5_i_of_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_5_i_of_D_i(): byte {
+function BIT_test_5_i_of_D_i(): byte {
   OpcodeMap[0x6a].call(this);
   return 8;
 }
@@ -4029,7 +4029,7 @@ export function BIT_test_5_i_of_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_5_i_of_E_i(): byte {
+function BIT_test_5_i_of_E_i(): byte {
   OpcodeMap[0x6b].call(this);
   return 8;
 }
@@ -4040,7 +4040,7 @@ export function BIT_test_5_i_of_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_5_i_of_H_i(): byte {
+function BIT_test_5_i_of_H_i(): byte {
   OpcodeMap[0x6c].call(this);
   return 8;
 }
@@ -4051,7 +4051,7 @@ export function BIT_test_5_i_of_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_5_i_of_L_i(): byte {
+function BIT_test_5_i_of_L_i(): byte {
   OpcodeMap[0x6d].call(this);
   return 8;
 }
@@ -4062,7 +4062,7 @@ export function BIT_test_5_i_of_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_5_i_of_HL_m(): byte {
+function BIT_test_5_i_of_HL_m(): byte {
   OpcodeMap[0x6e].call(this);
   return 12;
 }
@@ -4073,7 +4073,7 @@ export function BIT_test_5_i_of_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_5_i_of_A_i(): byte {
+function BIT_test_5_i_of_A_i(): byte {
   OpcodeMap[0x6f].call(this);
   return 8;
 }
@@ -4084,7 +4084,7 @@ export function BIT_test_5_i_of_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_6_i_of_B_i(): byte {
+function BIT_test_6_i_of_B_i(): byte {
   OpcodeMap[0x70].call(this);
   return 8;
 }
@@ -4095,7 +4095,7 @@ export function BIT_test_6_i_of_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_6_i_of_C_i(): byte {
+function BIT_test_6_i_of_C_i(): byte {
   OpcodeMap[0x71].call(this);
   return 8;
 }
@@ -4106,7 +4106,7 @@ export function BIT_test_6_i_of_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_6_i_of_D_i(): byte {
+function BIT_test_6_i_of_D_i(): byte {
   OpcodeMap[0x72].call(this);
   return 8;
 }
@@ -4117,7 +4117,7 @@ export function BIT_test_6_i_of_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_6_i_of_E_i(): byte {
+function BIT_test_6_i_of_E_i(): byte {
   OpcodeMap[0x73].call(this);
   return 8;
 }
@@ -4128,7 +4128,7 @@ export function BIT_test_6_i_of_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_6_i_of_H_i(): byte {
+function BIT_test_6_i_of_H_i(): byte {
   OpcodeMap[0x74].call(this);
   return 8;
 }
@@ -4139,7 +4139,7 @@ export function BIT_test_6_i_of_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_6_i_of_L_i(): byte {
+function BIT_test_6_i_of_L_i(): byte {
   OpcodeMap[0x75].call(this);
   return 8;
 }
@@ -4150,7 +4150,7 @@ export function BIT_test_6_i_of_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_6_i_of_HL_m(): byte {
+function BIT_test_6_i_of_HL_m(): byte {
   OpcodeMap[0x76].call(this);
   return 12;
 }
@@ -4161,7 +4161,7 @@ export function BIT_test_6_i_of_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_6_i_of_A_i(): byte {
+function BIT_test_6_i_of_A_i(): byte {
   OpcodeMap[0x77].call(this);
   return 8;
 }
@@ -4172,7 +4172,7 @@ export function BIT_test_6_i_of_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_7_i_of_B_i(): byte {
+function BIT_test_7_i_of_B_i(): byte {
   OpcodeMap[0x78].call(this);
   return 8;
 }
@@ -4183,7 +4183,7 @@ export function BIT_test_7_i_of_B_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_7_i_of_C_i(): byte {
+function BIT_test_7_i_of_C_i(): byte {
   OpcodeMap[0x79].call(this);
   return 8;
 }
@@ -4194,7 +4194,7 @@ export function BIT_test_7_i_of_C_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_7_i_of_D_i(): byte {
+function BIT_test_7_i_of_D_i(): byte {
   OpcodeMap[0x7a].call(this);
   return 8;
 }
@@ -4205,7 +4205,7 @@ export function BIT_test_7_i_of_D_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_7_i_of_E_i(): byte {
+function BIT_test_7_i_of_E_i(): byte {
   OpcodeMap[0x7b].call(this);
   return 8;
 }
@@ -4216,7 +4216,7 @@ export function BIT_test_7_i_of_E_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_7_i_of_H_i(): byte {
+function BIT_test_7_i_of_H_i(): byte {
   OpcodeMap[0x7c].call(this);
   return 8;
 }
@@ -4227,7 +4227,7 @@ export function BIT_test_7_i_of_H_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_7_i_of_L_i(): byte {
+function BIT_test_7_i_of_L_i(): byte {
   OpcodeMap[0x7d].call(this);
   return 8;
 }
@@ -4238,7 +4238,7 @@ export function BIT_test_7_i_of_L_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_7_i_of_HL_m(): byte {
+function BIT_test_7_i_of_HL_m(): byte {
   OpcodeMap[0x7e].call(this);
   return 12;
 }
@@ -4249,7 +4249,7 @@ export function BIT_test_7_i_of_HL_m(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags: Z, N, H
  */
-export function BIT_test_7_i_of_A_i(): byte {
+function BIT_test_7_i_of_A_i(): byte {
   OpcodeMap[0x7f].call(this);
   return 8;
 }
@@ -4260,7 +4260,7 @@ export function BIT_test_7_i_of_A_i(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit0_of_B(): byte {
+function RES_bit0_of_B(): byte {
   OpcodeMap[0x80].call(this);
   return 8;
 }
@@ -4271,7 +4271,7 @@ export function RES_bit0_of_B(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit0_of_C(): byte {
+function RES_bit0_of_C(): byte {
   OpcodeMap[0x81].call(this);
   return 8;
 }
@@ -4282,7 +4282,7 @@ export function RES_bit0_of_C(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit0_of_D(): byte {
+function RES_bit0_of_D(): byte {
   OpcodeMap[0x82].call(this);
   return 8;
 }
@@ -4293,7 +4293,7 @@ export function RES_bit0_of_D(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit0_of_E(): byte {
+function RES_bit0_of_E(): byte {
   OpcodeMap[0x83].call(this);
   return 8;
 }
@@ -4304,7 +4304,7 @@ export function RES_bit0_of_E(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit0_of_H(): byte {
+function RES_bit0_of_H(): byte {
   OpcodeMap[0x84].call(this);
   return 8;
 }
@@ -4315,7 +4315,7 @@ export function RES_bit0_of_H(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit0_of_L(): byte {
+function RES_bit0_of_L(): byte {
   OpcodeMap[0x85].call(this);
   return 8;
 }
@@ -4326,7 +4326,7 @@ export function RES_bit0_of_L(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit0_of_HL(): byte {
+function RES_bit0_of_HL(): byte {
   OpcodeMap[0x86].call(this);
   return 16;
 }
@@ -4337,7 +4337,7 @@ export function RES_bit0_of_HL(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit0_of_A(): byte {
+function RES_bit0_of_A(): byte {
   OpcodeMap[0x87].call(this);
   return 8;
 }
@@ -4348,7 +4348,7 @@ export function RES_bit0_of_A(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit1_of_B(): byte {
+function RES_bit1_of_B(): byte {
   OpcodeMap[0x88].call(this);
   return 8;
 }
@@ -4359,7 +4359,7 @@ export function RES_bit1_of_B(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit1_of_C(): byte {
+function RES_bit1_of_C(): byte {
   OpcodeMap[0x89].call(this);
   return 8;
 }
@@ -4370,7 +4370,7 @@ export function RES_bit1_of_C(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit1_of_D(): byte {
+function RES_bit1_of_D(): byte {
   OpcodeMap[0x8a].call(this);
   return 8;
 }
@@ -4381,7 +4381,7 @@ export function RES_bit1_of_D(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit1_of_E(): byte {
+function RES_bit1_of_E(): byte {
   OpcodeMap[0x8b].call(this);
   return 8;
 }
@@ -4392,7 +4392,7 @@ export function RES_bit1_of_E(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit1_of_H(): byte {
+function RES_bit1_of_H(): byte {
   OpcodeMap[0x8c].call(this);
   return 8;
 }
@@ -4403,7 +4403,7 @@ export function RES_bit1_of_H(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit1_of_L(): byte {
+function RES_bit1_of_L(): byte {
   OpcodeMap[0x8d].call(this);
   return 8;
 }
@@ -4414,7 +4414,7 @@ export function RES_bit1_of_L(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit1_of_HL(): byte {
+function RES_bit1_of_HL(): byte {
   OpcodeMap[0x8e].call(this);
   return 16;
 }
@@ -4425,7 +4425,7 @@ export function RES_bit1_of_HL(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit1_of_A(): byte {
+function RES_bit1_of_A(): byte {
   OpcodeMap[0x8f].call(this);
   return 8;
 }
@@ -4436,7 +4436,7 @@ export function RES_bit1_of_A(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit2_of_B(): byte {
+function RES_bit2_of_B(): byte {
   OpcodeMap[0x90].call(this);
   return 8;
 }
@@ -4447,7 +4447,7 @@ export function RES_bit2_of_B(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit2_of_C(): byte {
+function RES_bit2_of_C(): byte {
   OpcodeMap[0x91].call(this);
   return 8;
 }
@@ -4458,7 +4458,7 @@ export function RES_bit2_of_C(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit2_of_D(): byte {
+function RES_bit2_of_D(): byte {
   OpcodeMap[0x92].call(this);
   return 8;
 }
@@ -4469,7 +4469,7 @@ export function RES_bit2_of_D(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit2_of_E(): byte {
+function RES_bit2_of_E(): byte {
   OpcodeMap[0x93].call(this);
   return 8;
 }
@@ -4480,7 +4480,7 @@ export function RES_bit2_of_E(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit2_of_H(): byte {
+function RES_bit2_of_H(): byte {
   OpcodeMap[0x94].call(this);
   return 8;
 }
@@ -4491,7 +4491,7 @@ export function RES_bit2_of_H(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit2_of_L(): byte {
+function RES_bit2_of_L(): byte {
   OpcodeMap[0x95].call(this);
   return 8;
 }
@@ -4502,7 +4502,7 @@ export function RES_bit2_of_L(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit2_of_HL(): byte {
+function RES_bit2_of_HL(): byte {
   OpcodeMap[0x96].call(this);
   return 16;
 }
@@ -4513,7 +4513,7 @@ export function RES_bit2_of_HL(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit2_of_A(): byte {
+function RES_bit2_of_A(): byte {
   OpcodeMap[0x97].call(this);
   return 8;
 }
@@ -4524,7 +4524,7 @@ export function RES_bit2_of_A(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit3_of_B(): byte {
+function RES_bit3_of_B(): byte {
   OpcodeMap[0x98].call(this);
   return 8;
 }
@@ -4535,7 +4535,7 @@ export function RES_bit3_of_B(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit3_of_C(): byte {
+function RES_bit3_of_C(): byte {
   OpcodeMap[0x99].call(this);
   return 8;
 }
@@ -4546,7 +4546,7 @@ export function RES_bit3_of_C(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit3_of_D(): byte {
+function RES_bit3_of_D(): byte {
   OpcodeMap[0x9a].call(this);
   return 8;
 }
@@ -4557,7 +4557,7 @@ export function RES_bit3_of_D(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit3_of_E(): byte {
+function RES_bit3_of_E(): byte {
   OpcodeMap[0x9b].call(this);
   return 8;
 }
@@ -4568,7 +4568,7 @@ export function RES_bit3_of_E(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit3_of_H(): byte {
+function RES_bit3_of_H(): byte {
   OpcodeMap[0x9c].call(this);
   return 8;
 }
@@ -4579,7 +4579,7 @@ export function RES_bit3_of_H(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit3_of_L(): byte {
+function RES_bit3_of_L(): byte {
   OpcodeMap[0x9d].call(this);
   return 8;
 }
@@ -4590,7 +4590,7 @@ export function RES_bit3_of_L(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit3_of_HL(): byte {
+function RES_bit3_of_HL(): byte {
   OpcodeMap[0x9e].call(this);
   return 16;
 }
@@ -4601,7 +4601,7 @@ export function RES_bit3_of_HL(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit3_of_A(): byte {
+function RES_bit3_of_A(): byte {
   OpcodeMap[0x9f].call(this);
   return 8;
 }
@@ -4612,7 +4612,7 @@ export function RES_bit3_of_A(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit4_of_B(): byte {
+function RES_bit4_of_B(): byte {
   OpcodeMap[0xa0].call(this);
   return 8;
 }
@@ -4623,7 +4623,7 @@ export function RES_bit4_of_B(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit4_of_C(): byte {
+function RES_bit4_of_C(): byte {
   OpcodeMap[0xa1].call(this);
   return 8;
 }
@@ -4634,7 +4634,7 @@ export function RES_bit4_of_C(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit4_of_D(): byte {
+function RES_bit4_of_D(): byte {
   OpcodeMap[0xa2].call(this);
   return 8;
 }
@@ -4645,7 +4645,7 @@ export function RES_bit4_of_D(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit4_of_E(): byte {
+function RES_bit4_of_E(): byte {
   OpcodeMap[0xa3].call(this);
   return 8;
 }
@@ -4656,7 +4656,7 @@ export function RES_bit4_of_E(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit4_of_H(): byte {
+function RES_bit4_of_H(): byte {
   OpcodeMap[0xa4].call(this);
   return 8;
 }
@@ -4667,7 +4667,7 @@ export function RES_bit4_of_H(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit4_of_L(): byte {
+function RES_bit4_of_L(): byte {
   OpcodeMap[0xa5].call(this);
   return 8;
 }
@@ -4678,7 +4678,7 @@ export function RES_bit4_of_L(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit4_of_HL(): byte {
+function RES_bit4_of_HL(): byte {
   OpcodeMap[0xa6].call(this);
   return 16;
 }
@@ -4689,7 +4689,7 @@ export function RES_bit4_of_HL(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit4_of_A(): byte {
+function RES_bit4_of_A(): byte {
   OpcodeMap[0xa7].call(this);
   return 8;
 }
@@ -4700,7 +4700,7 @@ export function RES_bit4_of_A(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit5_of_B(): byte {
+function RES_bit5_of_B(): byte {
   OpcodeMap[0xa8].call(this);
   return 8;
 }
@@ -4711,7 +4711,7 @@ export function RES_bit5_of_B(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit5_of_C(): byte {
+function RES_bit5_of_C(): byte {
   OpcodeMap[0xa9].call(this);
   return 8;
 }
@@ -4722,7 +4722,7 @@ export function RES_bit5_of_C(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit5_of_D(): byte {
+function RES_bit5_of_D(): byte {
   OpcodeMap[0xaa].call(this);
   return 8;
 }
@@ -4733,7 +4733,7 @@ export function RES_bit5_of_D(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit5_of_E(): byte {
+function RES_bit5_of_E(): byte {
   OpcodeMap[0xab].call(this);
   return 8;
 }
@@ -4744,7 +4744,7 @@ export function RES_bit5_of_E(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit5_of_H(): byte {
+function RES_bit5_of_H(): byte {
   OpcodeMap[0xac].call(this);
   return 8;
 }
@@ -4755,7 +4755,7 @@ export function RES_bit5_of_H(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit5_of_L(): byte {
+function RES_bit5_of_L(): byte {
   OpcodeMap[0xad].call(this);
   return 8;
 }
@@ -4766,7 +4766,7 @@ export function RES_bit5_of_L(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit5_of_HL(): byte {
+function RES_bit5_of_HL(): byte {
   OpcodeMap[0xae].call(this);
   return 16;
 }
@@ -4777,7 +4777,7 @@ export function RES_bit5_of_HL(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit5_of_A(): byte {
+function RES_bit5_of_A(): byte {
   OpcodeMap[0xaf].call(this);
   return 8;
 }
@@ -4788,7 +4788,7 @@ export function RES_bit5_of_A(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit6_of_B(): byte {
+function RES_bit6_of_B(): byte {
   OpcodeMap[0xb0].call(this);
   return 8;
 }
@@ -4799,7 +4799,7 @@ export function RES_bit6_of_B(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit6_of_C(): byte {
+function RES_bit6_of_C(): byte {
   OpcodeMap[0xb1].call(this);
   return 8;
 }
@@ -4810,7 +4810,7 @@ export function RES_bit6_of_C(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit6_of_D(): byte {
+function RES_bit6_of_D(): byte {
   OpcodeMap[0xb2].call(this);
   return 8;
 }
@@ -4821,7 +4821,7 @@ export function RES_bit6_of_D(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit6_of_E(): byte {
+function RES_bit6_of_E(): byte {
   OpcodeMap[0xb3].call(this);
   return 8;
 }
@@ -4832,7 +4832,7 @@ export function RES_bit6_of_E(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit6_of_H(): byte {
+function RES_bit6_of_H(): byte {
   OpcodeMap[0xb4].call(this);
   return 8;
 }
@@ -4843,7 +4843,7 @@ export function RES_bit6_of_H(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit6_of_L(): byte {
+function RES_bit6_of_L(): byte {
   OpcodeMap[0xb5].call(this);
   return 8;
 }
@@ -4854,7 +4854,7 @@ export function RES_bit6_of_L(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit6_of_HL(): byte {
+function RES_bit6_of_HL(): byte {
   OpcodeMap[0xb6].call(this);
   return 16;
 }
@@ -4865,7 +4865,7 @@ export function RES_bit6_of_HL(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit6_of_A(): byte {
+function RES_bit6_of_A(): byte {
   OpcodeMap[0xb7].call(this);
   return 8;
 }
@@ -4876,7 +4876,7 @@ export function RES_bit6_of_A(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit7_of_B(): byte {
+function RES_bit7_of_B(): byte {
   OpcodeMap[0xb8].call(this);
   return 8;
 }
@@ -4887,7 +4887,7 @@ export function RES_bit7_of_B(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit7_of_C(): byte {
+function RES_bit7_of_C(): byte {
   OpcodeMap[0xb9].call(this);
   return 8;
 }
@@ -4898,7 +4898,7 @@ export function RES_bit7_of_C(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit7_of_D(): byte {
+function RES_bit7_of_D(): byte {
   OpcodeMap[0xba].call(this);
   return 8;
 }
@@ -4909,7 +4909,7 @@ export function RES_bit7_of_D(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit7_of_E(): byte {
+function RES_bit7_of_E(): byte {
   OpcodeMap[0xbb].call(this);
   return 8;
 }
@@ -4920,7 +4920,7 @@ export function RES_bit7_of_E(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit7_of_H(): byte {
+function RES_bit7_of_H(): byte {
   OpcodeMap[0xbc].call(this);
   return 8;
 }
@@ -4931,7 +4931,7 @@ export function RES_bit7_of_H(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit7_of_L(): byte {
+function RES_bit7_of_L(): byte {
   OpcodeMap[0xbd].call(this);
   return 8;
 }
@@ -4942,7 +4942,7 @@ export function RES_bit7_of_L(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit7_of_HL(): byte {
+function RES_bit7_of_HL(): byte {
   OpcodeMap[0xbe].call(this);
   return 16;
 }
@@ -4953,7 +4953,7 @@ export function RES_bit7_of_HL(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function RES_bit7_of_A(): byte {
+function RES_bit7_of_A(): byte {
   OpcodeMap[0xbf].call(this);
   return 8;
 }
@@ -4964,7 +4964,7 @@ export function RES_bit7_of_A(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit0_of_B(): byte {
+function SET_bit0_of_B(): byte {
   OpcodeMap[0xc0].call(this);
   return 8;
 }
@@ -4975,7 +4975,7 @@ export function SET_bit0_of_B(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit0_of_C(): byte {
+function SET_bit0_of_C(): byte {
   OpcodeMap[0xc1].call(this);
   return 8;
 }
@@ -4986,7 +4986,7 @@ export function SET_bit0_of_C(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit0_of_D(): byte {
+function SET_bit0_of_D(): byte {
   OpcodeMap[0xc2].call(this);
   return 8;
 }
@@ -4997,7 +4997,7 @@ export function SET_bit0_of_D(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit0_of_E(): byte {
+function SET_bit0_of_E(): byte {
   OpcodeMap[0xc3].call(this);
   return 8;
 }
@@ -5008,7 +5008,7 @@ export function SET_bit0_of_E(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit0_of_H(): byte {
+function SET_bit0_of_H(): byte {
   OpcodeMap[0xc4].call(this);
   return 8;
 }
@@ -5019,7 +5019,7 @@ export function SET_bit0_of_H(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit0_of_L(): byte {
+function SET_bit0_of_L(): byte {
   OpcodeMap[0xc5].call(this);
   return 8;
 }
@@ -5030,7 +5030,7 @@ export function SET_bit0_of_L(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit0_of_HL(): byte {
+function SET_bit0_of_HL(): byte {
   OpcodeMap[0xc6].call(this);
   return 16;
 }
@@ -5041,7 +5041,7 @@ export function SET_bit0_of_HL(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit0_of_A(): byte {
+function SET_bit0_of_A(): byte {
   OpcodeMap[0xc7].call(this);
   return 8;
 }
@@ -5052,7 +5052,7 @@ export function SET_bit0_of_A(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit1_of_B(): byte {
+function SET_bit1_of_B(): byte {
   OpcodeMap[0xc8].call(this);
   return 8;
 }
@@ -5063,7 +5063,7 @@ export function SET_bit1_of_B(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit1_of_C(): byte {
+function SET_bit1_of_C(): byte {
   OpcodeMap[0xc9].call(this);
   return 8;
 }
@@ -5074,7 +5074,7 @@ export function SET_bit1_of_C(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit1_of_D(): byte {
+function SET_bit1_of_D(): byte {
   OpcodeMap[0xca].call(this);
   return 8;
 }
@@ -5085,7 +5085,7 @@ export function SET_bit1_of_D(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit1_of_E(): byte {
+function SET_bit1_of_E(): byte {
   OpcodeMap[0xcb].call(this);
   return 8;
 }
@@ -5096,7 +5096,7 @@ export function SET_bit1_of_E(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit1_of_H(): byte {
+function SET_bit1_of_H(): byte {
   OpcodeMap[0xcc].call(this);
   return 8;
 }
@@ -5107,7 +5107,7 @@ export function SET_bit1_of_H(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit1_of_L(): byte {
+function SET_bit1_of_L(): byte {
   OpcodeMap[0xcd].call(this);
   return 8;
 }
@@ -5118,7 +5118,7 @@ export function SET_bit1_of_L(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit1_of_HL(): byte {
+function SET_bit1_of_HL(): byte {
   OpcodeMap[0xce].call(this);
   return 16;
 }
@@ -5129,7 +5129,7 @@ export function SET_bit1_of_HL(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit1_of_A(): byte {
+function SET_bit1_of_A(): byte {
   OpcodeMap[0xcf].call(this);
   return 8;
 }
@@ -5140,7 +5140,7 @@ export function SET_bit1_of_A(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit2_of_B(): byte {
+function SET_bit2_of_B(): byte {
   OpcodeMap[0xd0].call(this);
   return 8;
 }
@@ -5151,7 +5151,7 @@ export function SET_bit2_of_B(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit2_of_C(): byte {
+function SET_bit2_of_C(): byte {
   OpcodeMap[0xd1].call(this);
   return 8;
 }
@@ -5162,7 +5162,7 @@ export function SET_bit2_of_C(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit2_of_D(): byte {
+function SET_bit2_of_D(): byte {
   OpcodeMap[0xd2].call(this);
   return 8;
 }
@@ -5173,7 +5173,7 @@ export function SET_bit2_of_D(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit2_of_E(): byte {
+function SET_bit2_of_E(): byte {
   OpcodeMap[0xd3].call(this);
   return 8;
 }
@@ -5184,7 +5184,7 @@ export function SET_bit2_of_E(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit2_of_H(): byte {
+function SET_bit2_of_H(): byte {
   OpcodeMap[0xd4].call(this);
   return 8;
 }
@@ -5195,7 +5195,7 @@ export function SET_bit2_of_H(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit2_of_L(): byte {
+function SET_bit2_of_L(): byte {
   OpcodeMap[0xd5].call(this);
   return 8;
 }
@@ -5206,7 +5206,7 @@ export function SET_bit2_of_L(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit2_of_HL(): byte {
+function SET_bit2_of_HL(): byte {
   OpcodeMap[0xd6].call(this);
   return 16;
 }
@@ -5217,7 +5217,7 @@ export function SET_bit2_of_HL(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit2_of_A(): byte {
+function SET_bit2_of_A(): byte {
   OpcodeMap[0xd7].call(this);
   return 8;
 }
@@ -5228,7 +5228,7 @@ export function SET_bit2_of_A(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit3_of_B(): byte {
+function SET_bit3_of_B(): byte {
   OpcodeMap[0xd8].call(this);
   return 8;
 }
@@ -5239,7 +5239,7 @@ export function SET_bit3_of_B(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit3_of_C(): byte {
+function SET_bit3_of_C(): byte {
   OpcodeMap[0xd9].call(this);
   return 8;
 }
@@ -5250,7 +5250,7 @@ export function SET_bit3_of_C(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit3_of_D(): byte {
+function SET_bit3_of_D(): byte {
   OpcodeMap[0xda].call(this);
   return 8;
 }
@@ -5261,7 +5261,7 @@ export function SET_bit3_of_D(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit3_of_E(): byte {
+function SET_bit3_of_E(): byte {
   OpcodeMap[0xdb].call(this);
   return 8;
 }
@@ -5272,7 +5272,7 @@ export function SET_bit3_of_E(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit3_of_H(): byte {
+function SET_bit3_of_H(): byte {
   OpcodeMap[0xdc].call(this);
   return 8;
 }
@@ -5283,7 +5283,7 @@ export function SET_bit3_of_H(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit3_of_L(): byte {
+function SET_bit3_of_L(): byte {
   OpcodeMap[0xdd].call(this);
   return 8;
 }
@@ -5294,7 +5294,7 @@ export function SET_bit3_of_L(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit3_of_HL(): byte {
+function SET_bit3_of_HL(): byte {
   OpcodeMap[0xde].call(this);
   return 16;
 }
@@ -5305,7 +5305,7 @@ export function SET_bit3_of_HL(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit3_of_A(): byte {
+function SET_bit3_of_A(): byte {
   OpcodeMap[0xdf].call(this);
   return 8;
 }
@@ -5316,7 +5316,7 @@ export function SET_bit3_of_A(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit4_of_B(): byte {
+function SET_bit4_of_B(): byte {
   OpcodeMap[0xe0].call(this);
   return 8;
 }
@@ -5327,7 +5327,7 @@ export function SET_bit4_of_B(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit4_of_C(): byte {
+function SET_bit4_of_C(): byte {
   OpcodeMap[0xe1].call(this);
   return 8;
 }
@@ -5338,7 +5338,7 @@ export function SET_bit4_of_C(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit4_of_D(): byte {
+function SET_bit4_of_D(): byte {
   OpcodeMap[0xe2].call(this);
   return 8;
 }
@@ -5349,7 +5349,7 @@ export function SET_bit4_of_D(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit4_of_E(): byte {
+function SET_bit4_of_E(): byte {
   OpcodeMap[0xe3].call(this);
   return 8;
 }
@@ -5360,7 +5360,7 @@ export function SET_bit4_of_E(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit4_of_H(): byte {
+function SET_bit4_of_H(): byte {
   OpcodeMap[0xe4].call(this);
   return 8;
 }
@@ -5371,7 +5371,7 @@ export function SET_bit4_of_H(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit4_of_L(): byte {
+function SET_bit4_of_L(): byte {
   OpcodeMap[0xe5].call(this);
   return 8;
 }
@@ -5382,7 +5382,7 @@ export function SET_bit4_of_L(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit4_of_HL(): byte {
+function SET_bit4_of_HL(): byte {
   OpcodeMap[0xe6].call(this);
   return 16;
 }
@@ -5393,7 +5393,7 @@ export function SET_bit4_of_HL(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit4_of_A(): byte {
+function SET_bit4_of_A(): byte {
   OpcodeMap[0xe7].call(this);
   return 8;
 }
@@ -5404,7 +5404,7 @@ export function SET_bit4_of_A(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit5_of_B(): byte {
+function SET_bit5_of_B(): byte {
   OpcodeMap[0xe8].call(this);
   return 8;
 }
@@ -5415,7 +5415,7 @@ export function SET_bit5_of_B(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit5_of_C(): byte {
+function SET_bit5_of_C(): byte {
   OpcodeMap[0xe9].call(this);
   return 8;
 }
@@ -5426,7 +5426,7 @@ export function SET_bit5_of_C(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit5_of_D(): byte {
+function SET_bit5_of_D(): byte {
   OpcodeMap[0xea].call(this);
   return 8;
 }
@@ -5437,7 +5437,7 @@ export function SET_bit5_of_D(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit5_of_E(): byte {
+function SET_bit5_of_E(): byte {
   OpcodeMap[0xeb].call(this);
   return 8;
 }
@@ -5448,7 +5448,7 @@ export function SET_bit5_of_E(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit5_of_H(): byte {
+function SET_bit5_of_H(): byte {
   OpcodeMap[0xec].call(this);
   return 8;
 }
@@ -5459,7 +5459,7 @@ export function SET_bit5_of_H(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit5_of_L(): byte {
+function SET_bit5_of_L(): byte {
   OpcodeMap[0xed].call(this);
   return 8;
 }
@@ -5470,7 +5470,7 @@ export function SET_bit5_of_L(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit5_of_HL(): byte {
+function SET_bit5_of_HL(): byte {
   OpcodeMap[0xee].call(this);
   return 16;
 }
@@ -5481,7 +5481,7 @@ export function SET_bit5_of_HL(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit5_of_A(): byte {
+function SET_bit5_of_A(): byte {
   OpcodeMap[0xef].call(this);
   return 8;
 }
@@ -5492,7 +5492,7 @@ export function SET_bit5_of_A(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit6_of_B(): byte {
+function SET_bit6_of_B(): byte {
   OpcodeMap[0xf0].call(this);
   return 8;
 }
@@ -5503,7 +5503,7 @@ export function SET_bit6_of_B(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit6_of_C(): byte {
+function SET_bit6_of_C(): byte {
   OpcodeMap[0xf1].call(this);
   return 8;
 }
@@ -5514,7 +5514,7 @@ export function SET_bit6_of_C(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit6_of_D(): byte {
+function SET_bit6_of_D(): byte {
   OpcodeMap[0xf2].call(this);
   return 8;
 }
@@ -5525,7 +5525,7 @@ export function SET_bit6_of_D(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit6_of_E(): byte {
+function SET_bit6_of_E(): byte {
   OpcodeMap[0xf3].call(this);
   return 8;
 }
@@ -5536,7 +5536,7 @@ export function SET_bit6_of_E(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit6_of_H(): byte {
+function SET_bit6_of_H(): byte {
   OpcodeMap[0xf4].call(this);
   return 8;
 }
@@ -5547,7 +5547,7 @@ export function SET_bit6_of_H(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit6_of_L(): byte {
+function SET_bit6_of_L(): byte {
   OpcodeMap[0xf5].call(this);
   return 8;
 }
@@ -5558,7 +5558,7 @@ export function SET_bit6_of_L(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit6_of_HL(): byte {
+function SET_bit6_of_HL(): byte {
   OpcodeMap[0xf6].call(this);
   return 16;
 }
@@ -5569,7 +5569,7 @@ export function SET_bit6_of_HL(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit6_of_A(): byte {
+function SET_bit6_of_A(): byte {
   OpcodeMap[0xf7].call(this);
   return 8;
 }
@@ -5580,7 +5580,7 @@ export function SET_bit6_of_A(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit7_of_B(): byte {
+function SET_bit7_of_B(): byte {
   OpcodeMap[0xf8].call(this);
   return 8;
 }
@@ -5591,7 +5591,7 @@ export function SET_bit7_of_B(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit7_of_C(): byte {
+function SET_bit7_of_C(): byte {
   OpcodeMap[0xf9].call(this);
   return 8;
 }
@@ -5602,7 +5602,7 @@ export function SET_bit7_of_C(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit7_of_D(): byte {
+function SET_bit7_of_D(): byte {
   OpcodeMap[0xfa].call(this);
   return 8;
 }
@@ -5613,7 +5613,7 @@ export function SET_bit7_of_D(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit7_of_E(): byte {
+function SET_bit7_of_E(): byte {
   OpcodeMap[0xfb].call(this);
   return 8;
 }
@@ -5624,7 +5624,7 @@ export function SET_bit7_of_E(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit7_of_H(): byte {
+function SET_bit7_of_H(): byte {
   OpcodeMap[0xfc].call(this);
   return 8;
 }
@@ -5635,7 +5635,7 @@ export function SET_bit7_of_H(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit7_of_L(): byte {
+function SET_bit7_of_L(): byte {
   OpcodeMap[0xfd].call(this);
   return 8;
 }
@@ -5646,7 +5646,7 @@ export function SET_bit7_of_L(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit7_of_HL(): byte {
+function SET_bit7_of_HL(): byte {
   OpcodeMap[0xfe].call(this);
   return 16;
 }
@@ -5657,7 +5657,7 @@ export function SET_bit7_of_HL(): byte {
  * @returns - Number of system clock ticks used.
  * Affected flags:
  */
-export function SET_bit7_of_A(): byte {
+function SET_bit7_of_A(): byte {
   OpcodeMap[0xff].call(this);
   return 8;
 }

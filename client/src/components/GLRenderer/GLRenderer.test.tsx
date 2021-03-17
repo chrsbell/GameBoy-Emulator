@@ -1,5 +1,4 @@
-import { createCanvas } from 'canvas';
-import * as React from 'react';
+import {createCanvas} from 'canvas';
 import GLRenderer from '.';
 
 describe('GLRenderer', () => {

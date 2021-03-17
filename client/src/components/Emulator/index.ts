@@ -1,11 +1,11 @@
 import CPU from '../CPU';
 import Memory from '../Memory';
-import GLRenderer, { Colors } from '../GLRenderer';
+import GLRenderer, {Colors} from '../GLRenderer';
 import * as _ from 'lodash';
 
 class Emulator {
-  private i: number = 0;
-  private j: number = 0;
+  private i = 0;
+  private j = 0;
   private timerID: ReturnType<typeof setTimeout>;
   public constructor() {
     this.update = this.update.bind(this);
@@ -26,7 +26,7 @@ class Emulator {
    * the ID of setTimeout each time.
    */
   public update() {
-    let cyclesPerUpdate = CPU.clock / GLRenderer.fps;
+    const cyclesPerUpdate = CPU.clock / GLRenderer.fps;
     let cycles = 0;
     let elapsed;
 

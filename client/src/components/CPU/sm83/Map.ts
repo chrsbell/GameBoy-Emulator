@@ -91,9 +91,11 @@ function XOR(operand: byte): void {
 }
 
 function CP(operand: byte): void {
+  debugger;
   CPU.checkFullCarry8(upper(CPU.r.af), operand, -1);
   CPU.checkHalfCarry(upper(CPU.r.af), operand, -1);
   const result: byte = addByte(upper(CPU.r.af), -operand);
+  CPU.r.f.n = 1;
   CPU.checkZFlag(result);
 }
 
@@ -114,7 +116,7 @@ function PUSH(register: word): void {
   Memory.writeByte(CPU.sp, lower(register));
 }
 
-function POP(register: word): word {
+function POP(): word {
   const value: word = Memory.readWord(CPU.sp);
   CPU.sp = addWord(CPU.sp, 2);
   return value;
@@ -1143,7 +1145,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xc1: function (): void {
-    CPU.r.bc = POP(CPU.r.bc);
+    CPU.r.bc = POP();
   },
 
   0xc2: function (): boolean {
@@ -1239,7 +1241,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xd1: function (): void {
-    CPU.r.de = POP(CPU.r.de);
+    CPU.r.de = POP();
   },
 
   0xd2: function (): boolean {
@@ -1323,7 +1325,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xe1: function (): void {
-    CPU.r.hl = POP(CPU.r.hl);
+    CPU.r.hl = POP();
   },
 
   0xe2: function (): void {
@@ -1398,7 +1400,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xf1: function (): void {
-    CPU.r.af = POP(CPU.r.af);
+    CPU.r.af = POP();
   },
 
   0xf2: function (): void {
@@ -1443,7 +1445,10 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xfa: function (): void {
-    CPU.r.af = setUpper(CPU.r.af, toByte(Memory.readByte(Memory.readWord(CPU.pc))));
+    CPU.r.af = setUpper(
+      CPU.r.af,
+      toByte(Memory.readByte(Memory.readWord(CPU.pc)))
+    );
     CPU.pc += 2;
   },
 
@@ -1460,7 +1465,9 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xfe: function (): void {
-    debugger;
+    // if (CPU.sp === 57331) {
+    //   debugger;
+    // }
     CP(Memory.readByte(CPU.pc));
     CPU.pc += 1;
   },
