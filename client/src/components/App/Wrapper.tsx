@@ -1,16 +1,15 @@
 import * as React from 'react';
-import {useRef, useEffect, useState, useContext, FormEvent} from 'react';
-import Context from './Context';
+import {useRef, useEffect, useState, FormEvent} from 'react';
+import type {AppContext} from './types';
 import axios, {AxiosRequestConfig} from 'axios';
 import './Wrapper.css';
 
-const Wrapper = () => {
-  const {dispatch} = useContext(Context);
-  const canvasRef = useRef(null);
-  const hiddenBIOSRef = useRef(null);
-  const hiddenROMRef = useRef(null);
-  const [ROMFile, setROMFile] = useState(null);
-  const [BIOSFile, setBIOSFile] = useState(null);
+const Wrapper: React.FC<AppContext> = ({appDispatch}) => {
+  const canvasRef: React.MutableRefObject<HTMLCanvasElement> = useRef(null!);
+  const hiddenBIOSRef: React.MutableRefObject<HTMLInputElement> = useRef(null!);
+  const hiddenROMRef: React.MutableRefObject<HTMLInputElement> = useRef(null!);
+  const [ROMFile, setROMFile] = useState(new Blob());
+  const [BIOSFile, setBIOSFile] = useState(new Blob());
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -22,8 +21,8 @@ const Wrapper = () => {
     };
     axios.post('/parse', data, options).then(res => {
       if (res.status === 201) {
-        dispatch({type: 'parsedROM', parsedROM: res.data.rom});
-        dispatch({type: 'parsedBIOS', parsedBIOS: res.data.bios});
+        appDispatch({type: 'parsedROM', parsedROM: res.data.rom});
+        appDispatch({type: 'parsedBIOS', parsedBIOS: res.data.bios});
       } else {
         console.error('Error parsing ROM on server.');
       }
@@ -31,7 +30,7 @@ const Wrapper = () => {
   };
 
   useEffect(() => {
-    dispatch({type: 'canvas', canvas: canvasRef.current});
+    appDispatch({type: 'canvas', canvas: canvasRef.current});
     console.log('Canvas created.');
   }, []);
 
@@ -57,14 +56,14 @@ const Wrapper = () => {
             type="file"
             name="rom"
             ref={hiddenROMRef}
-            onChange={e => setROMFile(e.target.files[0])}
+            onChange={e => setROMFile(e.target.files![0])}
             style={{display: 'none'}}
           />
           <input
             type="file"
             name="bios"
             ref={hiddenBIOSRef}
-            onChange={e => setBIOSFile(e.target.files[0])}
+            onChange={e => setBIOSFile(e.target.files![0])}
             style={{display: 'none'}}
           />
           <button type="button" onClick={onSubmit}>

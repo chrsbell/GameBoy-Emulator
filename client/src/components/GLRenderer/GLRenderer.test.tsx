@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {createCanvas} from 'canvas';
 import GLRenderer from '.';
 

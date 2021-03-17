@@ -1,25 +1,14 @@
 import * as React from 'react';
 import {useEffect, useReducer, useRef} from 'react';
 import Emulator from '../Emulator';
-import AppContext from './Context';
 import GLRenderer from '../GLRenderer';
 import Wrapper from './Wrapper';
-
-interface AppState {
-  canvas: HTMLCanvasElement;
-  parsedROM: Uint8Array;
-  parsedBIOS: Uint8Array;
-}
-
-type Action =
-  | {type: 'canvas'; canvas: HTMLCanvasElement}
-  | {type: 'parsedROM'; parsedROM: Uint8Array}
-  | {type: 'parsedBIOS'; parsedBIOS: Uint8Array};
+import type {AppState, Action} from './types';
 
 const initialState: AppState = {
-  canvas: null as HTMLCanvasElement,
-  parsedROM: null as Uint8Array,
-  parsedBIOS: null as Uint8Array,
+  canvas: null!,
+  parsedROM: null!,
+  parsedBIOS: null!,
 };
 
 const reducer = (state: AppState, action: Action) => {
@@ -46,8 +35,8 @@ const reducer = (state: AppState, action: Action) => {
   }
 };
 
-const App = () => {
-  const [appState, dispatch] = useReducer(reducer, initialState);
+const App: React.FC = () => {
+  const [appState, appDispatch] = useReducer(reducer, initialState);
   const emulator = useRef(new Emulator());
 
   useEffect(() => {
@@ -65,11 +54,12 @@ const App = () => {
     }
   }, [appState.canvas]);
 
-  return (
-    <AppContext.Provider value={{appState, dispatch}}>
-      <Wrapper />
-    </AppContext.Provider>
-  );
+  const reducerProps = {
+    appState,
+    appDispatch,
+  };
+
+  return <Wrapper {...reducerProps} />;
 };
 
 export default App;

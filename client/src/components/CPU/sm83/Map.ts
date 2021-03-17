@@ -46,8 +46,8 @@ function ADC(operand: byte): void {
 }
 
 function SUB(operand: byte): void {
-  CPU.checkFullCarry8(upper(CPU.r.af), operand, -1);
-  CPU.checkHalfCarry(upper(CPU.r.af), operand, -1);
+  CPU.checkFullCarry8(upper(CPU.r.af), operand, true);
+  CPU.checkHalfCarry(upper(CPU.r.af), operand, true);
   CPU.r.af = toWord(addUpper(CPU.r.af, -operand));
   CPU.checkZFlag(upper(CPU.r.af));
   CPU.r.f.n = 1;
@@ -56,8 +56,8 @@ function SUB(operand: byte): void {
 function SBC(operand: byte): void {
   const carry = CPU.r.f.cy ? -1 : 0;
   operand = addByte(operand, carry);
-  CPU.checkFullCarry8(upper(CPU.r.af), operand, -1);
-  CPU.checkHalfCarry(upper(CPU.r.af), operand, -1);
+  CPU.checkFullCarry8(upper(CPU.r.af), operand, true);
+  CPU.checkHalfCarry(upper(CPU.r.af), operand, true);
   CPU.r.af = toWord(addUpper(CPU.r.af, -operand));
   CPU.checkZFlag(upper(CPU.r.af));
   CPU.r.f.n = 1;
@@ -91,9 +91,9 @@ function XOR(operand: byte): void {
 }
 
 function CP(operand: byte): void {
-  debugger;
-  CPU.checkFullCarry8(upper(CPU.r.af), operand, -1);
-  CPU.checkHalfCarry(upper(CPU.r.af), operand, -1);
+  // debugger;
+  CPU.checkFullCarry8(upper(CPU.r.af), operand, true);
+  CPU.checkHalfCarry(upper(CPU.r.af), operand, true);
   const result: byte = addByte(upper(CPU.r.af), -operand);
   CPU.r.f.n = 1;
   CPU.checkZFlag(result);
@@ -179,7 +179,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0x05: function (): void {
-    CPU.checkHalfCarry(upper(CPU.r.bc), 1, -1);
+    CPU.checkHalfCarry(upper(CPU.r.bc), 1, true);
     CPU.r.bc = addUpper(CPU.r.bc, toByte(-1));
     CPU.checkZFlag(upper(CPU.r.bc));
     CPU.r.f.n = 1;
@@ -237,9 +237,9 @@ export const OpcodeMap: OpcodeList = {
 
   0x0d: function (): void {
     // convert operand to unsigned
-    CPU.checkHalfCarry(lower(CPU.r.bc), 1, -1);
+    CPU.checkHalfCarry(lower(CPU.r.bc), 1, true);
     CPU.r.bc = addLower(CPU.r.bc, toByte(-1));
-    CPU.checkZFlag(lower(this.r.bc));
+    CPU.checkZFlag(lower(CPU.r.bc));
     CPU.r.f.n = 1;
   },
 
@@ -295,7 +295,7 @@ export const OpcodeMap: OpcodeList = {
 
   0x15: function (): void {
     // check for half carry on affected byte only
-    CPU.checkHalfCarry(upper(CPU.r.de), 1, -1);
+    CPU.checkHalfCarry(upper(CPU.r.de), 1, true);
     CPU.r.de = addUpper(CPU.r.de, toByte(-1));
     CPU.checkZFlag(upper(CPU.r.de));
     CPU.r.f.n = 1;
@@ -356,7 +356,7 @@ export const OpcodeMap: OpcodeList = {
 
   0x1d: function (): void {
     // check for half carry on affected byte only
-    CPU.checkHalfCarry(lower(CPU.r.de), 1, -1);
+    CPU.checkHalfCarry(lower(CPU.r.de), 1, true);
     CPU.r.de = addLower(CPU.r.de, toByte(-1));
     CPU.checkZFlag(lower(CPU.r.de));
     CPU.r.f.n = 1;
@@ -421,9 +421,9 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0x25: function (): void {
-    CPU.checkHalfCarry(upper(CPU.r.hl), 1, -1);
+    CPU.checkHalfCarry(upper(CPU.r.hl), 1, true);
     CPU.r.hl = addUpper(CPU.r.hl, toByte(-1));
-    CPU.checkZFlag(upper(this.r.hl));
+    CPU.checkZFlag(upper(CPU.r.hl));
     CPU.r.f.n = 1;
   },
 
@@ -497,9 +497,9 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0x2d: function (): void {
-    CPU.checkHalfCarry(lower(CPU.r.hl), 1, -1);
+    CPU.checkHalfCarry(lower(CPU.r.hl), 1, true);
     CPU.r.hl = addLower(CPU.r.hl, toByte(-1));
-    CPU.checkZFlag(lower(this.r.hl));
+    CPU.checkZFlag(lower(CPU.r.hl));
     CPU.r.f.n = 1;
   },
 
@@ -554,7 +554,7 @@ export const OpcodeMap: OpcodeList = {
     // convert operand to unsigned
     let newVal: byte = toByte(Memory.readByte(CPU.r.hl));
     // check for half carry on affected byte only
-    CPU.checkHalfCarry(newVal, 1, -1);
+    CPU.checkHalfCarry(newVal, 1, true);
     newVal = addByte(newVal, toByte(-1));
     Memory.writeByte(CPU.r.hl, newVal);
     CPU.checkZFlag(newVal);
@@ -607,9 +607,9 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0x3d: function (): void {
-    CPU.checkHalfCarry(upper(CPU.r.af), 1, -1);
+    CPU.checkHalfCarry(upper(CPU.r.af), 1, true);
     CPU.r.af = addUpper(CPU.r.af, toByte(-1));
-    CPU.checkZFlag(upper(this.r.af));
+    CPU.checkZFlag(upper(CPU.r.af));
     CPU.r.f.n = 1;
   },
 

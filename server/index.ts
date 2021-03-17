@@ -1,7 +1,7 @@
 import {Response, Request} from 'express';
-import * as express from 'express';
-import * as path from 'path';
-import * as multer from 'multer';
+const multer = require('multer');
+const express = require('express');
+const path = require('path');
 
 const upload = multer();
 const app = express();

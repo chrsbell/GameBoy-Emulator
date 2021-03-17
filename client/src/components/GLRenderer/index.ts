@@ -11,14 +11,14 @@ export const Colors = {
 
 class GLRenderer {
   public fps = 60;
-  private gl: WebGL2RenderingContext;
-  private vertexShader: WebGLShader;
-  private fragmentShader: WebGLShader;
-  private program: WebGLProgram;
-  private positionAttributeLocation: GLint;
-  private positionBuffer: WebGLBuffer;
-  private shadeAttributeLocation: GLint;
-  private shadeBuffer: WebGLBuffer;
+  private gl!: WebGL2RenderingContext;
+  private vertexShader!: WebGLShader;
+  private fragmentShader!: WebGLShader;
+  private program!: WebGLProgram;
+  private positionAttributeLocation!: GLint;
+  private positionBuffer!: WebGLBuffer;
+  private shadeAttributeLocation!: GLint;
+  private shadeBuffer!: WebGLBuffer;
   private initialized = false;
   private screenWidth = 160;
   private screenHeight = 144;
@@ -35,20 +35,30 @@ class GLRenderer {
   /**
    * Initializes the renderer.
    */
-  public initialize(canvas: any) {
+  public initialize(canvas: HTMLCanvasElement) {
     if (canvas && !this.initialized) {
-      this.gl = canvas.getContext('webgl2');
+      this.gl = canvas.getContext('webgl2')!;
       const gl: WebGL2RenderingContext = this.gl;
+      const vertexElement: HTMLElement = document.getElementById(
+        'vertex-shader'
+      ) as HTMLElement;
+      const fragmentElement: HTMLElement = document.getElementById(
+        'fragment-shader'
+      ) as HTMLElement;
+      if (!vertexElement || !fragmentElement) {
+        throw new Error(`Couldn't find shader source.`);
+      }
+
       if (gl) {
         this.vertexShader = this.createShader(
           gl,
           gl.VERTEX_SHADER,
-          document.querySelector('#vertex-shader').innerHTML
+          vertexElement.innerHTML
         );
         this.fragmentShader = this.createShader(
           gl,
           gl.FRAGMENT_SHADER,
-          document.querySelector('#fragment-shader').innerHTML
+          fragmentElement.innerHTML
         );
         this.program = this.createProgram(
           gl,
@@ -70,8 +80,8 @@ class GLRenderer {
         gl.enableVertexAttribArray(this.shadeAttributeLocation);
 
         // bind buffers and describe/send their data
-        this.positionBuffer = gl.createBuffer();
-        this.shadeBuffer = gl.createBuffer();
+        this.positionBuffer = gl.createBuffer()!;
+        this.shadeBuffer = gl.createBuffer()!;
 
         const pixelBuffer = [];
         const shadeBuffer = [];
@@ -144,8 +154,8 @@ class GLRenderer {
     gl: WebGL2RenderingContext,
     type: number,
     source: string
-  ) {
-    const shader = gl.createShader(type);
+  ): WebGLShader {
+    const shader = gl.createShader(type)!;
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
     const success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
@@ -155,6 +165,7 @@ class GLRenderer {
 
     console.log(gl.getShaderInfoLog(shader));
     gl.deleteShader(shader);
+    return -1;
   }
 
   /**
@@ -164,8 +175,8 @@ class GLRenderer {
     gl: WebGL2RenderingContext,
     vertexShader: WebGLShader,
     fragmentShader: WebGLShader
-  ) {
-    const program: WebGLProgram = gl.createProgram();
+  ): WebGLProgram {
+    const program: WebGLProgram = gl.createProgram()!;
     gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);
     gl.linkProgram(program);
@@ -176,12 +187,13 @@ class GLRenderer {
 
     console.log(gl.getProgramInfoLog(program));
     gl.deleteProgram(program);
+    return -1;
   }
 
   /**
    * Set a pixel of the virtual screen
    */
-  public setPixel(x: number, y: number, shade: RGB) {
+  public setPixel(x: number, y: number, shade: RGB): void {
     if (x >= 0 && x < this.screenWidth) {
       if (y >= 0 && y < this.screenHeight) {
         const {gl} = this;
@@ -200,21 +212,21 @@ class GLRenderer {
   /**
    * @returns the screen width.
    */
-  public getScreenWidth() {
+  public getScreenWidth(): number {
     return this.screenWidth;
   }
 
   /**
    * @returns the screen height.
    */
-  public getScreenHeight() {
+  public getScreenHeight(): number {
     return this.screenHeight;
   }
 
   /**
    * The main render loop.
    */
-  public draw() {
+  public draw(): void {
     const {gl} = this;
     gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
     gl.clear(gl.COLOR_BUFFER_BIT);

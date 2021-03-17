@@ -9,7 +9,7 @@ import {byte} from '../../Types';
  * Affected flags:
  */
 function NOP(): byte {
-  OpcodeMap[0x00].call(this);
+  OpcodeMap[0x00]();
   return 4;
 }
 
@@ -20,7 +20,7 @@ function NOP(): byte {
  * Affected flags:
  */
 function LD_into_BC_i_from_d16_i(): byte {
-  OpcodeMap[0x01].call(this);
+  OpcodeMap[0x01]();
   return 12;
 }
 
@@ -31,7 +31,7 @@ function LD_into_BC_i_from_d16_i(): byte {
  * Affected flags:
  */
 function LD_into_BC_m_from_A_i(): byte {
-  OpcodeMap[0x02].call(this);
+  OpcodeMap[0x02]();
   return 8;
 }
 
@@ -42,7 +42,7 @@ function LD_into_BC_m_from_A_i(): byte {
  * Affected flags:
  */
 function INC_BC_i(): byte {
-  OpcodeMap[0x03].call(this);
+  OpcodeMap[0x03]();
   return 8;
 }
 
@@ -53,7 +53,7 @@ function INC_BC_i(): byte {
  * Affected flags: Z, N, H
  */
 function INC_B_i(): byte {
-  OpcodeMap[0x04].call(this);
+  OpcodeMap[0x04]();
   return 4;
 }
 
@@ -64,7 +64,7 @@ function INC_B_i(): byte {
  * Affected flags: Z, N, H
  */
 function DEC_B_i(): byte {
-  OpcodeMap[0x05].call(this);
+  OpcodeMap[0x05]();
   return 4;
 }
 
@@ -75,7 +75,7 @@ function DEC_B_i(): byte {
  * Affected flags:
  */
 function LD_into_B_i_from_d8_i(): byte {
-  OpcodeMap[0x06].call(this);
+  OpcodeMap[0x06]();
   return 8;
 }
 
@@ -86,7 +86,7 @@ function LD_into_B_i_from_d8_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RLCA(): byte {
-  OpcodeMap[0x07].call(this);
+  OpcodeMap[0x07]();
   return 4;
 }
 
@@ -97,7 +97,7 @@ function RLCA(): byte {
  * Affected flags:
  */
 function LD_into_a16_m_from_SP_i(): byte {
-  OpcodeMap[0x08].call(this);
+  OpcodeMap[0x08]();
   return 20;
 }
 
@@ -108,7 +108,7 @@ function LD_into_a16_m_from_SP_i(): byte {
  * Affected flags: N, H, C
  */
 function ADD_into_HL_i_from_BC_i(): byte {
-  OpcodeMap[0x09].call(this);
+  OpcodeMap[0x09]();
   return 8;
 }
 
@@ -119,7 +119,7 @@ function ADD_into_HL_i_from_BC_i(): byte {
  * Affected flags:
  */
 function LD_into_A_i_from_BC_m(): byte {
-  OpcodeMap[0x0a].call(this);
+  OpcodeMap[0x0a]();
   return 8;
 }
 
@@ -130,7 +130,7 @@ function LD_into_A_i_from_BC_m(): byte {
  * Affected flags:
  */
 function DEC_BC_i(): byte {
-  OpcodeMap[0x0b].call(this);
+  OpcodeMap[0x0b]();
   return 8;
 }
 
@@ -141,7 +141,7 @@ function DEC_BC_i(): byte {
  * Affected flags: Z, N, H
  */
 function INC_C_i(): byte {
-  OpcodeMap[0x0c].call(this);
+  OpcodeMap[0x0c]();
   return 4;
 }
 
@@ -152,7 +152,7 @@ function INC_C_i(): byte {
  * Affected flags: Z, N, H
  */
 function DEC_C_i(): byte {
-  OpcodeMap[0x0d].call(this);
+  OpcodeMap[0x0d]();
   return 4;
 }
 
@@ -163,7 +163,7 @@ function DEC_C_i(): byte {
  * Affected flags:
  */
 function LD_into_C_i_from_d8_i(): byte {
-  OpcodeMap[0x0e].call(this);
+  OpcodeMap[0x0e]();
   return 8;
 }
 
@@ -174,7 +174,7 @@ function LD_into_C_i_from_d8_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RRCA(): byte {
-  OpcodeMap[0x0f].call(this);
+  OpcodeMap[0x0f]();
   return 4;
 }
 
@@ -185,7 +185,7 @@ function RRCA(): byte {
  * Affected flags:
  */
 function STOP(): byte {
-  OpcodeMap[0x10].call(this);
+  OpcodeMap[0x10]();
   return 4;
 }
 
@@ -196,7 +196,7 @@ function STOP(): byte {
  * Affected flags:
  */
 function LD_into_DE_i_from_d16_i(): byte {
-  OpcodeMap[0x11].call(this);
+  OpcodeMap[0x11]();
   return 12;
 }
 
@@ -207,7 +207,7 @@ function LD_into_DE_i_from_d16_i(): byte {
  * Affected flags:
  */
 function LD_into_DE_m_from_A_i(): byte {
-  OpcodeMap[0x12].call(this);
+  OpcodeMap[0x12]();
   return 8;
 }
 
@@ -218,7 +218,7 @@ function LD_into_DE_m_from_A_i(): byte {
  * Affected flags:
  */
 function INC_DE_i(): byte {
-  OpcodeMap[0x13].call(this);
+  OpcodeMap[0x13]();
   return 8;
 }
 
@@ -229,7 +229,7 @@ function INC_DE_i(): byte {
  * Affected flags: Z, N, H
  */
 function INC_D_i(): byte {
-  OpcodeMap[0x14].call(this);
+  OpcodeMap[0x14]();
   return 4;
 }
 
@@ -240,7 +240,7 @@ function INC_D_i(): byte {
  * Affected flags: Z, N, H
  */
 function DEC_D_i(): byte {
-  OpcodeMap[0x15].call(this);
+  OpcodeMap[0x15]();
   return 4;
 }
 
@@ -251,7 +251,7 @@ function DEC_D_i(): byte {
  * Affected flags:
  */
 function LD_into_D_i_from_d8_i(): byte {
-  OpcodeMap[0x16].call(this);
+  OpcodeMap[0x16]();
   return 8;
 }
 
@@ -262,7 +262,7 @@ function LD_into_D_i_from_d8_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RLA(): byte {
-  OpcodeMap[0x17].call(this);
+  OpcodeMap[0x17]();
   return 4;
 }
 
@@ -273,7 +273,7 @@ function RLA(): byte {
  * Affected flags:
  */
 function JR_r8(): byte {
-  OpcodeMap[0x18].call(this);
+  OpcodeMap[0x18]();
   return 12;
 }
 
@@ -284,7 +284,7 @@ function JR_r8(): byte {
  * Affected flags: N, H, C
  */
 function ADD_into_HL_i_from_DE_i(): byte {
-  OpcodeMap[0x19].call(this);
+  OpcodeMap[0x19]();
   return 8;
 }
 
@@ -295,7 +295,7 @@ function ADD_into_HL_i_from_DE_i(): byte {
  * Affected flags:
  */
 function LD_into_A_i_from_DE_m(): byte {
-  OpcodeMap[0x1a].call(this);
+  OpcodeMap[0x1a]();
   return 8;
 }
 
@@ -306,7 +306,7 @@ function LD_into_A_i_from_DE_m(): byte {
  * Affected flags:
  */
 function DEC_DE_i(): byte {
-  OpcodeMap[0x1b].call(this);
+  OpcodeMap[0x1b]();
   return 8;
 }
 
@@ -317,7 +317,7 @@ function DEC_DE_i(): byte {
  * Affected flags: Z, N, H
  */
 function INC_E_i(): byte {
-  OpcodeMap[0x1c].call(this);
+  OpcodeMap[0x1c]();
   return 4;
 }
 
@@ -328,7 +328,7 @@ function INC_E_i(): byte {
  * Affected flags: Z, N, H
  */
 function DEC_E_i(): byte {
-  OpcodeMap[0x1d].call(this);
+  OpcodeMap[0x1d]();
   return 4;
 }
 
@@ -339,7 +339,7 @@ function DEC_E_i(): byte {
  * Affected flags:
  */
 function LD_into_E_i_from_d8_i(): byte {
-  OpcodeMap[0x1e].call(this);
+  OpcodeMap[0x1e]();
   return 8;
 }
 
@@ -350,7 +350,7 @@ function LD_into_E_i_from_d8_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RRA(): byte {
-  OpcodeMap[0x1f].call(this);
+  OpcodeMap[0x1f]();
   return 4;
 }
 
@@ -361,7 +361,7 @@ function RRA(): byte {
  * Affected flags:
  */
 export function JR_C_NZ_r8(): byte {
-  const condition: boolean = OpcodeMap[0x20].call(this);
+  const condition: boolean = OpcodeMap[0x20]();
   if (!condition) {
     return 8;
   }
@@ -375,7 +375,7 @@ export function JR_C_NZ_r8(): byte {
  * Affected flags:
  */
 function LD_into_HL_i_from_d16_i(): byte {
-  OpcodeMap[0x21].call(this);
+  OpcodeMap[0x21]();
   return 12;
 }
 
@@ -386,7 +386,7 @@ function LD_into_HL_i_from_d16_i(): byte {
  * Affected flags:
  */
 function LD_into_HL_incr_m_from_A_i(): byte {
-  OpcodeMap[0x22].call(this);
+  OpcodeMap[0x22]();
   return 8;
 }
 
@@ -397,7 +397,7 @@ function LD_into_HL_incr_m_from_A_i(): byte {
  * Affected flags:
  */
 function INC_HL_i(): byte {
-  OpcodeMap[0x23].call(this);
+  OpcodeMap[0x23]();
   return 8;
 }
 
@@ -408,7 +408,7 @@ function INC_HL_i(): byte {
  * Affected flags: Z, N, H
  */
 function INC_H_i(): byte {
-  OpcodeMap[0x24].call(this);
+  OpcodeMap[0x24]();
   return 4;
 }
 
@@ -419,7 +419,7 @@ function INC_H_i(): byte {
  * Affected flags: Z, N, H
  */
 function DEC_H_i(): byte {
-  OpcodeMap[0x25].call(this);
+  OpcodeMap[0x25]();
   return 4;
 }
 
@@ -430,7 +430,7 @@ function DEC_H_i(): byte {
  * Affected flags:
  */
 function LD_into_H_i_from_d8_i(): byte {
-  OpcodeMap[0x26].call(this);
+  OpcodeMap[0x26]();
   return 8;
 }
 
@@ -441,7 +441,7 @@ function LD_into_H_i_from_d8_i(): byte {
  * Affected flags: Z, H, C
  */
 function DAA_A(): byte {
-  OpcodeMap[0x27].call(this);
+  OpcodeMap[0x27]();
   return 4;
 }
 
@@ -452,7 +452,7 @@ function DAA_A(): byte {
  * Affected flags:
  */
 export function JR_C_Z_r8(): byte {
-  const condition: boolean = OpcodeMap[0x28].call(this);
+  const condition: boolean = OpcodeMap[0x28]();
   if (!condition) {
     return 8;
   }
@@ -466,7 +466,7 @@ export function JR_C_Z_r8(): byte {
  * Affected flags: N, H, C
  */
 function ADD_into_HL_i_from_HL_i(): byte {
-  OpcodeMap[0x29].call(this);
+  OpcodeMap[0x29]();
   return 8;
 }
 
@@ -477,7 +477,7 @@ function ADD_into_HL_i_from_HL_i(): byte {
  * Affected flags:
  */
 function LD_into_A_i_from_HL_incr_m(): byte {
-  OpcodeMap[0x2a].call(this);
+  OpcodeMap[0x2a]();
   return 8;
 }
 
@@ -488,7 +488,7 @@ function LD_into_A_i_from_HL_incr_m(): byte {
  * Affected flags:
  */
 function DEC_HL_i(): byte {
-  OpcodeMap[0x2b].call(this);
+  OpcodeMap[0x2b]();
   return 8;
 }
 
@@ -499,7 +499,7 @@ function DEC_HL_i(): byte {
  * Affected flags: Z, N, H
  */
 function INC_L_i(): byte {
-  OpcodeMap[0x2c].call(this);
+  OpcodeMap[0x2c]();
   return 4;
 }
 
@@ -510,7 +510,7 @@ function INC_L_i(): byte {
  * Affected flags: Z, N, H
  */
 function DEC_L_i(): byte {
-  OpcodeMap[0x2d].call(this);
+  OpcodeMap[0x2d]();
   return 4;
 }
 
@@ -521,7 +521,7 @@ function DEC_L_i(): byte {
  * Affected flags:
  */
 function LD_into_L_i_from_d8_i(): byte {
-  OpcodeMap[0x2e].call(this);
+  OpcodeMap[0x2e]();
   return 8;
 }
 
@@ -532,7 +532,7 @@ function LD_into_L_i_from_d8_i(): byte {
  * Affected flags: N, H
  */
 function CPL_A(): byte {
-  OpcodeMap[0x2f].call(this);
+  OpcodeMap[0x2f]();
   return 4;
 }
 
@@ -543,7 +543,7 @@ function CPL_A(): byte {
  * Affected flags:
  */
 export function JR_C_NC_r8(): byte {
-  const condition: boolean = OpcodeMap[0x30].call(this);
+  const condition: boolean = OpcodeMap[0x30]();
   if (!condition) {
     return 8;
   }
@@ -557,7 +557,7 @@ export function JR_C_NC_r8(): byte {
  * Affected flags:
  */
 function LD_into_SP_i_from_d16_i(): byte {
-  OpcodeMap[0x31].call(this);
+  OpcodeMap[0x31]();
   return 12;
 }
 
@@ -568,7 +568,7 @@ function LD_into_SP_i_from_d16_i(): byte {
  * Affected flags:
  */
 function LD_into_HL_decr_m_from_A_i(): byte {
-  OpcodeMap[0x32].call(this);
+  OpcodeMap[0x32]();
   return 8;
 }
 
@@ -579,7 +579,7 @@ function LD_into_HL_decr_m_from_A_i(): byte {
  * Affected flags:
  */
 function INC_SP_i(): byte {
-  OpcodeMap[0x33].call(this);
+  OpcodeMap[0x33]();
   return 8;
 }
 
@@ -590,7 +590,7 @@ function INC_SP_i(): byte {
  * Affected flags: Z, N, H
  */
 function INC_HL_m(): byte {
-  OpcodeMap[0x34].call(this);
+  OpcodeMap[0x34]();
   return 12;
 }
 
@@ -601,7 +601,7 @@ function INC_HL_m(): byte {
  * Affected flags: Z, N, H
  */
 function DEC_HL_m(): byte {
-  OpcodeMap[0x35].call(this);
+  OpcodeMap[0x35]();
   return 12;
 }
 
@@ -612,7 +612,7 @@ function DEC_HL_m(): byte {
  * Affected flags:
  */
 function LD_into_HL_m_from_d8_i(): byte {
-  OpcodeMap[0x36].call(this);
+  OpcodeMap[0x36]();
   return 12;
 }
 
@@ -623,7 +623,7 @@ function LD_into_HL_m_from_d8_i(): byte {
  * Affected flags: N, H, C
  */
 function SCF(): byte {
-  OpcodeMap[0x37].call(this);
+  OpcodeMap[0x37]();
   return 4;
 }
 
@@ -634,7 +634,7 @@ function SCF(): byte {
  * Affected flags:
  */
 export function JR_C_C_r8(): byte {
-  const condition: boolean = OpcodeMap[0x38].call(this);
+  const condition: boolean = OpcodeMap[0x38]();
   if (!condition) {
     return 8;
   }
@@ -648,7 +648,7 @@ export function JR_C_C_r8(): byte {
  * Affected flags: N, H, C
  */
 function ADD_into_HL_i_from_SP_i(): byte {
-  OpcodeMap[0x39].call(this);
+  OpcodeMap[0x39]();
   return 8;
 }
 
@@ -659,7 +659,7 @@ function ADD_into_HL_i_from_SP_i(): byte {
  * Affected flags:
  */
 function LD_into_A_i_from_HL_decr_m(): byte {
-  OpcodeMap[0x3a].call(this);
+  OpcodeMap[0x3a]();
   return 8;
 }
 
@@ -670,7 +670,7 @@ function LD_into_A_i_from_HL_decr_m(): byte {
  * Affected flags:
  */
 function DEC_SP_i(): byte {
-  OpcodeMap[0x3b].call(this);
+  OpcodeMap[0x3b]();
   return 8;
 }
 
@@ -681,7 +681,7 @@ function DEC_SP_i(): byte {
  * Affected flags: Z, N, H
  */
 function INC_A_i(): byte {
-  OpcodeMap[0x3c].call(this);
+  OpcodeMap[0x3c]();
   return 4;
 }
 
@@ -692,7 +692,7 @@ function INC_A_i(): byte {
  * Affected flags: Z, N, H
  */
 function DEC_A_i(): byte {
-  OpcodeMap[0x3d].call(this);
+  OpcodeMap[0x3d]();
   return 4;
 }
 
@@ -703,7 +703,7 @@ function DEC_A_i(): byte {
  * Affected flags:
  */
 function LD_into_A_i_from_d8_i(): byte {
-  OpcodeMap[0x3e].call(this);
+  OpcodeMap[0x3e]();
   return 8;
 }
 
@@ -716,7 +716,7 @@ function LD_into_A_i_from_d8_i(): byte {
  * Affected flags: N, H, C
  */
 function CCF(): byte {
-  OpcodeMap[0x3f].call(this);
+  OpcodeMap[0x3f]();
   return 4;
 }
 
@@ -727,7 +727,7 @@ function CCF(): byte {
  * Affected flags:
  */
 function LD_into_B_i_from_B_i(): byte {
-  OpcodeMap[0x40].call(this);
+  OpcodeMap[0x40]();
   return 4;
 }
 
@@ -738,7 +738,7 @@ function LD_into_B_i_from_B_i(): byte {
  * Affected flags:
  */
 function LD_into_B_i_from_C_i(): byte {
-  OpcodeMap[0x41].call(this);
+  OpcodeMap[0x41]();
   return 4;
 }
 
@@ -749,7 +749,7 @@ function LD_into_B_i_from_C_i(): byte {
  * Affected flags:
  */
 function LD_into_B_i_from_D_i(): byte {
-  OpcodeMap[0x42].call(this);
+  OpcodeMap[0x42]();
   return 4;
 }
 
@@ -760,7 +760,7 @@ function LD_into_B_i_from_D_i(): byte {
  * Affected flags:
  */
 function LD_into_B_i_from_E_i(): byte {
-  OpcodeMap[0x43].call(this);
+  OpcodeMap[0x43]();
   return 4;
 }
 
@@ -771,7 +771,7 @@ function LD_into_B_i_from_E_i(): byte {
  * Affected flags:
  */
 function LD_into_B_i_from_H_i(): byte {
-  OpcodeMap[0x44].call(this);
+  OpcodeMap[0x44]();
   return 4;
 }
 
@@ -782,7 +782,7 @@ function LD_into_B_i_from_H_i(): byte {
  * Affected flags:
  */
 function LD_into_B_i_from_L_i(): byte {
-  OpcodeMap[0x45].call(this);
+  OpcodeMap[0x45]();
   return 4;
 }
 
@@ -793,7 +793,7 @@ function LD_into_B_i_from_L_i(): byte {
  * Affected flags:
  */
 function LD_into_B_i_from_HL_m(): byte {
-  OpcodeMap[0x46].call(this);
+  OpcodeMap[0x46]();
   return 8;
 }
 
@@ -804,7 +804,7 @@ function LD_into_B_i_from_HL_m(): byte {
  * Affected flags:
  */
 function LD_into_B_i_from_A_i(): byte {
-  OpcodeMap[0x47].call(this);
+  OpcodeMap[0x47]();
   return 4;
 }
 
@@ -815,7 +815,7 @@ function LD_into_B_i_from_A_i(): byte {
  * Affected flags:
  */
 function LD_into_C_i_from_B_i(): byte {
-  OpcodeMap[0x48].call(this);
+  OpcodeMap[0x48]();
   return 4;
 }
 
@@ -826,7 +826,7 @@ function LD_into_C_i_from_B_i(): byte {
  * Affected flags:
  */
 function LD_into_C_i_from_C_i(): byte {
-  OpcodeMap[0x49].call(this);
+  OpcodeMap[0x49]();
   return 4;
 }
 
@@ -837,7 +837,7 @@ function LD_into_C_i_from_C_i(): byte {
  * Affected flags:
  */
 function LD_into_C_i_from_D_i(): byte {
-  OpcodeMap[0x4a].call(this);
+  OpcodeMap[0x4a]();
   return 4;
 }
 
@@ -848,7 +848,7 @@ function LD_into_C_i_from_D_i(): byte {
  * Affected flags:
  */
 function LD_into_C_i_from_E_i(): byte {
-  OpcodeMap[0x4b].call(this);
+  OpcodeMap[0x4b]();
   return 4;
 }
 
@@ -859,7 +859,7 @@ function LD_into_C_i_from_E_i(): byte {
  * Affected flags:
  */
 function LD_into_C_i_from_H_i(): byte {
-  OpcodeMap[0x4c].call(this);
+  OpcodeMap[0x4c]();
   return 4;
 }
 
@@ -870,7 +870,7 @@ function LD_into_C_i_from_H_i(): byte {
  * Affected flags:
  */
 function LD_into_C_i_from_L_i(): byte {
-  OpcodeMap[0x4d].call(this);
+  OpcodeMap[0x4d]();
   return 4;
 }
 
@@ -881,7 +881,7 @@ function LD_into_C_i_from_L_i(): byte {
  * Affected flags:
  */
 function LD_into_C_i_from_HL_m(): byte {
-  OpcodeMap[0x4e].call(this);
+  OpcodeMap[0x4e]();
   return 8;
 }
 
@@ -892,7 +892,7 @@ function LD_into_C_i_from_HL_m(): byte {
  * Affected flags:
  */
 function LD_into_C_i_from_A_i(): byte {
-  OpcodeMap[0x4f].call(this);
+  OpcodeMap[0x4f]();
   return 4;
 }
 
@@ -903,7 +903,7 @@ function LD_into_C_i_from_A_i(): byte {
  * Affected flags:
  */
 function LD_into_D_i_from_B_i(): byte {
-  OpcodeMap[0x50].call(this);
+  OpcodeMap[0x50]();
   return 4;
 }
 
@@ -914,7 +914,7 @@ function LD_into_D_i_from_B_i(): byte {
  * Affected flags:
  */
 function LD_into_D_i_from_C_i(): byte {
-  OpcodeMap[0x51].call(this);
+  OpcodeMap[0x51]();
   return 4;
 }
 
@@ -925,7 +925,7 @@ function LD_into_D_i_from_C_i(): byte {
  * Affected flags:
  */
 function LD_into_D_i_from_D_i(): byte {
-  OpcodeMap[0x52].call(this);
+  OpcodeMap[0x52]();
   return 4;
 }
 
@@ -936,7 +936,7 @@ function LD_into_D_i_from_D_i(): byte {
  * Affected flags:
  */
 function LD_into_D_i_from_E_i(): byte {
-  OpcodeMap[0x53].call(this);
+  OpcodeMap[0x53]();
   return 4;
 }
 
@@ -947,7 +947,7 @@ function LD_into_D_i_from_E_i(): byte {
  * Affected flags:
  */
 function LD_into_D_i_from_H_i(): byte {
-  OpcodeMap[0x54].call(this);
+  OpcodeMap[0x54]();
   return 4;
 }
 
@@ -958,7 +958,7 @@ function LD_into_D_i_from_H_i(): byte {
  * Affected flags:
  */
 function LD_into_D_i_from_L_i(): byte {
-  OpcodeMap[0x55].call(this);
+  OpcodeMap[0x55]();
   return 4;
 }
 
@@ -969,7 +969,7 @@ function LD_into_D_i_from_L_i(): byte {
  * Affected flags:
  */
 function LD_into_D_i_from_HL_m(): byte {
-  OpcodeMap[0x56].call(this);
+  OpcodeMap[0x56]();
   return 8;
 }
 
@@ -980,7 +980,7 @@ function LD_into_D_i_from_HL_m(): byte {
  * Affected flags:
  */
 function LD_into_D_i_from_A_i(): byte {
-  OpcodeMap[0x57].call(this);
+  OpcodeMap[0x57]();
   return 4;
 }
 
@@ -991,7 +991,7 @@ function LD_into_D_i_from_A_i(): byte {
  * Affected flags:
  */
 function LD_into_E_i_from_B_i(): byte {
-  OpcodeMap[0x58].call(this);
+  OpcodeMap[0x58]();
   return 4;
 }
 
@@ -1002,7 +1002,7 @@ function LD_into_E_i_from_B_i(): byte {
  * Affected flags:
  */
 function LD_into_E_i_from_C_i(): byte {
-  OpcodeMap[0x59].call(this);
+  OpcodeMap[0x59]();
   return 4;
 }
 
@@ -1013,7 +1013,7 @@ function LD_into_E_i_from_C_i(): byte {
  * Affected flags:
  */
 function LD_into_E_i_from_D_i(): byte {
-  OpcodeMap[0x5a].call(this);
+  OpcodeMap[0x5a]();
   return 4;
 }
 
@@ -1024,7 +1024,7 @@ function LD_into_E_i_from_D_i(): byte {
  * Affected flags:
  */
 function LD_into_E_i_from_E_i(): byte {
-  OpcodeMap[0x5b].call(this);
+  OpcodeMap[0x5b]();
   return 4;
 }
 
@@ -1035,7 +1035,7 @@ function LD_into_E_i_from_E_i(): byte {
  * Affected flags:
  */
 function LD_into_E_i_from_H_i(): byte {
-  OpcodeMap[0x5c].call(this);
+  OpcodeMap[0x5c]();
   return 4;
 }
 
@@ -1046,7 +1046,7 @@ function LD_into_E_i_from_H_i(): byte {
  * Affected flags:
  */
 function LD_into_E_i_from_L_i(): byte {
-  OpcodeMap[0x5d].call(this);
+  OpcodeMap[0x5d]();
   return 4;
 }
 
@@ -1057,7 +1057,7 @@ function LD_into_E_i_from_L_i(): byte {
  * Affected flags:
  */
 function LD_into_E_i_from_HL_m(): byte {
-  OpcodeMap[0x5e].call(this);
+  OpcodeMap[0x5e]();
   return 8;
 }
 
@@ -1068,7 +1068,7 @@ function LD_into_E_i_from_HL_m(): byte {
  * Affected flags:
  */
 function LD_into_E_i_from_A_i(): byte {
-  OpcodeMap[0x5f].call(this);
+  OpcodeMap[0x5f]();
   return 4;
 }
 
@@ -1079,7 +1079,7 @@ function LD_into_E_i_from_A_i(): byte {
  * Affected flags:
  */
 function LD_into_H_i_from_B_i(): byte {
-  OpcodeMap[0x60].call(this);
+  OpcodeMap[0x60]();
   return 4;
 }
 
@@ -1090,7 +1090,7 @@ function LD_into_H_i_from_B_i(): byte {
  * Affected flags:
  */
 function LD_into_H_i_from_C_i(): byte {
-  OpcodeMap[0x61].call(this);
+  OpcodeMap[0x61]();
   return 4;
 }
 
@@ -1101,7 +1101,7 @@ function LD_into_H_i_from_C_i(): byte {
  * Affected flags:
  */
 function LD_into_H_i_from_D_i(): byte {
-  OpcodeMap[0x62].call(this);
+  OpcodeMap[0x62]();
   return 4;
 }
 
@@ -1112,7 +1112,7 @@ function LD_into_H_i_from_D_i(): byte {
  * Affected flags:
  */
 function LD_into_H_i_from_E_i(): byte {
-  OpcodeMap[0x63].call(this);
+  OpcodeMap[0x63]();
   return 4;
 }
 
@@ -1123,7 +1123,7 @@ function LD_into_H_i_from_E_i(): byte {
  * Affected flags:
  */
 function LD_into_H_i_from_H_i(): byte {
-  OpcodeMap[0x64].call(this);
+  OpcodeMap[0x64]();
   return 4;
 }
 
@@ -1134,7 +1134,7 @@ function LD_into_H_i_from_H_i(): byte {
  * Affected flags:
  */
 function LD_into_H_i_from_L_i(): byte {
-  OpcodeMap[0x65].call(this);
+  OpcodeMap[0x65]();
   return 4;
 }
 
@@ -1145,7 +1145,7 @@ function LD_into_H_i_from_L_i(): byte {
  * Affected flags:
  */
 function LD_into_H_i_from_HL_m(): byte {
-  OpcodeMap[0x66].call(this);
+  OpcodeMap[0x66]();
   return 8;
 }
 
@@ -1156,7 +1156,7 @@ function LD_into_H_i_from_HL_m(): byte {
  * Affected flags:
  */
 function LD_into_H_i_from_A_i(): byte {
-  OpcodeMap[0x67].call(this);
+  OpcodeMap[0x67]();
   return 4;
 }
 
@@ -1167,7 +1167,7 @@ function LD_into_H_i_from_A_i(): byte {
  * Affected flags:
  */
 function LD_into_L_i_from_B_i(): byte {
-  OpcodeMap[0x68].call(this);
+  OpcodeMap[0x68]();
   return 4;
 }
 
@@ -1178,7 +1178,7 @@ function LD_into_L_i_from_B_i(): byte {
  * Affected flags:
  */
 function LD_into_L_i_from_C_i(): byte {
-  OpcodeMap[0x69].call(this);
+  OpcodeMap[0x69]();
   return 4;
 }
 
@@ -1189,7 +1189,7 @@ function LD_into_L_i_from_C_i(): byte {
  * Affected flags:
  */
 function LD_into_L_i_from_D_i(): byte {
-  OpcodeMap[0x6a].call(this);
+  OpcodeMap[0x6a]();
   return 4;
 }
 
@@ -1200,7 +1200,7 @@ function LD_into_L_i_from_D_i(): byte {
  * Affected flags:
  */
 function LD_into_L_i_from_E_i(): byte {
-  OpcodeMap[0x6b].call(this);
+  OpcodeMap[0x6b]();
   return 4;
 }
 
@@ -1211,7 +1211,7 @@ function LD_into_L_i_from_E_i(): byte {
  * Affected flags:
  */
 function LD_into_L_i_from_H_i(): byte {
-  OpcodeMap[0x6c].call(this);
+  OpcodeMap[0x6c]();
   return 4;
 }
 
@@ -1222,7 +1222,7 @@ function LD_into_L_i_from_H_i(): byte {
  * Affected flags:
  */
 function LD_into_L_i_from_L_i(): byte {
-  OpcodeMap[0x6d].call(this);
+  OpcodeMap[0x6d]();
   return 4;
 }
 
@@ -1233,7 +1233,7 @@ function LD_into_L_i_from_L_i(): byte {
  * Affected flags:
  */
 function LD_into_L_i_from_HL_m(): byte {
-  OpcodeMap[0x6e].call(this);
+  OpcodeMap[0x6e]();
   return 8;
 }
 
@@ -1244,7 +1244,7 @@ function LD_into_L_i_from_HL_m(): byte {
  * Affected flags:
  */
 function LD_into_L_i_from_A_i(): byte {
-  OpcodeMap[0x6f].call(this);
+  OpcodeMap[0x6f]();
   return 4;
 }
 
@@ -1255,7 +1255,7 @@ function LD_into_L_i_from_A_i(): byte {
  * Affected flags:
  */
 function LD_into_HL_m_from_B_i(): byte {
-  OpcodeMap[0x70].call(this);
+  OpcodeMap[0x70]();
   return 8;
 }
 
@@ -1266,7 +1266,7 @@ function LD_into_HL_m_from_B_i(): byte {
  * Affected flags:
  */
 function LD_into_HL_m_from_C_i(): byte {
-  OpcodeMap[0x71].call(this);
+  OpcodeMap[0x71]();
   return 8;
 }
 
@@ -1277,7 +1277,7 @@ function LD_into_HL_m_from_C_i(): byte {
  * Affected flags:
  */
 function LD_into_HL_m_from_D_i(): byte {
-  OpcodeMap[0x72].call(this);
+  OpcodeMap[0x72]();
   return 8;
 }
 
@@ -1288,7 +1288,7 @@ function LD_into_HL_m_from_D_i(): byte {
  * Affected flags:
  */
 function LD_into_HL_m_from_E_i(): byte {
-  OpcodeMap[0x73].call(this);
+  OpcodeMap[0x73]();
   return 8;
 }
 
@@ -1299,7 +1299,7 @@ function LD_into_HL_m_from_E_i(): byte {
  * Affected flags:
  */
 function LD_into_HL_m_from_H_i(): byte {
-  OpcodeMap[0x74].call(this);
+  OpcodeMap[0x74]();
   return 8;
 }
 
@@ -1310,7 +1310,7 @@ function LD_into_HL_m_from_H_i(): byte {
  * Affected flags:
  */
 function LD_into_HL_m_from_L_i(): byte {
-  OpcodeMap[0x75].call(this);
+  OpcodeMap[0x75]();
   return 8;
 }
 
@@ -1321,7 +1321,7 @@ function LD_into_HL_m_from_L_i(): byte {
  * Affected flags:
  */
 function HALT(): byte {
-  OpcodeMap[0x76].call(this);
+  OpcodeMap[0x76]();
   return 4;
 }
 
@@ -1332,7 +1332,7 @@ function HALT(): byte {
  * Affected flags:
  */
 function LD_into_HL_m_from_A_i(): byte {
-  OpcodeMap[0x77].call(this);
+  OpcodeMap[0x77]();
   return 8;
 }
 
@@ -1343,7 +1343,7 @@ function LD_into_HL_m_from_A_i(): byte {
  * Affected flags:
  */
 function LD_into_A_i_from_B_i(): byte {
-  OpcodeMap[0x78].call(this);
+  OpcodeMap[0x78]();
   return 4;
 }
 
@@ -1354,7 +1354,7 @@ function LD_into_A_i_from_B_i(): byte {
  * Affected flags:
  */
 function LD_into_A_i_from_C_i(): byte {
-  OpcodeMap[0x79].call(this);
+  OpcodeMap[0x79]();
   return 4;
 }
 
@@ -1365,7 +1365,7 @@ function LD_into_A_i_from_C_i(): byte {
  * Affected flags:
  */
 function LD_into_A_i_from_D_i(): byte {
-  OpcodeMap[0x7a].call(this);
+  OpcodeMap[0x7a]();
   return 4;
 }
 
@@ -1376,7 +1376,7 @@ function LD_into_A_i_from_D_i(): byte {
  * Affected flags:
  */
 function LD_into_A_i_from_E_i(): byte {
-  OpcodeMap[0x7b].call(this);
+  OpcodeMap[0x7b]();
   return 4;
 }
 
@@ -1387,7 +1387,7 @@ function LD_into_A_i_from_E_i(): byte {
  * Affected flags:
  */
 function LD_into_A_i_from_H_i(): byte {
-  OpcodeMap[0x7c].call(this);
+  OpcodeMap[0x7c]();
   return 4;
 }
 
@@ -1398,7 +1398,7 @@ function LD_into_A_i_from_H_i(): byte {
  * Affected flags:
  */
 function LD_into_A_i_from_L_i(): byte {
-  OpcodeMap[0x7d].call(this);
+  OpcodeMap[0x7d]();
   return 4;
 }
 
@@ -1409,7 +1409,7 @@ function LD_into_A_i_from_L_i(): byte {
  * Affected flags:
  */
 function LD_into_A_i_from_HL_m(): byte {
-  OpcodeMap[0x7e].call(this);
+  OpcodeMap[0x7e]();
   return 8;
 }
 
@@ -1420,7 +1420,7 @@ function LD_into_A_i_from_HL_m(): byte {
  * Affected flags:
  */
 function LD_into_A_i_from_A_i(): byte {
-  OpcodeMap[0x7f].call(this);
+  OpcodeMap[0x7f]();
   return 4;
 }
 
@@ -1431,7 +1431,7 @@ function LD_into_A_i_from_A_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function ADD_into_A_i_from_B_i(): byte {
-  OpcodeMap[0x80].call(this);
+  OpcodeMap[0x80]();
   return 4;
 }
 
@@ -1442,7 +1442,7 @@ function ADD_into_A_i_from_B_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function ADD_into_A_i_from_C_i(): byte {
-  OpcodeMap[0x81].call(this);
+  OpcodeMap[0x81]();
   return 4;
 }
 
@@ -1453,7 +1453,7 @@ function ADD_into_A_i_from_C_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function ADD_into_A_i_from_D_i(): byte {
-  OpcodeMap[0x82].call(this);
+  OpcodeMap[0x82]();
   return 4;
 }
 
@@ -1464,7 +1464,7 @@ function ADD_into_A_i_from_D_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function ADD_into_A_i_from_E_i(): byte {
-  OpcodeMap[0x83].call(this);
+  OpcodeMap[0x83]();
   return 4;
 }
 
@@ -1475,7 +1475,7 @@ function ADD_into_A_i_from_E_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function ADD_into_A_i_from_H_i(): byte {
-  OpcodeMap[0x84].call(this);
+  OpcodeMap[0x84]();
   return 4;
 }
 
@@ -1486,7 +1486,7 @@ function ADD_into_A_i_from_H_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function ADD_into_A_i_from_L_i(): byte {
-  OpcodeMap[0x85].call(this);
+  OpcodeMap[0x85]();
   return 4;
 }
 
@@ -1497,7 +1497,7 @@ function ADD_into_A_i_from_L_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function ADD_into_A_i_from_HL_m(): byte {
-  OpcodeMap[0x86].call(this);
+  OpcodeMap[0x86]();
   return 8;
 }
 
@@ -1508,7 +1508,7 @@ function ADD_into_A_i_from_HL_m(): byte {
  * Affected flags: Z, N, H, C
  */
 function ADD_into_A_i_from_A_i(): byte {
-  OpcodeMap[0x87].call(this);
+  OpcodeMap[0x87]();
   return 4;
 }
 
@@ -1519,7 +1519,7 @@ function ADD_into_A_i_from_A_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function ADC_into_A_i_from_B_i(): byte {
-  OpcodeMap[0x88].call(this);
+  OpcodeMap[0x88]();
   return 4;
 }
 
@@ -1530,7 +1530,7 @@ function ADC_into_A_i_from_B_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function ADC_into_A_i_from_C_i(): byte {
-  OpcodeMap[0x89].call(this);
+  OpcodeMap[0x89]();
   return 4;
 }
 
@@ -1541,7 +1541,7 @@ function ADC_into_A_i_from_C_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function ADC_into_A_i_from_D_i(): byte {
-  OpcodeMap[0x8a].call(this);
+  OpcodeMap[0x8a]();
   return 4;
 }
 
@@ -1552,7 +1552,7 @@ function ADC_into_A_i_from_D_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function ADC_into_A_i_from_E_i(): byte {
-  OpcodeMap[0x8b].call(this);
+  OpcodeMap[0x8b]();
   return 4;
 }
 
@@ -1563,7 +1563,7 @@ function ADC_into_A_i_from_E_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function ADC_into_A_i_from_H_i(): byte {
-  OpcodeMap[0x8c].call(this);
+  OpcodeMap[0x8c]();
   return 4;
 }
 
@@ -1574,7 +1574,7 @@ function ADC_into_A_i_from_H_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function ADC_into_A_i_from_L_i(): byte {
-  OpcodeMap[0x8d].call(this);
+  OpcodeMap[0x8d]();
   return 4;
 }
 
@@ -1585,7 +1585,7 @@ function ADC_into_A_i_from_L_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function ADC_into_A_i_from_HL_m(): byte {
-  OpcodeMap[0x8e].call(this);
+  OpcodeMap[0x8e]();
   return 8;
 }
 
@@ -1596,7 +1596,7 @@ function ADC_into_A_i_from_HL_m(): byte {
  * Affected flags: Z, N, H, C
  */
 function ADC_into_A_i_from_A_i(): byte {
-  OpcodeMap[0x8f].call(this);
+  OpcodeMap[0x8f]();
   return 4;
 }
 
@@ -1607,7 +1607,7 @@ function ADC_into_A_i_from_A_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SUB_from_A_i_value_B_i(): byte {
-  OpcodeMap[0x90].call(this);
+  OpcodeMap[0x90]();
   return 4;
 }
 
@@ -1618,7 +1618,7 @@ function SUB_from_A_i_value_B_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SUB_from_A_i_value_C_i(): byte {
-  OpcodeMap[0x91].call(this);
+  OpcodeMap[0x91]();
   return 4;
 }
 
@@ -1629,7 +1629,7 @@ function SUB_from_A_i_value_C_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SUB_from_A_i_value_D_i(): byte {
-  OpcodeMap[0x92].call(this);
+  OpcodeMap[0x92]();
   return 4;
 }
 
@@ -1640,7 +1640,7 @@ function SUB_from_A_i_value_D_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SUB_from_A_i_value_E_i(): byte {
-  OpcodeMap[0x93].call(this);
+  OpcodeMap[0x93]();
   return 4;
 }
 
@@ -1651,7 +1651,7 @@ function SUB_from_A_i_value_E_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SUB_from_A_i_value_H_i(): byte {
-  OpcodeMap[0x94].call(this);
+  OpcodeMap[0x94]();
   return 4;
 }
 
@@ -1662,7 +1662,7 @@ function SUB_from_A_i_value_H_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SUB_from_A_i_value_L_i(): byte {
-  OpcodeMap[0x95].call(this);
+  OpcodeMap[0x95]();
   return 4;
 }
 
@@ -1673,7 +1673,7 @@ function SUB_from_A_i_value_L_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SUB_from_A_i_value_HL_m(): byte {
-  OpcodeMap[0x96].call(this);
+  OpcodeMap[0x96]();
   return 8;
 }
 
@@ -1684,7 +1684,7 @@ function SUB_from_A_i_value_HL_m(): byte {
  * Affected flags: Z, N, H, C
  */
 function SUB_from_A_i_value_A_i(): byte {
-  OpcodeMap[0x97].call(this);
+  OpcodeMap[0x97]();
   return 4;
 }
 
@@ -1695,7 +1695,7 @@ function SUB_from_A_i_value_A_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SBC_from_A_i_value_B_i(): byte {
-  OpcodeMap[0x98].call(this);
+  OpcodeMap[0x98]();
   return 4;
 }
 
@@ -1706,7 +1706,7 @@ function SBC_from_A_i_value_B_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SBC_from_A_i_value_C_i(): byte {
-  OpcodeMap[0x99].call(this);
+  OpcodeMap[0x99]();
   return 4;
 }
 
@@ -1717,7 +1717,7 @@ function SBC_from_A_i_value_C_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SBC_from_A_i_value_D_i(): byte {
-  OpcodeMap[0x9a].call(this);
+  OpcodeMap[0x9a]();
   return 4;
 }
 
@@ -1728,7 +1728,7 @@ function SBC_from_A_i_value_D_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SBC_from_A_i_value_E_i(): byte {
-  OpcodeMap[0x9b].call(this);
+  OpcodeMap[0x9b]();
   return 4;
 }
 
@@ -1739,7 +1739,7 @@ function SBC_from_A_i_value_E_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SBC_from_A_i_value_H_i(): byte {
-  OpcodeMap[0x9c].call(this);
+  OpcodeMap[0x9c]();
   return 4;
 }
 
@@ -1750,7 +1750,7 @@ function SBC_from_A_i_value_H_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SBC_from_A_i_value_L_i(): byte {
-  OpcodeMap[0x9d].call(this);
+  OpcodeMap[0x9d]();
   return 4;
 }
 
@@ -1761,7 +1761,7 @@ function SBC_from_A_i_value_L_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SBC_from_A_i_value_HL_m(): byte {
-  OpcodeMap[0x9e].call(this);
+  OpcodeMap[0x9e]();
   return 8;
 }
 
@@ -1772,7 +1772,7 @@ function SBC_from_A_i_value_HL_m(): byte {
  * Affected flags: Z, N, H, C
  */
 function SBC_from_A_i_value_A_i(): byte {
-  OpcodeMap[0x9f].call(this);
+  OpcodeMap[0x9f]();
   return 4;
 }
 
@@ -1783,7 +1783,7 @@ function SBC_from_A_i_value_A_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function AND_A_with_B_i(): byte {
-  OpcodeMap[0xa0].call(this);
+  OpcodeMap[0xa0]();
   return 4;
 }
 
@@ -1794,7 +1794,7 @@ function AND_A_with_B_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function AND_A_with_C_i(): byte {
-  OpcodeMap[0xa1].call(this);
+  OpcodeMap[0xa1]();
   return 4;
 }
 
@@ -1805,7 +1805,7 @@ function AND_A_with_C_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function AND_A_with_D_i(): byte {
-  OpcodeMap[0xa2].call(this);
+  OpcodeMap[0xa2]();
   return 4;
 }
 
@@ -1816,7 +1816,7 @@ function AND_A_with_D_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function AND_A_with_E_i(): byte {
-  OpcodeMap[0xa3].call(this);
+  OpcodeMap[0xa3]();
   return 4;
 }
 
@@ -1827,7 +1827,7 @@ function AND_A_with_E_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function AND_A_with_H_i(): byte {
-  OpcodeMap[0xa4].call(this);
+  OpcodeMap[0xa4]();
   return 4;
 }
 
@@ -1838,7 +1838,7 @@ function AND_A_with_H_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function AND_A_with_L_i(): byte {
-  OpcodeMap[0xa5].call(this);
+  OpcodeMap[0xa5]();
   return 4;
 }
 
@@ -1849,7 +1849,7 @@ function AND_A_with_L_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function AND_A_with_HL_m(): byte {
-  OpcodeMap[0xa6].call(this);
+  OpcodeMap[0xa6]();
   return 8;
 }
 
@@ -1860,7 +1860,7 @@ function AND_A_with_HL_m(): byte {
  * Affected flags: Z, N, H, C
  */
 function AND_A_with_A_i(): byte {
-  OpcodeMap[0xa7].call(this);
+  OpcodeMap[0xa7]();
   return 4;
 }
 
@@ -1871,7 +1871,7 @@ function AND_A_with_A_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function XOR_A_with_B_i(): byte {
-  OpcodeMap[0xa8].call(this);
+  OpcodeMap[0xa8]();
   return 4;
 }
 
@@ -1882,7 +1882,7 @@ function XOR_A_with_B_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function XOR_A_with_C_i(): byte {
-  OpcodeMap[0xa9].call(this);
+  OpcodeMap[0xa9]();
   return 4;
 }
 
@@ -1893,7 +1893,7 @@ function XOR_A_with_C_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function XOR_A_with_D_i(): byte {
-  OpcodeMap[0xaa].call(this);
+  OpcodeMap[0xaa]();
   return 4;
 }
 
@@ -1904,7 +1904,7 @@ function XOR_A_with_D_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function XOR_A_with_E_i(): byte {
-  OpcodeMap[0xab].call(this);
+  OpcodeMap[0xab]();
   return 4;
 }
 
@@ -1915,7 +1915,7 @@ function XOR_A_with_E_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function XOR_A_with_H_i(): byte {
-  OpcodeMap[0xac].call(this);
+  OpcodeMap[0xac]();
   return 4;
 }
 
@@ -1926,7 +1926,7 @@ function XOR_A_with_H_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function XOR_A_with_L_i(): byte {
-  OpcodeMap[0xad].call(this);
+  OpcodeMap[0xad]();
   return 4;
 }
 
@@ -1937,7 +1937,7 @@ function XOR_A_with_L_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function XOR_A_with_HL_m(): byte {
-  OpcodeMap[0xae].call(this);
+  OpcodeMap[0xae]();
   return 8;
 }
 
@@ -1948,7 +1948,7 @@ function XOR_A_with_HL_m(): byte {
  * Affected flags: Z, N, H, C
  */
 function XOR_A_with_A_i(): byte {
-  OpcodeMap[0xaf].call(this);
+  OpcodeMap[0xaf]();
   return 4;
 }
 
@@ -1959,7 +1959,7 @@ function XOR_A_with_A_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function OR_A_with_B_i(): byte {
-  OpcodeMap[0xb0].call(this);
+  OpcodeMap[0xb0]();
   return 4;
 }
 
@@ -1970,7 +1970,7 @@ function OR_A_with_B_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function OR_A_with_C_i(): byte {
-  OpcodeMap[0xb1].call(this);
+  OpcodeMap[0xb1]();
   return 4;
 }
 
@@ -1981,7 +1981,7 @@ function OR_A_with_C_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function OR_A_with_D_i(): byte {
-  OpcodeMap[0xb2].call(this);
+  OpcodeMap[0xb2]();
   return 4;
 }
 
@@ -1992,7 +1992,7 @@ function OR_A_with_D_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function OR_A_with_E_i(): byte {
-  OpcodeMap[0xb3].call(this);
+  OpcodeMap[0xb3]();
   return 4;
 }
 
@@ -2003,7 +2003,7 @@ function OR_A_with_E_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function OR_A_with_H_i(): byte {
-  OpcodeMap[0xb4].call(this);
+  OpcodeMap[0xb4]();
   return 4;
 }
 
@@ -2014,7 +2014,7 @@ function OR_A_with_H_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function OR_A_with_L_i(): byte {
-  OpcodeMap[0xb5].call(this);
+  OpcodeMap[0xb5]();
   return 4;
 }
 
@@ -2025,7 +2025,7 @@ function OR_A_with_L_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function OR_A_with_HL_m(): byte {
-  OpcodeMap[0xb6].call(this);
+  OpcodeMap[0xb6]();
   return 8;
 }
 
@@ -2036,7 +2036,7 @@ function OR_A_with_HL_m(): byte {
  * Affected flags: Z, N, H, C
  */
 function OR_A_with_A_i(): byte {
-  OpcodeMap[0xb7].call(this);
+  OpcodeMap[0xb7]();
   return 4;
 }
 
@@ -2047,7 +2047,7 @@ function OR_A_with_A_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function CP_A_with_B_i(): byte {
-  OpcodeMap[0xb8].call(this);
+  OpcodeMap[0xb8]();
   return 4;
 }
 
@@ -2058,7 +2058,7 @@ function CP_A_with_B_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function CP_A_with_C_i(): byte {
-  OpcodeMap[0xb9].call(this);
+  OpcodeMap[0xb9]();
   return 4;
 }
 
@@ -2069,7 +2069,7 @@ function CP_A_with_C_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function CP_A_with_D_i(): byte {
-  OpcodeMap[0xba].call(this);
+  OpcodeMap[0xba]();
   return 4;
 }
 
@@ -2080,7 +2080,7 @@ function CP_A_with_D_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function CP_A_with_E_i(): byte {
-  OpcodeMap[0xbb].call(this);
+  OpcodeMap[0xbb]();
   return 4;
 }
 
@@ -2091,7 +2091,7 @@ function CP_A_with_E_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function CP_A_with_H_i(): byte {
-  OpcodeMap[0xbc].call(this);
+  OpcodeMap[0xbc]();
   return 4;
 }
 
@@ -2102,7 +2102,7 @@ function CP_A_with_H_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function CP_A_with_L_i(): byte {
-  OpcodeMap[0xbd].call(this);
+  OpcodeMap[0xbd]();
   return 4;
 }
 
@@ -2113,7 +2113,7 @@ function CP_A_with_L_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function CP_A_with_HL_m(): byte {
-  OpcodeMap[0xbe].call(this);
+  OpcodeMap[0xbe]();
   return 8;
 }
 
@@ -2124,7 +2124,7 @@ function CP_A_with_HL_m(): byte {
  * Affected flags: Z, N, H, C
  */
 function CP_A_with_A_i(): byte {
-  OpcodeMap[0xbf].call(this);
+  OpcodeMap[0xbf]();
   return 4;
 }
 
@@ -2135,7 +2135,7 @@ function CP_A_with_A_i(): byte {
  * Affected flags:
  */
 export function RET_C_NZ(): byte {
-  const condition: boolean = OpcodeMap[0xc0].call(this);
+  const condition: boolean = OpcodeMap[0xc0]();
   if (!condition) {
     return 8;
   }
@@ -2149,7 +2149,7 @@ export function RET_C_NZ(): byte {
  * Affected flags:
  */
 function POP_off_SP_into_BC_i(): byte {
-  OpcodeMap[0xc1].call(this);
+  OpcodeMap[0xc1]();
   return 12;
 }
 
@@ -2160,7 +2160,7 @@ function POP_off_SP_into_BC_i(): byte {
  * Affected flags:
  */
 export function JP_C_NZ_a16(): byte {
-  const condition: boolean = OpcodeMap[0xc2].call(this);
+  const condition: boolean = OpcodeMap[0xc2]();
   if (!condition) {
     return 12;
   }
@@ -2174,7 +2174,7 @@ export function JP_C_NZ_a16(): byte {
  * Affected flags:
  */
 function JP_a16(): byte {
-  OpcodeMap[0xc3].call(this);
+  OpcodeMap[0xc3]();
   return 16;
 }
 
@@ -2185,7 +2185,7 @@ function JP_a16(): byte {
  * Affected flags:
  */
 export function CALL_C_NZ_a16(): byte {
-  const condition: boolean = OpcodeMap[0xc4].call(this);
+  const condition: boolean = OpcodeMap[0xc4]();
   if (!condition) {
     return 12;
   }
@@ -2199,7 +2199,7 @@ export function CALL_C_NZ_a16(): byte {
  * Affected flags:
  */
 function PUSH_onto_SP_register_BC_i(): byte {
-  OpcodeMap[0xc5].call(this);
+  OpcodeMap[0xc5]();
   return 16;
 }
 
@@ -2210,7 +2210,7 @@ function PUSH_onto_SP_register_BC_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function ADD_into_A_i_from_d8_i(): byte {
-  OpcodeMap[0xc6].call(this);
+  OpcodeMap[0xc6]();
   return 8;
 }
 
@@ -2221,7 +2221,7 @@ function ADD_into_A_i_from_d8_i(): byte {
  * Affected flags:
  */
 function RST_to_A_i_from_00H_i(): byte {
-  OpcodeMap[0xc7].call(this);
+  OpcodeMap[0xc7]();
   return 16;
 }
 
@@ -2232,7 +2232,7 @@ function RST_to_A_i_from_00H_i(): byte {
  * Affected flags:
  */
 export function RET_C_Z(): byte {
-  const condition: boolean = OpcodeMap[0xc8].call(this);
+  const condition: boolean = OpcodeMap[0xc8]();
   if (!condition) {
     return 8;
   }
@@ -2246,7 +2246,7 @@ export function RET_C_Z(): byte {
  * Affected flags:
  */
 function RET(): byte {
-  OpcodeMap[0xc9].call(this);
+  OpcodeMap[0xc9]();
   return 16;
 }
 
@@ -2257,7 +2257,7 @@ function RET(): byte {
  * Affected flags:
  */
 export function JP_C_Z_a16(): byte {
-  const condition: boolean = OpcodeMap[0xca].call(this);
+  const condition: boolean = OpcodeMap[0xca]();
   if (!condition) {
     return 12;
   }
@@ -2271,7 +2271,7 @@ export function JP_C_Z_a16(): byte {
  * Affected flags:
  */
 function PREFIX(): byte {
-  OpcodeMap[0xcb].call(this);
+  OpcodeMap[0xcb]();
   return 4;
 }
 
@@ -2282,7 +2282,7 @@ function PREFIX(): byte {
  * Affected flags:
  */
 export function CALL_C_Z_a16(): byte {
-  const condition: boolean = OpcodeMap[0xcc].call(this);
+  const condition: boolean = OpcodeMap[0xcc]();
   if (!condition) {
     return 12;
   }
@@ -2296,7 +2296,7 @@ export function CALL_C_Z_a16(): byte {
  * Affected flags:
  */
 function CALL(): byte {
-  OpcodeMap[0xcd].call(this);
+  OpcodeMap[0xcd]();
   return 24;
 }
 
@@ -2307,7 +2307,7 @@ function CALL(): byte {
  * Affected flags: Z, N, H, C
  */
 function ADC_into_A_i_from_d8_i(): byte {
-  OpcodeMap[0xce].call(this);
+  OpcodeMap[0xce]();
   return 8;
 }
 
@@ -2318,7 +2318,7 @@ function ADC_into_A_i_from_d8_i(): byte {
  * Affected flags:
  */
 function RST_to_A_i_from_08H_i(): byte {
-  OpcodeMap[0xcf].call(this);
+  OpcodeMap[0xcf]();
   return 16;
 }
 
@@ -2329,7 +2329,7 @@ function RST_to_A_i_from_08H_i(): byte {
  * Affected flags:
  */
 export function RET_C_NC(): byte {
-  const condition: boolean = OpcodeMap[0xd0].call(this);
+  const condition: boolean = OpcodeMap[0xd0]();
   if (!condition) {
     return 8;
   }
@@ -2343,7 +2343,7 @@ export function RET_C_NC(): byte {
  * Affected flags:
  */
 function POP_off_SP_into_DE_i(): byte {
-  OpcodeMap[0xd1].call(this);
+  OpcodeMap[0xd1]();
   return 12;
 }
 
@@ -2354,7 +2354,7 @@ function POP_off_SP_into_DE_i(): byte {
  * Affected flags:
  */
 export function JP_C_NC_a16(): byte {
-  const condition: boolean = OpcodeMap[0xd2].call(this);
+  const condition: boolean = OpcodeMap[0xd2]();
   if (!condition) {
     return 12;
   }
@@ -2366,7 +2366,7 @@ export function JP_C_NC_a16(): byte {
  * Affected flags:
  */
 function ILLEGAL_D3(): byte {
-  OpcodeMap[0xd3].call(this);
+  OpcodeMap[0xd3]();
   return 4;
 }
 
@@ -2377,7 +2377,7 @@ function ILLEGAL_D3(): byte {
  * Affected flags:
  */
 export function CALL_C_NC_a16(): byte {
-  const condition: boolean = OpcodeMap[0xd4].call(this);
+  const condition: boolean = OpcodeMap[0xd4]();
   if (!condition) {
     return 12;
   }
@@ -2391,7 +2391,7 @@ export function CALL_C_NC_a16(): byte {
  * Affected flags:
  */
 function PUSH_onto_SP_register_DE_i(): byte {
-  OpcodeMap[0xd5].call(this);
+  OpcodeMap[0xd5]();
   return 16;
 }
 
@@ -2402,7 +2402,7 @@ function PUSH_onto_SP_register_DE_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SUB_from_A_i_value_d8_i(): byte {
-  OpcodeMap[0xd6].call(this);
+  OpcodeMap[0xd6]();
   return 8;
 }
 
@@ -2413,7 +2413,7 @@ function SUB_from_A_i_value_d8_i(): byte {
  * Affected flags:
  */
 function RST_to_A_i_from_10H_i(): byte {
-  OpcodeMap[0xd7].call(this);
+  OpcodeMap[0xd7]();
   return 16;
 }
 
@@ -2424,7 +2424,7 @@ function RST_to_A_i_from_10H_i(): byte {
  * Affected flags:
  */
 export function RET_C_C(): byte {
-  const condition: boolean = OpcodeMap[0xd8].call(this);
+  const condition: boolean = OpcodeMap[0xd8]();
   if (!condition) {
     return 8;
   }
@@ -2438,7 +2438,7 @@ export function RET_C_C(): byte {
  * Affected flags:
  */
 function RETI(): byte {
-  OpcodeMap[0xd9].call(this);
+  OpcodeMap[0xd9]();
   return 16;
 }
 
@@ -2449,7 +2449,7 @@ function RETI(): byte {
  * Affected flags:
  */
 export function JP_C_C_a16(): byte {
-  const condition: boolean = OpcodeMap[0xda].call(this);
+  const condition: boolean = OpcodeMap[0xda]();
   if (!condition) {
     return 12;
   }
@@ -2461,7 +2461,7 @@ export function JP_C_C_a16(): byte {
  * Affected flags:
  */
 function ILLEGAL_DB(): byte {
-  OpcodeMap[0xdb].call(this);
+  OpcodeMap[0xdb]();
   return 4;
 }
 
@@ -2472,7 +2472,7 @@ function ILLEGAL_DB(): byte {
  * Affected flags:
  */
 export function CALL_C_C_a16(): byte {
-  const condition: boolean = OpcodeMap[0xdc].call(this);
+  const condition: boolean = OpcodeMap[0xdc]();
   if (!condition) {
     return 12;
   }
@@ -2484,7 +2484,7 @@ export function CALL_C_C_a16(): byte {
  * Affected flags:
  */
 function ILLEGAL_DD(): byte {
-  OpcodeMap[0xdd].call(this);
+  OpcodeMap[0xdd]();
   return 4;
 }
 
@@ -2495,7 +2495,7 @@ function ILLEGAL_DD(): byte {
  * Affected flags: Z, N, H, C
  */
 function SBC_from_A_i_value_d8_i(): byte {
-  OpcodeMap[0xde].call(this);
+  OpcodeMap[0xde]();
   return 8;
 }
 
@@ -2506,7 +2506,7 @@ function SBC_from_A_i_value_d8_i(): byte {
  * Affected flags:
  */
 function RST_to_A_i_from_18H_i(): byte {
-  OpcodeMap[0xdf].call(this);
+  OpcodeMap[0xdf]();
   return 16;
 }
 
@@ -2517,7 +2517,7 @@ function RST_to_A_i_from_18H_i(): byte {
  * Affected flags:
  */
 function LDH_into_a8_m_from_A_i(): byte {
-  OpcodeMap[0xe0].call(this);
+  OpcodeMap[0xe0]();
   return 12;
 }
 
@@ -2528,7 +2528,7 @@ function LDH_into_a8_m_from_A_i(): byte {
  * Affected flags:
  */
 function POP_off_SP_into_HL_i(): byte {
-  OpcodeMap[0xe1].call(this);
+  OpcodeMap[0xe1]();
   return 12;
 }
 
@@ -2539,7 +2539,7 @@ function POP_off_SP_into_HL_i(): byte {
  * Affected flags:
  */
 function LD_into_C_m_from_A_i(): byte {
-  OpcodeMap[0xe2].call(this);
+  OpcodeMap[0xe2]();
   return 8;
 }
 
@@ -2548,7 +2548,7 @@ function LD_into_C_m_from_A_i(): byte {
  * Affected flags:
  */
 function ILLEGAL_E3(): byte {
-  OpcodeMap[0xe3].call(this);
+  OpcodeMap[0xe3]();
   return 4;
 }
 
@@ -2557,7 +2557,7 @@ function ILLEGAL_E3(): byte {
  * Affected flags:
  */
 function ILLEGAL_E4(): byte {
-  OpcodeMap[0xe4].call(this);
+  OpcodeMap[0xe4]();
   return 4;
 }
 
@@ -2568,7 +2568,7 @@ function ILLEGAL_E4(): byte {
  * Affected flags:
  */
 function PUSH_onto_SP_register_HL_i(): byte {
-  OpcodeMap[0xe5].call(this);
+  OpcodeMap[0xe5]();
   return 16;
 }
 
@@ -2579,7 +2579,7 @@ function PUSH_onto_SP_register_HL_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function AND_A_with_d8_i(): byte {
-  OpcodeMap[0xe6].call(this);
+  OpcodeMap[0xe6]();
   return 8;
 }
 
@@ -2590,7 +2590,7 @@ function AND_A_with_d8_i(): byte {
  * Affected flags:
  */
 function RST_to_A_i_from_20H_i(): byte {
-  OpcodeMap[0xe7].call(this);
+  OpcodeMap[0xe7]();
   return 16;
 }
 
@@ -2601,7 +2601,7 @@ function RST_to_A_i_from_20H_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function ADD_into_SP_i_from_r8_i(): byte {
-  OpcodeMap[0xe8].call(this);
+  OpcodeMap[0xe8]();
   return 16;
 }
 
@@ -2612,7 +2612,7 @@ function ADD_into_SP_i_from_r8_i(): byte {
  * Affected flags:
  */
 function JP_HL(): byte {
-  OpcodeMap[0xe9].call(this);
+  OpcodeMap[0xe9]();
   return 4;
 }
 
@@ -2623,7 +2623,7 @@ function JP_HL(): byte {
  * Affected flags:
  */
 function LD_into_a16_m_from_A_i(): byte {
-  OpcodeMap[0xea].call(this);
+  OpcodeMap[0xea]();
   return 16;
 }
 
@@ -2632,7 +2632,7 @@ function LD_into_a16_m_from_A_i(): byte {
  * Affected flags:
  */
 function ILLEGAL_EB(): byte {
-  OpcodeMap[0xeb].call(this);
+  OpcodeMap[0xeb]();
   return 4;
 }
 
@@ -2641,7 +2641,7 @@ function ILLEGAL_EB(): byte {
  * Affected flags:
  */
 function ILLEGAL_EC(): byte {
-  OpcodeMap[0xec].call(this);
+  OpcodeMap[0xec]();
   return 4;
 }
 
@@ -2650,7 +2650,7 @@ function ILLEGAL_EC(): byte {
  * Affected flags:
  */
 function ILLEGAL_ED(): byte {
-  OpcodeMap[0xed].call(this);
+  OpcodeMap[0xed]();
   return 4;
 }
 
@@ -2661,7 +2661,7 @@ function ILLEGAL_ED(): byte {
  * Affected flags: Z, N, H, C
  */
 function XOR_A_with_d8_i(): byte {
-  OpcodeMap[0xee].call(this);
+  OpcodeMap[0xee]();
   return 8;
 }
 
@@ -2672,7 +2672,7 @@ function XOR_A_with_d8_i(): byte {
  * Affected flags:
  */
 function RST_to_A_i_from_28H_i(): byte {
-  OpcodeMap[0xef].call(this);
+  OpcodeMap[0xef]();
   return 16;
 }
 
@@ -2683,7 +2683,7 @@ function RST_to_A_i_from_28H_i(): byte {
  * Affected flags:
  */
 function LDH_into_A_i_from_a8_m(): byte {
-  OpcodeMap[0xf0].call(this);
+  OpcodeMap[0xf0]();
   return 12;
 }
 
@@ -2694,7 +2694,7 @@ function LDH_into_A_i_from_a8_m(): byte {
  * Affected flags: Z, N, H, C
  */
 function POP_off_SP_into_AF_i(): byte {
-  OpcodeMap[0xf1].call(this);
+  OpcodeMap[0xf1]();
   return 12;
 }
 
@@ -2705,7 +2705,7 @@ function POP_off_SP_into_AF_i(): byte {
  * Affected flags:
  */
 function LD_into_A_i_from_C_m(): byte {
-  OpcodeMap[0xf2].call(this);
+  OpcodeMap[0xf2]();
   return 8;
 }
 
@@ -2716,7 +2716,7 @@ function LD_into_A_i_from_C_m(): byte {
  * Affected flags:
  */
 function DI(): byte {
-  OpcodeMap[0xf3].call(this);
+  OpcodeMap[0xf3]();
   return 4;
 }
 
@@ -2725,7 +2725,7 @@ function DI(): byte {
  * Affected flags:
  */
 function ILLEGAL_F4(): byte {
-  OpcodeMap[0xf4].call(this);
+  OpcodeMap[0xf4]();
   return 4;
 }
 
@@ -2736,7 +2736,7 @@ function ILLEGAL_F4(): byte {
  * Affected flags:
  */
 function PUSH_onto_SP_register_AF_i(): byte {
-  OpcodeMap[0xf5].call(this);
+  OpcodeMap[0xf5]();
   return 16;
 }
 
@@ -2747,7 +2747,7 @@ function PUSH_onto_SP_register_AF_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function OR_A_with_d8_i(): byte {
-  OpcodeMap[0xf6].call(this);
+  OpcodeMap[0xf6]();
   return 8;
 }
 
@@ -2758,7 +2758,7 @@ function OR_A_with_d8_i(): byte {
  * Affected flags:
  */
 function RST_to_A_i_from_30H_i(): byte {
-  OpcodeMap[0xf7].call(this);
+  OpcodeMap[0xf7]();
   return 16;
 }
 
@@ -2769,7 +2769,7 @@ function RST_to_A_i_from_30H_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function LD_into_HL_i_from_SP_incr_i(): byte {
-  OpcodeMap[0xf8].call(this);
+  OpcodeMap[0xf8]();
   return 12;
 }
 
@@ -2780,7 +2780,7 @@ function LD_into_HL_i_from_SP_incr_i(): byte {
  * Affected flags:
  */
 function LD_into_SP_i_from_HL_i(): byte {
-  OpcodeMap[0xf9].call(this);
+  OpcodeMap[0xf9]();
   return 8;
 }
 
@@ -2791,7 +2791,7 @@ function LD_into_SP_i_from_HL_i(): byte {
  * Affected flags:
  */
 function LD_into_A_i_from_a16_m(): byte {
-  OpcodeMap[0xfa].call(this);
+  OpcodeMap[0xfa]();
   return 16;
 }
 
@@ -2802,7 +2802,7 @@ function LD_into_A_i_from_a16_m(): byte {
  * Affected flags:
  */
 function EI(): byte {
-  OpcodeMap[0xfb].call(this);
+  OpcodeMap[0xfb]();
   return 4;
 }
 
@@ -2811,7 +2811,7 @@ function EI(): byte {
  * Affected flags:
  */
 function ILLEGAL_FC(): byte {
-  OpcodeMap[0xfc].call(this);
+  OpcodeMap[0xfc]();
   return 4;
 }
 
@@ -2820,7 +2820,7 @@ function ILLEGAL_FC(): byte {
  * Affected flags:
  */
 function ILLEGAL_FD(): byte {
-  OpcodeMap[0xfd].call(this);
+  OpcodeMap[0xfd]();
   return 4;
 }
 
@@ -2831,7 +2831,7 @@ function ILLEGAL_FD(): byte {
  * Affected flags: Z, N, H, C
  */
 function CP_A_with_d8_i(): byte {
-  OpcodeMap[0xfe].call(this);
+  OpcodeMap[0xfe]();
   return 8;
 }
 
@@ -2842,7 +2842,7 @@ function CP_A_with_d8_i(): byte {
  * Affected flags:
  */
 function RST_to_A_i_from_38H_i(): byte {
-  OpcodeMap[0xff].call(this);
+  OpcodeMap[0xff]();
   return 16;
 }
 
@@ -2853,7 +2853,7 @@ function RST_to_A_i_from_38H_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RLC_B_i(): byte {
-  OpcodeMap[0x00].call(this);
+  OpcodeMap[0x00]();
   return 8;
 }
 
@@ -2864,7 +2864,7 @@ function RLC_B_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RLC_C_i(): byte {
-  OpcodeMap[0x01].call(this);
+  OpcodeMap[0x01]();
   return 8;
 }
 
@@ -2875,7 +2875,7 @@ function RLC_C_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RLC_D_i(): byte {
-  OpcodeMap[0x02].call(this);
+  OpcodeMap[0x02]();
   return 8;
 }
 
@@ -2886,7 +2886,7 @@ function RLC_D_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RLC_E_i(): byte {
-  OpcodeMap[0x03].call(this);
+  OpcodeMap[0x03]();
   return 8;
 }
 
@@ -2897,7 +2897,7 @@ function RLC_E_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RLC_H_i(): byte {
-  OpcodeMap[0x04].call(this);
+  OpcodeMap[0x04]();
   return 8;
 }
 
@@ -2908,7 +2908,7 @@ function RLC_H_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RLC_L_i(): byte {
-  OpcodeMap[0x05].call(this);
+  OpcodeMap[0x05]();
   return 8;
 }
 
@@ -2919,7 +2919,7 @@ function RLC_L_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RLC_HL_m(): byte {
-  OpcodeMap[0x06].call(this);
+  OpcodeMap[0x06]();
   return 16;
 }
 
@@ -2930,7 +2930,7 @@ function RLC_HL_m(): byte {
  * Affected flags: Z, N, H, C
  */
 function RLC_A_i(): byte {
-  OpcodeMap[0x07].call(this);
+  OpcodeMap[0x07]();
   return 8;
 }
 
@@ -2941,7 +2941,7 @@ function RLC_A_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RRC_B_i(): byte {
-  OpcodeMap[0x08].call(this);
+  OpcodeMap[0x08]();
   return 8;
 }
 
@@ -2952,7 +2952,7 @@ function RRC_B_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RRC_C_i(): byte {
-  OpcodeMap[0x09].call(this);
+  OpcodeMap[0x09]();
   return 8;
 }
 
@@ -2963,7 +2963,7 @@ function RRC_C_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RRC_D_i(): byte {
-  OpcodeMap[0x0a].call(this);
+  OpcodeMap[0x0a]();
   return 8;
 }
 
@@ -2974,7 +2974,7 @@ function RRC_D_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RRC_E_i(): byte {
-  OpcodeMap[0x0b].call(this);
+  OpcodeMap[0x0b]();
   return 8;
 }
 
@@ -2985,7 +2985,7 @@ function RRC_E_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RRC_H_i(): byte {
-  OpcodeMap[0x0c].call(this);
+  OpcodeMap[0x0c]();
   return 8;
 }
 
@@ -2996,7 +2996,7 @@ function RRC_H_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RRC_L_i(): byte {
-  OpcodeMap[0x0d].call(this);
+  OpcodeMap[0x0d]();
   return 8;
 }
 
@@ -3007,7 +3007,7 @@ function RRC_L_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RRC_HL_m(): byte {
-  OpcodeMap[0x0e].call(this);
+  OpcodeMap[0x0e]();
   return 16;
 }
 
@@ -3018,7 +3018,7 @@ function RRC_HL_m(): byte {
  * Affected flags: Z, N, H, C
  */
 function RRC_A_i(): byte {
-  OpcodeMap[0x0f].call(this);
+  OpcodeMap[0x0f]();
   return 8;
 }
 
@@ -3029,7 +3029,7 @@ function RRC_A_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RL_B_i(): byte {
-  OpcodeMap[0x10].call(this);
+  OpcodeMap[0x10]();
   return 8;
 }
 
@@ -3040,7 +3040,7 @@ function RL_B_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RL_C_i(): byte {
-  OpcodeMap[0x11].call(this);
+  OpcodeMap[0x11]();
   return 8;
 }
 
@@ -3051,7 +3051,7 @@ function RL_C_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RL_D_i(): byte {
-  OpcodeMap[0x12].call(this);
+  OpcodeMap[0x12]();
   return 8;
 }
 
@@ -3062,7 +3062,7 @@ function RL_D_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RL_E_i(): byte {
-  OpcodeMap[0x13].call(this);
+  OpcodeMap[0x13]();
   return 8;
 }
 
@@ -3073,7 +3073,7 @@ function RL_E_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RL_H_i(): byte {
-  OpcodeMap[0x14].call(this);
+  OpcodeMap[0x14]();
   return 8;
 }
 
@@ -3084,7 +3084,7 @@ function RL_H_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RL_L_i(): byte {
-  OpcodeMap[0x15].call(this);
+  OpcodeMap[0x15]();
   return 8;
 }
 
@@ -3095,7 +3095,7 @@ function RL_L_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RL_HL_m(): byte {
-  OpcodeMap[0x16].call(this);
+  OpcodeMap[0x16]();
   return 16;
 }
 
@@ -3106,7 +3106,7 @@ function RL_HL_m(): byte {
  * Affected flags: Z, N, H, C
  */
 function RL_A_i(): byte {
-  OpcodeMap[0x17].call(this);
+  OpcodeMap[0x17]();
   return 8;
 }
 
@@ -3117,7 +3117,7 @@ function RL_A_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RR_B_i(): byte {
-  OpcodeMap[0x18].call(this);
+  OpcodeMap[0x18]();
   return 8;
 }
 
@@ -3128,7 +3128,7 @@ function RR_B_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RR_C_i(): byte {
-  OpcodeMap[0x19].call(this);
+  OpcodeMap[0x19]();
   return 8;
 }
 
@@ -3139,7 +3139,7 @@ function RR_C_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RR_D_i(): byte {
-  OpcodeMap[0x1a].call(this);
+  OpcodeMap[0x1a]();
   return 8;
 }
 
@@ -3150,7 +3150,7 @@ function RR_D_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RR_E_i(): byte {
-  OpcodeMap[0x1b].call(this);
+  OpcodeMap[0x1b]();
   return 8;
 }
 
@@ -3161,7 +3161,7 @@ function RR_E_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RR_H_i(): byte {
-  OpcodeMap[0x1c].call(this);
+  OpcodeMap[0x1c]();
   return 8;
 }
 
@@ -3172,7 +3172,7 @@ function RR_H_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RR_L_i(): byte {
-  OpcodeMap[0x1d].call(this);
+  OpcodeMap[0x1d]();
   return 8;
 }
 
@@ -3183,7 +3183,7 @@ function RR_L_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function RR_HL_m(): byte {
-  OpcodeMap[0x1e].call(this);
+  OpcodeMap[0x1e]();
   return 16;
 }
 
@@ -3194,7 +3194,7 @@ function RR_HL_m(): byte {
  * Affected flags: Z, N, H, C
  */
 function RR_A_i(): byte {
-  OpcodeMap[0x1f].call(this);
+  OpcodeMap[0x1f]();
   return 8;
 }
 
@@ -3205,7 +3205,7 @@ function RR_A_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SLA_B_i(): byte {
-  OpcodeMap[0x20].call(this);
+  OpcodeMap[0x20]();
   return 8;
 }
 
@@ -3216,7 +3216,7 @@ function SLA_B_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SLA_C_i(): byte {
-  OpcodeMap[0x21].call(this);
+  OpcodeMap[0x21]();
   return 8;
 }
 
@@ -3227,7 +3227,7 @@ function SLA_C_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SLA_D_i(): byte {
-  OpcodeMap[0x22].call(this);
+  OpcodeMap[0x22]();
   return 8;
 }
 
@@ -3238,7 +3238,7 @@ function SLA_D_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SLA_E_i(): byte {
-  OpcodeMap[0x23].call(this);
+  OpcodeMap[0x23]();
   return 8;
 }
 
@@ -3249,7 +3249,7 @@ function SLA_E_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SLA_H_i(): byte {
-  OpcodeMap[0x24].call(this);
+  OpcodeMap[0x24]();
   return 8;
 }
 
@@ -3260,7 +3260,7 @@ function SLA_H_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SLA_L_i(): byte {
-  OpcodeMap[0x25].call(this);
+  OpcodeMap[0x25]();
   return 8;
 }
 
@@ -3271,7 +3271,7 @@ function SLA_L_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SLA_HL_m(): byte {
-  OpcodeMap[0x26].call(this);
+  OpcodeMap[0x26]();
   return 16;
 }
 
@@ -3282,7 +3282,7 @@ function SLA_HL_m(): byte {
  * Affected flags: Z, N, H, C
  */
 function SLA_A_i(): byte {
-  OpcodeMap[0x27].call(this);
+  OpcodeMap[0x27]();
   return 8;
 }
 
@@ -3293,7 +3293,7 @@ function SLA_A_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SRA_B_i(): byte {
-  OpcodeMap[0x28].call(this);
+  OpcodeMap[0x28]();
   return 8;
 }
 
@@ -3304,7 +3304,7 @@ function SRA_B_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SRA_C_i(): byte {
-  OpcodeMap[0x29].call(this);
+  OpcodeMap[0x29]();
   return 8;
 }
 
@@ -3315,7 +3315,7 @@ function SRA_C_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SRA_D_i(): byte {
-  OpcodeMap[0x2a].call(this);
+  OpcodeMap[0x2a]();
   return 8;
 }
 
@@ -3326,7 +3326,7 @@ function SRA_D_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SRA_E_i(): byte {
-  OpcodeMap[0x2b].call(this);
+  OpcodeMap[0x2b]();
   return 8;
 }
 
@@ -3337,7 +3337,7 @@ function SRA_E_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SRA_H_i(): byte {
-  OpcodeMap[0x2c].call(this);
+  OpcodeMap[0x2c]();
   return 8;
 }
 
@@ -3348,7 +3348,7 @@ function SRA_H_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SRA_L_i(): byte {
-  OpcodeMap[0x2d].call(this);
+  OpcodeMap[0x2d]();
   return 8;
 }
 
@@ -3359,7 +3359,7 @@ function SRA_L_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SRA_HL_m(): byte {
-  OpcodeMap[0x2e].call(this);
+  OpcodeMap[0x2e]();
   return 16;
 }
 
@@ -3370,7 +3370,7 @@ function SRA_HL_m(): byte {
  * Affected flags: Z, N, H, C
  */
 function SRA_A_i(): byte {
-  OpcodeMap[0x2f].call(this);
+  OpcodeMap[0x2f]();
   return 8;
 }
 
@@ -3381,7 +3381,7 @@ function SRA_A_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SWAP_B_i(): byte {
-  OpcodeMap[0x30].call(this);
+  OpcodeMap[0x30]();
   return 8;
 }
 
@@ -3392,7 +3392,7 @@ function SWAP_B_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SWAP_C_i(): byte {
-  OpcodeMap[0x31].call(this);
+  OpcodeMap[0x31]();
   return 8;
 }
 
@@ -3403,7 +3403,7 @@ function SWAP_C_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SWAP_D_i(): byte {
-  OpcodeMap[0x32].call(this);
+  OpcodeMap[0x32]();
   return 8;
 }
 
@@ -3414,7 +3414,7 @@ function SWAP_D_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SWAP_E_i(): byte {
-  OpcodeMap[0x33].call(this);
+  OpcodeMap[0x33]();
   return 8;
 }
 
@@ -3425,7 +3425,7 @@ function SWAP_E_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SWAP_H_i(): byte {
-  OpcodeMap[0x34].call(this);
+  OpcodeMap[0x34]();
   return 8;
 }
 
@@ -3436,7 +3436,7 @@ function SWAP_H_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SWAP_L_i(): byte {
-  OpcodeMap[0x35].call(this);
+  OpcodeMap[0x35]();
   return 8;
 }
 
@@ -3447,7 +3447,7 @@ function SWAP_L_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SWAP_HL_m(): byte {
-  OpcodeMap[0x36].call(this);
+  OpcodeMap[0x36]();
   return 16;
 }
 
@@ -3458,7 +3458,7 @@ function SWAP_HL_m(): byte {
  * Affected flags: Z, N, H, C
  */
 function SWAP_A_i(): byte {
-  OpcodeMap[0x37].call(this);
+  OpcodeMap[0x37]();
   return 8;
 }
 
@@ -3469,7 +3469,7 @@ function SWAP_A_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SRL_B_i(): byte {
-  OpcodeMap[0x38].call(this);
+  OpcodeMap[0x38]();
   return 8;
 }
 
@@ -3480,7 +3480,7 @@ function SRL_B_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SRL_C_i(): byte {
-  OpcodeMap[0x39].call(this);
+  OpcodeMap[0x39]();
   return 8;
 }
 
@@ -3491,7 +3491,7 @@ function SRL_C_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SRL_D_i(): byte {
-  OpcodeMap[0x3a].call(this);
+  OpcodeMap[0x3a]();
   return 8;
 }
 
@@ -3502,7 +3502,7 @@ function SRL_D_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SRL_E_i(): byte {
-  OpcodeMap[0x3b].call(this);
+  OpcodeMap[0x3b]();
   return 8;
 }
 
@@ -3513,7 +3513,7 @@ function SRL_E_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SRL_H_i(): byte {
-  OpcodeMap[0x3c].call(this);
+  OpcodeMap[0x3c]();
   return 8;
 }
 
@@ -3524,7 +3524,7 @@ function SRL_H_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SRL_L_i(): byte {
-  OpcodeMap[0x3d].call(this);
+  OpcodeMap[0x3d]();
   return 8;
 }
 
@@ -3535,7 +3535,7 @@ function SRL_L_i(): byte {
  * Affected flags: Z, N, H, C
  */
 function SRL_HL_m(): byte {
-  OpcodeMap[0x3e].call(this);
+  OpcodeMap[0x3e]();
   return 16;
 }
 
@@ -3546,7 +3546,7 @@ function SRL_HL_m(): byte {
  * Affected flags: Z, N, H, C
  */
 function SRL_A_i(): byte {
-  OpcodeMap[0x3f].call(this);
+  OpcodeMap[0x3f]();
   return 8;
 }
 
@@ -3557,7 +3557,7 @@ function SRL_A_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_0_i_of_B_i(): byte {
-  OpcodeMap[0x40].call(this);
+  OpcodeMap[0x40]();
   return 8;
 }
 
@@ -3568,7 +3568,7 @@ function BIT_test_0_i_of_B_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_0_i_of_C_i(): byte {
-  OpcodeMap[0x41].call(this);
+  OpcodeMap[0x41]();
   return 8;
 }
 
@@ -3579,7 +3579,7 @@ function BIT_test_0_i_of_C_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_0_i_of_D_i(): byte {
-  OpcodeMap[0x42].call(this);
+  OpcodeMap[0x42]();
   return 8;
 }
 
@@ -3590,7 +3590,7 @@ function BIT_test_0_i_of_D_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_0_i_of_E_i(): byte {
-  OpcodeMap[0x43].call(this);
+  OpcodeMap[0x43]();
   return 8;
 }
 
@@ -3601,7 +3601,7 @@ function BIT_test_0_i_of_E_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_0_i_of_H_i(): byte {
-  OpcodeMap[0x44].call(this);
+  OpcodeMap[0x44]();
   return 8;
 }
 
@@ -3612,7 +3612,7 @@ function BIT_test_0_i_of_H_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_0_i_of_L_i(): byte {
-  OpcodeMap[0x45].call(this);
+  OpcodeMap[0x45]();
   return 8;
 }
 
@@ -3623,7 +3623,7 @@ function BIT_test_0_i_of_L_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_0_i_of_HL_m(): byte {
-  OpcodeMap[0x46].call(this);
+  OpcodeMap[0x46]();
   return 12;
 }
 
@@ -3634,7 +3634,7 @@ function BIT_test_0_i_of_HL_m(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_0_i_of_A_i(): byte {
-  OpcodeMap[0x47].call(this);
+  OpcodeMap[0x47]();
   return 8;
 }
 
@@ -3645,7 +3645,7 @@ function BIT_test_0_i_of_A_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_1_i_of_B_i(): byte {
-  OpcodeMap[0x48].call(this);
+  OpcodeMap[0x48]();
   return 8;
 }
 
@@ -3656,7 +3656,7 @@ function BIT_test_1_i_of_B_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_1_i_of_C_i(): byte {
-  OpcodeMap[0x49].call(this);
+  OpcodeMap[0x49]();
   return 8;
 }
 
@@ -3667,7 +3667,7 @@ function BIT_test_1_i_of_C_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_1_i_of_D_i(): byte {
-  OpcodeMap[0x4a].call(this);
+  OpcodeMap[0x4a]();
   return 8;
 }
 
@@ -3678,7 +3678,7 @@ function BIT_test_1_i_of_D_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_1_i_of_E_i(): byte {
-  OpcodeMap[0x4b].call(this);
+  OpcodeMap[0x4b]();
   return 8;
 }
 
@@ -3689,7 +3689,7 @@ function BIT_test_1_i_of_E_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_1_i_of_H_i(): byte {
-  OpcodeMap[0x4c].call(this);
+  OpcodeMap[0x4c]();
   return 8;
 }
 
@@ -3700,7 +3700,7 @@ function BIT_test_1_i_of_H_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_1_i_of_L_i(): byte {
-  OpcodeMap[0x4d].call(this);
+  OpcodeMap[0x4d]();
   return 8;
 }
 
@@ -3711,7 +3711,7 @@ function BIT_test_1_i_of_L_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_1_i_of_HL_m(): byte {
-  OpcodeMap[0x4e].call(this);
+  OpcodeMap[0x4e]();
   return 12;
 }
 
@@ -3722,7 +3722,7 @@ function BIT_test_1_i_of_HL_m(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_1_i_of_A_i(): byte {
-  OpcodeMap[0x4f].call(this);
+  OpcodeMap[0x4f]();
   return 8;
 }
 
@@ -3733,7 +3733,7 @@ function BIT_test_1_i_of_A_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_2_i_of_B_i(): byte {
-  OpcodeMap[0x50].call(this);
+  OpcodeMap[0x50]();
   return 8;
 }
 
@@ -3744,7 +3744,7 @@ function BIT_test_2_i_of_B_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_2_i_of_C_i(): byte {
-  OpcodeMap[0x51].call(this);
+  OpcodeMap[0x51]();
   return 8;
 }
 
@@ -3755,7 +3755,7 @@ function BIT_test_2_i_of_C_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_2_i_of_D_i(): byte {
-  OpcodeMap[0x52].call(this);
+  OpcodeMap[0x52]();
   return 8;
 }
 
@@ -3766,7 +3766,7 @@ function BIT_test_2_i_of_D_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_2_i_of_E_i(): byte {
-  OpcodeMap[0x53].call(this);
+  OpcodeMap[0x53]();
   return 8;
 }
 
@@ -3777,7 +3777,7 @@ function BIT_test_2_i_of_E_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_2_i_of_H_i(): byte {
-  OpcodeMap[0x54].call(this);
+  OpcodeMap[0x54]();
   return 8;
 }
 
@@ -3788,7 +3788,7 @@ function BIT_test_2_i_of_H_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_2_i_of_L_i(): byte {
-  OpcodeMap[0x55].call(this);
+  OpcodeMap[0x55]();
   return 8;
 }
 
@@ -3799,7 +3799,7 @@ function BIT_test_2_i_of_L_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_2_i_of_HL_m(): byte {
-  OpcodeMap[0x56].call(this);
+  OpcodeMap[0x56]();
   return 12;
 }
 
@@ -3810,7 +3810,7 @@ function BIT_test_2_i_of_HL_m(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_2_i_of_A_i(): byte {
-  OpcodeMap[0x57].call(this);
+  OpcodeMap[0x57]();
   return 8;
 }
 
@@ -3821,7 +3821,7 @@ function BIT_test_2_i_of_A_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_3_i_of_B_i(): byte {
-  OpcodeMap[0x58].call(this);
+  OpcodeMap[0x58]();
   return 8;
 }
 
@@ -3832,7 +3832,7 @@ function BIT_test_3_i_of_B_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_3_i_of_C_i(): byte {
-  OpcodeMap[0x59].call(this);
+  OpcodeMap[0x59]();
   return 8;
 }
 
@@ -3843,7 +3843,7 @@ function BIT_test_3_i_of_C_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_3_i_of_D_i(): byte {
-  OpcodeMap[0x5a].call(this);
+  OpcodeMap[0x5a]();
   return 8;
 }
 
@@ -3854,7 +3854,7 @@ function BIT_test_3_i_of_D_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_3_i_of_E_i(): byte {
-  OpcodeMap[0x5b].call(this);
+  OpcodeMap[0x5b]();
   return 8;
 }
 
@@ -3865,7 +3865,7 @@ function BIT_test_3_i_of_E_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_3_i_of_H_i(): byte {
-  OpcodeMap[0x5c].call(this);
+  OpcodeMap[0x5c]();
   return 8;
 }
 
@@ -3876,7 +3876,7 @@ function BIT_test_3_i_of_H_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_3_i_of_L_i(): byte {
-  OpcodeMap[0x5d].call(this);
+  OpcodeMap[0x5d]();
   return 8;
 }
 
@@ -3887,7 +3887,7 @@ function BIT_test_3_i_of_L_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_3_i_of_HL_m(): byte {
-  OpcodeMap[0x5e].call(this);
+  OpcodeMap[0x5e]();
   return 12;
 }
 
@@ -3898,7 +3898,7 @@ function BIT_test_3_i_of_HL_m(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_3_i_of_A_i(): byte {
-  OpcodeMap[0x5f].call(this);
+  OpcodeMap[0x5f]();
   return 8;
 }
 
@@ -3909,7 +3909,7 @@ function BIT_test_3_i_of_A_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_4_i_of_B_i(): byte {
-  OpcodeMap[0x60].call(this);
+  OpcodeMap[0x60]();
   return 8;
 }
 
@@ -3920,7 +3920,7 @@ function BIT_test_4_i_of_B_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_4_i_of_C_i(): byte {
-  OpcodeMap[0x61].call(this);
+  OpcodeMap[0x61]();
   return 8;
 }
 
@@ -3931,7 +3931,7 @@ function BIT_test_4_i_of_C_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_4_i_of_D_i(): byte {
-  OpcodeMap[0x62].call(this);
+  OpcodeMap[0x62]();
   return 8;
 }
 
@@ -3942,7 +3942,7 @@ function BIT_test_4_i_of_D_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_4_i_of_E_i(): byte {
-  OpcodeMap[0x63].call(this);
+  OpcodeMap[0x63]();
   return 8;
 }
 
@@ -3953,7 +3953,7 @@ function BIT_test_4_i_of_E_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_4_i_of_H_i(): byte {
-  OpcodeMap[0x64].call(this);
+  OpcodeMap[0x64]();
   return 8;
 }
 
@@ -3964,7 +3964,7 @@ function BIT_test_4_i_of_H_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_4_i_of_L_i(): byte {
-  OpcodeMap[0x65].call(this);
+  OpcodeMap[0x65]();
   return 8;
 }
 
@@ -3975,7 +3975,7 @@ function BIT_test_4_i_of_L_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_4_i_of_HL_m(): byte {
-  OpcodeMap[0x66].call(this);
+  OpcodeMap[0x66]();
   return 12;
 }
 
@@ -3986,7 +3986,7 @@ function BIT_test_4_i_of_HL_m(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_4_i_of_A_i(): byte {
-  OpcodeMap[0x67].call(this);
+  OpcodeMap[0x67]();
   return 8;
 }
 
@@ -3997,7 +3997,7 @@ function BIT_test_4_i_of_A_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_5_i_of_B_i(): byte {
-  OpcodeMap[0x68].call(this);
+  OpcodeMap[0x68]();
   return 8;
 }
 
@@ -4008,7 +4008,7 @@ function BIT_test_5_i_of_B_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_5_i_of_C_i(): byte {
-  OpcodeMap[0x69].call(this);
+  OpcodeMap[0x69]();
   return 8;
 }
 
@@ -4019,7 +4019,7 @@ function BIT_test_5_i_of_C_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_5_i_of_D_i(): byte {
-  OpcodeMap[0x6a].call(this);
+  OpcodeMap[0x6a]();
   return 8;
 }
 
@@ -4030,7 +4030,7 @@ function BIT_test_5_i_of_D_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_5_i_of_E_i(): byte {
-  OpcodeMap[0x6b].call(this);
+  OpcodeMap[0x6b]();
   return 8;
 }
 
@@ -4041,7 +4041,7 @@ function BIT_test_5_i_of_E_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_5_i_of_H_i(): byte {
-  OpcodeMap[0x6c].call(this);
+  OpcodeMap[0x6c]();
   return 8;
 }
 
@@ -4052,7 +4052,7 @@ function BIT_test_5_i_of_H_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_5_i_of_L_i(): byte {
-  OpcodeMap[0x6d].call(this);
+  OpcodeMap[0x6d]();
   return 8;
 }
 
@@ -4063,7 +4063,7 @@ function BIT_test_5_i_of_L_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_5_i_of_HL_m(): byte {
-  OpcodeMap[0x6e].call(this);
+  OpcodeMap[0x6e]();
   return 12;
 }
 
@@ -4074,7 +4074,7 @@ function BIT_test_5_i_of_HL_m(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_5_i_of_A_i(): byte {
-  OpcodeMap[0x6f].call(this);
+  OpcodeMap[0x6f]();
   return 8;
 }
 
@@ -4085,7 +4085,7 @@ function BIT_test_5_i_of_A_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_6_i_of_B_i(): byte {
-  OpcodeMap[0x70].call(this);
+  OpcodeMap[0x70]();
   return 8;
 }
 
@@ -4096,7 +4096,7 @@ function BIT_test_6_i_of_B_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_6_i_of_C_i(): byte {
-  OpcodeMap[0x71].call(this);
+  OpcodeMap[0x71]();
   return 8;
 }
 
@@ -4107,7 +4107,7 @@ function BIT_test_6_i_of_C_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_6_i_of_D_i(): byte {
-  OpcodeMap[0x72].call(this);
+  OpcodeMap[0x72]();
   return 8;
 }
 
@@ -4118,7 +4118,7 @@ function BIT_test_6_i_of_D_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_6_i_of_E_i(): byte {
-  OpcodeMap[0x73].call(this);
+  OpcodeMap[0x73]();
   return 8;
 }
 
@@ -4129,7 +4129,7 @@ function BIT_test_6_i_of_E_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_6_i_of_H_i(): byte {
-  OpcodeMap[0x74].call(this);
+  OpcodeMap[0x74]();
   return 8;
 }
 
@@ -4140,7 +4140,7 @@ function BIT_test_6_i_of_H_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_6_i_of_L_i(): byte {
-  OpcodeMap[0x75].call(this);
+  OpcodeMap[0x75]();
   return 8;
 }
 
@@ -4151,7 +4151,7 @@ function BIT_test_6_i_of_L_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_6_i_of_HL_m(): byte {
-  OpcodeMap[0x76].call(this);
+  OpcodeMap[0x76]();
   return 12;
 }
 
@@ -4162,7 +4162,7 @@ function BIT_test_6_i_of_HL_m(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_6_i_of_A_i(): byte {
-  OpcodeMap[0x77].call(this);
+  OpcodeMap[0x77]();
   return 8;
 }
 
@@ -4173,7 +4173,7 @@ function BIT_test_6_i_of_A_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_7_i_of_B_i(): byte {
-  OpcodeMap[0x78].call(this);
+  OpcodeMap[0x78]();
   return 8;
 }
 
@@ -4184,7 +4184,7 @@ function BIT_test_7_i_of_B_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_7_i_of_C_i(): byte {
-  OpcodeMap[0x79].call(this);
+  OpcodeMap[0x79]();
   return 8;
 }
 
@@ -4195,7 +4195,7 @@ function BIT_test_7_i_of_C_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_7_i_of_D_i(): byte {
-  OpcodeMap[0x7a].call(this);
+  OpcodeMap[0x7a]();
   return 8;
 }
 
@@ -4206,7 +4206,7 @@ function BIT_test_7_i_of_D_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_7_i_of_E_i(): byte {
-  OpcodeMap[0x7b].call(this);
+  OpcodeMap[0x7b]();
   return 8;
 }
 
@@ -4217,7 +4217,7 @@ function BIT_test_7_i_of_E_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_7_i_of_H_i(): byte {
-  OpcodeMap[0x7c].call(this);
+  OpcodeMap[0x7c]();
   return 8;
 }
 
@@ -4228,7 +4228,7 @@ function BIT_test_7_i_of_H_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_7_i_of_L_i(): byte {
-  OpcodeMap[0x7d].call(this);
+  OpcodeMap[0x7d]();
   return 8;
 }
 
@@ -4239,7 +4239,7 @@ function BIT_test_7_i_of_L_i(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_7_i_of_HL_m(): byte {
-  OpcodeMap[0x7e].call(this);
+  OpcodeMap[0x7e]();
   return 12;
 }
 
@@ -4250,7 +4250,7 @@ function BIT_test_7_i_of_HL_m(): byte {
  * Affected flags: Z, N, H
  */
 function BIT_test_7_i_of_A_i(): byte {
-  OpcodeMap[0x7f].call(this);
+  OpcodeMap[0x7f]();
   return 8;
 }
 
@@ -4261,7 +4261,7 @@ function BIT_test_7_i_of_A_i(): byte {
  * Affected flags:
  */
 function RES_bit0_of_B(): byte {
-  OpcodeMap[0x80].call(this);
+  OpcodeMap[0x80]();
   return 8;
 }
 
@@ -4272,7 +4272,7 @@ function RES_bit0_of_B(): byte {
  * Affected flags:
  */
 function RES_bit0_of_C(): byte {
-  OpcodeMap[0x81].call(this);
+  OpcodeMap[0x81]();
   return 8;
 }
 
@@ -4283,7 +4283,7 @@ function RES_bit0_of_C(): byte {
  * Affected flags:
  */
 function RES_bit0_of_D(): byte {
-  OpcodeMap[0x82].call(this);
+  OpcodeMap[0x82]();
   return 8;
 }
 
@@ -4294,7 +4294,7 @@ function RES_bit0_of_D(): byte {
  * Affected flags:
  */
 function RES_bit0_of_E(): byte {
-  OpcodeMap[0x83].call(this);
+  OpcodeMap[0x83]();
   return 8;
 }
 
@@ -4305,7 +4305,7 @@ function RES_bit0_of_E(): byte {
  * Affected flags:
  */
 function RES_bit0_of_H(): byte {
-  OpcodeMap[0x84].call(this);
+  OpcodeMap[0x84]();
   return 8;
 }
 
@@ -4316,7 +4316,7 @@ function RES_bit0_of_H(): byte {
  * Affected flags:
  */
 function RES_bit0_of_L(): byte {
-  OpcodeMap[0x85].call(this);
+  OpcodeMap[0x85]();
   return 8;
 }
 
@@ -4327,7 +4327,7 @@ function RES_bit0_of_L(): byte {
  * Affected flags:
  */
 function RES_bit0_of_HL(): byte {
-  OpcodeMap[0x86].call(this);
+  OpcodeMap[0x86]();
   return 16;
 }
 
@@ -4338,7 +4338,7 @@ function RES_bit0_of_HL(): byte {
  * Affected flags:
  */
 function RES_bit0_of_A(): byte {
-  OpcodeMap[0x87].call(this);
+  OpcodeMap[0x87]();
   return 8;
 }
 
@@ -4349,7 +4349,7 @@ function RES_bit0_of_A(): byte {
  * Affected flags:
  */
 function RES_bit1_of_B(): byte {
-  OpcodeMap[0x88].call(this);
+  OpcodeMap[0x88]();
   return 8;
 }
 
@@ -4360,7 +4360,7 @@ function RES_bit1_of_B(): byte {
  * Affected flags:
  */
 function RES_bit1_of_C(): byte {
-  OpcodeMap[0x89].call(this);
+  OpcodeMap[0x89]();
   return 8;
 }
 
@@ -4371,7 +4371,7 @@ function RES_bit1_of_C(): byte {
  * Affected flags:
  */
 function RES_bit1_of_D(): byte {
-  OpcodeMap[0x8a].call(this);
+  OpcodeMap[0x8a]();
   return 8;
 }
 
@@ -4382,7 +4382,7 @@ function RES_bit1_of_D(): byte {
  * Affected flags:
  */
 function RES_bit1_of_E(): byte {
-  OpcodeMap[0x8b].call(this);
+  OpcodeMap[0x8b]();
   return 8;
 }
 
@@ -4393,7 +4393,7 @@ function RES_bit1_of_E(): byte {
  * Affected flags:
  */
 function RES_bit1_of_H(): byte {
-  OpcodeMap[0x8c].call(this);
+  OpcodeMap[0x8c]();
   return 8;
 }
 
@@ -4404,7 +4404,7 @@ function RES_bit1_of_H(): byte {
  * Affected flags:
  */
 function RES_bit1_of_L(): byte {
-  OpcodeMap[0x8d].call(this);
+  OpcodeMap[0x8d]();
   return 8;
 }
 
@@ -4415,7 +4415,7 @@ function RES_bit1_of_L(): byte {
  * Affected flags:
  */
 function RES_bit1_of_HL(): byte {
-  OpcodeMap[0x8e].call(this);
+  OpcodeMap[0x8e]();
   return 16;
 }
 
@@ -4426,7 +4426,7 @@ function RES_bit1_of_HL(): byte {
  * Affected flags:
  */
 function RES_bit1_of_A(): byte {
-  OpcodeMap[0x8f].call(this);
+  OpcodeMap[0x8f]();
   return 8;
 }
 
@@ -4437,7 +4437,7 @@ function RES_bit1_of_A(): byte {
  * Affected flags:
  */
 function RES_bit2_of_B(): byte {
-  OpcodeMap[0x90].call(this);
+  OpcodeMap[0x90]();
   return 8;
 }
 
@@ -4448,7 +4448,7 @@ function RES_bit2_of_B(): byte {
  * Affected flags:
  */
 function RES_bit2_of_C(): byte {
-  OpcodeMap[0x91].call(this);
+  OpcodeMap[0x91]();
   return 8;
 }
 
@@ -4459,7 +4459,7 @@ function RES_bit2_of_C(): byte {
  * Affected flags:
  */
 function RES_bit2_of_D(): byte {
-  OpcodeMap[0x92].call(this);
+  OpcodeMap[0x92]();
   return 8;
 }
 
@@ -4470,7 +4470,7 @@ function RES_bit2_of_D(): byte {
  * Affected flags:
  */
 function RES_bit2_of_E(): byte {
-  OpcodeMap[0x93].call(this);
+  OpcodeMap[0x93]();
   return 8;
 }
 
@@ -4481,7 +4481,7 @@ function RES_bit2_of_E(): byte {
  * Affected flags:
  */
 function RES_bit2_of_H(): byte {
-  OpcodeMap[0x94].call(this);
+  OpcodeMap[0x94]();
   return 8;
 }
 
@@ -4492,7 +4492,7 @@ function RES_bit2_of_H(): byte {
  * Affected flags:
  */
 function RES_bit2_of_L(): byte {
-  OpcodeMap[0x95].call(this);
+  OpcodeMap[0x95]();
   return 8;
 }
 
@@ -4503,7 +4503,7 @@ function RES_bit2_of_L(): byte {
  * Affected flags:
  */
 function RES_bit2_of_HL(): byte {
-  OpcodeMap[0x96].call(this);
+  OpcodeMap[0x96]();
   return 16;
 }
 
@@ -4514,7 +4514,7 @@ function RES_bit2_of_HL(): byte {
  * Affected flags:
  */
 function RES_bit2_of_A(): byte {
-  OpcodeMap[0x97].call(this);
+  OpcodeMap[0x97]();
   return 8;
 }
 
@@ -4525,7 +4525,7 @@ function RES_bit2_of_A(): byte {
  * Affected flags:
  */
 function RES_bit3_of_B(): byte {
-  OpcodeMap[0x98].call(this);
+  OpcodeMap[0x98]();
   return 8;
 }
 
@@ -4536,7 +4536,7 @@ function RES_bit3_of_B(): byte {
  * Affected flags:
  */
 function RES_bit3_of_C(): byte {
-  OpcodeMap[0x99].call(this);
+  OpcodeMap[0x99]();
   return 8;
 }
 
@@ -4547,7 +4547,7 @@ function RES_bit3_of_C(): byte {
  * Affected flags:
  */
 function RES_bit3_of_D(): byte {
-  OpcodeMap[0x9a].call(this);
+  OpcodeMap[0x9a]();
   return 8;
 }
 
@@ -4558,7 +4558,7 @@ function RES_bit3_of_D(): byte {
  * Affected flags:
  */
 function RES_bit3_of_E(): byte {
-  OpcodeMap[0x9b].call(this);
+  OpcodeMap[0x9b]();
   return 8;
 }
 
@@ -4569,7 +4569,7 @@ function RES_bit3_of_E(): byte {
  * Affected flags:
  */
 function RES_bit3_of_H(): byte {
-  OpcodeMap[0x9c].call(this);
+  OpcodeMap[0x9c]();
   return 8;
 }
 
@@ -4580,7 +4580,7 @@ function RES_bit3_of_H(): byte {
  * Affected flags:
  */
 function RES_bit3_of_L(): byte {
-  OpcodeMap[0x9d].call(this);
+  OpcodeMap[0x9d]();
   return 8;
 }
 
@@ -4591,7 +4591,7 @@ function RES_bit3_of_L(): byte {
  * Affected flags:
  */
 function RES_bit3_of_HL(): byte {
-  OpcodeMap[0x9e].call(this);
+  OpcodeMap[0x9e]();
   return 16;
 }
 
@@ -4602,7 +4602,7 @@ function RES_bit3_of_HL(): byte {
  * Affected flags:
  */
 function RES_bit3_of_A(): byte {
-  OpcodeMap[0x9f].call(this);
+  OpcodeMap[0x9f]();
   return 8;
 }
 
@@ -4613,7 +4613,7 @@ function RES_bit3_of_A(): byte {
  * Affected flags:
  */
 function RES_bit4_of_B(): byte {
-  OpcodeMap[0xa0].call(this);
+  OpcodeMap[0xa0]();
   return 8;
 }
 
@@ -4624,7 +4624,7 @@ function RES_bit4_of_B(): byte {
  * Affected flags:
  */
 function RES_bit4_of_C(): byte {
-  OpcodeMap[0xa1].call(this);
+  OpcodeMap[0xa1]();
   return 8;
 }
 
@@ -4635,7 +4635,7 @@ function RES_bit4_of_C(): byte {
  * Affected flags:
  */
 function RES_bit4_of_D(): byte {
-  OpcodeMap[0xa2].call(this);
+  OpcodeMap[0xa2]();
   return 8;
 }
 
@@ -4646,7 +4646,7 @@ function RES_bit4_of_D(): byte {
  * Affected flags:
  */
 function RES_bit4_of_E(): byte {
-  OpcodeMap[0xa3].call(this);
+  OpcodeMap[0xa3]();
   return 8;
 }
 
@@ -4657,7 +4657,7 @@ function RES_bit4_of_E(): byte {
  * Affected flags:
  */
 function RES_bit4_of_H(): byte {
-  OpcodeMap[0xa4].call(this);
+  OpcodeMap[0xa4]();
   return 8;
 }
 
@@ -4668,7 +4668,7 @@ function RES_bit4_of_H(): byte {
  * Affected flags:
  */
 function RES_bit4_of_L(): byte {
-  OpcodeMap[0xa5].call(this);
+  OpcodeMap[0xa5]();
   return 8;
 }
 
@@ -4679,7 +4679,7 @@ function RES_bit4_of_L(): byte {
  * Affected flags:
  */
 function RES_bit4_of_HL(): byte {
-  OpcodeMap[0xa6].call(this);
+  OpcodeMap[0xa6]();
   return 16;
 }
 
@@ -4690,7 +4690,7 @@ function RES_bit4_of_HL(): byte {
  * Affected flags:
  */
 function RES_bit4_of_A(): byte {
-  OpcodeMap[0xa7].call(this);
+  OpcodeMap[0xa7]();
   return 8;
 }
 
@@ -4701,7 +4701,7 @@ function RES_bit4_of_A(): byte {
  * Affected flags:
  */
 function RES_bit5_of_B(): byte {
-  OpcodeMap[0xa8].call(this);
+  OpcodeMap[0xa8]();
   return 8;
 }
 
@@ -4712,7 +4712,7 @@ function RES_bit5_of_B(): byte {
  * Affected flags:
  */
 function RES_bit5_of_C(): byte {
-  OpcodeMap[0xa9].call(this);
+  OpcodeMap[0xa9]();
   return 8;
 }
 
@@ -4723,7 +4723,7 @@ function RES_bit5_of_C(): byte {
  * Affected flags:
  */
 function RES_bit5_of_D(): byte {
-  OpcodeMap[0xaa].call(this);
+  OpcodeMap[0xaa]();
   return 8;
 }
 
@@ -4734,7 +4734,7 @@ function RES_bit5_of_D(): byte {
  * Affected flags:
  */
 function RES_bit5_of_E(): byte {
-  OpcodeMap[0xab].call(this);
+  OpcodeMap[0xab]();
   return 8;
 }
 
@@ -4745,7 +4745,7 @@ function RES_bit5_of_E(): byte {
  * Affected flags:
  */
 function RES_bit5_of_H(): byte {
-  OpcodeMap[0xac].call(this);
+  OpcodeMap[0xac]();
   return 8;
 }
 
@@ -4756,7 +4756,7 @@ function RES_bit5_of_H(): byte {
  * Affected flags:
  */
 function RES_bit5_of_L(): byte {
-  OpcodeMap[0xad].call(this);
+  OpcodeMap[0xad]();
   return 8;
 }
 
@@ -4767,7 +4767,7 @@ function RES_bit5_of_L(): byte {
  * Affected flags:
  */
 function RES_bit5_of_HL(): byte {
-  OpcodeMap[0xae].call(this);
+  OpcodeMap[0xae]();
   return 16;
 }
 
@@ -4778,7 +4778,7 @@ function RES_bit5_of_HL(): byte {
  * Affected flags:
  */
 function RES_bit5_of_A(): byte {
-  OpcodeMap[0xaf].call(this);
+  OpcodeMap[0xaf]();
   return 8;
 }
 
@@ -4789,7 +4789,7 @@ function RES_bit5_of_A(): byte {
  * Affected flags:
  */
 function RES_bit6_of_B(): byte {
-  OpcodeMap[0xb0].call(this);
+  OpcodeMap[0xb0]();
   return 8;
 }
 
@@ -4800,7 +4800,7 @@ function RES_bit6_of_B(): byte {
  * Affected flags:
  */
 function RES_bit6_of_C(): byte {
-  OpcodeMap[0xb1].call(this);
+  OpcodeMap[0xb1]();
   return 8;
 }
 
@@ -4811,7 +4811,7 @@ function RES_bit6_of_C(): byte {
  * Affected flags:
  */
 function RES_bit6_of_D(): byte {
-  OpcodeMap[0xb2].call(this);
+  OpcodeMap[0xb2]();
   return 8;
 }
 
@@ -4822,7 +4822,7 @@ function RES_bit6_of_D(): byte {
  * Affected flags:
  */
 function RES_bit6_of_E(): byte {
-  OpcodeMap[0xb3].call(this);
+  OpcodeMap[0xb3]();
   return 8;
 }
 
@@ -4833,7 +4833,7 @@ function RES_bit6_of_E(): byte {
  * Affected flags:
  */
 function RES_bit6_of_H(): byte {
-  OpcodeMap[0xb4].call(this);
+  OpcodeMap[0xb4]();
   return 8;
 }
 
@@ -4844,7 +4844,7 @@ function RES_bit6_of_H(): byte {
  * Affected flags:
  */
 function RES_bit6_of_L(): byte {
-  OpcodeMap[0xb5].call(this);
+  OpcodeMap[0xb5]();
   return 8;
 }
 
@@ -4855,7 +4855,7 @@ function RES_bit6_of_L(): byte {
  * Affected flags:
  */
 function RES_bit6_of_HL(): byte {
-  OpcodeMap[0xb6].call(this);
+  OpcodeMap[0xb6]();
   return 16;
 }
 
@@ -4866,7 +4866,7 @@ function RES_bit6_of_HL(): byte {
  * Affected flags:
  */
 function RES_bit6_of_A(): byte {
-  OpcodeMap[0xb7].call(this);
+  OpcodeMap[0xb7]();
   return 8;
 }
 
@@ -4877,7 +4877,7 @@ function RES_bit6_of_A(): byte {
  * Affected flags:
  */
 function RES_bit7_of_B(): byte {
-  OpcodeMap[0xb8].call(this);
+  OpcodeMap[0xb8]();
   return 8;
 }
 
@@ -4888,7 +4888,7 @@ function RES_bit7_of_B(): byte {
  * Affected flags:
  */
 function RES_bit7_of_C(): byte {
-  OpcodeMap[0xb9].call(this);
+  OpcodeMap[0xb9]();
   return 8;
 }
 
@@ -4899,7 +4899,7 @@ function RES_bit7_of_C(): byte {
  * Affected flags:
  */
 function RES_bit7_of_D(): byte {
-  OpcodeMap[0xba].call(this);
+  OpcodeMap[0xba]();
   return 8;
 }
 
@@ -4910,7 +4910,7 @@ function RES_bit7_of_D(): byte {
  * Affected flags:
  */
 function RES_bit7_of_E(): byte {
-  OpcodeMap[0xbb].call(this);
+  OpcodeMap[0xbb]();
   return 8;
 }
 
@@ -4921,7 +4921,7 @@ function RES_bit7_of_E(): byte {
  * Affected flags:
  */
 function RES_bit7_of_H(): byte {
-  OpcodeMap[0xbc].call(this);
+  OpcodeMap[0xbc]();
   return 8;
 }
 
@@ -4932,7 +4932,7 @@ function RES_bit7_of_H(): byte {
  * Affected flags:
  */
 function RES_bit7_of_L(): byte {
-  OpcodeMap[0xbd].call(this);
+  OpcodeMap[0xbd]();
   return 8;
 }
 
@@ -4943,7 +4943,7 @@ function RES_bit7_of_L(): byte {
  * Affected flags:
  */
 function RES_bit7_of_HL(): byte {
-  OpcodeMap[0xbe].call(this);
+  OpcodeMap[0xbe]();
   return 16;
 }
 
@@ -4954,7 +4954,7 @@ function RES_bit7_of_HL(): byte {
  * Affected flags:
  */
 function RES_bit7_of_A(): byte {
-  OpcodeMap[0xbf].call(this);
+  OpcodeMap[0xbf]();
   return 8;
 }
 
@@ -4965,7 +4965,7 @@ function RES_bit7_of_A(): byte {
  * Affected flags:
  */
 function SET_bit0_of_B(): byte {
-  OpcodeMap[0xc0].call(this);
+  OpcodeMap[0xc0]();
   return 8;
 }
 
@@ -4976,7 +4976,7 @@ function SET_bit0_of_B(): byte {
  * Affected flags:
  */
 function SET_bit0_of_C(): byte {
-  OpcodeMap[0xc1].call(this);
+  OpcodeMap[0xc1]();
   return 8;
 }
 
@@ -4987,7 +4987,7 @@ function SET_bit0_of_C(): byte {
  * Affected flags:
  */
 function SET_bit0_of_D(): byte {
-  OpcodeMap[0xc2].call(this);
+  OpcodeMap[0xc2]();
   return 8;
 }
 
@@ -4998,7 +4998,7 @@ function SET_bit0_of_D(): byte {
  * Affected flags:
  */
 function SET_bit0_of_E(): byte {
-  OpcodeMap[0xc3].call(this);
+  OpcodeMap[0xc3]();
   return 8;
 }
 
@@ -5009,7 +5009,7 @@ function SET_bit0_of_E(): byte {
  * Affected flags:
  */
 function SET_bit0_of_H(): byte {
-  OpcodeMap[0xc4].call(this);
+  OpcodeMap[0xc4]();
   return 8;
 }
 
@@ -5020,7 +5020,7 @@ function SET_bit0_of_H(): byte {
  * Affected flags:
  */
 function SET_bit0_of_L(): byte {
-  OpcodeMap[0xc5].call(this);
+  OpcodeMap[0xc5]();
   return 8;
 }
 
@@ -5031,7 +5031,7 @@ function SET_bit0_of_L(): byte {
  * Affected flags:
  */
 function SET_bit0_of_HL(): byte {
-  OpcodeMap[0xc6].call(this);
+  OpcodeMap[0xc6]();
   return 16;
 }
 
@@ -5042,7 +5042,7 @@ function SET_bit0_of_HL(): byte {
  * Affected flags:
  */
 function SET_bit0_of_A(): byte {
-  OpcodeMap[0xc7].call(this);
+  OpcodeMap[0xc7]();
   return 8;
 }
 
@@ -5053,7 +5053,7 @@ function SET_bit0_of_A(): byte {
  * Affected flags:
  */
 function SET_bit1_of_B(): byte {
-  OpcodeMap[0xc8].call(this);
+  OpcodeMap[0xc8]();
   return 8;
 }
 
@@ -5064,7 +5064,7 @@ function SET_bit1_of_B(): byte {
  * Affected flags:
  */
 function SET_bit1_of_C(): byte {
-  OpcodeMap[0xc9].call(this);
+  OpcodeMap[0xc9]();
   return 8;
 }
 
@@ -5075,7 +5075,7 @@ function SET_bit1_of_C(): byte {
  * Affected flags:
  */
 function SET_bit1_of_D(): byte {
-  OpcodeMap[0xca].call(this);
+  OpcodeMap[0xca]();
   return 8;
 }
 
@@ -5086,7 +5086,7 @@ function SET_bit1_of_D(): byte {
  * Affected flags:
  */
 function SET_bit1_of_E(): byte {
-  OpcodeMap[0xcb].call(this);
+  OpcodeMap[0xcb]();
   return 8;
 }
 
@@ -5097,7 +5097,7 @@ function SET_bit1_of_E(): byte {
  * Affected flags:
  */
 function SET_bit1_of_H(): byte {
-  OpcodeMap[0xcc].call(this);
+  OpcodeMap[0xcc]();
   return 8;
 }
 
@@ -5108,7 +5108,7 @@ function SET_bit1_of_H(): byte {
  * Affected flags:
  */
 function SET_bit1_of_L(): byte {
-  OpcodeMap[0xcd].call(this);
+  OpcodeMap[0xcd]();
   return 8;
 }
 
@@ -5119,7 +5119,7 @@ function SET_bit1_of_L(): byte {
  * Affected flags:
  */
 function SET_bit1_of_HL(): byte {
-  OpcodeMap[0xce].call(this);
+  OpcodeMap[0xce]();
   return 16;
 }
 
@@ -5130,7 +5130,7 @@ function SET_bit1_of_HL(): byte {
  * Affected flags:
  */
 function SET_bit1_of_A(): byte {
-  OpcodeMap[0xcf].call(this);
+  OpcodeMap[0xcf]();
   return 8;
 }
 
@@ -5141,7 +5141,7 @@ function SET_bit1_of_A(): byte {
  * Affected flags:
  */
 function SET_bit2_of_B(): byte {
-  OpcodeMap[0xd0].call(this);
+  OpcodeMap[0xd0]();
   return 8;
 }
 
@@ -5152,7 +5152,7 @@ function SET_bit2_of_B(): byte {
  * Affected flags:
  */
 function SET_bit2_of_C(): byte {
-  OpcodeMap[0xd1].call(this);
+  OpcodeMap[0xd1]();
   return 8;
 }
 
@@ -5163,7 +5163,7 @@ function SET_bit2_of_C(): byte {
  * Affected flags:
  */
 function SET_bit2_of_D(): byte {
-  OpcodeMap[0xd2].call(this);
+  OpcodeMap[0xd2]();
   return 8;
 }
 
@@ -5174,7 +5174,7 @@ function SET_bit2_of_D(): byte {
  * Affected flags:
  */
 function SET_bit2_of_E(): byte {
-  OpcodeMap[0xd3].call(this);
+  OpcodeMap[0xd3]();
   return 8;
 }
 
@@ -5185,7 +5185,7 @@ function SET_bit2_of_E(): byte {
  * Affected flags:
  */
 function SET_bit2_of_H(): byte {
-  OpcodeMap[0xd4].call(this);
+  OpcodeMap[0xd4]();
   return 8;
 }
 
@@ -5196,7 +5196,7 @@ function SET_bit2_of_H(): byte {
  * Affected flags:
  */
 function SET_bit2_of_L(): byte {
-  OpcodeMap[0xd5].call(this);
+  OpcodeMap[0xd5]();
   return 8;
 }
 
@@ -5207,7 +5207,7 @@ function SET_bit2_of_L(): byte {
  * Affected flags:
  */
 function SET_bit2_of_HL(): byte {
-  OpcodeMap[0xd6].call(this);
+  OpcodeMap[0xd6]();
   return 16;
 }
 
@@ -5218,7 +5218,7 @@ function SET_bit2_of_HL(): byte {
  * Affected flags:
  */
 function SET_bit2_of_A(): byte {
-  OpcodeMap[0xd7].call(this);
+  OpcodeMap[0xd7]();
   return 8;
 }
 
@@ -5229,7 +5229,7 @@ function SET_bit2_of_A(): byte {
  * Affected flags:
  */
 function SET_bit3_of_B(): byte {
-  OpcodeMap[0xd8].call(this);
+  OpcodeMap[0xd8]();
   return 8;
 }
 
@@ -5240,7 +5240,7 @@ function SET_bit3_of_B(): byte {
  * Affected flags:
  */
 function SET_bit3_of_C(): byte {
-  OpcodeMap[0xd9].call(this);
+  OpcodeMap[0xd9]();
   return 8;
 }
 
@@ -5251,7 +5251,7 @@ function SET_bit3_of_C(): byte {
  * Affected flags:
  */
 function SET_bit3_of_D(): byte {
-  OpcodeMap[0xda].call(this);
+  OpcodeMap[0xda]();
   return 8;
 }
 
@@ -5262,7 +5262,7 @@ function SET_bit3_of_D(): byte {
  * Affected flags:
  */
 function SET_bit3_of_E(): byte {
-  OpcodeMap[0xdb].call(this);
+  OpcodeMap[0xdb]();
   return 8;
 }
 
@@ -5273,7 +5273,7 @@ function SET_bit3_of_E(): byte {
  * Affected flags:
  */
 function SET_bit3_of_H(): byte {
-  OpcodeMap[0xdc].call(this);
+  OpcodeMap[0xdc]();
   return 8;
 }
 
@@ -5284,7 +5284,7 @@ function SET_bit3_of_H(): byte {
  * Affected flags:
  */
 function SET_bit3_of_L(): byte {
-  OpcodeMap[0xdd].call(this);
+  OpcodeMap[0xdd]();
   return 8;
 }
 
@@ -5295,7 +5295,7 @@ function SET_bit3_of_L(): byte {
  * Affected flags:
  */
 function SET_bit3_of_HL(): byte {
-  OpcodeMap[0xde].call(this);
+  OpcodeMap[0xde]();
   return 16;
 }
 
@@ -5306,7 +5306,7 @@ function SET_bit3_of_HL(): byte {
  * Affected flags:
  */
 function SET_bit3_of_A(): byte {
-  OpcodeMap[0xdf].call(this);
+  OpcodeMap[0xdf]();
   return 8;
 }
 
@@ -5317,7 +5317,7 @@ function SET_bit3_of_A(): byte {
  * Affected flags:
  */
 function SET_bit4_of_B(): byte {
-  OpcodeMap[0xe0].call(this);
+  OpcodeMap[0xe0]();
   return 8;
 }
 
@@ -5328,7 +5328,7 @@ function SET_bit4_of_B(): byte {
  * Affected flags:
  */
 function SET_bit4_of_C(): byte {
-  OpcodeMap[0xe1].call(this);
+  OpcodeMap[0xe1]();
   return 8;
 }
 
@@ -5339,7 +5339,7 @@ function SET_bit4_of_C(): byte {
  * Affected flags:
  */
 function SET_bit4_of_D(): byte {
-  OpcodeMap[0xe2].call(this);
+  OpcodeMap[0xe2]();
   return 8;
 }
 
@@ -5350,7 +5350,7 @@ function SET_bit4_of_D(): byte {
  * Affected flags:
  */
 function SET_bit4_of_E(): byte {
-  OpcodeMap[0xe3].call(this);
+  OpcodeMap[0xe3]();
   return 8;
 }
 
@@ -5361,7 +5361,7 @@ function SET_bit4_of_E(): byte {
  * Affected flags:
  */
 function SET_bit4_of_H(): byte {
-  OpcodeMap[0xe4].call(this);
+  OpcodeMap[0xe4]();
   return 8;
 }
 
@@ -5372,7 +5372,7 @@ function SET_bit4_of_H(): byte {
  * Affected flags:
  */
 function SET_bit4_of_L(): byte {
-  OpcodeMap[0xe5].call(this);
+  OpcodeMap[0xe5]();
   return 8;
 }
 
@@ -5383,7 +5383,7 @@ function SET_bit4_of_L(): byte {
  * Affected flags:
  */
 function SET_bit4_of_HL(): byte {
-  OpcodeMap[0xe6].call(this);
+  OpcodeMap[0xe6]();
   return 16;
 }
 
@@ -5394,7 +5394,7 @@ function SET_bit4_of_HL(): byte {
  * Affected flags:
  */
 function SET_bit4_of_A(): byte {
-  OpcodeMap[0xe7].call(this);
+  OpcodeMap[0xe7]();
   return 8;
 }
 
@@ -5405,7 +5405,7 @@ function SET_bit4_of_A(): byte {
  * Affected flags:
  */
 function SET_bit5_of_B(): byte {
-  OpcodeMap[0xe8].call(this);
+  OpcodeMap[0xe8]();
   return 8;
 }
 
@@ -5416,7 +5416,7 @@ function SET_bit5_of_B(): byte {
  * Affected flags:
  */
 function SET_bit5_of_C(): byte {
-  OpcodeMap[0xe9].call(this);
+  OpcodeMap[0xe9]();
   return 8;
 }
 
@@ -5427,7 +5427,7 @@ function SET_bit5_of_C(): byte {
  * Affected flags:
  */
 function SET_bit5_of_D(): byte {
-  OpcodeMap[0xea].call(this);
+  OpcodeMap[0xea]();
   return 8;
 }
 
@@ -5438,7 +5438,7 @@ function SET_bit5_of_D(): byte {
  * Affected flags:
  */
 function SET_bit5_of_E(): byte {
-  OpcodeMap[0xeb].call(this);
+  OpcodeMap[0xeb]();
   return 8;
 }
 
@@ -5449,7 +5449,7 @@ function SET_bit5_of_E(): byte {
  * Affected flags:
  */
 function SET_bit5_of_H(): byte {
-  OpcodeMap[0xec].call(this);
+  OpcodeMap[0xec]();
   return 8;
 }
 
@@ -5460,7 +5460,7 @@ function SET_bit5_of_H(): byte {
  * Affected flags:
  */
 function SET_bit5_of_L(): byte {
-  OpcodeMap[0xed].call(this);
+  OpcodeMap[0xed]();
   return 8;
 }
 
@@ -5471,7 +5471,7 @@ function SET_bit5_of_L(): byte {
  * Affected flags:
  */
 function SET_bit5_of_HL(): byte {
-  OpcodeMap[0xee].call(this);
+  OpcodeMap[0xee]();
   return 16;
 }
 
@@ -5482,7 +5482,7 @@ function SET_bit5_of_HL(): byte {
  * Affected flags:
  */
 function SET_bit5_of_A(): byte {
-  OpcodeMap[0xef].call(this);
+  OpcodeMap[0xef]();
   return 8;
 }
 
@@ -5493,7 +5493,7 @@ function SET_bit5_of_A(): byte {
  * Affected flags:
  */
 function SET_bit6_of_B(): byte {
-  OpcodeMap[0xf0].call(this);
+  OpcodeMap[0xf0]();
   return 8;
 }
 
@@ -5504,7 +5504,7 @@ function SET_bit6_of_B(): byte {
  * Affected flags:
  */
 function SET_bit6_of_C(): byte {
-  OpcodeMap[0xf1].call(this);
+  OpcodeMap[0xf1]();
   return 8;
 }
 
@@ -5515,7 +5515,7 @@ function SET_bit6_of_C(): byte {
  * Affected flags:
  */
 function SET_bit6_of_D(): byte {
-  OpcodeMap[0xf2].call(this);
+  OpcodeMap[0xf2]();
   return 8;
 }
 
@@ -5526,7 +5526,7 @@ function SET_bit6_of_D(): byte {
  * Affected flags:
  */
 function SET_bit6_of_E(): byte {
-  OpcodeMap[0xf3].call(this);
+  OpcodeMap[0xf3]();
   return 8;
 }
 
@@ -5537,7 +5537,7 @@ function SET_bit6_of_E(): byte {
  * Affected flags:
  */
 function SET_bit6_of_H(): byte {
-  OpcodeMap[0xf4].call(this);
+  OpcodeMap[0xf4]();
   return 8;
 }
 
@@ -5548,7 +5548,7 @@ function SET_bit6_of_H(): byte {
  * Affected flags:
  */
 function SET_bit6_of_L(): byte {
-  OpcodeMap[0xf5].call(this);
+  OpcodeMap[0xf5]();
   return 8;
 }
 
@@ -5559,7 +5559,7 @@ function SET_bit6_of_L(): byte {
  * Affected flags:
  */
 function SET_bit6_of_HL(): byte {
-  OpcodeMap[0xf6].call(this);
+  OpcodeMap[0xf6]();
   return 16;
 }
 
@@ -5570,7 +5570,7 @@ function SET_bit6_of_HL(): byte {
  * Affected flags:
  */
 function SET_bit6_of_A(): byte {
-  OpcodeMap[0xf7].call(this);
+  OpcodeMap[0xf7]();
   return 8;
 }
 
@@ -5581,7 +5581,7 @@ function SET_bit6_of_A(): byte {
  * Affected flags:
  */
 function SET_bit7_of_B(): byte {
-  OpcodeMap[0xf8].call(this);
+  OpcodeMap[0xf8]();
   return 8;
 }
 
@@ -5592,7 +5592,7 @@ function SET_bit7_of_B(): byte {
  * Affected flags:
  */
 function SET_bit7_of_C(): byte {
-  OpcodeMap[0xf9].call(this);
+  OpcodeMap[0xf9]();
   return 8;
 }
 
@@ -5603,7 +5603,7 @@ function SET_bit7_of_C(): byte {
  * Affected flags:
  */
 function SET_bit7_of_D(): byte {
-  OpcodeMap[0xfa].call(this);
+  OpcodeMap[0xfa]();
   return 8;
 }
 
@@ -5614,7 +5614,7 @@ function SET_bit7_of_D(): byte {
  * Affected flags:
  */
 function SET_bit7_of_E(): byte {
-  OpcodeMap[0xfb].call(this);
+  OpcodeMap[0xfb]();
   return 8;
 }
 
@@ -5625,7 +5625,7 @@ function SET_bit7_of_E(): byte {
  * Affected flags:
  */
 function SET_bit7_of_H(): byte {
-  OpcodeMap[0xfc].call(this);
+  OpcodeMap[0xfc]();
   return 8;
 }
 
@@ -5636,7 +5636,7 @@ function SET_bit7_of_H(): byte {
  * Affected flags:
  */
 function SET_bit7_of_L(): byte {
-  OpcodeMap[0xfd].call(this);
+  OpcodeMap[0xfd]();
   return 8;
 }
 
@@ -5647,7 +5647,7 @@ function SET_bit7_of_L(): byte {
  * Affected flags:
  */
 function SET_bit7_of_HL(): byte {
-  OpcodeMap[0xfe].call(this);
+  OpcodeMap[0xfe]();
   return 16;
 }
 
@@ -5658,7 +5658,7 @@ function SET_bit7_of_HL(): byte {
  * Affected flags:
  */
 function SET_bit7_of_A(): byte {
-  OpcodeMap[0xff].call(this);
+  OpcodeMap[0xff]();
   return 8;
 }
 

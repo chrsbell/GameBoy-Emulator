@@ -3,6 +3,13 @@
   "rules": {
     "@typescript-eslint/no-namespace": "off",
     "node/no-unpublished-import": "off",
-    "node/no-unpublished-require": "off"
+    "node/no-unpublished-require": "off",
+    "quotes": [
+      "error",
+      "single",
+      {
+        "allowTemplateLiterals": true
+      }
+    ]
   }
 }

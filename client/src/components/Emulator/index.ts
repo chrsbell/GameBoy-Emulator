@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 class Emulator {
   private i = 0;
   private j = 0;
-  private timerID: ReturnType<typeof setTimeout>;
+  private timerID!: ReturnType<typeof setTimeout>;
   public constructor() {
     this.update = this.update.bind(this);
   }
@@ -38,16 +38,16 @@ class Emulator {
     }
 
     // test animation
-    GLRenderer.setPixel(this.i, this.j, _.sample(Colors));
-    this.i += 1;
-    if (this.i === GLRenderer.getScreenWidth()) {
-      this.j += 1;
-      this.i = 0;
-      if (this.j === GLRenderer.getScreenHeight()) {
-        this.i = 0;
-        this.j = 0;
-      }
-    }
+    // GLRenderer.setPixel(this.i, this.j, _.sample([[...Colors));
+    // this.i += 1;
+    // if (this.i === GLRenderer.getScreenWidth()) {
+    //   this.j += 1;
+    //   this.i = 0;
+    //   if (this.j === GLRenderer.getScreenHeight()) {
+    //     this.i = 0;
+    //     this.j = 0;
+    //   }
+    // }
 
     GLRenderer.draw();
     this.timerID = setTimeout(this.update, 1000 / GLRenderer.fps);

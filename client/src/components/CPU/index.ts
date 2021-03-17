@@ -18,7 +18,7 @@ class CPU {
     return CPU._clock;
   }
   // 16-bit program counter
-  private _pc: word;
+  private _pc: word = 0;
   public get pc(): word {
     return this._pc;
   }
@@ -26,7 +26,7 @@ class CPU {
     this._pc = value;
   }
   // stack pointer
-  private _sp: word;
+  private _sp: word = 0;
   public get sp(): word {
     return this._sp;
   }
@@ -34,10 +34,10 @@ class CPU {
     this._sp = value;
   }
   private _r: Registers = {
-    af: null as word,
-    bc: null as word,
-    de: null as word,
-    hl: null as word,
+    af: 0 as word,
+    bc: 0 as word,
+    de: 0 as word,
+    hl: 0 as word,
     f: new Flag(),
   };
   public get r(): Registers {
@@ -46,16 +46,16 @@ class CPU {
   public set r(value: Registers) {
     this._r = value;
   }
-  private _halted: boolean;
+  private _halted = false;
   public get halted(): boolean {
     return this._halted;
   }
   public set halted(value: boolean) {
     this._halted = value;
   }
-  protected _interruptsEnabled: boolean;
+  protected _interruptsEnabled = true;
   protected opcodes: any;
-  private _lastExecuted: Array<byte>;
+  private _lastExecuted: Array<byte> = [];
   public get lastExecuted(): Array<byte> {
     return this._lastExecuted;
   }
@@ -98,15 +98,17 @@ class CPU {
    * https://stackoverflow.com/questions/8868396/game-boy-what-constitutes-a-half-carry
    * https://gbdev.io/gb-opcodes/optables/
    */
-  public checkHalfCarry(op1: byte, op2: byte, multiplier = 1): void {
-    const carryBit = ((op1 & 0xf) + multiplier * (op2 & 0xf)) & 0x10;
+  public checkHalfCarry(op1: byte, op2: byte, subtraction?: boolean): void {
+    const carryBit = subtraction
+      ? ((op1 & 0xf) - (op2 & 0xf)) & 0x10
+      : ((op1 & 0xf) + (op2 & 0xf)) & 0x10;
     this.r.f.h = carryBit === 0x10 ? 1 : 0;
   }
   /**
    * Sets the carry flag if the sum will exceed the size of the data type.
    */
-  public checkFullCarry16(op1: word, op2: word, multiplier = 1): void {
-    if (multiplier === 1) {
+  public checkFullCarry16(op1: word, op2: word, subtraction?: boolean): void {
+    if (subtraction) {
       if (op1 + op2 > 65535) {
         this.r.f.cy = 1;
       } else {
@@ -120,8 +122,8 @@ class CPU {
       }
     }
   }
-  public checkFullCarry8(op1: byte, op2: byte, multiplier = 1): void {
-    if (multiplier === 1) {
+  public checkFullCarry8(op1: byte, op2: byte, subtraction?: boolean): void {
+    if (subtraction) {
       if (op1 + op2 > 255) {
         this.r.f.cy = 1;
       } else {

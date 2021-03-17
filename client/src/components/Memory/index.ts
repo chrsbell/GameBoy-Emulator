@@ -75,21 +75,20 @@ interface Cartridge {
 }
 
 class Memory {
-  private bios: Uint8Array;
+  private bios!: Uint8Array;
   // whether bios execution has finished
   public inBios = false;
-  public cart: Cartridge;
+  public cart!: Cartridge;
   // 8k vRAM
-  private vRAM: Uint8Array;
+  private vRAM!: Uint8Array;
   // 8k internal RAM
-  private wRAM: Uint8Array;
+  private wRAM!: Uint8Array;
   // shadow of working RAM, (8k - 512) bytes
-  private wRAMShadow: Uint8Array;
+  private wRAMShadow!: Uint8Array;
   // sprite attribute table
-  private OAM: Uint8Array;
+  private OAM!: Uint8Array;
   // 126 bytes high RAM
-  private hRAM: Uint8Array;
-  private initialized = false;
+  private hRAM!: Uint8Array;
   public constructor() {
     this.reset();
   }
@@ -104,18 +103,18 @@ class Memory {
     this.hRAM = new Uint8Array(0xfffe - 0xff80);
     // defaults to bank 1 at power on
     this.cart = {
-      ROM: null as Uint8Array,
-      ROMSize: toByte(0),
-      RAMSize: toByte(0),
-      MBCType: toByte(0),
-      ROMBanks: null as Array<Uint8Array>,
-      RAMBanks: null as Array<Uint8Array>,
+      ROM: new Uint8Array(),
+      ROMSize: 0,
+      RAMSize: 0,
+      MBCType: 0,
+      ROMBanks: [new Uint8Array()],
+      RAMBanks: [new Uint8Array()],
       R: {
         RAMEnabled: false,
-        currROMBank: toByte(1),
-        currRAMBank: toByte(1),
-        ROMRAMMixed: toByte(0),
-        bankingMode: toByte(0),
+        currROMBank: 1,
+        currRAMBank: 1,
+        ROMRAMMixed: 0,
+        bankingMode: 0,
       },
     };
     this.cart.R.currROMBank = toByte(1);
@@ -148,7 +147,7 @@ class Memory {
     } else if (address <= 0xdfff) {
       this.wRAM[address - 0xc000] = data;
     } else if (address <= 0xfdff) {
-      console.error("Can't write to prohibited address.");
+      console.error(`Can't write to prohibited address.`);
     } else if (address <= 0xfe9f) {
       this.OAM[address - 0xfe00] = data;
     } else if (address <= 0xff7f) {
@@ -194,9 +193,11 @@ class Memory {
       return this.OAM[address - 0xfe00];
     } else if (address <= 0xff7f) {
       // hardware I/O
+      return 0;
     } else if (address <= 0xffff) {
       return this.hRAM[address - 0xff80];
     }
+    throw new Error(`Tried to read out of bounds address: ${toHex(address)}.`);
   }
   /**
    * Return the word at the address
@@ -236,7 +237,7 @@ class Memory {
   /**
    * Loads parsed files into BIOS/ROM
    */
-  public load(bios: Uint8Array, rom: Uint8Array): void {
+  public load(bios: Uint8Array | null, rom: Uint8Array): void {
     this.cart.ROM = rom;
     this.cart.MBCType = this.readByte(0x147);
     this.cart.ROMSize = this.readByte(0x148);
@@ -249,7 +250,6 @@ class Memory {
 
     if (this.cart.MBCType === 0) {
       // MBC 0x00
-      this.initialized = true;
     } else {
       console.log(`No support for MBC ${toHex(this.cart.MBCType)}.`);
     }
