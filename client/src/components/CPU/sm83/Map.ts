@@ -15,6 +15,7 @@ import {
   toSigned,
 } from '../../Types';
 import CPU from '..';
+import Flag from '../Flag';
 
 /**
  * To double-check:
@@ -91,7 +92,6 @@ function XOR(operand: byte): void {
 }
 
 function CP(operand: byte): void {
-  // debugger;
   CPU.checkFullCarry8(upper(CPU.r.af), operand, true);
   CPU.checkHalfCarry(upper(CPU.r.af), operand, true);
   const result: byte = addByte(upper(CPU.r.af), -operand);
@@ -462,7 +462,6 @@ export const OpcodeMap: OpcodeList = {
 
   0x28: function (): boolean {
     const incr = toSigned(Memory.readByte(CPU.pc));
-    // increment pc if zero flag was set
     CPU.pc += 1;
     if (CPU.r.f.z) {
       CPU.pc = addWord(CPU.pc, incr);
@@ -488,11 +487,9 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0x2c: function (): void {
-    let operand: byte = 1;
-    CPU.checkHalfCarry(lower(CPU.r.hl), operand);
-    operand = addByte(operand, lower(CPU.r.hl));
-    setLower(CPU.r.hl, operand);
-    CPU.checkZFlag(operand);
+    CPU.checkHalfCarry(lower(CPU.r.hl), 1);
+    CPU.r.hl = addLower(CPU.r.hl, 1);
+    CPU.checkZFlag(lower(CPU.r.hl));
     CPU.r.f.n = 0;
   },
 
@@ -1269,7 +1266,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xd6: function (): void {
-    SUB(toByte(Memory.readByte(CPU.pc)));
+    SUB(Memory.readByte(CPU.pc));
     CPU.pc += 1;
   },
 
@@ -1400,7 +1397,14 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xf1: function (): void {
+    if (CPU.r.hl === 36864) debugger;
     CPU.r.af = POP();
+    const f: byte = lower(CPU.r.af);
+    const converted = new Flag(f);
+    CPU.r.f.z = !converted.z ? 1 : 0;
+    CPU.r.f.h = converted.h;
+    CPU.r.f.cy = converted.cy;
+    CPU.r.f.n = !converted.n ? 1 : 0;
   },
 
   0xf2: function (): void {
@@ -1465,9 +1469,6 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xfe: function (): void {
-    // if (CPU.sp === 57331) {
-    //   debugger;
-    // }
     CP(Memory.readByte(CPU.pc));
     CPU.pc += 1;
   },

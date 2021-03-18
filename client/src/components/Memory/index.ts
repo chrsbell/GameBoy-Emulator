@@ -136,9 +136,7 @@ class Memory {
       this.cart.ROM[address] = data;
     } else if (address <= 0x7fff) {
       // write to ROM bank of cartridge
-      if (this.cart.MBCType === 0) {
-        this.cart.ROM[address] = data;
-      }
+      this.cart.ROM[address] = data;
     } else if (address <= 0x9fff) {
       this.vRAM[address - 0x8000] = data;
     } else if (address <= 0xbfff) {

@@ -1,5 +1,5 @@
 import Memory from '../Memory';
-import {byte, word} from '../Types';
+import {byte, word, setLower} from '../Types';
 import Opcodes from './sm83';
 import Flag from './Flag';
 
@@ -109,13 +109,13 @@ class CPU {
    */
   public checkFullCarry16(op1: word, op2: word, subtraction?: boolean): void {
     if (subtraction) {
-      if (op1 + op2 > 65535) {
+      if (op1 - op2 < 0) {
         this.r.f.cy = 1;
       } else {
         this.r.f.cy = 0;
       }
     } else {
-      if (op1 - op2 < 0) {
+      if (op1 + op2 > 65535) {
         this.r.f.cy = 1;
       } else {
         this.r.f.cy = 0;
@@ -124,13 +124,13 @@ class CPU {
   }
   public checkFullCarry8(op1: byte, op2: byte, subtraction?: boolean): void {
     if (subtraction) {
-      if (op1 + op2 > 255) {
+      if (op1 - op2 < 0) {
         this.r.f.cy = 1;
       } else {
         this.r.f.cy = 0;
       }
     } else {
-      if (op1 - op2 < 0) {
+      if (op1 + op2 > 255) {
         this.r.f.cy = 1;
       } else {
         this.r.f.cy = 0;
@@ -195,7 +195,6 @@ class CPU {
       // not doing any execution of bios instructions for now
       // execute
       const numCycles: number = this.opcodes[opcode].call(this);
-      // this.pc = addWord(this.pc, 1);
       // check if finished bios execution
       if (!Memory.inBios) {
         console.log('exiting bios');
@@ -207,17 +206,13 @@ class CPU {
       // fetch
       const opcode: byte = Memory.readByte(this.pc);
       this.pc += 1;
-      // const oldbc = this.r.bc;
       // execute
       const numCycles: number = this.opcodes[opcode].call(this);
-      // const newbc = this.r.bc;
-      // if (oldbc !== newbc) {
-      //   debugger;
-      // }
       this.lastExecuted.push(opcode);
-      if (this.lastExecuted.length > 40) {
+      if (this.lastExecuted.length > 100) {
         this.lastExecuted.shift();
       }
+      this.r.af = setLower(this.r.af, this.r.f.value());
       return numCycles;
     }
   }

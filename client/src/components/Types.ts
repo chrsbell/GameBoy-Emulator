@@ -69,13 +69,13 @@ const addWord = (opOne: word, opTwo: word): word => toWord(opOne + opTwo);
  * @returns {word}
  */
 const addUpper = (value: word, operand: byte): word =>
-  toWord(lower(value) | setUpper(value, addByte(upper(value), operand)));
+  lower(value) | (addByte(upper(value), operand) << 8);
 
 /**
  * Adds the operand to the lower byte.
  */
 const addLower = (value: word, operand: byte): word =>
-  toWord(upper(value) | setLower(value, addByte(lower(value), operand)));
+  (upper(value) << 8) | addByte(lower(value), operand);
 
 /**
  * Formats the byte/word as a hex value

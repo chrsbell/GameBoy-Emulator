@@ -3,7 +3,7 @@ import {useEffect, useReducer, useRef} from 'react';
 import Emulator from '../Emulator';
 import GLRenderer from '../GLRenderer';
 import Wrapper from './Wrapper';
-import type {AppState, Action} from './types';
+import type {AppState, Action} from './AppTypes';
 
 const initialState: AppState = {
   canvas: null!,

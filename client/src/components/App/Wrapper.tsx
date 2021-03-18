@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {useRef, useEffect, useState, FormEvent} from 'react';
-import type {AppContext} from './types';
+import type {AppContext} from './AppTypes';
 import axios, {AxiosRequestConfig} from 'axios';
 import './Wrapper.css';
 

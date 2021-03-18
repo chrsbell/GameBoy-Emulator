@@ -1,5 +1,8 @@
 import * as path from 'path';
 import * as fs from 'fs';
+import * as util from 'util';
+import _ from 'lodash';
+const chalk = require('chalk');
 import CPU from '.';
 import Flag from './Flag';
 import Memory from '../Memory';
@@ -54,6 +57,15 @@ declare global {
   }
 }
 
+const logObject = (object: Object) => util.inspect(object, false, null, true);
+const consoleColors = [
+  chalk.red,
+  chalk.blue,
+  chalk.green,
+  chalk.cyan,
+  chalk.magenta,
+];
+
 expect.extend({
   toMatchRegister(
     received: byte | word,
@@ -69,23 +81,20 @@ expect.extend({
     } else {
       let logged: string | byte | word = received;
       if (register === 'F') {
-        logged = JSON.stringify(new Flag(received as byte), null, '\n');
+        logged = logObject(new Flag(received as byte));
       }
       return {
         message: () =>
-          `Expected register ${register} value ${logged} to equal ${expected} after instruction ${CPU.lastExecuted
-            .map(instr => toHex(instr))
-            .reverse()}, Expected CPU State: ${JSON.stringify(
-            {
-              ...expectedState,
-            },
-            null,
-            '\n'
-          )}, \nExpected Flag: ${JSON.stringify(
-            new Flag(expectedState.f),
-            null,
-            '\n'
-          )}`,
+          `Expected register ${chalk.green(register)} value ${chalk.red(
+            logged
+          )} to equal ${chalk.green(expected)} after instructions: \n\n${[
+            ...new Set([...CPU.lastExecuted]),
+          ]
+            .map(instr => _.sample(consoleColors)(toHex(instr)))
+            .reverse()
+            .join(' ')}\n\nExpected CPU State: ${logObject(
+            expectedState
+          )}\n\nExpected Flag: ${logObject(new Flag(expectedState.f))}`,
         pass: false,
       };
     }
@@ -140,14 +149,14 @@ describe('CPU', () => {
     CPU.reset();
   });
 
-  // it('executes an instruction', () => {
-  //   Memory.load(null, new Uint8Array([...Array(8192 * 2).fill(0)]));
-  //   const memReadSpy = jest.spyOn(Memory, 'readByte');
-  //   // to do: NOP instruction spy
-  //   const cycles = CPU.executeInstruction();
-  //   expect(memReadSpy).toHaveBeenCalledTimes(1);
-  //   expect(cycles).toEqual(4);
-  // });
+  xit('executes an instruction', () => {
+    Memory.load(null, new Uint8Array([...Array(8192 * 2).fill(0)]));
+    const memReadSpy = jest.spyOn(Memory, 'readByte');
+    // to do: NOP instruction spy
+    const cycles = CPU.executeInstruction();
+    expect(memReadSpy).toHaveBeenCalledTimes(1);
+    expect(cycles).toEqual(4);
+  });
 
   /**
    * Compares save states from a test ROM to the cpu's state
@@ -180,31 +189,31 @@ describe('CPU', () => {
     checkRegisters('03-op sp,hl.gb');
   });
 
-  test('Immediate instructions', () => {
+  xtest('Immediate instructions', () => {
     checkRegisters('04-op r,imm.gb');
   });
 
-  test('BC/DE/HL arithmetic', () => {
+  xtest('BC/DE/HL arithmetic', () => {
     checkRegisters('05-op rp.gb');
   });
 
-  test('LD r,r ($40-$7F)', () => {
+  xtest('LD r,r ($40-$7F)', () => {
     checkRegisters('06-ld r,r.gb');
   });
 
-  test('Miscellaneous instructions', () => {
+  xtest('Miscellaneous instructions', () => {
     checkRegisters('08-misc instrs.gb');
   });
 
-  test('Register instructions pt. 1', () => {
+  xtest('Register instructions pt. 1', () => {
     checkRegisters('09-op r,r.gb');
   });
 
-  test('Register instructions pt. 2', () => {
+  xtest('Register instructions pt. 2', () => {
     checkRegisters('10-bit ops.gb');
   });
 
-  test('HL/BC/DE instructions.', () => {
+  xtest('HL/BC/DE instructions.', () => {
     checkRegisters('11-op a,(hl).gb');
   });
 });
