@@ -15,7 +15,6 @@ import {
   toSigned,
 } from '../../Types';
 import CPU from '..';
-import Flag from '../Flag';
 
 /**
  * To double-check:
@@ -29,74 +28,169 @@ import Flag from '../Flag';
  * STOP
  */
 
+const setZFlag = (value: byte) => {
+  if (value) {
+    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) | (value << 7));
+  } else {
+    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) & (value << 7));
+  }
+};
+
+const setCYFlag = (value: byte) => {
+  if (value) {
+    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) | (value << 4));
+  } else {
+    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) & (value << 4));
+  }
+};
+
+const setHFlag = (value: byte) => {
+  if (value) {
+    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) | (value << 5));
+  } else {
+    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) & (value << 5));
+  }
+};
+
+const setNFlag = (value: byte) => {
+  if (value) {
+    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) | (value << 6));
+  } else {
+    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) & (value << 6));
+  }
+};
+
+/**
+ * Sets the Z flag if the register is 0, otherwise resets it.
+ */
+const checkZFlag = (reg: byte): void => {
+  if (!reg) {
+    setZFlag(1);
+  } else {
+    setZFlag(0);
+  }
+};
+
+/**
+ * Sets the half carry flag if a carry will be generated from bits 3 to 4 of the sum.
+ * For 16-bit operations, this function should be called on the upper bytes of the operands.
+ * Sources:
+ * https://robdor.com/2016/08/10/gameboy-emulator-half-carry-flag/
+ * https://stackoverflow.com/questions/8868396/game-boy-what-constitutes-a-half-carry
+ * https://gbdev.io/gb-opcodes/optables/
+ */
+const checkHalfCarry = (op1: byte, op2: byte, subtraction?: boolean): void => {
+  const carryBit = subtraction
+    ? ((op1 & 0xf) - (op2 & 0xf)) & 0x10
+    : ((op1 & 0xf) + (op2 & 0xf)) & 0x10;
+  setHFlag(carryBit === 0x10 ? 1 : 0);
+};
+/**
+ * Sets the carry flag if the sum will exceed the size of the data type.
+ */
+const checkFullCarry16 = (
+  op1: word,
+  op2: word,
+  subtraction?: boolean
+): void => {
+  if (subtraction) {
+    if (op1 - op2 < 0) {
+      setCYFlag(1);
+    } else {
+      setCYFlag(0);
+    }
+  } else {
+    if (op1 + op2 > 65535) {
+      setCYFlag(1);
+    } else {
+      setCYFlag(0);
+    }
+  }
+};
+const checkFullCarry8 = (op1: byte, op2: byte, subtraction?: boolean): void => {
+  if (subtraction) {
+    if (op1 - op2 < 0) {
+      setCYFlag(1);
+    } else {
+      setCYFlag(0);
+    }
+  } else {
+    if (op1 + op2 > 255) {
+      setCYFlag(1);
+    } else {
+      setCYFlag(0);
+    }
+  }
+};
+
 function ADD(operand: byte): void {
-  CPU.checkFullCarry8(upper(CPU.r.af), operand);
-  CPU.checkHalfCarry(upper(CPU.r.af), operand);
+  checkFullCarry8(upper(CPU.r.af), operand);
+  checkHalfCarry(upper(CPU.r.af), operand);
   CPU.r.af = addUpper(CPU.r.af, operand);
-  CPU.checkZFlag(upper(CPU.r.af));
-  CPU.r.f.n = 0;
+  checkZFlag(upper(CPU.r.af));
+  setNFlag(0);
 }
 
 function ADC(operand: byte): void {
-  operand = addByte(operand, CPU.r.f.cy);
-  CPU.checkFullCarry8(upper(CPU.r.af), operand);
-  CPU.checkHalfCarry(upper(CPU.r.af), operand);
+  operand = addByte(operand, flag.cy);
+  checkFullCarry8(upper(CPU.r.af), operand);
+  checkHalfCarry(upper(CPU.r.af), operand);
   CPU.r.af = addUpper(CPU.r.af, operand);
-  CPU.checkZFlag(upper(CPU.r.af));
-  CPU.r.f.n = 0;
+  checkZFlag(upper(CPU.r.af));
+  setNFlag(0);
 }
 
 function SUB(operand: byte): void {
-  CPU.checkFullCarry8(upper(CPU.r.af), operand, true);
-  CPU.checkHalfCarry(upper(CPU.r.af), operand, true);
+  checkFullCarry8(upper(CPU.r.af), operand, true);
+  checkHalfCarry(upper(CPU.r.af), operand, true);
   CPU.r.af = toWord(addUpper(CPU.r.af, -operand));
-  CPU.checkZFlag(upper(CPU.r.af));
-  CPU.r.f.n = 1;
+  checkZFlag(upper(CPU.r.af));
+  setNFlag(1);
 }
 
 function SBC(operand: byte): void {
-  const carry = CPU.r.f.cy ? -1 : 0;
+  const carry = flag.cy ? -1 : 0;
   operand = addByte(operand, carry);
-  CPU.checkFullCarry8(upper(CPU.r.af), operand, true);
-  CPU.checkHalfCarry(upper(CPU.r.af), operand, true);
+  checkFullCarry8(upper(CPU.r.af), operand, true);
+  checkHalfCarry(upper(CPU.r.af), operand, true);
   CPU.r.af = toWord(addUpper(CPU.r.af, -operand));
-  CPU.checkZFlag(upper(CPU.r.af));
-  CPU.r.f.n = 1;
+  checkZFlag(upper(CPU.r.af));
+  setNFlag(1);
 }
 
 function OR(operand: byte): void {
   const result = upper(CPU.r.af) | operand;
   CPU.r.af = setUpper(CPU.r.af, toByte(result));
-  CPU.checkZFlag(upper(CPU.r.af));
-  CPU.r.f.n = 0;
-  CPU.r.f.h = 0;
-  CPU.r.f.cy = 0;
+  checkZFlag(upper(CPU.r.af));
+  setNFlag(0);
+  setHFlag(0);
+  setCYFlag(0);
 }
 
 function AND(operand: byte): void {
   const result = upper(CPU.r.af) & operand;
   CPU.r.af = setUpper(CPU.r.af, toByte(result));
-  CPU.checkZFlag(upper(CPU.r.af));
-  CPU.r.f.n = 0;
-  CPU.r.f.h = 1;
-  CPU.r.f.cy = 0;
+  checkZFlag(upper(CPU.r.af));
+  setNFlag(0);
+  setHFlag(1);
+  setCYFlag(0);
 }
 
 function XOR(operand: byte): void {
   const result = upper(CPU.r.af) ^ operand;
   CPU.r.af = setUpper(CPU.r.af, toByte(result));
-  CPU.checkZFlag(upper(CPU.r.af));
-  CPU.r.f.n = 0;
-  CPU.r.f.h = 0;
-  CPU.r.f.cy = 0;
+  checkZFlag(upper(CPU.r.af));
+  setNFlag(0);
+  setHFlag(0);
+  setCYFlag(0);
 }
 
 function CP(operand: byte): void {
-  CPU.checkFullCarry8(upper(CPU.r.af), operand, true);
-  CPU.checkHalfCarry(upper(CPU.r.af), operand, true);
+  checkFullCarry8(upper(CPU.r.af), operand, true);
+  checkHalfCarry(upper(CPU.r.af), operand, true);
   const result: byte = addByte(upper(CPU.r.af), -operand);
-  CPU.r.f.n = 1;
-  CPU.checkZFlag(result);
+  setNFlag(1);
+  checkZFlag(result);
 }
 
 function CALL(flag: boolean): boolean {
@@ -169,20 +263,20 @@ export const OpcodeMap: OpcodeList = {
     // convert operand to unsigned
     let operand: byte = 1;
     // check for half carry on affected byte only
-    CPU.checkHalfCarry(upper(CPU.r.bc), operand);
+    checkHalfCarry(upper(CPU.r.bc), operand);
     // perform addition
     operand = addByte(operand, upper(CPU.r.bc));
     CPU.r.bc = setUpper(CPU.r.bc, operand);
 
-    CPU.checkZFlag(upper(CPU.r.bc));
-    CPU.r.f.n = 0;
+    checkZFlag(upper(CPU.r.bc));
+    setNFlag(0);
   },
 
   0x05: function (): void {
-    CPU.checkHalfCarry(upper(CPU.r.bc), 1, true);
+    checkHalfCarry(upper(CPU.r.bc), 1, true);
     CPU.r.bc = addUpper(CPU.r.bc, toByte(-1));
-    CPU.checkZFlag(upper(CPU.r.bc));
-    CPU.r.f.n = 1;
+    checkZFlag(upper(CPU.r.bc));
+    setNFlag(1);
   },
 
   0x06: function (): void {
@@ -193,14 +287,14 @@ export const OpcodeMap: OpcodeList = {
 
   0x07: function (): void {
     // check carry flag
-    CPU.r.f.cy = upper(CPU.r.af) >> 7;
+    flag.cy = upper(CPU.r.af) >> 7;
     // left shift
     const shifted: byte = upper(CPU.r.af) << 1;
     CPU.r.af = setUpper(CPU.r.af, toByte(shifted | (shifted >> 8)));
     // flag resets
-    CPU.r.f.n = 0;
-    CPU.r.f.h = 0;
-    CPU.r.f.z = 0;
+    setNFlag(0);
+    setHFlag(0);
+    flag.z = 0;
   },
 
   0x08: function (): void {
@@ -208,10 +302,10 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0x09: function (): void {
-    CPU.checkFullCarry16(CPU.r.hl, CPU.r.bc);
-    CPU.checkHalfCarry(upper(CPU.r.hl), upper(CPU.r.bc));
+    checkFullCarry16(CPU.r.hl, CPU.r.bc);
+    checkHalfCarry(upper(CPU.r.hl), upper(CPU.r.bc));
     CPU.r.hl = addWord(CPU.r.hl, CPU.r.bc);
-    CPU.r.f.n = 0;
+    setNFlag(0);
   },
 
   0x0a: function (): void {
@@ -226,21 +320,21 @@ export const OpcodeMap: OpcodeList = {
     // convert operand to unsigned
     let operand: byte = 1;
     // check for half carry on affected byte only
-    CPU.checkHalfCarry(lower(CPU.r.bc), operand);
+    checkHalfCarry(lower(CPU.r.bc), operand);
     // perform addition
     operand = addByte(operand, lower(CPU.r.bc));
     CPU.r.bc = setLower(CPU.r.bc, operand);
 
-    CPU.checkZFlag(lower(CPU.r.bc));
-    CPU.r.f.n = 0;
+    checkZFlag(lower(CPU.r.bc));
+    setNFlag(0);
   },
 
   0x0d: function (): void {
     // convert operand to unsigned
-    CPU.checkHalfCarry(lower(CPU.r.bc), 1, true);
+    checkHalfCarry(lower(CPU.r.bc), 1, true);
     CPU.r.bc = addLower(CPU.r.bc, toByte(-1));
-    CPU.checkZFlag(lower(CPU.r.bc));
-    CPU.r.f.n = 1;
+    checkZFlag(lower(CPU.r.bc));
+    setNFlag(1);
   },
 
   0x0e: function (): void {
@@ -252,14 +346,14 @@ export const OpcodeMap: OpcodeList = {
   0x0f: function (): void {
     // check carry flag
     const bitZero = upper(CPU.r.af) & 1;
-    CPU.r.f.cy = bitZero;
+    flag.cy = bitZero;
     // right shift
     const shifted: byte = upper(CPU.r.af) >> 1;
     CPU.r.af = setUpper(CPU.r.af, toByte(shifted | (bitZero << 7)));
     // flag resets
-    CPU.r.f.n = 0;
-    CPU.r.f.h = 0;
-    CPU.r.f.z = 0;
+    setNFlag(0);
+    setHFlag(0);
+    flag.z = 0;
   },
 
   0x10: function (): void {
@@ -284,21 +378,21 @@ export const OpcodeMap: OpcodeList = {
     // convert operand to unsigned
     let operand: byte = 1;
     // check for half carry on affected byte only
-    CPU.checkHalfCarry(upper(CPU.r.de), operand);
+    checkHalfCarry(upper(CPU.r.de), operand);
     // perform addition
     operand = addByte(operand, upper(CPU.r.de));
     CPU.r.de = setUpper(CPU.r.de, operand);
 
-    CPU.checkZFlag(upper(CPU.r.de));
-    CPU.r.f.n = 0;
+    checkZFlag(upper(CPU.r.de));
+    setNFlag(0);
   },
 
   0x15: function (): void {
     // check for half carry on affected byte only
-    CPU.checkHalfCarry(upper(CPU.r.de), 1, true);
+    checkHalfCarry(upper(CPU.r.de), 1, true);
     CPU.r.de = addUpper(CPU.r.de, toByte(-1));
-    CPU.checkZFlag(upper(CPU.r.de));
-    CPU.r.f.n = 1;
+    checkZFlag(upper(CPU.r.de));
+    setNFlag(1);
   },
 
   0x16: function (): void {
@@ -309,16 +403,16 @@ export const OpcodeMap: OpcodeList = {
   0x17: function (): void {
     // need to rotate left through the carry flag
     // get the old carry value
-    const oldCY = CPU.r.f.cy;
+    const oldCY = flag.cy;
     // set the carry flag to the 7th bit of A
-    CPU.r.f.cy = upper(CPU.r.af) >> 7;
+    flag.cy = upper(CPU.r.af) >> 7;
     // rotate left
     const shifted = upper(CPU.r.af) << 1;
     // combine old flag and shifted, set to A
     CPU.r.af = setUpper(CPU.r.af, toByte(shifted | oldCY));
-    CPU.r.f.h = 0;
-    CPU.r.f.n = 0;
-    CPU.r.f.z = 0;
+    setHFlag(0);
+    setNFlag(0);
+    flag.z = 0;
   },
 
   0x18: function (): void {
@@ -327,10 +421,10 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0x19: function (): void {
-    CPU.checkFullCarry16(CPU.r.hl, CPU.r.de);
-    CPU.checkHalfCarry(upper(CPU.r.hl), upper(CPU.r.de));
+    checkFullCarry16(CPU.r.hl, CPU.r.de);
+    checkHalfCarry(upper(CPU.r.hl), upper(CPU.r.de));
     CPU.r.hl = addWord(CPU.r.hl, CPU.r.de);
-    CPU.r.f.n = 0;
+    setNFlag(0);
   },
 
   0x1a: function (): void {
@@ -345,21 +439,21 @@ export const OpcodeMap: OpcodeList = {
     // convert operand to unsigned
     let operand: byte = 1;
     // check for half carry on affected byte only
-    CPU.checkHalfCarry(lower(CPU.r.de), operand);
+    checkHalfCarry(lower(CPU.r.de), operand);
     // perform addition
     operand = addByte(operand, lower(CPU.r.de));
     CPU.r.de = setLower(CPU.r.de, operand);
 
-    CPU.checkZFlag(lower(CPU.r.de));
-    CPU.r.f.n = 0;
+    checkZFlag(lower(CPU.r.de));
+    setNFlag(0);
   },
 
   0x1d: function (): void {
     // check for half carry on affected byte only
-    CPU.checkHalfCarry(lower(CPU.r.de), 1, true);
+    checkHalfCarry(lower(CPU.r.de), 1, true);
     CPU.r.de = addLower(CPU.r.de, toByte(-1));
-    CPU.checkZFlag(lower(CPU.r.de));
-    CPU.r.f.n = 1;
+    checkZFlag(lower(CPU.r.de));
+    setNFlag(1);
   },
 
   0x1e: function (): void {
@@ -370,22 +464,22 @@ export const OpcodeMap: OpcodeList = {
   0x1f: function (): void {
     // rotate right through the carry flag
     // get the old carry value
-    const oldCY = CPU.r.f.cy;
+    const oldCY = flag.cy;
     // set the carry flag to the 0th bit of A
-    CPU.r.f.cy = upper(CPU.r.af) & 1;
+    flag.cy = upper(CPU.r.af) & 1;
     // rotate right
     const shifted = upper(CPU.r.af) >> 1;
     // combine old flag and shifted, set to A
     CPU.r.af = setUpper(CPU.r.af, toByte(shifted | (oldCY << 7)));
-    CPU.r.f.h = 0;
-    CPU.r.f.n = 0;
-    CPU.r.f.z = 0;
+    setHFlag(0);
+    setNFlag(0);
+    flag.z = 0;
   },
 
   0x20: function (): boolean {
     const incr = toSigned(Memory.readByte(CPU.pc));
     CPU.pc += 1;
-    if (!CPU.r.f.z) {
+    if (!flag.z) {
       // increment pc if zero flag was reset
       CPU.pc = addWord(CPU.pc, incr);
       return true;
@@ -411,20 +505,20 @@ export const OpcodeMap: OpcodeList = {
     // convert operand to unsigned
     let operand: byte = 1;
     // check for half carry on affected byte only
-    CPU.checkHalfCarry(upper(CPU.r.hl), operand);
+    checkHalfCarry(upper(CPU.r.hl), operand);
     // perform addition
     operand = addByte(operand, upper(CPU.r.hl));
     CPU.r.hl = setUpper(CPU.r.hl, operand);
 
-    CPU.checkZFlag(operand);
-    CPU.r.f.n = 0;
+    checkZFlag(operand);
+    setNFlag(0);
   },
 
   0x25: function (): void {
-    CPU.checkHalfCarry(upper(CPU.r.hl), 1, true);
+    checkHalfCarry(upper(CPU.r.hl), 1, true);
     CPU.r.hl = addUpper(CPU.r.hl, toByte(-1));
-    CPU.checkZFlag(upper(CPU.r.hl));
-    CPU.r.f.n = 1;
+    checkZFlag(upper(CPU.r.hl));
+    setNFlag(1);
   },
 
   0x26: function (): void {
@@ -437,33 +531,33 @@ export const OpcodeMap: OpcodeList = {
    */
   0x27: function (): void {
     // note: assumes a is a uint8_t and wraps from 0xff to 0
-    if (!CPU.r.f.n) {
+    if (!flag.n) {
       // after an addition, adjust if (half-)carry occurred or if result is out of bounds
-      if (CPU.r.f.cy || upper(CPU.r.af) > 0x99) {
+      if (flag.cy || upper(CPU.r.af) > 0x99) {
         CPU.r.af = addUpper(CPU.r.af, 0x60);
-        CPU.r.f.cy = 1;
+        flag.cy = 1;
       }
-      if (CPU.r.f.h || (upper(CPU.r.af) & 0x0f) > 0x09) {
+      if (flag.h || (upper(CPU.r.af) & 0x0f) > 0x09) {
         CPU.r.af = addUpper(CPU.r.af, 0x6);
       }
     } else {
       // after a subtraction, only adjust if (half-)carry occurred
-      if (CPU.r.f.cy) {
+      if (flag.cy) {
         CPU.r.af = addUpper(CPU.r.af, -0x60);
       }
-      if (CPU.r.f.h) {
+      if (flag.h) {
         CPU.r.af = addUpper(CPU.r.af, -0x6);
       }
     }
     // these flags are always updated
-    CPU.checkZFlag(upper(CPU.r.af));
-    CPU.r.f.h = 0; // h flag is always cleared
+    checkZFlag(upper(CPU.r.af));
+    setHFlag(0); // h flag is always cleared
   },
 
   0x28: function (): boolean {
     const incr = toSigned(Memory.readByte(CPU.pc));
     CPU.pc += 1;
-    if (CPU.r.f.z) {
+    if (flag.z) {
       CPU.pc = addWord(CPU.pc, incr);
       return true;
     }
@@ -471,10 +565,10 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0x29: function (): void {
-    CPU.checkFullCarry16(CPU.r.hl, CPU.r.hl);
-    CPU.checkHalfCarry(upper(CPU.r.hl), upper(CPU.r.hl));
+    checkFullCarry16(CPU.r.hl, CPU.r.hl);
+    checkHalfCarry(upper(CPU.r.hl), upper(CPU.r.hl));
     CPU.r.hl = addWord(CPU.r.hl, CPU.r.hl);
-    CPU.r.f.n = 0;
+    setNFlag(0);
   },
 
   0x2a: function (): void {
@@ -487,17 +581,17 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0x2c: function (): void {
-    CPU.checkHalfCarry(lower(CPU.r.hl), 1);
+    checkHalfCarry(lower(CPU.r.hl), 1);
     CPU.r.hl = addLower(CPU.r.hl, 1);
-    CPU.checkZFlag(lower(CPU.r.hl));
-    CPU.r.f.n = 0;
+    checkZFlag(lower(CPU.r.hl));
+    setNFlag(0);
   },
 
   0x2d: function (): void {
-    CPU.checkHalfCarry(lower(CPU.r.hl), 1, true);
+    checkHalfCarry(lower(CPU.r.hl), 1, true);
     CPU.r.hl = addLower(CPU.r.hl, toByte(-1));
-    CPU.checkZFlag(lower(CPU.r.hl));
-    CPU.r.f.n = 1;
+    checkZFlag(lower(CPU.r.hl));
+    setNFlag(1);
   },
 
   0x2e: function (): void {
@@ -507,13 +601,13 @@ export const OpcodeMap: OpcodeList = {
 
   0x2f: function (): void {
     CPU.r.af = setUpper(CPU.r.af, toByte(~upper(CPU.r.af)));
-    CPU.r.f.n = 1;
-    CPU.r.f.h = 1;
+    setNFlag(1);
+    setHFlag(1);
   },
 
   0x30: function (): boolean {
     const incr = toSigned(Memory.readByte(CPU.pc));
-    if (!CPU.r.f.cy) {
+    if (!flag.cy) {
       CPU.pc = addWord(CPU.pc, incr);
       return true;
     }
@@ -539,23 +633,23 @@ export const OpcodeMap: OpcodeList = {
     let operand: byte = 1;
     const newVal: byte = toByte(Memory.readByte(CPU.r.hl));
     // check for half carry on affected byte only
-    CPU.checkHalfCarry(newVal, operand);
+    checkHalfCarry(newVal, operand);
     operand = addByte(operand, newVal);
     Memory.writeByte(CPU.r.hl, operand);
 
-    CPU.checkZFlag(operand);
-    CPU.r.f.n = 0;
+    checkZFlag(operand);
+    setNFlag(0);
   },
 
   0x35: function (): void {
     // convert operand to unsigned
     let newVal: byte = toByte(Memory.readByte(CPU.r.hl));
     // check for half carry on affected byte only
-    CPU.checkHalfCarry(newVal, 1, true);
+    checkHalfCarry(newVal, 1, true);
     newVal = addByte(newVal, toByte(-1));
     Memory.writeByte(CPU.r.hl, newVal);
-    CPU.checkZFlag(newVal);
-    CPU.r.f.n = 1;
+    checkZFlag(newVal);
+    setNFlag(1);
   },
 
   0x36: function (): void {
@@ -563,15 +657,15 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0x37: function (): void {
-    CPU.r.f.cy = 1;
-    CPU.r.f.n = 0;
-    CPU.r.f.h = 0;
+    flag.cy = 1;
+    setNFlag(0);
+    setHFlag(0);
   },
 
   0x38: function (): boolean {
     const incr = toSigned(Memory.readByte(CPU.pc));
     CPU.pc += 1;
-    if (CPU.r.f.cy) {
+    if (flag.cy) {
       CPU.pc = addWord(CPU.pc, incr);
       return true;
     }
@@ -579,10 +673,10 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0x39: function (): void {
-    CPU.checkFullCarry16(CPU.r.hl, CPU.sp);
-    CPU.checkHalfCarry(upper(CPU.r.hl), upper(CPU.sp));
+    checkFullCarry16(CPU.r.hl, CPU.sp);
+    checkHalfCarry(upper(CPU.r.hl), upper(CPU.sp));
     CPU.r.hl = addWord(CPU.r.hl, CPU.sp);
-    CPU.r.f.n = 0;
+    setNFlag(0);
   },
 
   0x3a: function (): void {
@@ -596,18 +690,18 @@ export const OpcodeMap: OpcodeList = {
 
   0x3c: function (): void {
     let operand: byte = 1;
-    CPU.checkHalfCarry(upper(CPU.r.af), operand);
+    checkHalfCarry(upper(CPU.r.af), operand);
     operand = addByte(operand, upper(CPU.r.af));
     CPU.r.af = setUpper(CPU.r.af, operand);
-    CPU.checkZFlag(operand);
-    CPU.r.f.n = 0;
+    checkZFlag(operand);
+    setNFlag(0);
   },
 
   0x3d: function (): void {
-    CPU.checkHalfCarry(upper(CPU.r.af), 1, true);
+    checkHalfCarry(upper(CPU.r.af), 1, true);
     CPU.r.af = addUpper(CPU.r.af, toByte(-1));
-    CPU.checkZFlag(upper(CPU.r.af));
-    CPU.r.f.n = 1;
+    checkZFlag(upper(CPU.r.af));
+    setNFlag(1);
   },
 
   0x3e: function (): void {
@@ -616,13 +710,13 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0x3f: function (): void {
-    if (CPU.r.f.cy) {
-      CPU.r.f.cy = 0;
+    if (flag.cy) {
+      setCYFlag(0);
     } else {
-      CPU.r.f.cy = 1;
+      flag.cy = 1;
     }
-    CPU.r.f.n = 0;
-    CPU.r.f.h = 0;
+    setNFlag(0);
+    setHFlag(0);
   },
 
   0x40: function (): void {
@@ -1138,7 +1232,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xc0: function (): boolean {
-    return RET(!CPU.r.f.z);
+    return RET(!flag.z);
   },
 
   0xc1: function (): void {
@@ -1146,7 +1240,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xc2: function (): boolean {
-    if (Jpcc(!CPU.r.f.z)) {
+    if (Jpcc(!flag.z)) {
       return true;
     }
     CPU.pc += 2;
@@ -1158,7 +1252,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xc4: function (): boolean {
-    if (CALL(!CPU.r.f.z)) {
+    if (CALL(!flag.z)) {
       return true;
     }
     CPU.pc += 2;
@@ -1171,12 +1265,12 @@ export const OpcodeMap: OpcodeList = {
 
   0xc6: function (): void {
     const value = toByte(Memory.readByte(CPU.pc));
-    CPU.checkFullCarry8(upper(CPU.r.af), value);
-    CPU.checkHalfCarry(upper(CPU.r.af), value);
+    checkFullCarry8(upper(CPU.r.af), value);
+    checkHalfCarry(upper(CPU.r.af), value);
     CPU.r.af = addUpper(CPU.r.af, value);
-    CPU.checkZFlag(upper(CPU.r.af));
+    checkZFlag(upper(CPU.r.af));
     CPU.pc += 1;
-    CPU.r.f.n = 0;
+    setNFlag(0);
   },
 
   0xc7: function (): void {
@@ -1184,7 +1278,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xc8: function (): boolean {
-    if (CPU.r.f.z) {
+    if (flag.z) {
       const address: word = Memory.readWord(CPU.sp);
       CPU.pc = address;
       CPU.sp = addWord(CPU.sp, 2);
@@ -1198,7 +1292,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xca: function (): boolean {
-    if (Jpcc(CPU.r.f.z === 0)) {
+    if (Jpcc(flag.z === 0)) {
       return true;
     }
     CPU.pc += 2;
@@ -1213,7 +1307,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xcc: function (): boolean {
-    if (CALL(CPU.r.f.z === 1)) {
+    if (CALL(flag.z === 1)) {
       return true;
     }
     CPU.pc += 2;
@@ -1234,7 +1328,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xd0: function (): boolean {
-    return RET(!CPU.r.f.cy);
+    return RET(!flag.cy);
   },
 
   0xd1: function (): void {
@@ -1242,7 +1336,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xd2: function (): boolean {
-    if (Jpcc(CPU.r.f.z === 0)) {
+    if (Jpcc(flag.z === 0)) {
       return true;
     }
     CPU.pc += 2;
@@ -1254,7 +1348,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xd4: function (): boolean {
-    if (CALL(!CPU.r.f.cy)) {
+    if (CALL(!flag.cy)) {
       return true;
     }
     CPU.pc += 2;
@@ -1275,7 +1369,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xd8: function (): boolean {
-    return RET(CPU.r.f.cy === 1);
+    return RET(flag.cy === 1);
   },
 
   0xd9: function (): void {
@@ -1284,7 +1378,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xda: function (): boolean {
-    if (Jpcc(CPU.r.f.cy === 0)) {
+    if (Jpcc(flag.cy === 0)) {
       return true;
     }
     CPU.pc += 2;
@@ -1296,7 +1390,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xdc: function (): boolean {
-    if (CALL(CPU.r.f.cy === 1)) {
+    if (CALL(flag.cy === 1)) {
       return true;
     }
     CPU.pc += 2;
@@ -1356,8 +1450,8 @@ export const OpcodeMap: OpcodeList = {
     CPU.checkHalfCarry(upper(CPU.sp), upper(operand));
     CPU.sp = addWord(CPU.sp, operand);
     CPU.pc += 1;
-    CPU.r.f.z = 0;
-    CPU.r.f.n = 0;
+    setZFlag(0);
+    setNFlag(0);
   },
 
   0xe9: function (): void {
@@ -1399,12 +1493,12 @@ export const OpcodeMap: OpcodeList = {
   0xf1: function (): void {
     if (CPU.r.hl === 36864) debugger;
     CPU.r.af = POP();
-    const f: byte = lower(CPU.r.af);
-    const converted = new Flag(f);
-    CPU.r.f.z = !converted.z ? 1 : 0;
-    CPU.r.f.h = converted.h;
-    CPU.r.f.cy = converted.cy;
-    CPU.r.f.n = !converted.n ? 1 : 0;
+    // const f: byte = lower(CPU.r.af);
+    // const converted = new flag(f);
+    // flag.z = !converted.z ? 1 : 0;
+    // flag.h = converted.h;
+    // flag.cy = converted.cy;
+    // flag.n = !converted.n ? 1 : 0;
   },
 
   0xf2: function (): void {
@@ -1435,13 +1529,13 @@ export const OpcodeMap: OpcodeList = {
 
   0xf8: function (): void {
     let incr = toWord(toSigned(Memory.readByte(CPU.pc)));
-    CPU.checkHalfCarry(upper(incr), upper(CPU.sp));
-    CPU.checkFullCarry16(incr, CPU.sp);
+    checkHalfCarry(upper(incr), upper(CPU.sp));
+    checkFullCarry16(incr, CPU.sp);
     CPU.pc += 1;
     incr = addWord(incr, CPU.sp);
     CPU.r.hl = incr;
-    CPU.r.f.z = 0;
-    CPU.r.f.n = 0;
+    flag.z = 0;
+    setNFlag(0);
   },
 
   0xf9: function (): void {
@@ -1479,81 +1573,81 @@ export const OpcodeMap: OpcodeList = {
 };
 
 function RLCn(reg: byte): byte {
-  CPU.r.f.cy = reg >> 7;
+  flag.cy = reg >> 7;
   const shifted: byte = reg << 1;
   const result: byte = toByte(shifted | (shifted >> 8));
-  CPU.checkZFlag(result);
-  CPU.r.f.n = 0;
-  CPU.r.f.h = 0;
+  checkZFlag(result);
+  setNFlag(0);
+  setHFlag(0);
   return result;
 }
 
 function RLn(reg: byte): byte {
-  const oldCY = CPU.r.f.cy;
-  CPU.r.f.cy = reg >> 7;
+  const oldCY = flag.cy;
+  flag.cy = reg >> 7;
   const shifted = reg << 1;
   const result = toByte(shifted | oldCY);
-  CPU.checkZFlag(result);
-  CPU.r.f.h = 0;
-  CPU.r.f.n = 0;
+  checkZFlag(result);
+  setHFlag(0);
+  setNFlag(0);
   return result;
 }
 
 function RRCn(reg: byte): byte {
   const bitZero = reg & 1;
-  CPU.r.f.cy = bitZero;
+  flag.cy = bitZero;
   const shifted: byte = reg >> 1;
   const result: byte = toByte(shifted | (bitZero << 7));
-  CPU.checkZFlag(result);
-  CPU.r.f.n = 0;
-  CPU.r.f.h = 0;
+  checkZFlag(result);
+  setNFlag(0);
+  setHFlag(0);
   return result;
 }
 
 function RRn(reg: byte): byte {
-  const oldCY = CPU.r.f.cy;
-  CPU.r.f.cy = reg & 1;
+  const oldCY = flag.cy;
+  flag.cy = reg & 1;
   const shifted = reg >> 1;
   const result: byte = toByte(shifted | (oldCY << 7));
-  CPU.checkZFlag(result);
-  CPU.r.f.h = 0;
-  CPU.r.f.n = 0;
+  checkZFlag(result);
+  setHFlag(0);
+  setNFlag(0);
   return result;
 }
 
 function SLAn(reg: byte): byte {
-  CPU.r.f.cy = reg >> 7;
+  flag.cy = reg >> 7;
   const result = toByte(reg << 1);
-  CPU.checkZFlag(result);
-  CPU.r.f.h = 0;
-  CPU.r.f.n = 0;
+  checkZFlag(result);
+  setHFlag(0);
+  setNFlag(0);
   return result;
 }
 
 function SRAn(reg: byte): byte {
-  CPU.r.f.cy = reg & 1;
+  flag.cy = reg & 1;
   // shift to right, but keep the most sig bit
   const msb: byte = reg >> 7;
   const result: byte = (reg >> 1) | msb;
-  CPU.checkZFlag(result);
-  CPU.r.f.h = 0;
-  CPU.r.f.n = 0;
+  checkZFlag(result);
+  setHFlag(0);
+  setNFlag(0);
   return result;
 }
 
 function SRLn(reg: byte): byte {
-  CPU.r.f.cy = reg & 1;
+  flag.cy = reg & 1;
   const result: byte = reg >> 1;
-  CPU.checkZFlag(result);
-  CPU.r.f.h = 0;
-  CPU.r.f.n = 0;
+  checkZFlag(result);
+  setHFlag(0);
+  setNFlag(0);
   return result;
 }
 
 function BIT(bit: number, reg: byte): void {
-  CPU.checkZFlag((reg >> bit) & 1);
-  CPU.r.f.n = 0;
-  CPU.r.f.h = 1;
+  checkZFlag((reg >> bit) & 1);
+  setNFlag(0);
+  setHFlag(1);
 }
 
 function RES0(reg: byte): byte {
@@ -1596,7 +1690,7 @@ function SWAP(reg: byte) {
   const upper = reg >> 4;
   const lower = reg & 0xf;
   const result = (lower << 4) | upper;
-  CPU.checkZFlag(result);
+  checkZFlag(result);
   return result;
 }
 

@@ -4,7 +4,6 @@ import * as util from 'util';
 import _ from 'lodash';
 const chalk = require('chalk');
 import CPU from '.';
-import Flag from './Flag';
 import Memory from '../Memory';
 import {byte, word, upper, lower, toHex} from '../Types';
 
@@ -79,10 +78,10 @@ expect.extend({
         pass: true,
       };
     } else {
-      let logged: string | byte | word = received;
-      if (register === 'F') {
-        logged = logObject(new Flag(received as byte));
-      }
+      const logged: string | byte | word = received;
+      // if (register === 'F') {
+      //   logged = logObject(new Flag(received as byte));
+      // }
       return {
         message: () =>
           `Expected register ${chalk.green(register)} value ${chalk.red(
@@ -94,7 +93,7 @@ expect.extend({
             .reverse()
             .join(' ')}\n\nExpected CPU State: ${logObject(
             expectedState
-          )}\n\nExpected Flag: ${logObject(new Flag(expectedState.f))}`,
+          )}\n\nExpected Flag: ${logObject(expectedState.f)}`,
         pass: false,
       };
     }
@@ -181,7 +180,7 @@ describe('CPU', () => {
       expect(lower(CPU.r.bc)).toMatchRegister(expected.c, 'C', expected);
       expect(upper(CPU.r.de)).toMatchRegister(expected.d, 'D', expected);
       expect(lower(CPU.r.de)).toMatchRegister(expected.e, 'E', expected);
-      expect(CPU.r.f.value()).toMatchRegister(expected.f, 'F', expected);
+      expect(lower(CPU.r.af)).toMatchRegister(expected.f, 'F', expected);
     }
   };
 
