@@ -87,4 +87,4 @@ class Flag {
   }
 }
 
-export default new Flag();
+export default Flag;

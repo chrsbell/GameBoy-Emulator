@@ -5,7 +5,8 @@ import _ from 'lodash';
 const chalk = require('chalk');
 import CPU from '.';
 import Memory from '../Memory';
-import {byte, word, upper, lower, toHex} from '../Types';
+import {byte, word, upper, lower, setLower, toHex} from '../Types';
+import Flag from './Flag';
 
 const ROM_FOLDER = path.join(
   __dirname,
@@ -172,6 +173,7 @@ describe('CPU', () => {
       CPU.executeInstruction();
       [expected, fileIndex] = readSaveState(saveState, fileIndex);
       // Assert
+
       expect(CPU.pc).toMatchRegister(expected.pc, 'PC', expected);
       expect(CPU.sp).toMatchRegister(expected.sp, 'SP', expected);
       expect(CPU.r.hl).toMatchRegister(expected.hl, 'HL', expected);

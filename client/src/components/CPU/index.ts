@@ -1,5 +1,5 @@
 import Memory from '../Memory';
-import {byte, word, setLower} from '../Types';
+import {byte, word} from '../Types';
 import Opcodes from './sm83';
 
 interface Registers {
@@ -62,6 +62,7 @@ class CPU {
   public constructor() {
     this.reset();
   }
+
   /**
    * Resets the CPU.
    */

@@ -32,7 +32,7 @@ const setZFlag = (value: byte) => {
   if (value) {
     CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) | (value << 7));
   } else {
-    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) & (value << 7));
+    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) & ~(1 << 7));
   }
 };
 
@@ -40,26 +40,31 @@ const setCYFlag = (value: byte) => {
   if (value) {
     CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) | (value << 4));
   } else {
-    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) & (value << 4));
+    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) & ~(1 << 4));
   }
 };
 
 const setHFlag = (value: byte) => {
-  if (value) {
-    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) | (value << 5));
+  if (CPU.pc === 521 && CPU.r.hl === 16400) debugger;
+  if (value === 1) {
+    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) | (1 << 5));
   } else {
-    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) & (value << 5));
+    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) & ~(1 << 5));
   }
 };
 
 const setNFlag = (value: byte) => {
   if (value) {
-    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) | (value << 6));
+    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) | (1 << 6));
   } else {
-    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) & (value << 6));
+    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) & ~(1 << 6));
   }
 };
 
+const getZFlag = (): number => (lower(CPU.r.af) >> 7) & 1;
+const getCYFlag = (): number => (lower(CPU.r.af) >> 4) & 1;
+const getHFlag = (): number => (lower(CPU.r.af) >> 5) & 1;
+const getNFlag = (): number => (lower(CPU.r.af) >> 6) & 1;
 /**
  * Sets the Z flag if the register is 0, otherwise resets it.
  */
@@ -132,7 +137,7 @@ function ADD(operand: byte): void {
 }
 
 function ADC(operand: byte): void {
-  operand = addByte(operand, flag.cy);
+  operand = addByte(operand, getCYFlag());
   checkFullCarry8(upper(CPU.r.af), operand);
   checkHalfCarry(upper(CPU.r.af), operand);
   CPU.r.af = addUpper(CPU.r.af, operand);
@@ -149,7 +154,7 @@ function SUB(operand: byte): void {
 }
 
 function SBC(operand: byte): void {
-  const carry = flag.cy ? -1 : 0;
+  const carry = getCYFlag() ? -1 : 0;
   operand = addByte(operand, carry);
   checkFullCarry8(upper(CPU.r.af), operand, true);
   checkHalfCarry(upper(CPU.r.af), operand, true);
@@ -287,14 +292,14 @@ export const OpcodeMap: OpcodeList = {
 
   0x07: function (): void {
     // check carry flag
-    flag.cy = upper(CPU.r.af) >> 7;
+    setCYFlag(upper(CPU.r.af) >> 7);
     // left shift
     const shifted: byte = upper(CPU.r.af) << 1;
     CPU.r.af = setUpper(CPU.r.af, toByte(shifted | (shifted >> 8)));
     // flag resets
     setNFlag(0);
     setHFlag(0);
-    flag.z = 0;
+    setZFlag(0);
   },
 
   0x08: function (): void {
@@ -346,14 +351,14 @@ export const OpcodeMap: OpcodeList = {
   0x0f: function (): void {
     // check carry flag
     const bitZero = upper(CPU.r.af) & 1;
-    flag.cy = bitZero;
+    setCYFlag(bitZero);
     // right shift
     const shifted: byte = upper(CPU.r.af) >> 1;
     CPU.r.af = setUpper(CPU.r.af, toByte(shifted | (bitZero << 7)));
     // flag resets
     setNFlag(0);
     setHFlag(0);
-    flag.z = 0;
+    setZFlag(0);
   },
 
   0x10: function (): void {
@@ -403,16 +408,16 @@ export const OpcodeMap: OpcodeList = {
   0x17: function (): void {
     // need to rotate left through the carry flag
     // get the old carry value
-    const oldCY = flag.cy;
+    const oldCY = getCYFlag();
     // set the carry flag to the 7th bit of A
-    flag.cy = upper(CPU.r.af) >> 7;
+    setCYFlag(upper(CPU.r.af) >> 7);
     // rotate left
     const shifted = upper(CPU.r.af) << 1;
     // combine old flag and shifted, set to A
     CPU.r.af = setUpper(CPU.r.af, toByte(shifted | oldCY));
     setHFlag(0);
     setNFlag(0);
-    flag.z = 0;
+    setZFlag(0);
   },
 
   0x18: function (): void {
@@ -464,22 +469,22 @@ export const OpcodeMap: OpcodeList = {
   0x1f: function (): void {
     // rotate right through the carry flag
     // get the old carry value
-    const oldCY = flag.cy;
+    const oldCY = getCYFlag();
     // set the carry flag to the 0th bit of A
-    flag.cy = upper(CPU.r.af) & 1;
+    setCYFlag(upper(CPU.r.af) & 1);
     // rotate right
     const shifted = upper(CPU.r.af) >> 1;
     // combine old flag and shifted, set to A
     CPU.r.af = setUpper(CPU.r.af, toByte(shifted | (oldCY << 7)));
     setHFlag(0);
     setNFlag(0);
-    flag.z = 0;
+    setZFlag(0);
   },
 
   0x20: function (): boolean {
     const incr = toSigned(Memory.readByte(CPU.pc));
     CPU.pc += 1;
-    if (!flag.z) {
+    if (!getZFlag()) {
       // increment pc if zero flag was reset
       CPU.pc = addWord(CPU.pc, incr);
       return true;
@@ -531,21 +536,21 @@ export const OpcodeMap: OpcodeList = {
    */
   0x27: function (): void {
     // note: assumes a is a uint8_t and wraps from 0xff to 0
-    if (!flag.n) {
+    if (!getNFlag()) {
       // after an addition, adjust if (half-)carry occurred or if result is out of bounds
-      if (flag.cy || upper(CPU.r.af) > 0x99) {
+      if (getCYFlag() || upper(CPU.r.af) > 0x99) {
         CPU.r.af = addUpper(CPU.r.af, 0x60);
-        flag.cy = 1;
+        setCYFlag(1);
       }
-      if (flag.h || (upper(CPU.r.af) & 0x0f) > 0x09) {
+      if (getHFlag() || (upper(CPU.r.af) & 0x0f) > 0x09) {
         CPU.r.af = addUpper(CPU.r.af, 0x6);
       }
     } else {
       // after a subtraction, only adjust if (half-)carry occurred
-      if (flag.cy) {
+      if (getCYFlag()) {
         CPU.r.af = addUpper(CPU.r.af, -0x60);
       }
-      if (flag.h) {
+      if (getHFlag()) {
         CPU.r.af = addUpper(CPU.r.af, -0x6);
       }
     }
@@ -557,7 +562,7 @@ export const OpcodeMap: OpcodeList = {
   0x28: function (): boolean {
     const incr = toSigned(Memory.readByte(CPU.pc));
     CPU.pc += 1;
-    if (flag.z) {
+    if (getZFlag()) {
       CPU.pc = addWord(CPU.pc, incr);
       return true;
     }
@@ -607,7 +612,8 @@ export const OpcodeMap: OpcodeList = {
 
   0x30: function (): boolean {
     const incr = toSigned(Memory.readByte(CPU.pc));
-    if (!flag.cy) {
+    CPU.pc += 1;
+    if (!getCYFlag()) {
       CPU.pc = addWord(CPU.pc, incr);
       return true;
     }
@@ -657,7 +663,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0x37: function (): void {
-    flag.cy = 1;
+    setCYFlag(1);
     setNFlag(0);
     setHFlag(0);
   },
@@ -665,7 +671,7 @@ export const OpcodeMap: OpcodeList = {
   0x38: function (): boolean {
     const incr = toSigned(Memory.readByte(CPU.pc));
     CPU.pc += 1;
-    if (flag.cy) {
+    if (getCYFlag()) {
       CPU.pc = addWord(CPU.pc, incr);
       return true;
     }
@@ -710,10 +716,10 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0x3f: function (): void {
-    if (flag.cy) {
+    if (getCYFlag()) {
       setCYFlag(0);
     } else {
-      flag.cy = 1;
+      setCYFlag(1);
     }
     setNFlag(0);
     setHFlag(0);
@@ -1232,7 +1238,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xc0: function (): boolean {
-    return RET(!flag.z);
+    return RET(!getZFlag());
   },
 
   0xc1: function (): void {
@@ -1240,7 +1246,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xc2: function (): boolean {
-    if (Jpcc(!flag.z)) {
+    if (Jpcc(!getZFlag())) {
       return true;
     }
     CPU.pc += 2;
@@ -1252,7 +1258,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xc4: function (): boolean {
-    if (CALL(!flag.z)) {
+    if (CALL(!getZFlag())) {
       return true;
     }
     CPU.pc += 2;
@@ -1278,7 +1284,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xc8: function (): boolean {
-    if (flag.z) {
+    if (getZFlag()) {
       const address: word = Memory.readWord(CPU.sp);
       CPU.pc = address;
       CPU.sp = addWord(CPU.sp, 2);
@@ -1292,7 +1298,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xca: function (): boolean {
-    if (Jpcc(flag.z === 0)) {
+    if (Jpcc(getZFlag() === 0)) {
       return true;
     }
     CPU.pc += 2;
@@ -1307,7 +1313,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xcc: function (): boolean {
-    if (CALL(flag.z === 1)) {
+    if (CALL(getZFlag() === 1)) {
       return true;
     }
     CPU.pc += 2;
@@ -1328,7 +1334,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xd0: function (): boolean {
-    return RET(!flag.cy);
+    return RET(!getCYFlag());
   },
 
   0xd1: function (): void {
@@ -1336,7 +1342,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xd2: function (): boolean {
-    if (Jpcc(flag.z === 0)) {
+    if (Jpcc(getZFlag() === 0)) {
       return true;
     }
     CPU.pc += 2;
@@ -1348,7 +1354,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xd4: function (): boolean {
-    if (CALL(!flag.cy)) {
+    if (CALL(!getCYFlag())) {
       return true;
     }
     CPU.pc += 2;
@@ -1360,6 +1366,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xd6: function (): void {
+    if (CPU.r.hl === 51988) debugger;
     SUB(Memory.readByte(CPU.pc));
     CPU.pc += 1;
   },
@@ -1369,7 +1376,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xd8: function (): boolean {
-    return RET(flag.cy === 1);
+    return RET(getCYFlag() === 1);
   },
 
   0xd9: function (): void {
@@ -1378,7 +1385,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xda: function (): boolean {
-    if (Jpcc(flag.cy === 0)) {
+    if (Jpcc(getCYFlag() === 0)) {
       return true;
     }
     CPU.pc += 2;
@@ -1390,7 +1397,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xdc: function (): boolean {
-    if (CALL(flag.cy === 1)) {
+    if (CALL(getCYFlag() === 1)) {
       return true;
     }
     CPU.pc += 2;
@@ -1446,8 +1453,8 @@ export const OpcodeMap: OpcodeList = {
 
   0xe8: function (): void {
     const operand = toWord(toSigned(Memory.readByte(CPU.pc)));
-    CPU.checkFullCarry16(CPU.sp, operand);
-    CPU.checkHalfCarry(upper(CPU.sp), upper(operand));
+    checkFullCarry16(CPU.sp, operand);
+    checkHalfCarry(upper(CPU.sp), upper(operand));
     CPU.sp = addWord(CPU.sp, operand);
     CPU.pc += 1;
     setZFlag(0);
@@ -1495,10 +1502,10 @@ export const OpcodeMap: OpcodeList = {
     CPU.r.af = POP();
     // const f: byte = lower(CPU.r.af);
     // const converted = new flag(f);
-    // flag.z = !converted.z ? 1 : 0;
-    // flag.h = converted.h;
-    // flag.cy = converted.cy;
-    // flag.n = !converted.n ? 1 : 0;
+    // getZFlag() = !converted.z ? 1 : 0;
+    // getHFlag() = converted.h;
+    // getCYFlag() = converted.cy;
+    // getNFlag() = !converted.n ? 1 : 0;
   },
 
   0xf2: function (): void {
@@ -1534,7 +1541,7 @@ export const OpcodeMap: OpcodeList = {
     CPU.pc += 1;
     incr = addWord(incr, CPU.sp);
     CPU.r.hl = incr;
-    flag.z = 0;
+    setZFlag(0);
     setNFlag(0);
   },
 
@@ -1573,7 +1580,7 @@ export const OpcodeMap: OpcodeList = {
 };
 
 function RLCn(reg: byte): byte {
-  flag.cy = reg >> 7;
+  setCYFlag(reg << 7);
   const shifted: byte = reg << 1;
   const result: byte = toByte(shifted | (shifted >> 8));
   checkZFlag(result);
@@ -1583,8 +1590,8 @@ function RLCn(reg: byte): byte {
 }
 
 function RLn(reg: byte): byte {
-  const oldCY = flag.cy;
-  flag.cy = reg >> 7;
+  const oldCY = getCYFlag();
+  setCYFlag(reg << 7);
   const shifted = reg << 1;
   const result = toByte(shifted | oldCY);
   checkZFlag(result);
@@ -1595,7 +1602,7 @@ function RLn(reg: byte): byte {
 
 function RRCn(reg: byte): byte {
   const bitZero = reg & 1;
-  flag.cy = bitZero;
+  setCYFlag(bitZero);
   const shifted: byte = reg >> 1;
   const result: byte = toByte(shifted | (bitZero << 7));
   checkZFlag(result);
@@ -1605,8 +1612,8 @@ function RRCn(reg: byte): byte {
 }
 
 function RRn(reg: byte): byte {
-  const oldCY = flag.cy;
-  flag.cy = reg & 1;
+  const oldCY = getCYFlag();
+  setCYFlag(reg & 1);
   const shifted = reg >> 1;
   const result: byte = toByte(shifted | (oldCY << 7));
   checkZFlag(result);
@@ -1616,7 +1623,7 @@ function RRn(reg: byte): byte {
 }
 
 function SLAn(reg: byte): byte {
-  flag.cy = reg >> 7;
+  setCYFlag(reg << 7);
   const result = toByte(reg << 1);
   checkZFlag(result);
   setHFlag(0);
@@ -1625,7 +1632,7 @@ function SLAn(reg: byte): byte {
 }
 
 function SRAn(reg: byte): byte {
-  flag.cy = reg & 1;
+  setCYFlag(reg & 1);
   // shift to right, but keep the most sig bit
   const msb: byte = reg >> 7;
   const result: byte = (reg >> 1) | msb;
@@ -1636,7 +1643,7 @@ function SRAn(reg: byte): byte {
 }
 
 function SRLn(reg: byte): byte {
-  flag.cy = reg & 1;
+  setCYFlag(reg & 1);
   const result: byte = reg >> 1;
   checkZFlag(result);
   setHFlag(0);
