@@ -11,6 +11,7 @@ interface Flavoring<FlavorT> {
 
 type Primitive<T, FlavorT> = T & Flavoring<FlavorT>;
 
+export type bit = Primitive<number, 'bit'>;
 export type byte = Primitive<number, 'byte'>;
 export type word = Primitive<number, 'word'>;
 export interface OpcodeList {
@@ -95,6 +96,27 @@ const toSigned = (value: byte) => {
   return value;
 };
 
+const getBit = (value: byte, bit: number) => {
+  if (bit > 7) {
+    throw new Error('Tried to get bit outside of range.');
+  }
+  return (value >> bit) & 1;
+};
+
+const setBit = (value: byte, bit: number) => {
+  if (bit > 7) {
+    throw new Error('Tried to set bit outside of range.');
+  }
+  return (value >> bit) & 1;
+};
+
+const clearBit = (value: byte, bit: number) => {
+  if (bit > 7) {
+    throw new Error('Tried to set bit outside of range.');
+  }
+  return value & ~(1 << 7);
+};
+
 export {
   toByte,
   addByte,
@@ -108,4 +130,7 @@ export {
   addLower,
   toHex,
   toSigned,
+  getBit,
+  setBit,
+  clearBit,
 };

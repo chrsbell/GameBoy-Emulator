@@ -13,46 +13,49 @@ import {
   addUpper,
   addLower,
   toSigned,
+  getBit,
+  setBit,
+  clearBit,
   OpcodeList,
 } from '../../Types';
 import CPU from '..';
 
 const setZFlag = (value: byte): void => {
   if (value) {
-    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) | (value << 7));
+    CPU.r.af = setLower(CPU.r.af, setBit(lower(CPU.r.af), 7));
   } else {
-    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) & ~(1 << 7));
+    CPU.r.af = setLower(CPU.r.af, clearBit(lower(CPU.r.af), 7));
   }
 };
 
 const setCYFlag = (value: byte): void => {
   if (value) {
-    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) | (value << 4));
+    CPU.r.af = setLower(CPU.r.af, setBit(lower(CPU.r.af), 4));
   } else {
-    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) & ~(1 << 4));
+    CPU.r.af = setLower(CPU.r.af, clearBit(lower(CPU.r.af), 4));
   }
 };
 
 const setHFlag = (value: byte): void => {
   if (value === 1) {
-    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) | (1 << 5));
+    CPU.r.af = setLower(CPU.r.af, setBit(lower(CPU.r.af), 5));
   } else {
-    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) & ~(1 << 5));
+    CPU.r.af = setLower(CPU.r.af, clearBit(lower(CPU.r.af), 5));
   }
 };
 
 const setNFlag = (value: byte): void => {
   if (value) {
-    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) | (1 << 6));
+    CPU.r.af = setLower(CPU.r.af, setBit(lower(CPU.r.af), 6));
   } else {
-    CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) & ~(1 << 6));
+    CPU.r.af = setLower(CPU.r.af, clearBit(lower(CPU.r.af), 6));
   }
 };
 
-const getZFlag = (): number => (lower(CPU.r.af) >> 7) & 1;
-const getCYFlag = (): number => (lower(CPU.r.af) >> 4) & 1;
-const getHFlag = (): number => (lower(CPU.r.af) >> 5) & 1;
-const getNFlag = (): number => (lower(CPU.r.af) >> 6) & 1;
+const getZFlag = (): number => getBit(lower(CPU.r.af), 7);
+const getCYFlag = (): number => getBit(lower(CPU.r.af), 4);
+const getHFlag = (): number => getBit(lower(CPU.r.af), 5);
+const getNFlag = (): number => getBit(lower(CPU.r.af), 6);
 /**
  * Sets the Z flag if the register is 0, otherwise resets it.
  */
