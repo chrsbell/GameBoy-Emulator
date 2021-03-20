@@ -13,22 +13,11 @@ import {
   addUpper,
   addLower,
   toSigned,
+  OpcodeList,
 } from '../../Types';
 import CPU from '..';
 
-/**
- * To double-check:
- * RLCA
- * RRCA
- * RLA
- * RRA
- *
- * Implement:
- * Template functions for recurring opcodes
- * STOP
- */
-
-const setZFlag = (value: byte) => {
+const setZFlag = (value: byte): void => {
   if (value) {
     CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) | (value << 7));
   } else {
@@ -36,7 +25,7 @@ const setZFlag = (value: byte) => {
   }
 };
 
-const setCYFlag = (value: byte) => {
+const setCYFlag = (value: byte): void => {
   if (value) {
     CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) | (value << 4));
   } else {
@@ -44,8 +33,7 @@ const setCYFlag = (value: byte) => {
   }
 };
 
-const setHFlag = (value: byte) => {
-  if (CPU.pc === 521 && CPU.r.hl === 16400) debugger;
+const setHFlag = (value: byte): void => {
   if (value === 1) {
     CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) | (1 << 5));
   } else {
@@ -53,7 +41,7 @@ const setHFlag = (value: byte) => {
   }
 };
 
-const setNFlag = (value: byte) => {
+const setNFlag = (value: byte): void => {
   if (value) {
     CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) | (1 << 6));
   } else {
@@ -242,10 +230,6 @@ function RST(address: word): void {
   CPU.sp = addWord(CPU.sp, -2);
   Memory.writeWord(CPU.sp, CPU.pc);
   CPU.pc = address;
-}
-
-interface OpcodeList {
-  [key: string]: Function;
 }
 
 export const OpcodeMap: OpcodeList = {
@@ -886,35 +870,35 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0x68: function (): void {
-    setLower(CPU.r.hl, upper(CPU.r.bc));
+    CPU.r.hl = setLower(CPU.r.hl, upper(CPU.r.bc));
   },
 
   0x69: function (): void {
-    setLower(CPU.r.hl, lower(CPU.r.bc));
+    CPU.r.hl = setLower(CPU.r.hl, lower(CPU.r.bc));
   },
 
   0x6a: function (): void {
-    setLower(CPU.r.hl, upper(CPU.r.de));
+    CPU.r.hl = setLower(CPU.r.hl, upper(CPU.r.de));
   },
 
   0x6b: function (): void {
-    setLower(CPU.r.hl, lower(CPU.r.de));
+    CPU.r.hl = setLower(CPU.r.hl, lower(CPU.r.de));
   },
 
   0x6c: function (): void {
-    setLower(CPU.r.hl, upper(CPU.r.hl));
+    CPU.r.hl = setLower(CPU.r.hl, upper(CPU.r.hl));
   },
 
   0x6d: function (): void {
-    setLower(CPU.r.hl, lower(CPU.r.hl));
+    CPU.r.hl = setLower(CPU.r.hl, lower(CPU.r.hl));
   },
 
   0x6e: function (): void {
-    setLower(CPU.r.hl, toByte(Memory.readByte(CPU.r.hl)));
+    CPU.r.hl = setLower(CPU.r.hl, toByte(Memory.readByte(CPU.r.hl)));
   },
 
   0x6f: function (): void {
-    setLower(CPU.r.hl, upper(CPU.r.af));
+    CPU.r.hl = setLower(CPU.r.hl, upper(CPU.r.af));
   },
 
   0x70: function (): void {
@@ -1366,7 +1350,6 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xd6: function (): void {
-    if (CPU.r.hl === 51988) debugger;
     SUB(Memory.readByte(CPU.pc));
     CPU.pc += 1;
   },
@@ -1498,14 +1481,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xf1: function (): void {
-    if (CPU.r.hl === 36864) debugger;
     CPU.r.af = POP();
-    // const f: byte = lower(CPU.r.af);
-    // const converted = new flag(f);
-    // getZFlag() = !converted.z ? 1 : 0;
-    // getHFlag() = converted.h;
-    // getCYFlag() = converted.cy;
-    // getNFlag() = !converted.n ? 1 : 0;
   },
 
   0xf2: function (): void {

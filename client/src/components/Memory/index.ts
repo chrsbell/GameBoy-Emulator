@@ -117,7 +117,7 @@ class Memory {
         bankingMode: 0,
       },
     };
-    this.cart.R.currROMBank = toByte(1);
+    this.cart.R.currROMBank = 1;
   }
   /**
    * Writes the provided byte to the address
@@ -127,8 +127,8 @@ class Memory {
       if (address <= 0xff) {
         this.bios[address] = data;
       } else {
-        // this.inBios = false;
-        // console.log('Exited bios using write to memory.');
+        this.inBios = false;
+        console.log('Exited bios using write to memory.');
       }
     }
     if (address < 0x4000) {

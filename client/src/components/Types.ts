@@ -13,6 +13,9 @@ type Primitive<T, FlavorT> = T & Flavoring<FlavorT>;
 
 export type byte = Primitive<number, 'byte'>;
 export type word = Primitive<number, 'word'>;
+export interface OpcodeList {
+  [key: string]: Function;
+}
 
 /**
  * Casts a number to a byte.

@@ -1,5 +1,5 @@
 import Memory from '../Memory';
-import {byte, word} from '../Types';
+import {byte, word, OpcodeList} from '../Types';
 import Opcodes from './sm83';
 
 interface Registers {
@@ -51,7 +51,7 @@ class CPU {
     this._halted = value;
   }
   protected _interruptsEnabled = true;
-  protected opcodes: any;
+  protected opcodes: OpcodeList = Opcodes;
   private _lastExecuted: Array<byte> = [];
   public get lastExecuted(): Array<byte> {
     return this._lastExecuted;
@@ -69,7 +69,6 @@ class CPU {
   public reset(): void {
     this.pc = 0;
     this.sp = 0;
-    this.opcodes = Opcodes;
     this.halted = false;
     this._interruptsEnabled = true;
     this.r.af = 0;
@@ -132,7 +131,6 @@ class CPU {
     if (Memory.inBios) {
       // fetch
       const opcode: byte = Memory.readByte(this.pc);
-      this.log();
       this.pc += 1;
       // not doing any execution of bios instructions for now
       // execute
