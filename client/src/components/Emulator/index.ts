@@ -1,15 +1,13 @@
 import CPU from '../CPU';
 import Memory from '../Memory';
-import GLRenderer, { Colors } from '../GLRenderer';
+import GLRenderer, {Colors} from '../GLRenderer';
 import * as _ from 'lodash';
 
 class Emulator {
-  private cpu: CPU;
-  private i: number = 0;
-  private j: number = 0;
-  private timerID: ReturnType<typeof setTimeout>;
+  private i = 0;
+  private j = 0;
+  private timerID!: ReturnType<typeof setTimeout>;
   public constructor() {
-    this.cpu = new CPU();
     this.update = this.update.bind(this);
   }
   /**
@@ -28,27 +26,15 @@ class Emulator {
    * the ID of setTimeout each time.
    */
   public update() {
-    let cyclesPerUpdate = CPU.clock / GLRenderer.fps;
+    const cyclesPerUpdate = CPU.clock / GLRenderer.fps;
     let cycles = 0;
     let elapsed;
 
     // elapse time according to number of cpu cycles used
     while (cycles < cyclesPerUpdate) {
-      elapsed = this.cpu.executeInstruction();
+      elapsed = CPU.executeInstruction();
       cycles += elapsed;
       // need to update timers using elapsed cpu cycles
-    }
-
-    // test animation
-    GLRenderer.setPixel(this.i, this.j, _.sample(Colors));
-    this.i += 1;
-    if (this.i === GLRenderer.getScreenWidth()) {
-      this.j += 1;
-      this.i = 0;
-      if (this.j === GLRenderer.getScreenHeight()) {
-        this.i = 0;
-        this.j = 0;
-      }
     }
 
     GLRenderer.draw();

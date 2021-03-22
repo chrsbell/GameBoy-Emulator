@@ -1,7 +1,15 @@
 {
-  "extends": ["airbnb", "prettier"],
-  "plugins": ["prettier"],
+  "extends": "./node_modules/gts/",
   "rules": {
-    "prettier/prettier": ["error"]
+    "@typescript-eslint/no-namespace": "off",
+    "node/no-unpublished-import": "off",
+    "node/no-unpublished-require": "off",
+    "quotes": [
+      "error",
+      "single",
+      {
+        "allowTemplateLiterals": true
+      }
+    ]
   }
 }

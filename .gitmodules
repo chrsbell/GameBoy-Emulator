@@ -4,3 +4,4 @@
 [submodule "client/test/PyBoy"]
 	path = client/test/PyBoy
 	url = https://github.com/chrsbell/PyBoy
+	branch = master

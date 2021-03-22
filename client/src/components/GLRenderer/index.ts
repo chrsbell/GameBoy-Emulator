@@ -10,18 +10,18 @@ export const Colors = {
 };
 
 class GLRenderer {
-  public fps: number = 60;
-  private gl: WebGL2RenderingContext;
-  private vertexShader: WebGLShader;
-  private fragmentShader: WebGLShader;
-  private program: WebGLProgram;
-  private positionAttributeLocation: GLint;
-  private positionBuffer: WebGLBuffer;
-  private shadeAttributeLocation: GLint;
-  private shadeBuffer: WebGLBuffer;
-  private initialized: boolean = false;
-  private screenWidth: number = 160;
-  private screenHeight: number = 144;
+  public fps = 60;
+  private gl!: WebGL2RenderingContext;
+  private vertexShader!: WebGLShader;
+  private fragmentShader!: WebGLShader;
+  private program!: WebGLProgram;
+  private positionAttributeLocation!: GLint;
+  private positionBuffer!: WebGLBuffer;
+  private shadeAttributeLocation!: GLint;
+  private shadeBuffer!: WebGLBuffer;
+  private initialized = false;
+  private screenWidth = 160;
+  private screenHeight = 144;
 
   public constructor() {}
 
@@ -37,39 +37,59 @@ class GLRenderer {
    */
   public initialize(canvas: HTMLCanvasElement) {
     if (canvas && !this.initialized) {
-      this.gl = canvas.getContext('webgl2');
+      this.gl = canvas.getContext('webgl2')!;
       const gl: WebGL2RenderingContext = this.gl;
+      const vertexElement: HTMLElement = document.getElementById(
+        'vertex-shader'
+      ) as HTMLElement;
+      const fragmentElement: HTMLElement = document.getElementById(
+        'fragment-shader'
+      ) as HTMLElement;
+      if (!vertexElement || !fragmentElement) {
+        throw new Error(`Couldn't find shader source.`);
+      }
+
       if (gl) {
         this.vertexShader = this.createShader(
           gl,
           gl.VERTEX_SHADER,
-          document.querySelector('#vertex-shader').innerHTML
+          vertexElement.innerHTML
         );
         this.fragmentShader = this.createShader(
           gl,
           gl.FRAGMENT_SHADER,
-          document.querySelector('#fragment-shader').innerHTML
+          fragmentElement.innerHTML
         );
-        this.program = this.createProgram(gl, this.vertexShader, this.fragmentShader);
+        this.program = this.createProgram(
+          gl,
+          this.vertexShader,
+          this.fragmentShader
+        );
         gl.useProgram(this.program);
 
-        this.positionAttributeLocation = gl.getAttribLocation(this.program, 'a_position');
+        this.positionAttributeLocation = gl.getAttribLocation(
+          this.program,
+          'a_position'
+        );
         gl.enableVertexAttribArray(this.positionAttributeLocation);
 
-        this.shadeAttributeLocation = gl.getAttribLocation(this.program, 'a_shade');
+        this.shadeAttributeLocation = gl.getAttribLocation(
+          this.program,
+          'a_shade'
+        );
         gl.enableVertexAttribArray(this.shadeAttributeLocation);
 
         // bind buffers and describe/send their data
-        this.positionBuffer = gl.createBuffer();
-        this.shadeBuffer = gl.createBuffer();
+        this.positionBuffer = gl.createBuffer()!;
+        this.shadeBuffer = gl.createBuffer()!;
 
-        let pixelBuffer = [];
-        let shadeBuffer = [];
+        const pixelBuffer = [];
+        const shadeBuffer = [];
         const xIncr = 2.0 / this.screenWidth;
         const yIncr = 2.0 / this.screenHeight;
         for (let x = 0; x < this.screenWidth; x++) {
           for (let y = 0; y < this.screenHeight; y++) {
-            let topLeft = { x: -1.0 + x * xIncr, y: -1.0 + y * yIncr };
+            const topLeft = {x: -1.0 + x * xIncr, y: -1.0 + y * yIncr};
             // triangle #1
             pixelBuffer.push(topLeft.x, topLeft.y);
             pixelBuffer.push(topLeft.x + xIncr, topLeft.y);
@@ -102,10 +122,25 @@ class GLRenderer {
           offset
         );
 
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(pixelBuffer), gl.STATIC_DRAW);
+        gl.bufferData(
+          gl.ARRAY_BUFFER,
+          new Float32Array(pixelBuffer),
+          gl.STATIC_DRAW
+        );
         gl.bindBuffer(gl.ARRAY_BUFFER, this.shadeBuffer);
-        gl.vertexAttribPointer(this.shadeAttributeLocation, 3, type, normalize, stride, offset);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(shadeBuffer), gl.DYNAMIC_DRAW);
+        gl.vertexAttribPointer(
+          this.shadeAttributeLocation,
+          3,
+          type,
+          normalize,
+          stride,
+          offset
+        );
+        gl.bufferData(
+          gl.ARRAY_BUFFER,
+          new Float32Array(shadeBuffer),
+          gl.DYNAMIC_DRAW
+        );
       }
       console.log('Initialized GL Renderer.');
       this.initialized = true;
@@ -115,8 +150,12 @@ class GLRenderer {
   /**
    * Compiles the shader program.
    */
-  private createShader(gl: WebGL2RenderingContext, type: number, source: string) {
-    const shader = gl.createShader(type);
+  private createShader(
+    gl: WebGL2RenderingContext,
+    type: number,
+    source: string
+  ): WebGLShader {
+    const shader = gl.createShader(type)!;
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
     const success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
@@ -126,6 +165,7 @@ class GLRenderer {
 
     console.log(gl.getShaderInfoLog(shader));
     gl.deleteShader(shader);
+    return -1;
   }
 
   /**
@@ -135,8 +175,8 @@ class GLRenderer {
     gl: WebGL2RenderingContext,
     vertexShader: WebGLShader,
     fragmentShader: WebGLShader
-  ) {
-    const program: WebGLProgram = gl.createProgram();
+  ): WebGLProgram {
+    const program: WebGLProgram = gl.createProgram()!;
     gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);
     gl.linkProgram(program);
@@ -147,18 +187,19 @@ class GLRenderer {
 
     console.log(gl.getProgramInfoLog(program));
     gl.deleteProgram(program);
+    return -1;
   }
 
   /**
    * Set a pixel of the virtual screen
    */
-  public setPixel(x: number, y: number, shade: RGB) {
+  public setPixel(x: number, y: number, shade: RGB): void {
     if (x >= 0 && x < this.screenWidth) {
       if (y >= 0 && y < this.screenHeight) {
-        const { gl } = this;
+        const {gl} = this;
         // sizeof(float) * num vertices per pixel * number of data points
         const start: number = y * 72 + x * 72 * this.screenHeight;
-        let data: Array<number> = [];
+        const data: Array<number> = [];
         for (let i = 0; i < 6; i++) {
           data.push(...shade);
         }
@@ -171,22 +212,22 @@ class GLRenderer {
   /**
    * @returns the screen width.
    */
-  public getScreenWidth() {
+  public getScreenWidth(): number {
     return this.screenWidth;
   }
 
   /**
    * @returns the screen height.
    */
-  public getScreenHeight() {
+  public getScreenHeight(): number {
     return this.screenHeight;
   }
 
   /**
    * The main render loop.
    */
-  public draw() {
-    const { gl } = this;
+  public draw(): void {
+    const {gl} = this;
     gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLES, 0, 6 * this.screenWidth * this.screenHeight);

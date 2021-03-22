@@ -1,21 +1,21 @@
-import type { byte, word } from '../Types';
-import { toByte, lower, upper, toHex } from '../Types';
+import type {byte, word} from '../Types';
+import {toByte, lower, upper, toHex} from '../Types';
 
 interface CartridgeCode {
   [key: number]: string;
 }
 
 interface ROMCode {
-  [key: number]: { size: string; numBanks: number };
+  [key: number]: {size: string; numBanks: number};
 }
 
 const ROMSizeCodes: ROMCode = {
-  0x00: { size: '32kB', numBanks: 2 },
-  0x01: { size: '64kB', numBanks: 4 },
-  0x02: { size: '128kB', numBanks: 8 },
-  0x03: { size: '256kB', numBanks: 16 },
-  0x04: { size: '512kB', numBanks: 32 },
-  0x05: { size: '1MB', numBanks: 64 },
+  0x00: {size: '32kB', numBanks: 2},
+  0x01: {size: '64kB', numBanks: 4},
+  0x02: {size: '128kB', numBanks: 8},
+  0x03: {size: '256kB', numBanks: 16},
+  0x04: {size: '512kB', numBanks: 32},
+  0x05: {size: '1MB', numBanks: 64},
 };
 
 const CartridgeTypes: CartridgeCode = {
@@ -75,22 +75,27 @@ interface Cartridge {
 }
 
 class Memory {
-  private bios: Uint8Array;
+  private bios!: Uint8Array;
   // whether bios execution has finished
-  public inBios: boolean = false;
-  private cart: Cartridge;
+  public inBios = false;
+  public cart!: Cartridge;
   // 8k vRAM
-  private vRAM: Uint8Array;
+  private vRAM!: Uint8Array;
   // 8k internal RAM
-  private wRAM: Uint8Array;
+  private wRAM!: Uint8Array;
   // shadow of working RAM, (8k - 512) bytes
-  private wRAMShadow: Uint8Array;
+  private wRAMShadow!: Uint8Array;
   // sprite attribute table
-  private OAM: Uint8Array;
+  private OAM!: Uint8Array;
   // 126 bytes high RAM
-  private hRAM: Uint8Array;
-  private initialized: boolean = false;
+  private hRAM!: Uint8Array;
   public constructor() {
+    this.reset();
+  }
+  /**
+   * Resets the Memory module.
+   */
+  public reset(): void {
     this.vRAM = new Uint8Array(0x9fff - 0x8000);
     this.wRAM = new Uint8Array(0xdfff - 0xc000);
     this.wRAMShadow = new Uint8Array(0xfdff - 0xe000);
@@ -98,32 +103,32 @@ class Memory {
     this.hRAM = new Uint8Array(0xfffe - 0xff80);
     // defaults to bank 1 at power on
     this.cart = {
-      ROM: null as Uint8Array,
-      ROMSize: toByte(0),
-      RAMSize: toByte(0),
-      MBCType: toByte(0),
-      ROMBanks: null as Array<Uint8Array>,
-      RAMBanks: null as Array<Uint8Array>,
+      ROM: new Uint8Array(),
+      ROMSize: 0,
+      RAMSize: 0,
+      MBCType: 0,
+      ROMBanks: [new Uint8Array()],
+      RAMBanks: [new Uint8Array()],
       R: {
         RAMEnabled: false,
-        currROMBank: toByte(1),
-        currRAMBank: toByte(1),
-        ROMRAMMixed: toByte(0),
-        bankingMode: toByte(0),
+        currROMBank: 1,
+        currRAMBank: 1,
+        ROMRAMMixed: 0,
+        bankingMode: 0,
       },
     };
-    this.cart.R.currROMBank = toByte(1);
+    this.cart.R.currROMBank = 1;
   }
   /**
    * Writes the provided byte to the address
    */
-  public writeByte(address: word, data: byte) {
+  public writeByte(address: word, data: byte): void {
     if (this.inBios) {
       if (address <= 0xff) {
         this.bios[address] = data;
       } else {
-        // this.inBios = false;
-        // console.log('Exited bios using write to memory.');
+        this.inBios = false;
+        console.log('Exited bios using write to memory.');
       }
     }
     if (address < 0x4000) {
@@ -131,9 +136,7 @@ class Memory {
       this.cart.ROM[address] = data;
     } else if (address <= 0x7fff) {
       // write to ROM bank of cartridge
-      if (this.cart.MBCType === 0) {
-        this.cart.ROM[address] = data;
-      }
+      this.cart.ROM[address] = data;
     } else if (address <= 0x9fff) {
       this.vRAM[address - 0x8000] = data;
     } else if (address <= 0xbfff) {
@@ -154,7 +157,7 @@ class Memory {
   /**
    * Writes the provided word to the address
    */
-  public writeWord(address: word, data: word) {
+  public writeWord(address: word, data: word): void {
     this.writeByte(address, lower(data));
     this.writeByte(address + 1, upper(data));
   }
@@ -174,9 +177,7 @@ class Memory {
       return this.cart.ROM[address];
     } else if (address <= 0x7fff) {
       // Reading from ROM bank of cartridge
-      if (this.cart.MBCType === 0) {
-        return this.cart.ROM[address];
-      }
+      return this.cart.ROM[address];
     } else if (address <= 0x9fff) {
       return this.vRAM[address - 0x8000];
     } else if (address <= 0xbfff) {
@@ -190,9 +191,11 @@ class Memory {
       return this.OAM[address - 0xfe00];
     } else if (address <= 0xff7f) {
       // hardware I/O
+      return 0;
     } else if (address <= 0xffff) {
       return this.hRAM[address - 0xff80];
     }
+    throw new Error(`Tried to read out of bounds address: ${toHex(address)}.`);
   }
   /**
    * Return the word at the address
@@ -204,7 +207,7 @@ class Memory {
   /**
    * Changes the ROM/RAM banks and associated registers
    */
-  private changeBank(address: word, data: byte) {
+  private changeBank(address: word, data: byte): void {
     if (address < 0x2000) {
       // RAM enable register
       this.cart.R.RAMEnabled = (data & 0b00001111) === 0xa;
@@ -220,7 +223,7 @@ class Memory {
       }
       if (this.cart.R.bankingMode === 0 && this.cart.ROMSize >= 0x05) {
         // for 1MB ROM or larger carts, set upper 2 bits (5-6) of ROM bank number
-        const { currROMBank } = this.cart.R;
+        const {currROMBank} = this.cart.R;
         this.cart.R.currROMBank = currROMBank | (register << 4);
       }
       // for 1MB ROM multi carts, apply same operation but only to bits 4-5
@@ -232,24 +235,27 @@ class Memory {
   /**
    * Loads parsed files into BIOS/ROM
    */
-  public load(bios: Uint8Array, rom: Uint8Array) {
+  public load(bios: Uint8Array | null, rom: Uint8Array): void {
     this.cart.ROM = rom;
     this.cart.MBCType = this.readByte(0x147);
     this.cart.ROMSize = this.readByte(0x148);
     this.cart.RAMSize = this.readByte(0x149);
-    console.log(`ROM Size: $${JSON.stringify(ROMSizeCodes[this.cart.ROMSize])}`);
+    console.log(
+      `ROM Size: $${JSON.stringify(ROMSizeCodes[this.cart.ROMSize])}`
+    );
     console.log(`RAM Size: ${RAMSizeCodes[this.cart.RAMSize]}`);
     console.log(`Cartridge Type: ${CartridgeTypes[this.cart.MBCType]}`);
 
     if (this.cart.MBCType === 0) {
       // MBC 0x00
-      this.initialized = true;
     } else {
       console.log(`No support for MBC ${toHex(this.cart.MBCType)}.`);
     }
     console.log('Loaded file into ROM memory.');
-    this.bios = bios;
-    this.inBios = true;
+    if (bios) {
+      this.bios = bios;
+      this.inBios = true;
+    }
     console.log('Loaded bios.');
   }
 }

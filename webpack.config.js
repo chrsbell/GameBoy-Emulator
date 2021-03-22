@@ -1,5 +1,5 @@
 const path = require('path');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 
 const SRC_DIR = path.join(__dirname, '/client/src');
 const DIST_DIR = path.join(__dirname, '/public/dist');
@@ -19,7 +19,13 @@ module.exports = (env, argv) => ({
     rules: [
       {
         test: /\.(ts|js)x?$/,
-        exclude: [/\.test.js$/, /\.test.jsx$/, /\.test.ts$/, /\.test.tsx$/, /node_modules/],
+        exclude: [
+          /\.test.js$/,
+          /\.test.jsx$/,
+          /\.test.ts$/,
+          /\.test.tsx$/,
+          /node_modules/,
+        ],
         loader: 'babel-loader',
       },
       {

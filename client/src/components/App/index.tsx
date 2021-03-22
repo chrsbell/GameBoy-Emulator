@@ -1,36 +1,29 @@
-import * as ReactDOM from 'react-dom';
 import * as React from 'react';
-import { useEffect, useReducer, useRef } from 'react';
+import {useEffect, useReducer, useRef} from 'react';
 import Emulator from '../Emulator';
 import GLRenderer from '../GLRenderer';
-import AppContext from './Context';
 import Wrapper from './Wrapper';
-
-interface AppState {
-  canvas: HTMLCanvasElement;
-  parsedROM: Uint8Array;
-  parsedBIOS: Uint8Array;
-}
+import type {AppState, Action} from './AppTypes';
 
 const initialState: AppState = {
-  canvas: null as HTMLCanvasElement,
-  parsedROM: null as Uint8Array,
-  parsedBIOS: null as Uint8Array,
+  canvas: null!,
+  parsedROM: null!,
+  parsedBIOS: null!,
 };
 
-const reducer = (state: AppState, action: any) => {
+const reducer = (state: AppState, action: Action) => {
   switch (action.type) {
     case 'canvas':
       return {
         ...state,
         canvas: action.canvas,
       };
-    case 'parsed_rom':
+    case 'parsedROM':
       return {
         ...state,
         parsedROM: action.parsedROM,
       };
-    case 'parsed_bios':
+    case 'parsedBIOS':
       return {
         ...state,
         parsedBIOS: action.parsedBIOS,
@@ -42,12 +35,12 @@ const reducer = (state: AppState, action: any) => {
   }
 };
 
-const App = () => {
-  const [appState, dispatch] = useReducer(reducer, initialState);
+const App: React.FC = () => {
+  const [appState, appDispatch] = useReducer(reducer, initialState);
   const emulator = useRef(new Emulator());
 
   useEffect(() => {
-    const { parsedROM, parsedBIOS } = appState;
+    const {parsedROM, parsedBIOS} = appState;
     if (parsedROM && parsedBIOS) {
       if (emulator.current.load(parsedBIOS, parsedROM)) {
         emulator.current.update();
@@ -61,11 +54,12 @@ const App = () => {
     }
   }, [appState.canvas]);
 
-  return (
-    <AppContext.Provider value={{ appState, dispatch }}>
-      <Wrapper />
-    </AppContext.Provider>
-  );
+  const reducerProps = {
+    appState,
+    appDispatch,
+  };
+
+  return <Wrapper {...reducerProps} />;
 };
 
 export default App;

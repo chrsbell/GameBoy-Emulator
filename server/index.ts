@@ -1,13 +1,17 @@
-import { Response, Request } from 'express';
-import * as express from 'express';
-import * as path from 'path';
-import * as multer from 'multer';
+import {Response, Request} from 'express';
+const multer = require('multer');
+const express = require('express');
+const path = require('path');
 
 const upload = multer();
 const app = express();
 
-interface MulterRequest extends Request {
-  files: any;
+declare global {
+  namespace Express {
+    interface Request {
+      files: {[fieldname: string]: Multer.File[]} | Express.Multer.File[];
+    }
+  }
 }
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
@@ -15,10 +19,10 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 app.post(
   '/parse',
   upload.fields([
-    { name: 'rom', maxCount: 1 },
-    { name: 'bios', maxCount: 1 },
+    {name: 'rom', maxCount: 1},
+    {name: 'bios', maxCount: 1},
   ]),
-  (req: MulterRequest, res: Response) => {
+  (req: Request, res: Response) => {
     if ('rom' in req.files && 'bios' in req.files) {
       res.status(201).json({
         rom: new Uint8Array([...req.files['rom'][0].buffer]),
