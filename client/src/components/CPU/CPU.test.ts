@@ -80,9 +80,7 @@ expect.extend({
       };
     } else {
       const logged: string | byte | word = received;
-      // if (register === 'F') {
-      //   logged = logObject(new Flag(received as byte));
-      // }
+
       return {
         message: () =>
           `Expected register ${chalk.green(register)} value ${chalk.red(
@@ -149,7 +147,7 @@ describe('CPU', () => {
     CPU.reset();
   });
 
-  xit('executes an instruction', () => {
+  it('executes an instruction', () => {
     Memory.load(null, new Uint8Array([...Array(8192 * 2).fill(0)]));
     const memReadSpy = jest.spyOn(Memory, 'readByte');
     // to do: NOP instruction spy
@@ -186,35 +184,35 @@ describe('CPU', () => {
     }
   };
 
-  test('SP and HL instructions', () => {
+  it('executes SP and HL instructions', () => {
     checkRegisters('03-op sp,hl.gb');
   });
 
-  xtest('Immediate instructions', () => {
+  it('executes immediate instructions', () => {
     checkRegisters('04-op r,imm.gb');
   });
 
-  xtest('BC/DE/HL arithmetic', () => {
+  it('executes BC/DE/HL arithmetic', () => {
     checkRegisters('05-op rp.gb');
   });
 
-  xtest('LD r,r ($40-$7F)', () => {
+  it('executes LD r,r ($40-$7F)', () => {
     checkRegisters('06-ld r,r.gb');
   });
 
-  xtest('Miscellaneous instructions', () => {
+  it('executes miscellaneous instructions', () => {
     checkRegisters('08-misc instrs.gb');
   });
 
-  xtest('Register instructions pt. 1', () => {
+  it('executes register instructions pt. 1', () => {
     checkRegisters('09-op r,r.gb');
   });
 
-  xtest('Register instructions pt. 2', () => {
+  it('executes register instructions pt. 2', () => {
     checkRegisters('10-bit ops.gb');
   });
 
-  xtest('HL/BC/DE instructions.', () => {
+  it('executes HL/BC/DE instructions.', () => {
     checkRegisters('11-op a,(hl).gb');
   });
 });

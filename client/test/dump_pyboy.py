@@ -7,11 +7,6 @@ from pyboy import PyBoy
 dirname = os.path.dirname(__file__)
 out_dir = os.path.join(dirname, "generated")
 
-
-def getTestFiles(path):
-    return [os.path.join(path, "01-special.gb"), os.path.join(path, "02-interrupts.gb")]
-
-
 def runCPUTest(rom_path, rom_name):
     print("Generating expected for " + rom_name)
     rom_file = os.path.join(rom_path, rom_name)

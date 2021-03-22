@@ -37,18 +37,6 @@ class Emulator {
       // need to update timers using elapsed cpu cycles
     }
 
-    // test animation
-    // GLRenderer.setPixel(this.i, this.j, _.sample([[...Colors));
-    // this.i += 1;
-    // if (this.i === GLRenderer.getScreenWidth()) {
-    //   this.j += 1;
-    //   this.i = 0;
-    //   if (this.j === GLRenderer.getScreenHeight()) {
-    //     this.i = 0;
-    //     this.j = 0;
-    //   }
-    // }
-
     GLRenderer.draw();
     this.timerID = setTimeout(this.update, 1000 / GLRenderer.fps);
   }
