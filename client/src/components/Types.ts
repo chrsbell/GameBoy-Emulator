@@ -28,7 +28,7 @@ const toByte = (value: number | byte): byte => value & 0xff;
  * Adds the operand to the byte.
  * @returns {byte}
  */
-const addByte = (opOne: byte, opTwo: byte): byte => (opOne + opTwo) & 0xff;
+const addByte = (opOne: byte, opTwo: byte): byte => toByte(opOne + opTwo);
 
 /**
  * Casts a number to a word.
@@ -47,13 +47,13 @@ const upper = (value: word): byte => value >> 8;
  * @returns {word}
  */
 const setUpper = (value: word, operand: byte): word =>
-  (value & 0xff) | (operand << 8);
+  toByte(value) | (operand << 8);
 
 /**
  * Returns the lower byte of the word.
  * @returns {byte}
  */
-const lower = (value: word): byte => value & 0xff;
+const lower = (value: word): byte => toByte(value);
 
 /**
  * Sets the lower byte of the word.
