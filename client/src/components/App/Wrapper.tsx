@@ -8,8 +8,8 @@ const Wrapper: React.FC<AppContext> = ({appDispatch}) => {
   const canvasRef: React.MutableRefObject<HTMLCanvasElement> = useRef(null!);
   const hiddenBIOSRef: React.MutableRefObject<HTMLInputElement> = useRef(null!);
   const hiddenROMRef: React.MutableRefObject<HTMLInputElement> = useRef(null!);
-  const [ROMFile, setROMFile] = useState(new Blob());
-  const [BIOSFile, setBIOSFile] = useState(new Blob());
+  const [ROMFile, setROMFile] = useState<Blob>(new Blob());
+  const [BIOSFile, setBIOSFile] = useState<Blob>(new Blob());
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
