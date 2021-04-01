@@ -1,4 +1,4 @@
-import {bit, byte, word} from '../Types';
+import {bit, byte, word, getBit} from '../Types';
 import LCDControl from './Control';
 import Memory from '../Memory';
 
@@ -10,7 +10,10 @@ enum lcdModes {
 }
 
 class LCD {
-  private lcdc: LCDControl = new LCDControl();
+  private _lcdc: LCDControl = new LCDControl();
+  public get lcdc(): LCDControl {
+    return this._lcdc;
+  }
   // lcd draw mode
   private mode = 0;
   // clock used to determine the draw mode, elapsed according to cpu t-states
@@ -33,27 +36,18 @@ class LCD {
     ]);
   }
   /**
+   * Set the LCD controls.
+   */
+  public setControls(value: byte): void {
+    this.lcdc.update(value);
+    debugger;
+  }
+  /**
    * Increments the current scanline.
    */
   private setNextScanline(): void {
     this.clock = 0;
     this.scanline += 1;
-  }
-  /**
-   * Updates internal tile map using the value written to VRAM.
-   */
-  public updateTile(address: word, value: byte): void {
-    debugger;
-    address &= 0x1ffe;
-    const tile = (address >> 4) & 511;
-    const row = (address >> 1) & 7;
-    for (let col = 0; col < 8; col++) {
-      const sx = 1 << (7 - col);
-      // actually just two sets of 2 bits
-      const lower: byte = Memory.readByte(address + 0x8000) & sx ? 1 : 0;
-      const upper: byte = Memory.readByte(address + 0x8000 + 1) & sx ? 2 : 0;
-      this.tileSet[tile][row][col] = lower + upper;
-    }
   }
   private vBlank(): void {
     if (this.clock >= 456) {
@@ -95,19 +89,40 @@ class LCD {
     switch (this.mode) {
       case lcdModes.hBlank:
         this.hBlank();
+        Memory.writeByte(0xff41, 0);
         break;
       case lcdModes.vBlank:
         this.vBlank();
+        Memory.writeByte(0xff41, 1);
         break;
       case lcdModes.readOAM:
         this.readOAM();
+        Memory.writeByte(0xff41, 2);
         break;
       case lcdModes.readVRAM:
         this.readVRAM();
+        Memory.writeByte(0xff41, 3);
         break;
     }
   }
+  /**
+   * Renders tiles.
+   */
+  public renderTiles(): void {}
+  /**
+   * Renders sprites.
+   */
+  public renderSprites(): void {}
+  /**
+   * Draws a scanline.
+   */
   public drawScanline(): void {
+    if (this.lcdc.bgWindowEnable) {
+      // draw tiles
+    }
+    if (this.lcdc.objEnable) {
+      // draw sprites
+    }
     console.log(`Tried to render scanline ${this.scanline}.`);
   }
 }

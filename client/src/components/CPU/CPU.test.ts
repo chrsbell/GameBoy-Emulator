@@ -171,7 +171,6 @@ describe('CPU', () => {
       CPU.executeInstruction();
       [expected, fileIndex] = readSaveState(saveState, fileIndex);
       // Assert
-
       expect(CPU.pc).toMatchRegister(expected.pc, 'PC', expected);
       expect(CPU.sp).toMatchRegister(expected.sp, 'SP', expected);
       expect(CPU.r.hl).toMatchRegister(expected.hl, 'HL', expected);

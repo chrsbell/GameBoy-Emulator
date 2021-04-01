@@ -90,6 +90,8 @@ class Memory {
   private OAM!: Uint8Array;
   // 126 bytes high RAM
   private hRAM!: Uint8Array;
+  // 128 bytes io register space
+  private IORAM!: Uint8Array;
   public constructor() {
     this.reset();
   }
@@ -101,6 +103,7 @@ class Memory {
     this.wRAM = new Uint8Array(0xdfff - 0xc000);
     this.wRAMShadow = new Uint8Array(0xfdff - 0xe000);
     this.OAM = new Uint8Array(0xfe9f - 0xfe00);
+    this.IORAM = new Uint8Array(0xff7f - 0xff00);
     this.hRAM = new Uint8Array(0xfffe - 0xff80);
     // defaults to bank 1 at power on
     this.cart = {
@@ -152,6 +155,11 @@ class Memory {
       this.OAM[address - 0xfe00] = data;
     } else if (address <= 0xff7f) {
       // hardware I/O
+      // LCD control register
+      if (address === 0xff40) {
+        LCD.setControls(data);
+      }
+      this.IORAM[address - 0xff00] = data;
     } else if (address <= 0xffff) {
       this.hRAM[address - 0xff80] = data;
     }
@@ -191,9 +199,15 @@ class Memory {
       return this.wRAMShadow[address - 0xe000];
     } else if (address <= 0xfe9f) {
       return this.OAM[address - 0xfe00];
+    } else if (address <= 0xfeff) {
+      throw new Error('Use of this area is prohibited.');
     } else if (address <= 0xff7f) {
+      // reset scanline if trying to write to associated register
+      if (address === 0xff44) {
+        this.IORAM[address - 0xff00] = 0;
+      }
       // hardware I/O
-      return 0;
+      return this.IORAM[address - 0xff00];
     } else if (address <= 0xffff) {
       return this.hRAM[address - 0xff80];
     }
