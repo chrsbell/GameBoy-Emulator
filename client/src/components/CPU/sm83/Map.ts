@@ -20,15 +20,16 @@ import {
 } from '../../Types';
 import CPU from '..';
 
-const setZFlag = (value: byte): void => {
+export const setZFlag = (value: byte): void => {
   if (value) {
+    console.log(value);
     CPU.r.af = setLower(CPU.r.af, setBit(lower(CPU.r.af), 7));
   } else {
     CPU.r.af = setLower(CPU.r.af, clearBit(lower(CPU.r.af), 7));
   }
 };
 
-const setCYFlag = (value: byte): void => {
+export const setCYFlag = (value: byte): void => {
   if (value) {
     CPU.r.af = setLower(CPU.r.af, setBit(lower(CPU.r.af), 4));
   } else {
@@ -36,7 +37,7 @@ const setCYFlag = (value: byte): void => {
   }
 };
 
-const setHFlag = (value: byte): void => {
+export const setHFlag = (value: byte): void => {
   if (value === 1) {
     CPU.r.af = setLower(CPU.r.af, setBit(lower(CPU.r.af), 5));
   } else {
@@ -44,7 +45,7 @@ const setHFlag = (value: byte): void => {
   }
 };
 
-const setNFlag = (value: byte): void => {
+export const setNFlag = (value: byte): void => {
   if (value) {
     CPU.r.af = setLower(CPU.r.af, setBit(lower(CPU.r.af), 6));
   } else {
@@ -52,14 +53,14 @@ const setNFlag = (value: byte): void => {
   }
 };
 
-const getZFlag = (): number => getBit(lower(CPU.r.af), 7);
-const getCYFlag = (): number => getBit(lower(CPU.r.af), 4);
-const getHFlag = (): number => getBit(lower(CPU.r.af), 5);
-const getNFlag = (): number => getBit(lower(CPU.r.af), 6);
+export const getZFlag = (): number => getBit(lower(CPU.r.af), 7);
+export const getCYFlag = (): number => getBit(lower(CPU.r.af), 4);
+export const getHFlag = (): number => getBit(lower(CPU.r.af), 5);
+export const getNFlag = (): number => getBit(lower(CPU.r.af), 6);
 /**
  * Sets the Z flag if the register is 0, otherwise resets it.
  */
-const checkZFlag = (reg: byte): void => {
+export const checkZFlag = (reg: byte): void => {
   if (!reg) {
     setZFlag(1);
   } else {
@@ -75,7 +76,11 @@ const checkZFlag = (reg: byte): void => {
  * https://stackoverflow.com/questions/8868396/game-boy-what-constitutes-a-half-carry
  * https://gbdev.io/gb-opcodes/optables/
  */
-const checkHalfCarry = (op1: byte, op2: byte, subtraction?: boolean): void => {
+export const checkHalfCarry = (
+  op1: byte,
+  op2: byte,
+  subtraction?: boolean
+): void => {
   const carryBit = subtraction
     ? ((op1 & 0xf) - (op2 & 0xf)) & 0x10
     : ((op1 & 0xf) + (op2 & 0xf)) & 0x10;
@@ -84,7 +89,7 @@ const checkHalfCarry = (op1: byte, op2: byte, subtraction?: boolean): void => {
 /**
  * Sets the carry flag if the sum will exceed the size of the data type.
  */
-const checkFullCarry16 = (
+export const checkFullCarry16 = (
   op1: word,
   op2: word,
   subtraction?: boolean
@@ -103,7 +108,12 @@ const checkFullCarry16 = (
     }
   }
 };
-const checkFullCarry8 = (op1: byte, op2: byte, subtraction?: boolean): void => {
+
+export const checkFullCarry8 = (
+  op1: byte,
+  op2: byte,
+  subtraction?: boolean
+): void => {
   if (subtraction) {
     if (op1 - op2 < 0) {
       setCYFlag(1);
@@ -471,6 +481,7 @@ export const OpcodeMap: OpcodeList = {
   0x20: function (): boolean {
     const incr = toSigned(Memory.readByte(CPU.pc));
     CPU.pc += 1;
+
     if (!getZFlag()) {
       // increment pc if zero flag was reset
       CPU.pc = addWord(CPU.pc, incr);

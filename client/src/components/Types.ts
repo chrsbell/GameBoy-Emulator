@@ -107,14 +107,14 @@ const setBit = (value: byte, bit: number) => {
   if (bit > 7) {
     throw new Error('Tried to set bit outside of range.');
   }
-  return (value >> bit) & 1;
+  return value | (1 << bit);
 };
 
 const clearBit = (value: byte, bit: number) => {
   if (bit > 7) {
     throw new Error('Tried to set bit outside of range.');
   }
-  return value & ~(1 << 7);
+  return value & ~(1 << bit);
 };
 
 export {
