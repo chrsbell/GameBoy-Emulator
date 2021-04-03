@@ -145,10 +145,19 @@ class Memory {
       console.error(`Can't write to prohibited address.`);
     } else if (address <= 0xfe9f) {
       this.OAM[address - 0xfe00] = data;
+    } else if (address <= 0xfeff) {
+      console.error(`Can't write to prohibited address.`);
     } else if (address <= 0xff7f) {
       // hardware I/O
-
-      this.IORAM[address - 0xff00] = data;
+      // reset scanline if trying to write to associated register
+      if (address === 0xff40) {
+        PPU.lcdc.update(data);
+      }
+      if (address === 0xff44) {
+        this.IORAM[address - 0xff00] = 0;
+      } else {
+        this.IORAM[address - 0xff00] = data;
+      }
     } else if (address <= 0xffff) {
       this.hRAM[address - 0xff80] = data;
     }
@@ -191,10 +200,6 @@ class Memory {
     } else if (address <= 0xfeff) {
       throw new Error('Use of this area is prohibited.');
     } else if (address <= 0xff7f) {
-      // reset scanline if trying to write to associated register
-      if (address === 0xff44) {
-        this.IORAM[address - 0xff00] = 0;
-      }
       // hardware I/O
       return this.IORAM[address - 0xff00];
     } else if (address <= 0xffff) {

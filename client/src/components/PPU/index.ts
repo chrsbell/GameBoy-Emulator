@@ -1,5 +1,5 @@
-import {bit, byte, word, getBit} from '../Types';
-import Interrupt from '../Interrupt';
+import {bit, byte, word, getBit, setBit, clearBit} from '../Types';
+import Interrupt, {enableInterrupt} from '../Interrupts';
 import PPUControl from './Control';
 import Memory from '../Memory';
 
@@ -28,18 +28,29 @@ export const PPUAddress: AddressMap = {
   windowY: 0xff4a,
 };
 
+const StatBits = {
+  modeLower: 0,
+  modeUpper: 1,
+  lycLc: 2,
+  hBlankInterrupt: 3,
+  vBlankInterrupt: 4,
+  readOAMInterrupt: 5,
+  lycLcInterrupt: 6,
+};
+
 class PPU {
   private _lcdc: PPUControl = new PPUControl();
   public get lcdc(): PPUControl {
     return this._lcdc;
   }
-  // lcd draw mode
-  private _mode = 0;
+  // stat register
+  private _stat = 0;
 
   // clock used to determine the draw mode, elapsed according to cpu t-states
   private clock = 0;
   // the scanline currently being rendererd (0-153)
   private _scanline = 0;
+  private _scanlineCompare = 0;
   private scrollX = 0;
   private scrollY = 0;
   private tileSet: Array<Array<Array<byte>>> = [];
@@ -58,7 +69,7 @@ class PPU {
   /**
    * Returns whether lcd is enabled.
    */
-  private lcdEnabled(): boolean {
+  public lcdEnabled(): boolean {
     return this._lcdc.LCDPPU === 1;
   }
   /**
@@ -73,19 +84,33 @@ class PPU {
   public get scanline(): byte {
     return Memory.readByte(PPUAddress.scanline);
   }
-  public set scanline(value) {
+  public set scanline(value: byte) {
     Memory.writeByte(PPUAddress.scanline, value);
     this._scanline = value;
   }
+  public get scanlineCompare(): byte {
+    return Memory.readByte(PPUAddress.scanlineCompare);
+  }
+  public set scanlineCompare(value: byte) {
+    Memory.writeByte(PPUAddress.scanlineCompare, value);
+    this._scanlineCompare = value;
+  }
   /**
-   * Get/Set the lcd mode (STAT register)
+   * Get/Set the STAT register
    */
-  public get mode(): byte {
+  public get stat(): byte {
     return Memory.readByte(PPUAddress.stat);
   }
-  public set mode(value) {
-    this._mode = value;
+  public set stat(value: byte) {
+    this._stat = value;
     Memory.writeByte(PPUAddress.stat, value);
+  }
+  public setStatMode(value: byte) {
+    let register: byte = this.stat;
+    register = clearBit(register, StatBits.modeLower);
+    register = clearBit(register, StatBits.modeUpper);
+    register |= value;
+    this.stat = register;
   }
   /**
    * Vertical blanking period.
@@ -95,7 +120,7 @@ class PPU {
       this.scanline = this.scanline + 1;
       this.clock = 0;
       if (this.scanline === 154) {
-        this.mode = 2;
+        this.setStatMode(ppuModes.readOAM);
         this.scanline = 0;
       }
     }
@@ -107,22 +132,22 @@ class PPU {
     if (this.clock >= 204) {
       this.scanline = this.scanline + 1;
       if (this.scanline === 143) {
-        this.mode = 1;
+        this.setStatMode(ppuModes.vBlank);
       } else {
-        this.mode = 2;
+        this.setStatMode(ppuModes.readOAM);
       }
     }
   }
   private readOAM(): void {
     if (this.clock >= 80) {
       this.clock = 0;
-      this.mode = 3;
+      this.setStatMode(ppuModes.readVRAM);
     }
   }
   private readVRAM(): void {
     if (this.clock >= 172) {
       this.clock = 0;
-      this.mode = 0;
+      this.setStatMode(ppuModes.hBlank);
     }
     this.drawScanline();
   }
@@ -131,23 +156,46 @@ class PPU {
    */
   public buildGraphics(cycles: number): void {
     if (this.lcdEnabled()) {
+      debugger;
+      let interruptModeBit: bit = 0;
       this.clock += cycles;
-      switch (this.mode) {
+      switch (this.stat) {
         case ppuModes.hBlank:
           this.hBlank();
+          interruptModeBit = getBit(this.stat, StatBits.hBlankInterrupt);
           break;
         case ppuModes.vBlank:
           this.vBlank();
+          interruptModeBit = getBit(this.stat, StatBits.vBlankInterrupt);
           break;
         case ppuModes.readOAM:
           this.readOAM();
+          interruptModeBit = getBit(this.stat, StatBits.readOAMInterrupt);
           break;
         case ppuModes.readVRAM:
           this.readVRAM();
           break;
       }
+      if (interruptModeBit) {
+        enableInterrupt(Interrupt.lcdStat);
+      }
+      this.compareLcLyc();
     } else {
       this.resetVBlank();
+    }
+  }
+  /**
+   * Compares the scanline/scanline compare registers and toggles appropriate bits.
+   */
+  public compareLcLyc(): void {
+    const register: byte = this.stat;
+    if (this.scanline === this.scanlineCompare) {
+      this.stat = setBit(register, StatBits.lycLc);
+      if (getBit(this.stat, StatBits.lycLcInterrupt)) {
+        enableInterrupt(Interrupt.lcdStat);
+      }
+    } else {
+      this.stat = clearBit(register, StatBits.lycLc);
     }
   }
   /**
@@ -156,7 +204,7 @@ class PPU {
   public resetVBlank(): void {
     this.clock = 456;
     this.scanline = 0;
-    this.mode = 1;
+    this.setStatMode(ppuModes.vBlank);
   }
   /**
    * Renders tiles.
