@@ -147,7 +147,7 @@ describe('CPU', () => {
     CPU.reset();
   });
 
-  it('executes an instruction', () => {
+  xit('executes an instruction', () => {
     Memory.load(null, new Uint8Array([...Array(8192 * 2).fill(0)]));
     const memReadSpy = jest.spyOn(Memory, 'readByte');
     // to do: NOP instruction spy
@@ -187,31 +187,31 @@ describe('CPU', () => {
     checkRegisters('03-op sp,hl.gb');
   });
 
-  it('executes immediate instructions', () => {
+  xit('executes immediate instructions', () => {
     checkRegisters('04-op r,imm.gb');
   });
 
-  it('executes BC/DE/HL arithmetic', () => {
+  xit('executes BC/DE/HL arithmetic', () => {
     checkRegisters('05-op rp.gb');
   });
 
-  it('executes LD r,r ($40-$7F)', () => {
+  xit('executes LD r,r ($40-$7F)', () => {
     checkRegisters('06-ld r,r.gb');
   });
 
-  it('executes miscellaneous instructions', () => {
+  xit('executes miscellaneous instructions', () => {
     checkRegisters('08-misc instrs.gb');
   });
 
-  it('executes register instructions pt. 1', () => {
+  xit('executes register instructions pt. 1', () => {
     checkRegisters('09-op r,r.gb');
   });
 
-  it('executes register instructions pt. 2', () => {
+  xit('executes register instructions pt. 2', () => {
     checkRegisters('10-bit ops.gb');
   });
 
-  it('executes HL/BC/DE instructions.', () => {
+  xit('executes HL/BC/DE instructions.', () => {
     checkRegisters('11-op a,(hl).gb');
   });
 });

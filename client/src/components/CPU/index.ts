@@ -1,6 +1,8 @@
 import Memory from '../Memory';
-import {byte, word, OpcodeList} from '../Types';
+import {byte, word, getBit, clearBit, OpcodeList} from '../Types';
 import Opcodes from './sm83';
+import {PUSH} from './sm83/Map';
+import Interrupt from '../Interrupts';
 
 interface Registers {
   af: word;
@@ -50,8 +52,8 @@ class CPU {
   public set halted(value: boolean) {
     this._halted = value;
   }
-  protected _interruptsEnabled = true;
-  protected opcodes: OpcodeList = Opcodes;
+  private _allInterruptsEnabled = true;
+  private opcodes: OpcodeList = Opcodes;
   private _lastExecuted: Array<byte> = [];
   public get lastExecuted(): Array<byte> {
     return this._lastExecuted;
@@ -70,7 +72,7 @@ class CPU {
     this.pc = 0;
     this.sp = 0;
     this.halted = false;
-    this._interruptsEnabled = true;
+    this._allInterruptsEnabled = true;
     this.r.af = 0;
     this.r.bc = 0;
     this.r.de = 0;
@@ -78,8 +80,8 @@ class CPU {
     this.lastExecuted = [];
   }
 
-  public setInterruptsEnabled(enabled: boolean): void {
-    this._interruptsEnabled = enabled;
+  public setInterruptsGlobal(enabled: boolean): void {
+    this._allInterruptsEnabled = enabled;
   }
   /**
    * Completes the GB power sequence
@@ -156,7 +158,51 @@ class CPU {
       return numCycles;
     }
   }
+  /**
+   * Checks if an interrupt needs to be handled.
+   */
+  public checkInterrupts(): void {
+    if (this._allInterruptsEnabled) {
+      const register: byte = Memory.readByte(Interrupt.if);
+      if (register) {
+        const individualEnabled = Memory.readByte(Interrupt.ie);
+        // 5 interrupts
+        for (let i = 0; i < 5; i++) {
+          if (getBit(register, i) && getBit(individualEnabled, i)) {
+            this.handleInterrupts(i);
+          }
+        }
+      }
+    }
+  }
+  /**
+   * Handles an interrupt.
+   */
+  private handleInterrupts(interrupt: number): void {
+    this.setInterruptsGlobal(false);
+    const register: byte = Memory.readByte(Interrupt.if);
+    Memory.writeByte(Interrupt.if, clearBit(register, interrupt));
 
+    PUSH(this.pc);
+
+    switch (interrupt) {
+      case Interrupt.vBlank:
+        this.pc = 0x40;
+        break;
+      case Interrupt.lcdStat:
+        this.pc = 0x48;
+        break;
+      case Interrupt.timer:
+        this.pc = 0x50;
+        break;
+      case Interrupt.serial:
+        this.pc = 0x58;
+        break;
+      case Interrupt.joypad:
+        this.pc = 0x40;
+        break;
+    }
+  }
   /**
    * Logs the internal state of the CPU.
    */

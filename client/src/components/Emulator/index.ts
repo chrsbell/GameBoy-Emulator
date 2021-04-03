@@ -37,6 +37,7 @@ class Emulator {
       cycles += elapsed;
       // need to update timers using elapsed cpu cycles
       LCD.draw(elapsed);
+      CPU.checkInterrupts();
     }
 
     GLRenderer.draw();

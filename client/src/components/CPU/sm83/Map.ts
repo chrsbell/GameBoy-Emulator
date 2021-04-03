@@ -22,7 +22,6 @@ import CPU from '..';
 
 export const setZFlag = (value: byte): void => {
   if (value) {
-    console.log(value);
     CPU.r.af = setLower(CPU.r.af, setBit(lower(CPU.r.af), 7));
   } else {
     CPU.r.af = setLower(CPU.r.af, clearBit(lower(CPU.r.af), 7));
@@ -209,7 +208,7 @@ function CALL(flag: boolean): boolean {
   return false;
 }
 
-function PUSH(register: word): void {
+export function PUSH(register: word): void {
   CPU.sp = addWord(CPU.sp, -1);
   Memory.writeByte(CPU.sp, upper(register));
   CPU.sp = addWord(CPU.sp, -1);
@@ -1378,7 +1377,7 @@ export const OpcodeMap: OpcodeList = {
 
   0xd9: function (): void {
     RET(true);
-    CPU.setInterruptsEnabled(true);
+    CPU.setInterruptsGlobal(true);
   },
 
   0xda: function (): boolean {
@@ -1504,7 +1503,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xf3: function (): void {
-    CPU.setInterruptsEnabled(false);
+    CPU.setInterruptsGlobal(false);
   },
 
   0xf4: function (): void {
@@ -1548,7 +1547,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xfb: function (): void {
-    CPU.setInterruptsEnabled(true);
+    CPU.setInterruptsGlobal(true);
   },
 
   0xfc: function (): void {
