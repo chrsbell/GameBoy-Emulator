@@ -143,7 +143,6 @@ class Memory {
       this.cart.ROM[address] = data;
     } else if (address <= 0x9fff) {
       this.vRAM[address - 0x8000] = data;
-      LCD.updateTile(address, data);
     } else if (address <= 0xbfff) {
       // write to RAM bank of cartridge
       this.cart.RAMBanks[this.cart.R.currRAMBank][address - 0xa000] = data;
