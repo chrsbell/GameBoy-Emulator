@@ -1,6 +1,6 @@
 import CPU from '../CPU';
 import Memory from '../Memory';
-import LCD from '../LCD';
+import PPU from '../PPU';
 import GLRenderer, {Colors} from '../GLRenderer';
 import * as _ from 'lodash';
 
@@ -36,7 +36,7 @@ class Emulator {
       elapsed = CPU.executeInstruction();
       cycles += elapsed;
       // need to update timers using elapsed cpu cycles
-      LCD.draw(elapsed);
+      PPU.buildGraphics(elapsed);
       CPU.checkInterrupts();
     }
 

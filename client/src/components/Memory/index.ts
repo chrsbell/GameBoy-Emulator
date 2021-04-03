@@ -1,6 +1,6 @@
 import type {byte, word} from '../Types';
 import {toByte, lower, upper, toHex} from '../Types';
-import LCD from '../LCD';
+import PPU from '../PPU';
 
 interface CartridgeCode {
   [key: number]: string;
@@ -127,14 +127,7 @@ class Memory {
    * Writes the provided byte to the address
    */
   public writeByte(address: word, data: byte): void {
-    if (this.inBios) {
-      if (address <= 0xff) {
-        this.bios[address] = data;
-      } else {
-        this.inBios = false;
-        console.log('Exited bios using write to memory.');
-      }
-    }
+    if (this.inBios && address <= 0xff) return;
     if (address < 0x4000) {
       // ROM Bank 0 is always available
       this.cart.ROM[address] = data;
@@ -154,10 +147,7 @@ class Memory {
       this.OAM[address - 0xfe00] = data;
     } else if (address <= 0xff7f) {
       // hardware I/O
-      // LCD control register
-      if (address === 0xff40) {
-        LCD.setControls(data);
-      }
+
       this.IORAM[address - 0xff00] = data;
     } else if (address <= 0xffff) {
       this.hRAM[address - 0xff80] = data;
@@ -177,7 +167,7 @@ class Memory {
     if (this.inBios) {
       if (address <= 0xff) {
         return this.bios[address];
-      } else {
+      } else if (address === 0x100) {
         this.inBios = false;
       }
     }
