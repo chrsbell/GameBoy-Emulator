@@ -1,4 +1,4 @@
-import {OpcodeMap} from './Map';
+import OpcodeMap from './Map';
 import {byte} from '../../Types';
 
 /**

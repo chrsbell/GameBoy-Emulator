@@ -1,4 +1,5 @@
 import Memory from '../../Memory';
+import PPU from '../../PPU';
 import {
   byte,
   word,
@@ -17,10 +18,11 @@ import {
   setBit,
   clearBit,
   OpcodeList,
+  toHex,
 } from '../../Types';
 import CPU from '..';
 
-export const setZFlag = (value: byte): void => {
+const setZFlag = (value: byte): void => {
   if (value) {
     CPU.r.af = setLower(CPU.r.af, setBit(lower(CPU.r.af), 7));
   } else {
@@ -28,7 +30,7 @@ export const setZFlag = (value: byte): void => {
   }
 };
 
-export const setCYFlag = (value: byte): void => {
+const setCYFlag = (value: byte): void => {
   if (value) {
     CPU.r.af = setLower(CPU.r.af, setBit(lower(CPU.r.af), 4));
   } else {
@@ -36,7 +38,7 @@ export const setCYFlag = (value: byte): void => {
   }
 };
 
-export const setHFlag = (value: byte): void => {
+const setHFlag = (value: byte): void => {
   if (value === 1) {
     CPU.r.af = setLower(CPU.r.af, setBit(lower(CPU.r.af), 5));
   } else {
@@ -44,7 +46,7 @@ export const setHFlag = (value: byte): void => {
   }
 };
 
-export const setNFlag = (value: byte): void => {
+const setNFlag = (value: byte): void => {
   if (value) {
     CPU.r.af = setLower(CPU.r.af, setBit(lower(CPU.r.af), 6));
   } else {
@@ -52,14 +54,14 @@ export const setNFlag = (value: byte): void => {
   }
 };
 
-export const getZFlag = (): number => getBit(lower(CPU.r.af), 7);
-export const getCYFlag = (): number => getBit(lower(CPU.r.af), 4);
-export const getHFlag = (): number => getBit(lower(CPU.r.af), 5);
-export const getNFlag = (): number => getBit(lower(CPU.r.af), 6);
+const getZFlag = (): number => getBit(lower(CPU.r.af), 7);
+const getCYFlag = (): number => getBit(lower(CPU.r.af), 4);
+const getHFlag = (): number => getBit(lower(CPU.r.af), 5);
+const getNFlag = (): number => getBit(lower(CPU.r.af), 6);
 /**
  * Sets the Z flag if the register is 0, otherwise resets it.
  */
-export const checkZFlag = (reg: byte): void => {
+const checkZFlag = (reg: byte): void => {
   if (!reg) {
     setZFlag(1);
   } else {
@@ -75,20 +77,16 @@ export const checkZFlag = (reg: byte): void => {
  * https://stackoverflow.com/questions/8868396/game-boy-what-constitutes-a-half-carry
  * https://gbdev.io/gb-opcodes/optables/
  */
-export const checkHalfCarry = (
-  op1: byte,
-  op2: byte,
-  subtraction?: boolean
-): void => {
+const checkHalfCarry = (op1: byte, op2: byte, subtraction?: boolean): void => {
   const carryBit = subtraction
     ? ((op1 & 0xf) - (op2 & 0xf)) & 0x10
     : ((op1 & 0xf) + (op2 & 0xf)) & 0x10;
-  setHFlag(carryBit === 0x10 ? 1 : 0);
+  instructionHelpers.setHFlag(carryBit === 0x10 ? 1 : 0);
 };
 /**
  * Sets the carry flag if the sum will exceed the size of the data type.
  */
-export const checkFullCarry16 = (
+const checkFullCarry16 = (
   op1: word,
   op2: word,
   subtraction?: boolean
@@ -108,11 +106,7 @@ export const checkFullCarry16 = (
   }
 };
 
-export const checkFullCarry8 = (
-  op1: byte,
-  op2: byte,
-  subtraction?: boolean
-): void => {
+const checkFullCarry8 = (op1: byte, op2: byte, subtraction?: boolean): void => {
   if (subtraction) {
     if (op1 - op2 < 0) {
       setCYFlag(1);
@@ -208,7 +202,7 @@ function CALL(flag: boolean): boolean {
   return false;
 }
 
-export function PUSH(register: word): void {
+function PUSH(register: word): void {
   CPU.sp = addWord(CPU.sp, -1);
   Memory.writeByte(CPU.sp, upper(register));
   CPU.sp = addWord(CPU.sp, -1);
@@ -244,7 +238,7 @@ function RST(address: word): void {
   CPU.pc = address;
 }
 
-export const OpcodeMap: OpcodeList = {
+const OpcodeMap: OpcodeList = {
   0x00: function (): void {},
 
   0x01: function (): void {
@@ -597,7 +591,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0x2e: function (): void {
-    setLower(CPU.r.hl, toByte(Memory.readByte(CPU.pc)));
+    CPU.r.hl = setLower(CPU.r.hl, toByte(Memory.readByte(CPU.pc)));
     CPU.pc += 1;
   },
 
@@ -1304,7 +1298,7 @@ export const OpcodeMap: OpcodeList = {
 
   0xcb: function (): void {
     const opcode: byte = Memory.readByte(CPU.pc);
-    console.log(opcode);
+    CPU.addCalledInstruction(`CB: ${toHex(opcode)}`);
     cbMap[opcode](CPU);
     CPU.pc += 1;
   },
@@ -1488,6 +1482,7 @@ export const OpcodeMap: OpcodeList = {
   },
 
   0xf0: function (): void {
+    if (PPU.lcdEnabled()) debugger;
     const data = toByte(Memory.readByte(0xff00 + Memory.readByte(CPU.pc)));
     CPU.r.af = setUpper(CPU.r.af, data);
     CPU.pc += 1;
@@ -1569,8 +1564,8 @@ export const OpcodeMap: OpcodeList = {
 };
 
 function RLCn(reg: byte): byte {
-  setCYFlag(reg << 7);
-  const shifted: byte = reg << 1;
+  setCYFlag(reg >> 7);
+  const shifted: number = reg << 1;
   const result: byte = toByte(shifted | (shifted >> 8));
   checkZFlag(result);
   setNFlag(0);
@@ -1580,7 +1575,7 @@ function RLCn(reg: byte): byte {
 
 function RLn(reg: byte): byte {
   const oldCY = getCYFlag();
-  setCYFlag(reg << 7);
+  setCYFlag(reg >> 7);
   const shifted = reg << 1;
   const result = toByte(shifted | oldCY);
   checkZFlag(result);
@@ -2459,4 +2454,28 @@ const cbMap: OpcodeList = {
   0xff: function (): void {
     CPU.r.af = setUpper(CPU.r.af, SET(7, upper(CPU.r.af)));
   },
+};
+
+export default OpcodeMap;
+
+export const instructionHelpers = {
+  setZFlag,
+  getZFlag,
+  setCYFlag,
+  getCYFlag,
+  setHFlag,
+  getHFlag,
+  setNFlag,
+  getNFlag,
+  checkHalfCarry,
+  checkFullCarry16,
+  checkFullCarry8,
+  PUSH,
+  RLCn,
+  RLn,
+  RRCn,
+  RRn,
+  SLAn,
+  SRAn,
+  BIT,
 };

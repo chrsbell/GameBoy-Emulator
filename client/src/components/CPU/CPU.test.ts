@@ -8,7 +8,7 @@ import Memory from '../Memory';
 import {byte, word, upper, lower, setLower, toHex} from '../Types';
 import Flag from './Flag';
 
-const ROM_FOLDER = path.join(
+const TEST_ROM_FOLDER = path.join(
   __dirname,
   '..',
   '..',
@@ -25,6 +25,15 @@ const GENERATED_FOLDER = path.join(
   '..',
   'test',
   'generated'
+);
+const ROM_FOLDER = path.join(
+  __dirname,
+  '..',
+  '..',
+  '..',
+  '..',
+  'public',
+  'roms'
 );
 
 interface CPUInfo {
@@ -79,35 +88,27 @@ expect.extend({
         pass: true,
       };
     } else {
-      const logged: string | byte | word = received;
-
+      let logged: string | byte | word = received;
+      if (register === 'F') {
+        logged = logObject(new Flag(received as byte));
+      }
       return {
         message: () =>
           `Expected register ${chalk.green(register)} value ${chalk.red(
             logged
-          )} to equal ${chalk.green(expected)} after instructions: \n\n${[
-            ...new Set([...CPU.lastExecuted]),
-          ]
-            .map(instr => _.sample(consoleColors)(toHex(instr)))
+          )} to equal ${chalk.green(
+            expected
+          )} after instructions: \n\n${CPU.lastExecuted
+            .map(instr => _.sample(consoleColors)(instr))
             .reverse()
             .join(' ')}\n\nExpected CPU State: ${logObject(
             expectedState
-          )}\n\nExpected Flag: ${logObject(expectedState.f)}`,
+          )}\n\nExpected Flag: ${logObject(new Flag(expectedState.f))}`,
         pass: false,
       };
     }
   },
 });
-
-/**
- * Loads a test ROM and the expected cpu state.
- * @returns {Buffer}
- */
-const setupTestROM = (testROM: string): Buffer => {
-  const ROMFile: Buffer = fs.readFileSync(path.join(ROM_FOLDER, testROM));
-  Memory.load(null, new Uint8Array([...ROMFile]));
-  return fs.readFileSync(path.join(GENERATED_FOLDER, `${testROM}.state`));
-};
 
 /**
  * Extracts the next expected CPU state from a save state.
@@ -147,23 +148,39 @@ describe('CPU', () => {
     CPU.reset();
   });
 
-  xit('executes an instruction', () => {
-    Memory.load(null, new Uint8Array([...Array(8192 * 2).fill(0)]));
-    const memReadSpy = jest.spyOn(Memory, 'readByte');
-    // to do: NOP instruction spy
-    const cycles = CPU.executeInstruction();
-    expect(memReadSpy).toHaveBeenCalledTimes(1);
-    expect(cycles).toEqual(4);
-  });
+  /**
+   * Loads a test ROM and the expected cpu state.
+   * @returns {Buffer}
+   */
+  const setupTestROM = (
+    biosFile: string | null,
+    testROM: string,
+    expectedState: string
+  ): Buffer => {
+    const ROMFile: Buffer = fs.readFileSync(testROM);
+    if (biosFile) {
+      const BIOSFile: Buffer = fs.readFileSync(biosFile);
+      Memory.load(BIOSFile, new Uint8Array([...ROMFile]));
+    } else {
+      Memory.load(null, new Uint8Array([...ROMFile]));
+    }
+    return fs.readFileSync(
+      path.join(GENERATED_FOLDER, `${expectedState}.state`)
+    );
+  };
 
   /**
    * Compares save states from a test ROM to the cpu's state
    */
-  const checkRegisters = (testROM: string) => {
+  const checkRegisters = (
+    biosFile: string | null,
+    testROM: string,
+    expectedState: string
+  ) => {
     let fileIndex = 0;
     let expected: CPUInfo;
     // Arrange
-    const saveState: Buffer = setupTestROM(testROM);
+    const saveState: Buffer = setupTestROM(biosFile, testROM, expectedState);
     // skip initial state
     [expected, fileIndex] = readSaveState(saveState, fileIndex);
     for (let i = 0; i < saveState.length; i++) {
@@ -183,35 +200,84 @@ describe('CPU', () => {
     }
   };
 
-  it('executes SP and HL instructions', () => {
-    checkRegisters('03-op sp,hl.gb');
+  xit('executes an instruction', () => {
+    Memory.load(null, new Uint8Array([...Array(8192 * 2).fill(0)]));
+    const memReadSpy = jest.spyOn(Memory, 'readByte');
+    // to do: NOP instruction spy
+    const cycles = CPU.executeInstruction();
+    expect(memReadSpy).toHaveBeenCalledTimes(1);
+    expect(cycles).toEqual(4);
+  });
+
+  xit('executes SP and HL instructions', () => {
+    checkRegisters(
+      null,
+      path.join(TEST_ROM_FOLDER, '03-op sp,hl.gb'),
+      '03-op sp,hl.gb'
+    );
   });
 
   xit('executes immediate instructions', () => {
-    checkRegisters('04-op r,imm.gb');
+    checkRegisters(
+      null,
+      path.join(TEST_ROM_FOLDER, '04-op r,imm.gb'),
+      '04-op r,imm.gb'
+    );
   });
 
   xit('executes BC/DE/HL arithmetic', () => {
-    checkRegisters('05-op rp.gb');
+    checkRegisters(
+      null,
+      path.join(TEST_ROM_FOLDER, '05-op rp.gb'),
+      '05-op rp.gb'
+    );
   });
 
   xit('executes LD r,r ($40-$7F)', () => {
-    checkRegisters('06-ld r,r.gb');
+    checkRegisters(
+      null,
+      path.join(TEST_ROM_FOLDER, '06-ld r,r.gb'),
+      '06-ld r,r.gb'
+    );
   });
 
   xit('executes miscellaneous instructions', () => {
-    checkRegisters('08-misc instrs.gb');
+    checkRegisters(
+      null,
+      path.join(TEST_ROM_FOLDER, '08-misc instrs.gb'),
+      '08-misc instrs.gb'
+    );
   });
 
   xit('executes register instructions pt. 1', () => {
-    checkRegisters('09-op r,r.gb');
+    checkRegisters(
+      null,
+      path.join(TEST_ROM_FOLDER, '09-op r,r.gb'),
+      '09-op r,r.gb.state'
+    );
   });
 
   xit('executes register instructions pt. 2', () => {
-    checkRegisters('10-bit ops.gb');
+    checkRegisters(
+      null,
+      path.join(TEST_ROM_FOLDER, '10-bit ops.gb'),
+      '10-bit ops.gb.state'
+    );
   });
 
   xit('executes HL/BC/DE instructions.', () => {
-    checkRegisters('11-op a,(hl).gb');
+    checkRegisters(
+      null,
+      path.join(TEST_ROM_FOLDER, '11-op a,(hl).gb'),
+      '11-op a,(hl).gb'
+    );
+  });
+
+  it('executes the bios', () => {
+    checkRegisters(
+      path.join(ROM_FOLDER, 'bios.bin'),
+      path.join(ROM_FOLDER, 'tetris.gb'),
+      'bios.gb'
+    );
   });
 });

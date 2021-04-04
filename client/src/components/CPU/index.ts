@@ -1,7 +1,7 @@
 import Memory from '../Memory';
-import {byte, word, getBit, clearBit, OpcodeList} from '../Types';
+import {byte, word, getBit, clearBit, OpcodeList, toHex} from '../Types';
 import Opcodes from './sm83';
-import {PUSH} from './sm83/Map';
+import {instructionHelpers as helpers} from './sm83/Map';
 import Interrupt from '../Interrupts';
 
 interface Registers {
@@ -34,10 +34,10 @@ class CPU {
     this._sp = value;
   }
   private _r: Registers = {
-    af: 0 as word,
-    bc: 0 as word,
-    de: 0 as word,
-    hl: 0 as word,
+    af: 0,
+    bc: 0,
+    de: 0,
+    hl: 0,
   };
   public get r(): Registers {
     return this._r;
@@ -54,11 +54,11 @@ class CPU {
   }
   private _allInterruptsEnabled = true;
   private opcodes: OpcodeList = Opcodes;
-  private _lastExecuted: Array<byte> = [];
-  public get lastExecuted(): Array<byte> {
+  private _lastExecuted: Array<string> = [];
+  public get lastExecuted(): Array<string> {
     return this._lastExecuted;
   }
-  public set lastExecuted(value: Array<byte>) {
+  public set lastExecuted(value: Array<string>) {
     this._lastExecuted = value;
   }
   public constructor() {
@@ -130,32 +130,25 @@ class CPU {
    * @returns {number} the number of CPU cycles required.
    */
   public executeInstruction(): number {
+    // fetch
+    const opcode: byte = Memory.readByte(this.pc);
+    this.pc += 1;
+    // execute
+    const numCycles: number = this.opcodes[opcode].call(this);
     if (Memory.inBios) {
-      // fetch
-      const opcode: byte = Memory.readByte(this.pc);
-      this.pc += 1;
-      // not doing any execution of bios instructions for now
-      // execute
-      const numCycles: number = this.opcodes[opcode].call(this);
       // check if finished bios execution
       if (!Memory.inBios) {
         console.log('exiting bios');
         this.initPowerSequence();
       }
-      return numCycles;
-    } else {
-      // normal execution
-      // fetch
-      const opcode: byte = Memory.readByte(this.pc);
-      this.pc += 1;
-      // execute
-      const numCycles: number = this.opcodes[opcode].call(this);
-      this.lastExecuted.push(opcode);
-      if (this.lastExecuted.length > 100) {
-        this.lastExecuted.shift();
-      }
-      // this.r.af = setLower(this.r.af, this.r.f.value());
-      return numCycles;
+    }
+    this.addCalledInstruction(toHex(opcode));
+    return numCycles;
+  }
+  public addCalledInstruction(opcode: string): void {
+    this.lastExecuted.push(opcode);
+    if (this.lastExecuted.length > 100) {
+      this.lastExecuted.shift();
     }
   }
   /**
@@ -183,7 +176,7 @@ class CPU {
     const register: byte = Memory.readByte(Interrupt.if);
     Memory.writeByte(Interrupt.if, clearBit(register, interrupt));
 
-    PUSH(this.pc);
+    helpers.PUSH(this.pc);
 
     switch (interrupt) {
       case Interrupt.vBlank:
