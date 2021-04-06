@@ -112,7 +112,7 @@ const setBit = (value: byte, bit: number) => {
 
 const clearBit = (value: byte, bit: number) => {
   if (bit > 7) {
-    throw new Error('Tried to set bit outside of range.');
+    throw new Error('Tried to clear bit outside of range.');
   }
   return value & ~(1 << bit);
 };

@@ -153,7 +153,7 @@ class Memory {
         PPU.lcdc.update(data);
       }
       if (address === 0xff46) {
-        this.dmaTransfer();
+        this.dmaTransfer(data);
       }
       // reset scanline if trying to write to associated register
       else if (address === 0xff44) {
