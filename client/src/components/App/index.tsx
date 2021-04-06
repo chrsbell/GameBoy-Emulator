@@ -3,7 +3,7 @@ import {useEffect, useReducer, useRef} from 'react';
 import Emulator from '../Emulator';
 import GLRenderer from '../GLRenderer';
 import Wrapper from './Wrapper';
-import type {AppState, Action} from './AppTypes';
+import type {AppState, Action, AppContext} from './AppTypes';
 
 const initialState: AppState = {
   canvas: null!,
@@ -54,7 +54,7 @@ const App: React.FC = () => {
     }
   }, [appState.canvas]);
 
-  const reducerProps = {
+  const reducerProps: AppContext = {
     appState,
     appDispatch,
   };

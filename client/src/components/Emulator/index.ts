@@ -16,7 +16,7 @@ class Emulator {
    * @returns - boolean, whether ROM was loaded
    * Stops the currently updating function.
    */
-  public load(bios: Uint8Array, rom: Uint8Array): boolean {
+  public load(bios: Uint8Array | null, rom: Uint8Array): boolean {
     Memory.load(bios, rom);
     clearTimeout(this.timerID);
     return true;

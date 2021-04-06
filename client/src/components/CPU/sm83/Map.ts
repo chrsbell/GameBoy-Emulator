@@ -1482,8 +1482,12 @@ const OpcodeMap: OpcodeList = {
   },
 
   0xf0: function (): void {
-    if (PPU.lcdEnabled()) debugger;
     const data = toByte(Memory.readByte(0xff00 + Memory.readByte(CPU.pc)));
+    console.log(
+      `Tried to read address ${Number(
+        0xff00 + Memory.readByte(CPU.pc)
+      ).toString(16)}`
+    );
     CPU.r.af = setUpper(CPU.r.af, data);
     CPU.pc += 1;
   },

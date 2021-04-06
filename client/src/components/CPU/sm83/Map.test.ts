@@ -5,9 +5,7 @@ import {lower} from '../../Types';
 
 describe('helper functions', () => {
   describe('flags', () => {
-    beforeEach(() => {
-      CPU.r.af = 0;
-    });
+    beforeEach(() => (CPU.r.af = 0));
     it('sets/unsets/gets the z flag', () => {
       helpers.setZFlag(1);
       expect(CPU.r.af).toBe(128);
@@ -46,9 +44,7 @@ describe('helper functions', () => {
     });
   });
   describe('half carry', () => {
-    beforeEach(() => {
-      CPU.r.af = 0;
-    });
+    beforeEach(() => (CPU.r.af = 0));
     it('checks half carry on addition ops', () => {
       helpers.checkHalfCarry(62, 34);
       expect(new Flag(lower(CPU.r.af)).h).toBe(1);
@@ -70,9 +66,7 @@ describe('helper functions', () => {
       expect(helpers.getHFlag()).toBe(0);
     };
     describe('rotate left', () => {
-      beforeEach(() => {
-        CPU.r.af = 0;
-      });
+      beforeEach(() => (CPU.r.af = 0));
       it('rotates a register left', () => {
         const reg = 0b00000001;
         const expected = 0b00000010;
@@ -123,9 +117,7 @@ describe('helper functions', () => {
       });
     });
     describe('rotate right', () => {
-      beforeEach(() => {
-        CPU.r.af = 0;
-      });
+      beforeEach(() => (CPU.r.af = 0));
       it('rotates a register right', () => {
         const reg = 0b00000010;
         const expected = 0b00000001;

@@ -4,8 +4,9 @@ import * as util from 'util';
 import _ from 'lodash';
 const chalk = require('chalk');
 import CPU from '.';
+import PPU from '../PPU';
 import Memory from '../Memory';
-import {byte, word, upper, lower, setLower, toHex} from '../Types';
+import {byte, word, upper, lower} from '../Types';
 import Flag from './Flag';
 
 const TEST_ROM_FOLDER = path.join(
@@ -146,6 +147,7 @@ describe('CPU', () => {
   beforeEach(() => {
     Memory.reset();
     CPU.reset();
+    PPU.reset();
   });
 
   /**
@@ -185,7 +187,10 @@ describe('CPU', () => {
     [expected, fileIndex] = readSaveState(saveState, fileIndex);
     for (let i = 0; i < saveState.length; i++) {
       // Act
-      CPU.executeInstruction();
+      const cycles = CPU.executeInstruction();
+      PPU.buildGraphics(cycles);
+      CPU.checkInterrupts();
+
       [expected, fileIndex] = readSaveState(saveState, fileIndex);
       // Assert
       expect(CPU.pc).toMatchRegister(expected.pc, 'PC', expected);
