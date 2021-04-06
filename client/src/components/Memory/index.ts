@@ -149,11 +149,14 @@ class Memory {
       console.error(`Can't write to prohibited address.`);
     } else if (address <= 0xff7f) {
       // hardware I/O
-      // reset scanline if trying to write to associated register
       if (address === 0xff40) {
         PPU.lcdc.update(data);
       }
-      if (address === 0xff44) {
+      if (address === 0xff46) {
+        this.dmaTransfer();
+      }
+      // reset scanline if trying to write to associated register
+      else if (address === 0xff44) {
         this.IORAM[address - 0xff00] = 0;
       } else {
         this.IORAM[address - 0xff00] = data;
@@ -162,6 +165,7 @@ class Memory {
       this.hRAM[address - 0xff80] = data;
     }
   }
+
   /**
    * Writes the provided word to the address
    */
@@ -240,6 +244,22 @@ class Memory {
     } else {
       // Banking mode select
       this.cart.R.bankingMode = data & 0x01;
+    }
+  }
+  /**
+   * Used internally by the PPU/lCD to update the current scanline.
+   */
+  public updateScanline(scanline: byte): void {
+    this.IORAM[0xff44 - 0xff00] = scanline;
+  }
+  /**
+   * Performs direct memory address transfer of sprite data.
+   * Pretty much copied from http://www.codeslinger.co.uk/pages/projects/gameboy/dma.html
+   */
+  public dmaTransfer(data: byte): void {
+    const address = data << 8;
+    for (let i = 0; i < 0xa0; i++) {
+      this.writeByte(0xfe00 + i, this.readByte(address + i));
     }
   }
   /**
