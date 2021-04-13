@@ -651,6 +651,7 @@ const OpcodeMap: OpcodeList = {
 
   0x36: function (): void {
     Memory.writeByte(CPU.r.hl, toByte(Memory.readByte(CPU.pc)));
+    CPU.pc += 1;
   },
 
   0x37: function (): void {
@@ -1482,12 +1483,12 @@ const OpcodeMap: OpcodeList = {
   },
 
   0xf0: function (): void {
-    const data = toByte(Memory.readByte(0xff00 + Memory.readByte(CPU.pc)));
-    console.log(
-      `Tried to read address ${Number(
-        0xff00 + Memory.readByte(CPU.pc)
-      ).toString(16)}`
-    );
+    const data = Memory.readByte(0xff00 + Memory.readByte(CPU.pc));
+    // console.log(
+    //   `Tried to read address ${Number(
+    //     0xff00 + Memory.readByte(CPU.pc)
+    //   ).toString(16)}`
+    // );
     CPU.r.af = setUpper(CPU.r.af, data);
     CPU.pc += 1;
   },
@@ -1497,7 +1498,7 @@ const OpcodeMap: OpcodeList = {
   },
 
   0xf2: function (): void {
-    const data = toByte(0xff00 + lower(CPU.r.bc));
+    const data = Memory.readByte(0xff00 + lower(CPU.r.bc));
     CPU.r.af = setUpper(CPU.r.af, data);
   },
 

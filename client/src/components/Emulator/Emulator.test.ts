@@ -2,7 +2,7 @@ import Emulator from '.';
 import Memory from '../Memory';
 import CPU from '../CPU';
 import PPU from '../PPU';
-import GLRenderer from '../GLRenderer';
+import CanvasRenderer from '../CanvasRenderer';
 
 describe('Emulator', () => {
   const gb = new Emulator();
@@ -21,7 +21,7 @@ describe('Emulator', () => {
     CPU.executeInstruction = jest.fn();
     PPU.buildGraphics = jest.fn();
     CPU.checkInterrupts = jest.fn();
-    GLRenderer.draw = jest.fn();
+    CanvasRenderer.draw = jest.fn();
     gb.update();
     // calls occur multiple times
     expect(CPU.executeInstruction).toHaveBeenCalled();

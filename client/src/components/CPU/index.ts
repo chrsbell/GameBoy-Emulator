@@ -3,6 +3,7 @@ import {byte, word, getBit, clearBit, OpcodeList, toHex} from '../Types';
 import Opcodes from './sm83';
 import {instructionHelpers as helpers} from './sm83/Map';
 import Interrupt from '../Interrupts';
+import benchmark, {benchmarksEnabled} from '../Performance';
 
 interface Registers {
   af: word;
@@ -62,6 +63,10 @@ class CPU {
     this._lastExecuted = value;
   }
   public constructor() {
+    if (benchmarksEnabled) {
+      this.executeInstruction = benchmark(this.executeInstruction.bind(this));
+      this.checkInterrupts = benchmark(this.checkInterrupts.bind(this));
+    }
     this.reset();
   }
 
@@ -134,21 +139,24 @@ class CPU {
     const opcode: byte = Memory.readByte(this.pc);
     this.pc += 1;
     // execute
-    const numCycles: number = this.opcodes[opcode].call(this);
     if (Memory.inBios) {
+      const numCycles: number = this.opcodes[opcode]();
       // check if finished bios execution
       if (!Memory.inBios) {
         console.log('exiting bios');
         this.initPowerSequence();
       }
+      return numCycles;
+    } else {
+      const numCycles: number = this.opcodes[opcode]();
+      return numCycles;
     }
-    this.addCalledInstruction(toHex(opcode));
-    return numCycles;
+    // this.addCalledInstruction(toHex(opcode));
   }
   public addCalledInstruction(opcode: string): void {
-    this.lastExecuted.push(opcode);
+    this.lastExecuted.unshift(opcode);
     if (this.lastExecuted.length > 100) {
-      this.lastExecuted.shift();
+      this.lastExecuted.pop();
     }
   }
   /**

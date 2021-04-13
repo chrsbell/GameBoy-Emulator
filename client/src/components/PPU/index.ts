@@ -1,8 +1,9 @@
-import {bit, byte, word, getBit, setBit, clearBit, toSigned} from '../Types';
+import {byte, word, getBit, setBit, clearBit, toSigned} from '../Types';
 import Interrupt, {enableInterrupt} from '../Interrupts';
 import PPUControl from './Control';
 import Memory from '../Memory';
-import GLRenderer, {Colors} from '../GLRenderer';
+import CanvasRenderer, {Colors} from '../CanvasRenderer';
+import benchmark, {benchmarksEnabled} from '../Performance';
 
 enum ppuModes {
   hBlank,
@@ -54,11 +55,6 @@ const StatBits: StatBitsType = {
     [ppuModes.readVRAM]: -1, // no interrupt bit
   },
   lycLcInterrupt: 6,
-};
-
-const LCD = {
-  width: 160,
-  height: 144,
 };
 
 class PPU {
@@ -116,6 +112,10 @@ class PPU {
   private static numScanlines = 384;
   public constructor() {
     this.reset();
+    if (benchmarksEnabled) {
+      this.buildGraphics = benchmark(this.buildGraphics.bind(this));
+      this.drawScanline = benchmark(this.drawScanline.bind(this));
+    }
   }
   /**
    * Resets the PPU.
@@ -203,7 +203,7 @@ class PPU {
   private hBlank(): void {
     if (this.clock >= 204) {
       this.scanline = this.scanline + 1;
-      if (this.scanline === LCD.height) {
+      if (this.scanline === CanvasRenderer.fps) {
         this.mode = ppuModes.vBlank;
       } else {
         this.mode = ppuModes.readOAM;
@@ -287,10 +287,10 @@ class PPU {
     const testBit = this.scanlineInWindow()
       ? this.lcdc.tileMapArea
       : this.lcdc.bgTileMapArea;
-    return testBit ? 0x9c00 : 0x9800;
+    return testBit ? 0x9c00 : 0x9c00;
   }
   private tileDataMapOffset(): word {
-    return this.lcdc.bgWindowTileData ? 0x8000 : 0x8800;
+    return this.lcdc.bgWindowTileData ? 0x8800 : 0x8800;
   }
   /**
    * Renders an individial pixel using tile data.
@@ -318,7 +318,18 @@ class PPU {
       : Memory.readByte(tileAddress);
     const tileLocation =
       tileDataAddress + (isSigned ? (tileId + 128) * 16 : tileId * 16);
-    GLRenderer.setPixel(xPos, yPos, Colors.white);
+    const line = (yPos % 8) * 2;
+    const upperByte = Memory.readByte(tileLocation + line);
+    const lowerByte = Memory.readByte(tileLocation + line + 1);
+    // debugger;
+    const colorBit = ((xPos % 8) - 7) * -1;
+    let colorNum = getBit(lowerByte, colorBit);
+    colorNum = colorNum << 1;
+    colorNum |= getBit(upperByte, colorBit);
+
+    // console.log(`color: ${colorNum}`);
+    const finalY = this.scanline;
+    CanvasRenderer.setPixel(xPos, finalY, Colors.white);
   }
   /**
    * Renders tiles.
@@ -336,7 +347,7 @@ class PPU {
     };
     const yPos = getYPos();
     const tileRow = (yPos / 8) * 32;
-    for (let x = 0; x < LCD.width; x++) {
+    for (let x = 0; x < CanvasRenderer.screenWidth; x++) {
       this.renderTilePixel(
         x,
         yPos,
@@ -357,13 +368,13 @@ class PPU {
    */
   public drawScanline(): void {
     if (this.lcdc.bgWindowEnable) {
-      console.log('rendering tiles');
+      // console.log('rendering tiles');
       this.renderTiles();
     }
     if (this.lcdc.objEnable) {
       this.renderSprites();
     }
-    console.log(`Tried to render scanline ${this.scanline}.`);
+    // console.log(`Tried to render scanline ${this.scanline}.`);
   }
 }
 

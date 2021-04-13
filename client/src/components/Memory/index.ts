@@ -1,6 +1,7 @@
 import type {byte, word} from '../Types';
 import {toByte, lower, upper, toHex} from '../Types';
 import PPU from '../PPU';
+import benchmark, {benchmarksEnabled} from '../Performance';
 
 interface CartridgeCode {
   [key: number]: string;
@@ -122,6 +123,10 @@ class Memory {
       },
     };
     this.cart.R.currROMBank = 1;
+    if (benchmarksEnabled) {
+      this.readByte = benchmark(this.readByte.bind(this));
+      this.writeByte = benchmark(this.writeByte.bind(this));
+    }
   }
   /**
    * Writes the provided byte to the address
@@ -149,6 +154,9 @@ class Memory {
       console.error(`Can't write to prohibited address.`);
     } else if (address <= 0xff7f) {
       // hardware I/O
+      if (address === 0xff42) console.log(`scrollY: ${data}`);
+      if (address === 0xff43) console.log(`scrollX: ${data}`);
+      // console.log('scrolled window.');
       if (address === 0xff40) {
         PPU.lcdc.update(data);
       }
@@ -178,10 +186,12 @@ class Memory {
    */
   public readByte(address: word): byte {
     if (this.inBios) {
-      if (address <= 0xff) {
+      if (address < 0x100) {
+        // if (address > 150) console.log(address);
         return this.bios[address];
       } else if (address === 0x100) {
         this.inBios = false;
+        console.log('exited bios');
       }
     }
     if (address < 0x4000) {
@@ -205,6 +215,7 @@ class Memory {
       throw new Error('Use of this area is prohibited.');
     } else if (address <= 0xff7f) {
       // hardware I/O
+
       return this.IORAM[address - 0xff00];
     } else if (address <= 0xffff) {
       return this.hRAM[address - 0xff80];

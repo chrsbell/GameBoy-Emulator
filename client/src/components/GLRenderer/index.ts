@@ -1,5 +1,6 @@
-// could render data as an image texture
+import benchmark, {benchmarksEnabled} from '../Performance';
 
+// could render data as an image texture
 type RGB = Array<number>;
 
 export const Colors = {
@@ -23,7 +24,9 @@ class GLRenderer {
   private screenWidth = 160;
   private screenHeight = 144;
 
-  public constructor() {}
+  public constructor() {
+    if (benchmarksEnabled) this.draw = benchmark(this.draw.bind(this));
+  }
 
   /**
    * @returns whether the renderer is initialized.

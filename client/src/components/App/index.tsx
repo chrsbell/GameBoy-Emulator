@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {useEffect, useReducer, useRef} from 'react';
 import Emulator from '../Emulator';
-import GLRenderer from '../GLRenderer';
+import CanvasRenderer from '../CanvasRenderer';
 import Wrapper from './Wrapper';
 import type {AppState, Action, AppContext} from './AppTypes';
 
@@ -49,8 +49,8 @@ const App: React.FC = () => {
   }, [appState.parsedROM, appState.parsedBIOS]);
 
   useEffect(() => {
-    if (appState.canvas && !GLRenderer.isInitialized()) {
-      GLRenderer.initialize(appState.canvas);
+    if (appState.canvas && !CanvasRenderer.initialized) {
+      CanvasRenderer.initialize(appState.canvas);
     }
   }, [appState.canvas]);
 
