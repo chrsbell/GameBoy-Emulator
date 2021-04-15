@@ -1,9 +1,7 @@
-import _ from 'lodash';
-
 import CPU from '../CPU';
 import Memory from '../Memory';
 import PPU from '../PPU';
-import CanvasRenderer, {Colors, RGB} from '../CanvasRenderer';
+import CanvasRenderer from '../CanvasRenderer';
 import benchmark, {getBenchmarks, benchmarksEnabled} from '../Performance';
 
 class Emulator {
@@ -57,17 +55,7 @@ class Emulator {
       PPU.buildGraphics(elapsed);
       CPU.checkInterrupts();
     }
-    // this.x += 1;
-    // if (this.x === CanvasRenderer.screenWidth) {
-    //   this.y += 1;
-    //   this.x = 0;
-    // }
-    // if (this.y === CanvasRenderer.screenHeight) {
-    //   this.x = 0;
-    //   this.y = 0;
-    // }
-    // CanvasRenderer.setPixel(this.x, this.y, _.sample(Colors) as RGB);
-
+    // CanvasRenderer.testAnimation();
     CanvasRenderer.draw();
     this.timerID = setTimeout(this.update, 0);
   }
