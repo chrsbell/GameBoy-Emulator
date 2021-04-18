@@ -3,6 +3,7 @@ import Memory from '../Memory';
 import PPU from '../PPU';
 import CanvasRenderer from '../CanvasRenderer';
 import benchmark, {getBenchmarks, benchmarksEnabled} from '../Performance';
+import _ from 'lodash';
 
 class Emulator {
   private x = 0;
@@ -33,6 +34,24 @@ class Emulator {
     const cyclesPerUpdate = CPU.clock / CanvasRenderer.fps;
     let cycles = 0;
     let elapsed;
+    this.logBenchmarks();
+    // elapse time according to number of cpu cycles used
+    while (cycles < cyclesPerUpdate) {
+      elapsed = CPU.executeInstruction();
+      this.numExecuted += elapsed;
+      cycles += elapsed;
+      // need to update timers using elapsed cpu cycles
+      PPU.buildGraphics(elapsed);
+      CPU.checkInterrupts();
+    }
+    // CanvasRenderer.testAnimation();
+    CanvasRenderer.draw();
+    this.timerID = setTimeout(this.update, 0);
+  }
+  /**
+   * Utility function to benchmark the emulator.
+   */
+  private logBenchmarks(): void {
     if (this.numExecuted > CPU.clock) {
       const times = getBenchmarks();
       _.map(times, (val, key) => [
@@ -46,18 +65,6 @@ class Emulator {
       console.log('1 second passed');
       this.numExecuted = 0;
     }
-    // elapse time according to number of cpu cycles used
-    while (cycles < cyclesPerUpdate) {
-      elapsed = CPU.executeInstruction();
-      this.numExecuted += elapsed;
-      cycles += elapsed;
-      // need to update timers using elapsed cpu cycles
-      PPU.buildGraphics(elapsed);
-      CPU.checkInterrupts();
-    }
-    // CanvasRenderer.testAnimation();
-    CanvasRenderer.draw();
-    this.timerID = setTimeout(this.update, 0);
   }
 }
 

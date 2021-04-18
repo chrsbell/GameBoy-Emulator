@@ -4,7 +4,7 @@ import GLRenderer from '.';
 
 describe('GLRenderer', () => {
   it('creates an instance of GLRenderer', () => {
-    expect(GLRenderer.getScreenHeight()).toEqual(144);
+    expect(GLRenderer.screenHeight()).toEqual(144);
     expect(GLRenderer.getScreenWidth()).toEqual(160);
   });
 

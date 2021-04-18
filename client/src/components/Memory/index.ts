@@ -1,7 +1,8 @@
 import type {byte, word} from '../Types';
-import {toByte, lower, upper, toHex} from '../Types';
-import PPU from '../PPU';
+import {lower, upper, toHex} from '../Types';
+import PPU, {PPUAddress} from '../PPU';
 import benchmark, {benchmarksEnabled} from '../Performance';
+import {DEBUG} from '../Debug';
 
 interface CartridgeCode {
   [key: number]: string;
@@ -147,24 +148,24 @@ class Memory {
     } else if (address <= 0xdfff) {
       this.wRAM[address - 0xc000] = data;
     } else if (address <= 0xfdff) {
-      console.error(`Can't write to prohibited address.`);
+      DEBUG && console.error(`Can't write to prohibited address.`);
     } else if (address <= 0xfe9f) {
       this.OAM[address - 0xfe00] = data;
     } else if (address <= 0xfeff) {
-      console.error(`Can't write to prohibited address.`);
+      DEBUG && console.error(`Can't write to prohibited address.`);
     } else if (address <= 0xff7f) {
       // hardware I/O
-      if (address === 0xff42) console.log(`scrollY: ${data}`);
-      if (address === 0xff43) console.log(`scrollX: ${data}`);
-      // console.log('scrolled window.');
-      if (address === 0xff40) {
+      // if (address === 0xff42) console.log(`scrollY: ${data}`);
+      // if (address === 0xff43) console.log(`scrollX: ${data}`);
+      if (address === PPUAddress.lcdc) {
         PPU.lcdc.update(data);
       }
       if (address === 0xff46) {
+        DEBUG && console.log('Initiated DMA transfer.');
         this.dmaTransfer(data);
       }
       // reset scanline if trying to write to associated register
-      else if (address === 0xff44) {
+      else if (address === PPUAddress.scanline) {
         this.IORAM[address - 0xff00] = 0;
       } else {
         this.IORAM[address - 0xff00] = data;
@@ -191,7 +192,7 @@ class Memory {
         return this.bios[address];
       } else if (address === 0x100) {
         this.inBios = false;
-        console.log('exited bios');
+        DEBUG && console.log('Exited bios.');
       }
     }
     if (address < 0x4000) {
@@ -215,7 +216,6 @@ class Memory {
       throw new Error('Use of this area is prohibited.');
     } else if (address <= 0xff7f) {
       // hardware I/O
-
       return this.IORAM[address - 0xff00];
     } else if (address <= 0xffff) {
       return this.hRAM[address - 0xff80];
@@ -281,23 +281,23 @@ class Memory {
     this.cart.MBCType = this.readByte(0x147);
     this.cart.ROMSize = this.readByte(0x148);
     this.cart.RAMSize = this.readByte(0x149);
-    console.log(
-      `ROM Size: $${JSON.stringify(ROMSizeCodes[this.cart.ROMSize])}`
-    );
-    console.log(`RAM Size: ${RAMSizeCodes[this.cart.RAMSize]}`);
-    console.log(`Cartridge Type: ${CartridgeTypes[this.cart.MBCType]}`);
+    DEBUG &&
+      console.log(
+        `ROM Size: $${JSON.stringify(ROMSizeCodes[this.cart.ROMSize])}`
+      );
+    DEBUG && console.log(`RAM Size: ${RAMSizeCodes[this.cart.RAMSize]}`);
+    DEBUG &&
+      console.log(`Cartridge Type: ${CartridgeTypes[this.cart.MBCType]}`);
 
-    if (this.cart.MBCType === 0) {
-      // MBC 0x00
-    } else {
-      console.log(`No support for MBC ${toHex(this.cart.MBCType)}.`);
+    if (this.cart.MBCType !== 0) {
+      DEBUG && console.log(`No support for MBC ${toHex(this.cart.MBCType)}.`);
     }
-    console.log('Loaded file into ROM memory.');
+    DEBUG && console.log('Loaded file into ROM memory.');
     if (bios) {
       this.bios = bios;
       this.inBios = true;
     }
-    console.log('Loaded bios.');
+    DEBUG && console.log('Loaded bios.');
   }
 }
 

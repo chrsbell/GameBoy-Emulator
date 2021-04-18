@@ -90,7 +90,8 @@ const toHex = (value: byte | word): string => `0x${pad(value.toString(16), 2)}`;
  * Converts the unsigned byte to its signed format using two's complement
  */
 const toSigned = (value: byte) => {
-  if (value >= 128) {
+  if (value < 0) throw new Error(`Can't pass signed value into toSigned.`);
+  if (value >= 128 || value <= -128) {
     return -((~value + 1) & 255);
   }
   return value;

@@ -50,7 +50,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (appState.canvas && !CanvasRenderer.initialized) {
-      CanvasRenderer.initialize(appState.canvas);
+      CanvasRenderer.initialize(appState.canvas, Math.round(787 / 160));
     }
   }, [appState.canvas]);
 

@@ -4,6 +4,7 @@ import Opcodes from './sm83';
 import {instructionHelpers as helpers} from './sm83/Map';
 import Interrupt from '../Interrupts';
 import benchmark, {benchmarksEnabled} from '../Performance';
+import {DEBUG} from '../Debug';
 
 interface Registers {
   af: word;
@@ -185,7 +186,7 @@ class CPU {
     Memory.writeByte(Interrupt.if, clearBit(register, interrupt));
 
     helpers.PUSH(this.pc);
-
+    DEBUG && console.log('Handled an interrupt.');
     switch (interrupt) {
       case Interrupt.vBlank:
         this.pc = 0x40;

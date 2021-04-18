@@ -21,7 +21,7 @@ class CanvasRenderer {
   private context!: CanvasRenderingContext2D;
   private _initialized = false;
   // how many pixels should an individual image pixel take up? e.g. NxN
-  private scaleFactor = 4;
+  private scaleFactor = 1;
   public get initialized() {
     return this._initialized;
   }
@@ -35,8 +35,9 @@ class CanvasRenderer {
     if (benchmarksEnabled) this.draw = benchmark(this.draw.bind(this));
   }
 
-  public initialize(canvas: HTMLCanvasElement) {
+  public initialize(canvas: HTMLCanvasElement, scaleFactor = 1) {
     if (canvas && !this.initialized) {
+      this.scaleFactor = scaleFactor;
       this.context = canvas.getContext('2d') as CanvasRenderingContext2D;
       this.image = this.context.createImageData(
         this.screenWidth * this.scaleFactor,
