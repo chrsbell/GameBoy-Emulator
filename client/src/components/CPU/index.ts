@@ -1,10 +1,10 @@
 import Memory from '../Memory';
-import {byte, word, getBit, clearBit, OpcodeList, toHex} from '../Types';
+import {byte, word, getBit, clearBit, OpcodeList, toHex} from '../../Types';
 import Opcodes from './sm83';
 import {instructionHelpers as helpers} from './sm83/Map';
 import Interrupt from '../Interrupts';
-import benchmark, {benchmarksEnabled} from '../Performance';
-import {DEBUG} from '../Debug';
+import benchmark, {benchmarksEnabled} from '../Helpers/Performance';
+import {DEBUG} from '../Helpers/Debug';
 
 interface Registers {
   af: word;
@@ -92,7 +92,7 @@ class CPU {
   /**
    * Completes the GB power sequence
    */
-  private initPowerSequence(): void {
+  public initPowerSequence(): void {
     this.pc = 0x100;
     this.r.af = 0x01b0;
     this.r.bc = 0x0013;
@@ -138,13 +138,14 @@ class CPU {
   public executeInstruction(): number {
     // fetch
     const opcode: byte = Memory.readByte(this.pc);
+    this.addCalledInstruction(toHex(opcode));
     this.pc += 1;
     // execute
     if (Memory.inBios) {
       const numCycles: number = this.opcodes[opcode]();
       // check if finished bios execution
       if (!Memory.inBios) {
-        console.log('exiting bios');
+        DEBUG && console.log('Exiting bios from CPU.');
         this.initPowerSequence();
       }
       return numCycles;
@@ -152,7 +153,6 @@ class CPU {
       const numCycles: number = this.opcodes[opcode]();
       return numCycles;
     }
-    // this.addCalledInstruction(toHex(opcode));
   }
   public addCalledInstruction(opcode: string): void {
     this.lastExecuted.unshift(opcode);
@@ -171,6 +171,7 @@ class CPU {
         // 5 interrupts
         for (let i = 0; i < 5; i++) {
           if (getBit(register, i) && getBit(individualEnabled, i)) {
+            debugger;
             this.handleInterrupts(i);
           }
         }

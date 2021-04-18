@@ -1,5 +1,5 @@
 // Using a class to prevent accidentally setting flag outside 0/1
-import {byte, word, lower, setLower} from '../Types';
+import {byte, word, lower, setLower} from '../../Types';
 import CPU from '.';
 
 class Flag {

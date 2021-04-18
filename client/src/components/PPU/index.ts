@@ -1,10 +1,10 @@
-import {byte, word, getBit, setBit, clearBit, toSigned} from '../Types';
+import {byte, word, getBit, setBit, clearBit, toSigned} from '../../Types';
 import Interrupt, {enableInterrupt} from '../Interrupts';
 import PPUControl from './Control';
 import Memory from '../Memory';
 import CanvasRenderer, {Colors} from '../CanvasRenderer';
 import type {RGB} from '../CanvasRenderer';
-import benchmark, {benchmarksEnabled} from '../Performance';
+import benchmark, {benchmarksEnabled} from '../Helpers/Performance';
 
 enum ppuModes {
   hBlank,
@@ -25,7 +25,17 @@ export const PPUAddress = {
   windowX: 0xff4b,
 };
 
-const StatBits = {
+type StatBitsType = {
+  modeLower: number;
+  modeUpper: number;
+  lycLc: number;
+  interrupt: {
+    [key: number]: number;
+  };
+  lycLcInterrupt: number;
+};
+
+const StatBits: StatBitsType = {
   modeLower: 0,
   modeUpper: 1,
   lycLc: 2,
@@ -167,9 +177,9 @@ class PPU {
     this.stat = register;
   }
   public get mode(): byte {
-    if (this._mode !== (Memory.readByte(PPUAddress.stat) & 0b11))
-      throw new Error('Mismatch in stat value from class and memory.');
-    return this._mode;
+    // if (this._mode !== (Memory.readByte(PPUAddress.stat) & 0b11))
+    // throw new Error('Mismatch in stat value from class and memory.');
+    return Memory.readByte(PPUAddress.stat) & 0b11;
   }
   /**
    * Vertical blanking period.
@@ -307,16 +317,18 @@ class PPU {
     const tileLocation =
       tileDataAddress + (isSigned ? (tileId + 128) * 16 : tileId * 16);
     const line = (yPos % 8) * 2;
-    const upperByte = Memory.readByte(tileLocation + line);
-    const lowerByte = Memory.readByte(tileLocation + line + 1);
+    const lowerByte = Memory.readByte(tileLocation + line);
+    const upperByte = Memory.readByte(tileLocation + line + 1);
 
     const colorBit = -((xPos % 8) - 7);
     const colorIndex =
-      (getBit(lowerByte, colorBit) << 1) | getBit(upperByte, colorBit);
+      (getBit(upperByte, colorBit) << 1) | getBit(lowerByte, colorBit);
 
-    const finalY = this.scanline;
-
-    CanvasRenderer.setPixel(xPos, finalY, this.colorFromPalette(colorIndex));
+    CanvasRenderer.setPixel(
+      xPos,
+      this.scanline,
+      this.colorFromPalette(colorIndex)
+    );
   }
   /**
    * Renders tiles.
@@ -351,9 +363,6 @@ class PPU {
    */
   public renderSprites(): void {}
   /**
-   * Draws a scanline.
-   */
-  /**
    * Lookup the color using the currently mapped palette.
    */
   public colorFromPalette(index: number): RGB {
@@ -376,15 +385,16 @@ class PPU {
         ];
     }
   }
+  /**
+   * Draws a scanline.
+   */
   public drawScanline(): void {
     if (this.lcdc.bgWindowEnable) {
-      // console.log('rendering tiles');
       this.renderTiles();
     }
     if (this.lcdc.objEnable) {
       this.renderSprites();
     }
-    // console.log(`Tried to render scanline ${this.scanline}.`);
   }
 }
 

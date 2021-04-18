@@ -1,5 +1,5 @@
-import benchmark, {benchmarksEnabled} from '../Performance';
-import _ from 'lodash';
+import benchmark, {benchmarksEnabled} from '../Helpers/Performance';
+import {sample} from 'lodash';
 
 export type RGB = Array<number>;
 
@@ -79,7 +79,7 @@ class CanvasRenderer {
       testAnimation.x = 0;
       testAnimation.y = 0;
     }
-    this.setPixel(testAnimation.x, testAnimation.y, _.sample(Colors) as RGB);
+    this.setPixel(testAnimation.x, testAnimation.y, sample(Colors) as RGB);
   }
 }
 

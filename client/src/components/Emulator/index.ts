@@ -2,8 +2,11 @@ import CPU from '../CPU';
 import Memory from '../Memory';
 import PPU from '../PPU';
 import CanvasRenderer from '../CanvasRenderer';
-import benchmark, {getBenchmarks, benchmarksEnabled} from '../Performance';
-import _ from 'lodash';
+import benchmark, {
+  getBenchmarks,
+  benchmarksEnabled,
+} from '../Helpers/Performance';
+import {map} from 'lodash';
 
 class Emulator {
   private x = 0;
@@ -16,9 +19,8 @@ class Emulator {
     }
   }
   /**
-   * Loads a bios and ROM file into the Memory module.
-   * @returns - boolean, whether ROM was loaded
-   * Stops the currently updating function.
+   * Loads a bios and ROM file into the Memory module and stops the currently updating function.
+   * @returns {boolean}
    */
   public load(bios: Uint8Array | null, rom: Uint8Array): boolean {
     Memory.load(bios, rom);
@@ -54,7 +56,7 @@ class Emulator {
   private logBenchmarks(): void {
     if (this.numExecuted > CPU.clock) {
       const times = getBenchmarks();
-      _.map(times, (val, key) => [
+      map(times, (val, key) => [
         `Average ${key} function call duration: ${
           (val.elapsed / val.calledTimes) * 1000
         }ms`,
@@ -62,7 +64,7 @@ class Emulator {
       ])
         .sort((a: Array<any>, b: Array<any>) => b[1] - a[1])
         .map((val: Array<any>) => console.log(val[0]));
-      console.log('1 second passed');
+      console.log('1 second passed in emulator time.');
       this.numExecuted = 0;
     }
   }

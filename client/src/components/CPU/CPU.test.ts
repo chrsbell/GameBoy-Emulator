@@ -6,7 +6,7 @@ const chalk = require('chalk');
 import CPU from '.';
 import PPU from '../PPU';
 import Memory from '../Memory';
-import {byte, word, upper, lower} from '../Types';
+import {byte, word, upper, lower} from '../../Types';
 import Flag from './Flag';
 
 const TEST_ROM_FOLDER = path.join(
@@ -197,7 +197,6 @@ describe('CPU', () => {
         CPU.r.bc = (expected.b << 8) | expected.c;
         CPU.r.de = (expected.d << 8) | expected.e;
         CPU.r.hl = expected.hl;
-        // debugger;
       }
 
       // Assert

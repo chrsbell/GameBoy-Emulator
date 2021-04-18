@@ -1,5 +1,5 @@
 import OpcodeMap from './Map';
-import {byte} from '../../Types';
+import {byte} from '../../../Types';
 
 /**
  * No operation.

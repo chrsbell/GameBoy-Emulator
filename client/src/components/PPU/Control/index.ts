@@ -1,4 +1,4 @@
-import {byte, bit, getBit} from '../../Types';
+import {byte, bit, getBit} from '../../../Types';
 
 export default class LCDControl {
   private _control: byte = 0;

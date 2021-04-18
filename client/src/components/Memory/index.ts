@@ -1,8 +1,9 @@
-import type {byte, word} from '../Types';
-import {lower, upper, toHex} from '../Types';
+import type {byte, word} from '../../Types';
+import {lower, upper, toHex} from '../../Types';
 import PPU, {PPUAddress} from '../PPU';
-import benchmark, {benchmarksEnabled} from '../Performance';
-import {DEBUG} from '../Debug';
+import CPU from '../CPU';
+import benchmark, {benchmarksEnabled} from '../Helpers/Performance';
+import {DEBUG} from '../Helpers/Debug';
 
 interface CartridgeCode {
   [key: number]: string;
@@ -296,8 +297,11 @@ class Memory {
     if (bios) {
       this.bios = bios;
       this.inBios = true;
+      DEBUG && console.log('Loaded bios.');
+    } else {
+      this.inBios = false;
+      CPU.initPowerSequence();
     }
-    DEBUG && console.log('Loaded bios.');
   }
 }
 

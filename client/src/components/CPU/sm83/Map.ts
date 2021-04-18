@@ -19,7 +19,7 @@ import {
   clearBit,
   OpcodeList,
   toHex,
-} from '../../Types';
+} from '../../../Types';
 import CPU from '..';
 
 const setZFlag = (value: byte): void => {

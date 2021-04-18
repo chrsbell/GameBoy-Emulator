@@ -1,7 +1,7 @@
 import {instructionHelpers as helpers} from './Map';
 import CPU from '../';
 import Flag from '../Flag';
-import {lower} from '../../Types';
+import {lower} from '../../../Types';
 
 describe('helper functions', () => {
   describe('flags', () => {
