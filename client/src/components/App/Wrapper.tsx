@@ -2,14 +2,15 @@ import * as React from 'react';
 import {useRef, useEffect, useState, FormEvent} from 'react';
 import type {AppContext} from './AppTypes';
 import axios, {AxiosRequestConfig} from 'axios';
+import {DEBUG} from '../Helpers/Debug';
 import './Wrapper.css';
 
 const Wrapper: React.FC<AppContext> = ({appDispatch}) => {
   const canvasRef: React.MutableRefObject<HTMLCanvasElement> = useRef(null!);
   const hiddenBIOSRef: React.MutableRefObject<HTMLInputElement> = useRef(null!);
   const hiddenROMRef: React.MutableRefObject<HTMLInputElement> = useRef(null!);
-  const [ROMFile, setROMFile] = useState(new Blob());
-  const [BIOSFile, setBIOSFile] = useState(new Blob());
+  const [ROMFile, setROMFile] = useState<Blob>(new Blob());
+  const [BIOSFile, setBIOSFile] = useState<Blob>(new Blob());
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -31,7 +32,7 @@ const Wrapper: React.FC<AppContext> = ({appDispatch}) => {
 
   useEffect(() => {
     appDispatch({type: 'canvas', canvas: canvasRef.current});
-    console.log('Canvas created.');
+    DEBUG && console.log('Canvas created.');
   }, []);
 
   return (

@@ -1,6 +1,10 @@
 import Memory from '../Memory';
-import {byte, word, OpcodeList} from '../Types';
+import {byte, word, getBit, clearBit, OpcodeList, toHex} from '../../Types';
 import Opcodes from './sm83';
+import {instructionHelpers as helpers} from './sm83/Map';
+import Interrupt from '../Interrupts';
+import benchmark, {benchmarksEnabled} from '../Helpers/Performance';
+import {DEBUG} from '../Helpers/Debug';
 
 interface Registers {
   af: word;
@@ -32,10 +36,10 @@ class CPU {
     this._sp = value;
   }
   private _r: Registers = {
-    af: 0 as word,
-    bc: 0 as word,
-    de: 0 as word,
-    hl: 0 as word,
+    af: 0,
+    bc: 0,
+    de: 0,
+    hl: 0,
   };
   public get r(): Registers {
     return this._r;
@@ -50,16 +54,20 @@ class CPU {
   public set halted(value: boolean) {
     this._halted = value;
   }
-  protected _interruptsEnabled = true;
-  protected opcodes: OpcodeList = Opcodes;
-  private _lastExecuted: Array<byte> = [];
-  public get lastExecuted(): Array<byte> {
+  private _allInterruptsEnabled = true;
+  private opcodes: OpcodeList = Opcodes;
+  private _lastExecuted: Array<string> = [];
+  public get lastExecuted(): Array<string> {
     return this._lastExecuted;
   }
-  public set lastExecuted(value: Array<byte>) {
+  public set lastExecuted(value: Array<string>) {
     this._lastExecuted = value;
   }
   public constructor() {
+    if (benchmarksEnabled) {
+      this.executeInstruction = benchmark(this.executeInstruction.bind(this));
+      this.checkInterrupts = benchmark(this.checkInterrupts.bind(this));
+    }
     this.reset();
   }
 
@@ -70,7 +78,7 @@ class CPU {
     this.pc = 0;
     this.sp = 0;
     this.halted = false;
-    this._interruptsEnabled = true;
+    this._allInterruptsEnabled = true;
     this.r.af = 0;
     this.r.bc = 0;
     this.r.de = 0;
@@ -78,13 +86,13 @@ class CPU {
     this.lastExecuted = [];
   }
 
-  public setInterruptsEnabled(enabled: boolean): void {
-    this._interruptsEnabled = enabled;
+  public setInterruptsGlobal(enabled: boolean): void {
+    this._allInterruptsEnabled = enabled;
   }
   /**
    * Completes the GB power sequence
    */
-  private initPowerSequence(): void {
+  public initPowerSequence(): void {
     this.pc = 0x100;
     this.r.af = 0x01b0;
     this.r.bc = 0x0013;
@@ -128,35 +136,76 @@ class CPU {
    * @returns {number} the number of CPU cycles required.
    */
   public executeInstruction(): number {
+    // fetch
+    const opcode: byte = Memory.readByte(this.pc);
+    this.addCalledInstruction(toHex(opcode));
+    this.pc += 1;
+    // execute
     if (Memory.inBios) {
-      // fetch
-      const opcode: byte = Memory.readByte(this.pc);
-      this.pc += 1;
-      // not doing any execution of bios instructions for now
-      // execute
-      const numCycles: number = this.opcodes[opcode].call(this);
+      const numCycles: number = this.opcodes[opcode]();
       // check if finished bios execution
       if (!Memory.inBios) {
-        console.log('exiting bios');
+        DEBUG && console.log('Exiting bios from CPU.');
         this.initPowerSequence();
       }
       return numCycles;
     } else {
-      // normal execution
-      // fetch
-      const opcode: byte = Memory.readByte(this.pc);
-      this.pc += 1;
-      // execute
-      const numCycles: number = this.opcodes[opcode].call(this);
-      this.lastExecuted.push(opcode);
-      if (this.lastExecuted.length > 100) {
-        this.lastExecuted.shift();
-      }
-      // this.r.af = setLower(this.r.af, this.r.f.value());
+      const numCycles: number = this.opcodes[opcode]();
       return numCycles;
     }
   }
+  public addCalledInstruction(opcode: string): void {
+    this.lastExecuted.unshift(opcode);
+    if (this.lastExecuted.length > 100) {
+      this.lastExecuted.pop();
+    }
+  }
+  /**
+   * Checks if an interrupt needs to be handled.
+   */
+  public checkInterrupts(): void {
+    if (this._allInterruptsEnabled) {
+      const register: byte = Memory.readByte(Interrupt.if);
+      if (register) {
+        const individualEnabled = Memory.readByte(Interrupt.ie);
+        // 5 interrupts
+        for (let i = 0; i < 5; i++) {
+          if (getBit(register, i) && getBit(individualEnabled, i)) {
+            debugger;
+            this.handleInterrupts(i);
+          }
+        }
+      }
+    }
+  }
+  /**
+   * Handles an interrupt.
+   */
+  private handleInterrupts(interrupt: number): void {
+    this.setInterruptsGlobal(false);
+    const register: byte = Memory.readByte(Interrupt.if);
+    Memory.writeByte(Interrupt.if, clearBit(register, interrupt));
 
+    helpers.PUSH(this.pc);
+    DEBUG && console.log('Handled an interrupt.');
+    switch (interrupt) {
+      case Interrupt.vBlank:
+        this.pc = 0x40;
+        break;
+      case Interrupt.lcdStat:
+        this.pc = 0x48;
+        break;
+      case Interrupt.timer:
+        this.pc = 0x50;
+        break;
+      case Interrupt.serial:
+        this.pc = 0x58;
+        break;
+      case Interrupt.joypad:
+        this.pc = 0x40;
+        break;
+    }
+  }
   /**
    * Logs the internal state of the CPU.
    */

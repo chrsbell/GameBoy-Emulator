@@ -28,7 +28,7 @@ const toByte = (value: number | byte): byte => value & 0xff;
  * Adds the operand to the byte.
  * @returns {byte}
  */
-const addByte = (opOne: byte, opTwo: byte): byte => (opOne + opTwo) & 0xff;
+const addByte = (opOne: byte, opTwo: byte): byte => toByte(opOne + opTwo);
 
 /**
  * Casts a number to a word.
@@ -47,13 +47,13 @@ const upper = (value: word): byte => value >> 8;
  * @returns {word}
  */
 const setUpper = (value: word, operand: byte): word =>
-  (value & 0xff) | (operand << 8);
+  toByte(value) | (operand << 8);
 
 /**
  * Returns the lower byte of the word.
  * @returns {byte}
  */
-const lower = (value: word): byte => value & 0xff;
+const lower = (value: word): byte => toByte(value);
 
 /**
  * Sets the lower byte of the word.
@@ -90,7 +90,8 @@ const toHex = (value: byte | word): string => `0x${pad(value.toString(16), 2)}`;
  * Converts the unsigned byte to its signed format using two's complement
  */
 const toSigned = (value: byte) => {
-  if (value >= 128) {
+  if (value < 0) throw new Error(`Can't pass signed value into toSigned.`);
+  if (value >= 128 || value <= -128) {
     return -((~value + 1) & 255);
   }
   return value;
@@ -107,14 +108,14 @@ const setBit = (value: byte, bit: number) => {
   if (bit > 7) {
     throw new Error('Tried to set bit outside of range.');
   }
-  return (value >> bit) & 1;
+  return value | (1 << bit);
 };
 
 const clearBit = (value: byte, bit: number) => {
   if (bit > 7) {
-    throw new Error('Tried to set bit outside of range.');
+    throw new Error('Tried to clear bit outside of range.');
   }
-  return value & ~(1 << 7);
+  return value & ~(1 << bit);
 };
 
 export {

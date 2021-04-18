@@ -1,5 +1,9 @@
-import type {byte, word} from '../Types';
-import {toByte, lower, upper, toHex} from '../Types';
+import type {byte, word} from '../../Types';
+import {lower, upper, toHex} from '../../Types';
+import PPU, {PPUAddress} from '../PPU';
+import CPU from '../CPU';
+import benchmark, {benchmarksEnabled} from '../Helpers/Performance';
+import {DEBUG} from '../Helpers/Debug';
 
 interface CartridgeCode {
   [key: number]: string;
@@ -89,6 +93,8 @@ class Memory {
   private OAM!: Uint8Array;
   // 126 bytes high RAM
   private hRAM!: Uint8Array;
+  // 128 bytes io register space
+  private IORAM!: Uint8Array;
   public constructor() {
     this.reset();
   }
@@ -100,6 +106,7 @@ class Memory {
     this.wRAM = new Uint8Array(0xdfff - 0xc000);
     this.wRAMShadow = new Uint8Array(0xfdff - 0xe000);
     this.OAM = new Uint8Array(0xfe9f - 0xfe00);
+    this.IORAM = new Uint8Array(0xff7f - 0xff00);
     this.hRAM = new Uint8Array(0xfffe - 0xff80);
     // defaults to bank 1 at power on
     this.cart = {
@@ -118,19 +125,16 @@ class Memory {
       },
     };
     this.cart.R.currROMBank = 1;
+    if (benchmarksEnabled) {
+      this.readByte = benchmark(this.readByte.bind(this));
+      this.writeByte = benchmark(this.writeByte.bind(this));
+    }
   }
   /**
    * Writes the provided byte to the address
    */
   public writeByte(address: word, data: byte): void {
-    if (this.inBios) {
-      if (address <= 0xff) {
-        this.bios[address] = data;
-      } else {
-        this.inBios = false;
-        console.log('Exited bios using write to memory.');
-      }
-    }
+    if (this.inBios && address <= 0xff) return;
     if (address < 0x4000) {
       // ROM Bank 0 is always available
       this.cart.ROM[address] = data;
@@ -145,15 +149,33 @@ class Memory {
     } else if (address <= 0xdfff) {
       this.wRAM[address - 0xc000] = data;
     } else if (address <= 0xfdff) {
-      console.error(`Can't write to prohibited address.`);
+      DEBUG && console.error(`Can't write to prohibited address.`);
     } else if (address <= 0xfe9f) {
       this.OAM[address - 0xfe00] = data;
+    } else if (address <= 0xfeff) {
+      DEBUG && console.error(`Can't write to prohibited address.`);
     } else if (address <= 0xff7f) {
       // hardware I/O
+      // if (address === 0xff42) console.log(`scrollY: ${data}`);
+      // if (address === 0xff43) console.log(`scrollX: ${data}`);
+      if (address === PPUAddress.lcdc) {
+        PPU.lcdc.update(data);
+      }
+      if (address === 0xff46) {
+        DEBUG && console.log('Initiated DMA transfer.');
+        this.dmaTransfer(data);
+      }
+      // reset scanline if trying to write to associated register
+      else if (address === PPUAddress.scanline) {
+        this.IORAM[address - 0xff00] = 0;
+      } else {
+        this.IORAM[address - 0xff00] = data;
+      }
     } else if (address <= 0xffff) {
       this.hRAM[address - 0xff80] = data;
     }
   }
+
   /**
    * Writes the provided word to the address
    */
@@ -166,10 +188,12 @@ class Memory {
    */
   public readByte(address: word): byte {
     if (this.inBios) {
-      if (address <= 0xff) {
+      if (address < 0x100) {
+        // if (address > 150) console.log(address);
         return this.bios[address];
-      } else {
+      } else if (address === 0x100) {
         this.inBios = false;
+        DEBUG && console.log('Exited bios.');
       }
     }
     if (address < 0x4000) {
@@ -189,9 +213,11 @@ class Memory {
       return this.wRAMShadow[address - 0xe000];
     } else if (address <= 0xfe9f) {
       return this.OAM[address - 0xfe00];
+    } else if (address <= 0xfeff) {
+      throw new Error('Use of this area is prohibited.');
     } else if (address <= 0xff7f) {
       // hardware I/O
-      return 0;
+      return this.IORAM[address - 0xff00];
     } else if (address <= 0xffff) {
       return this.hRAM[address - 0xff80];
     }
@@ -233,6 +259,22 @@ class Memory {
     }
   }
   /**
+   * Used internally by the PPU/lCD to update the current scanline.
+   */
+  public updateScanline(scanline: byte): void {
+    this.IORAM[0xff44 - 0xff00] = scanline;
+  }
+  /**
+   * Performs direct memory address transfer of sprite data.
+   * Pretty much copied from http://www.codeslinger.co.uk/pages/projects/gameboy/dma.html
+   */
+  public dmaTransfer(data: byte): void {
+    const address = data << 8;
+    for (let i = 0; i < 0xa0; i++) {
+      this.writeByte(0xfe00 + i, this.readByte(address + i));
+    }
+  }
+  /**
    * Loads parsed files into BIOS/ROM
    */
   public load(bios: Uint8Array | null, rom: Uint8Array): void {
@@ -240,23 +282,26 @@ class Memory {
     this.cart.MBCType = this.readByte(0x147);
     this.cart.ROMSize = this.readByte(0x148);
     this.cart.RAMSize = this.readByte(0x149);
-    console.log(
-      `ROM Size: $${JSON.stringify(ROMSizeCodes[this.cart.ROMSize])}`
-    );
-    console.log(`RAM Size: ${RAMSizeCodes[this.cart.RAMSize]}`);
-    console.log(`Cartridge Type: ${CartridgeTypes[this.cart.MBCType]}`);
+    DEBUG &&
+      console.log(
+        `ROM Size: $${JSON.stringify(ROMSizeCodes[this.cart.ROMSize])}`
+      );
+    DEBUG && console.log(`RAM Size: ${RAMSizeCodes[this.cart.RAMSize]}`);
+    DEBUG &&
+      console.log(`Cartridge Type: ${CartridgeTypes[this.cart.MBCType]}`);
 
-    if (this.cart.MBCType === 0) {
-      // MBC 0x00
-    } else {
-      console.log(`No support for MBC ${toHex(this.cart.MBCType)}.`);
+    if (this.cart.MBCType !== 0) {
+      DEBUG && console.log(`No support for MBC ${toHex(this.cart.MBCType)}.`);
     }
-    console.log('Loaded file into ROM memory.');
+    DEBUG && console.log('Loaded file into ROM memory.');
     if (bios) {
       this.bios = bios;
       this.inBios = true;
+      DEBUG && console.log('Loaded bios.');
+    } else {
+      this.inBios = false;
+      CPU.initPowerSequence();
     }
-    console.log('Loaded bios.');
   }
 }
 

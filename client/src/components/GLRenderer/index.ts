@@ -1,5 +1,6 @@
-// could render data as an image texture
+import benchmark, {benchmarksEnabled} from '../Helpers/Performance';
 
+// could render data as an image texture
 type RGB = Array<number>;
 
 export const Colors = {
@@ -20,10 +21,12 @@ class GLRenderer {
   private shadeAttributeLocation!: GLint;
   private shadeBuffer!: WebGLBuffer;
   private initialized = false;
-  private screenWidth = 160;
-  private screenHeight = 144;
+  public screenWidth = 160;
+  public screenHeight = 144;
 
-  public constructor() {}
+  public constructor() {
+    if (benchmarksEnabled) this.draw = benchmark(this.draw.bind(this));
+  }
 
   /**
    * @returns whether the renderer is initialized.
@@ -207,20 +210,6 @@ class GLRenderer {
         gl.bufferSubData(gl.ARRAY_BUFFER, start, new Float32Array(data));
       }
     }
-  }
-
-  /**
-   * @returns the screen width.
-   */
-  public getScreenWidth(): number {
-    return this.screenWidth;
-  }
-
-  /**
-   * @returns the screen height.
-   */
-  public getScreenHeight(): number {
-    return this.screenHeight;
   }
 
   /**

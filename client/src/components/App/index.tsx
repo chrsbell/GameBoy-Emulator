@@ -1,9 +1,9 @@
 import * as React from 'react';
 import {useEffect, useReducer, useRef} from 'react';
 import Emulator from '../Emulator';
-import GLRenderer from '../GLRenderer';
+import CanvasRenderer from '../CanvasRenderer';
 import Wrapper from './Wrapper';
-import type {AppState, Action} from './AppTypes';
+import type {AppState, Action, AppContext} from './AppTypes';
 
 const initialState: AppState = {
   canvas: null!,
@@ -49,12 +49,12 @@ const App: React.FC = () => {
   }, [appState.parsedROM, appState.parsedBIOS]);
 
   useEffect(() => {
-    if (appState.canvas && !GLRenderer.isInitialized()) {
-      GLRenderer.initialize(appState.canvas);
+    if (appState.canvas && !CanvasRenderer.initialized) {
+      CanvasRenderer.initialize(appState.canvas, Math.round(787 / 160));
     }
   }, [appState.canvas]);
 
-  const reducerProps = {
+  const reducerProps: AppContext = {
     appState,
     appDispatch,
   };

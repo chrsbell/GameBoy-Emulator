@@ -1,10 +1,10 @@
-import {OpcodeMap} from './Map';
-import {byte} from '../../Types';
+import OpcodeMap from './Map';
+import {byte} from '../../../Types';
 
 /**
  * No operation.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function NOP(): byte {
@@ -15,7 +15,7 @@ function NOP(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDBCid16i(): byte {
@@ -26,7 +26,7 @@ function LDBCid16i(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDBCmAi(): byte {
@@ -37,7 +37,7 @@ function LDBCmAi(): byte {
 /**
  * Increment register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function INCBCi(): byte {
@@ -48,7 +48,7 @@ function INCBCi(): byte {
 /**
  * Increment register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function INCBi(): byte {
@@ -59,7 +59,7 @@ function INCBi(): byte {
 /**
  * Decrement register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function DECBi(): byte {
@@ -70,7 +70,7 @@ function DECBi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDBid8i(): byte {
@@ -81,7 +81,7 @@ function LDBid8i(): byte {
 /**
  * Rotate A left. Old bit 7 to Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RLCA(): byte {
@@ -92,7 +92,7 @@ function RLCA(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDa16mSPi(): byte {
@@ -103,7 +103,7 @@ function LDa16mSPi(): byte {
 /**
  * Add.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: N, H, C
  */
 function ADDHLiBCi(): byte {
@@ -114,7 +114,7 @@ function ADDHLiBCi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDAiBCm(): byte {
@@ -125,7 +125,7 @@ function LDAiBCm(): byte {
 /**
  * Decrement register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function DECBCi(): byte {
@@ -136,7 +136,7 @@ function DECBCi(): byte {
 /**
  * Increment register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function INCCi(): byte {
@@ -147,7 +147,7 @@ function INCCi(): byte {
 /**
  * Decrement register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function DECCi(): byte {
@@ -158,7 +158,7 @@ function DECCi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDCid8i(): byte {
@@ -169,7 +169,7 @@ function LDCid8i(): byte {
 /**
  * Rotate A right. Old bit 0 to Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RRCA(): byte {
@@ -180,7 +180,7 @@ function RRCA(): byte {
 /**
  *  Halt CPU & LCD display until button pressed.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function STOP(): byte {
@@ -191,7 +191,7 @@ function STOP(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDDEid16i(): byte {
@@ -202,7 +202,7 @@ function LDDEid16i(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDDEmAi(): byte {
@@ -213,7 +213,7 @@ function LDDEmAi(): byte {
 /**
  * Increment register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function INCDEi(): byte {
@@ -224,7 +224,7 @@ function INCDEi(): byte {
 /**
  * Increment register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function INCDi(): byte {
@@ -235,7 +235,7 @@ function INCDi(): byte {
 /**
  * Decrement register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function DECDi(): byte {
@@ -246,7 +246,7 @@ function DECDi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDDid8i(): byte {
@@ -257,7 +257,7 @@ function LDDid8i(): byte {
 /**
  * Rotate A left through Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RLA(): byte {
@@ -268,7 +268,7 @@ function RLA(): byte {
 /**
  * Jump to the relative address.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function JRr8(): byte {
@@ -279,7 +279,7 @@ function JRr8(): byte {
 /**
  * Add.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: N, H, C
  */
 function ADDHLiDEi(): byte {
@@ -290,7 +290,7 @@ function ADDHLiDEi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDAiDEm(): byte {
@@ -301,7 +301,7 @@ function LDAiDEm(): byte {
 /**
  * Decrement register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function DECDEi(): byte {
@@ -312,7 +312,7 @@ function DECDEi(): byte {
 /**
  * Increment register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function INCEi(): byte {
@@ -323,7 +323,7 @@ function INCEi(): byte {
 /**
  * Decrement register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function DECEi(): byte {
@@ -334,7 +334,7 @@ function DECEi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDEid8i(): byte {
@@ -345,7 +345,7 @@ function LDEid8i(): byte {
 /**
  * Rotate A right through Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RRA(): byte {
@@ -356,7 +356,7 @@ function RRA(): byte {
 /**
  * Conditional jump to the relative address.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 export function JRCNZr8(): byte {
@@ -370,7 +370,7 @@ export function JRCNZr8(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDHLid16i(): byte {
@@ -381,7 +381,7 @@ function LDHLid16i(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDHLIncrmAi(): byte {
@@ -392,7 +392,7 @@ function LDHLIncrmAi(): byte {
 /**
  * Increment register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function INCHLi(): byte {
@@ -403,7 +403,7 @@ function INCHLi(): byte {
 /**
  * Increment register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function INCHi(): byte {
@@ -414,7 +414,7 @@ function INCHi(): byte {
 /**
  * Decrement register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function DECHi(): byte {
@@ -425,7 +425,7 @@ function DECHi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDHid8i(): byte {
@@ -436,7 +436,7 @@ function LDHid8i(): byte {
 /**
  * Decimal adjust register A.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, H, C
  */
 function DAAA(): byte {
@@ -447,7 +447,7 @@ function DAAA(): byte {
 /**
  * Conditional jump to the relative address.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 export function JRCZr8(): byte {
@@ -461,7 +461,7 @@ export function JRCZr8(): byte {
 /**
  * Add.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: N, H, C
  */
 function ADDHLiHLi(): byte {
@@ -472,7 +472,7 @@ function ADDHLiHLi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDAiHLIncrm(): byte {
@@ -483,7 +483,7 @@ function LDAiHLIncrm(): byte {
 /**
  * Decrement register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function DECHLi(): byte {
@@ -494,7 +494,7 @@ function DECHLi(): byte {
 /**
  * Increment register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function INCLi(): byte {
@@ -505,7 +505,7 @@ function INCLi(): byte {
 /**
  * Decrement register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function DECLi(): byte {
@@ -516,7 +516,7 @@ function DECLi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDLid8i(): byte {
@@ -527,7 +527,7 @@ function LDLid8i(): byte {
 /**
  * Complement A register. (Flip all bits.)
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: N, H
  */
 function CPLA(): byte {
@@ -538,7 +538,7 @@ function CPLA(): byte {
 /**
  * Conditional jump to the relative address.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 export function JRCNCr8(): byte {
@@ -552,7 +552,7 @@ export function JRCNCr8(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDSPid16i(): byte {
@@ -563,7 +563,7 @@ function LDSPid16i(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDHLDecrmAi(): byte {
@@ -574,7 +574,7 @@ function LDHLDecrmAi(): byte {
 /**
  * Increment register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function INCSPi(): byte {
@@ -585,7 +585,7 @@ function INCSPi(): byte {
 /**
  * Increment register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function INCHLm(): byte {
@@ -596,7 +596,7 @@ function INCHLm(): byte {
 /**
  * Decrement register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function DECHLm(): byte {
@@ -607,7 +607,7 @@ function DECHLm(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDHLmd8i(): byte {
@@ -618,7 +618,7 @@ function LDHLmd8i(): byte {
 /**
  *  Set Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: N, H, C
  */
 function SCF(): byte {
@@ -629,7 +629,7 @@ function SCF(): byte {
 /**
  * Conditional jump to the relative address.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 export function JRCCr8(): byte {
@@ -643,7 +643,7 @@ export function JRCCr8(): byte {
 /**
  * Add.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: N, H, C
  */
 function ADDHLiSPi(): byte {
@@ -654,7 +654,7 @@ function ADDHLiSPi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDAiHLDecrm(): byte {
@@ -665,7 +665,7 @@ function LDAiHLDecrm(): byte {
 /**
  * Decrement register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function DECSPi(): byte {
@@ -676,7 +676,7 @@ function DECSPi(): byte {
 /**
  * Increment register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function INCAi(): byte {
@@ -687,7 +687,7 @@ function INCAi(): byte {
 /**
  * Decrement register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function DECAi(): byte {
@@ -698,7 +698,7 @@ function DECAi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDAid8i(): byte {
@@ -711,7 +711,7 @@ function LDAid8i(): byte {
  * If C flag is set, then reset it.
  * If C flag is reset, then set it.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: N, H, C
  */
 function CCF(): byte {
@@ -722,7 +722,7 @@ function CCF(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDBiBi(): byte {
@@ -733,7 +733,7 @@ function LDBiBi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDBiCi(): byte {
@@ -744,7 +744,7 @@ function LDBiCi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDBiDi(): byte {
@@ -755,7 +755,7 @@ function LDBiDi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDBiEi(): byte {
@@ -766,7 +766,7 @@ function LDBiEi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDBiHi(): byte {
@@ -777,7 +777,7 @@ function LDBiHi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDBiLi(): byte {
@@ -788,7 +788,7 @@ function LDBiLi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDBiHLm(): byte {
@@ -799,7 +799,7 @@ function LDBiHLm(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDBiAi(): byte {
@@ -810,7 +810,7 @@ function LDBiAi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDCiBi(): byte {
@@ -821,7 +821,7 @@ function LDCiBi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDCiCi(): byte {
@@ -832,7 +832,7 @@ function LDCiCi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDCiDi(): byte {
@@ -843,7 +843,7 @@ function LDCiDi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDCiEi(): byte {
@@ -854,7 +854,7 @@ function LDCiEi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDCiHi(): byte {
@@ -865,7 +865,7 @@ function LDCiHi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDCiLi(): byte {
@@ -876,7 +876,7 @@ function LDCiLi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDCiHLm(): byte {
@@ -887,7 +887,7 @@ function LDCiHLm(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDCiAi(): byte {
@@ -898,7 +898,7 @@ function LDCiAi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDDiBi(): byte {
@@ -909,7 +909,7 @@ function LDDiBi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDDiCi(): byte {
@@ -920,7 +920,7 @@ function LDDiCi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDDiDi(): byte {
@@ -931,7 +931,7 @@ function LDDiDi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDDiEi(): byte {
@@ -942,7 +942,7 @@ function LDDiEi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDDiHi(): byte {
@@ -953,7 +953,7 @@ function LDDiHi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDDiLi(): byte {
@@ -964,7 +964,7 @@ function LDDiLi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDDiHLm(): byte {
@@ -975,7 +975,7 @@ function LDDiHLm(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDDiAi(): byte {
@@ -986,7 +986,7 @@ function LDDiAi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDEiBi(): byte {
@@ -997,7 +997,7 @@ function LDEiBi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDEiCi(): byte {
@@ -1008,7 +1008,7 @@ function LDEiCi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDEiDi(): byte {
@@ -1019,7 +1019,7 @@ function LDEiDi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDEiEi(): byte {
@@ -1030,7 +1030,7 @@ function LDEiEi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDEiHi(): byte {
@@ -1041,7 +1041,7 @@ function LDEiHi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDEiLi(): byte {
@@ -1052,7 +1052,7 @@ function LDEiLi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDEiHLm(): byte {
@@ -1063,7 +1063,7 @@ function LDEiHLm(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDEiAi(): byte {
@@ -1074,7 +1074,7 @@ function LDEiAi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDHiBi(): byte {
@@ -1085,7 +1085,7 @@ function LDHiBi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDHiCi(): byte {
@@ -1096,7 +1096,7 @@ function LDHiCi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDHiDi(): byte {
@@ -1107,7 +1107,7 @@ function LDHiDi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDHiEi(): byte {
@@ -1118,7 +1118,7 @@ function LDHiEi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDHiHi(): byte {
@@ -1129,7 +1129,7 @@ function LDHiHi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDHiLi(): byte {
@@ -1140,7 +1140,7 @@ function LDHiLi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDHiHLm(): byte {
@@ -1151,7 +1151,7 @@ function LDHiHLm(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDHiAi(): byte {
@@ -1162,7 +1162,7 @@ function LDHiAi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDLiBi(): byte {
@@ -1173,7 +1173,7 @@ function LDLiBi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDLiCi(): byte {
@@ -1184,7 +1184,7 @@ function LDLiCi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDLiDi(): byte {
@@ -1195,7 +1195,7 @@ function LDLiDi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDLiEi(): byte {
@@ -1206,7 +1206,7 @@ function LDLiEi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDLiHi(): byte {
@@ -1217,7 +1217,7 @@ function LDLiHi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDLiLi(): byte {
@@ -1228,7 +1228,7 @@ function LDLiLi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDLiHLm(): byte {
@@ -1239,7 +1239,7 @@ function LDLiHLm(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDLiAi(): byte {
@@ -1250,7 +1250,7 @@ function LDLiAi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDHLmBi(): byte {
@@ -1261,7 +1261,7 @@ function LDHLmBi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDHLmCi(): byte {
@@ -1272,7 +1272,7 @@ function LDHLmCi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDHLmDi(): byte {
@@ -1283,7 +1283,7 @@ function LDHLmDi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDHLmEi(): byte {
@@ -1294,7 +1294,7 @@ function LDHLmEi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDHLmHi(): byte {
@@ -1305,7 +1305,7 @@ function LDHLmHi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDHLmLi(): byte {
@@ -1316,7 +1316,7 @@ function LDHLmLi(): byte {
 /**
  * Disables interrupt handling.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function HALT(): byte {
@@ -1327,7 +1327,7 @@ function HALT(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDHLmAi(): byte {
@@ -1338,7 +1338,7 @@ function LDHLmAi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDAiBi(): byte {
@@ -1349,7 +1349,7 @@ function LDAiBi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDAiCi(): byte {
@@ -1360,7 +1360,7 @@ function LDAiCi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDAiDi(): byte {
@@ -1371,7 +1371,7 @@ function LDAiDi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDAiEi(): byte {
@@ -1382,7 +1382,7 @@ function LDAiEi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDAiHi(): byte {
@@ -1393,7 +1393,7 @@ function LDAiHi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDAiLi(): byte {
@@ -1404,7 +1404,7 @@ function LDAiLi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDAiHLm(): byte {
@@ -1415,7 +1415,7 @@ function LDAiHLm(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDAiAi(): byte {
@@ -1426,7 +1426,7 @@ function LDAiAi(): byte {
 /**
  * Add.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ADDAiBi(): byte {
@@ -1437,7 +1437,7 @@ function ADDAiBi(): byte {
 /**
  * Add.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ADDAiCi(): byte {
@@ -1448,7 +1448,7 @@ function ADDAiCi(): byte {
 /**
  * Add.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ADDAiDi(): byte {
@@ -1459,7 +1459,7 @@ function ADDAiDi(): byte {
 /**
  * Add.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ADDAiEi(): byte {
@@ -1470,7 +1470,7 @@ function ADDAiEi(): byte {
 /**
  * Add.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ADDAiHi(): byte {
@@ -1481,7 +1481,7 @@ function ADDAiHi(): byte {
 /**
  * Add.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ADDAiLi(): byte {
@@ -1492,7 +1492,7 @@ function ADDAiLi(): byte {
 /**
  * Add.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ADDAiHLm(): byte {
@@ -1503,7 +1503,7 @@ function ADDAiHLm(): byte {
 /**
  * Add.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ADDAiAi(): byte {
@@ -1514,7 +1514,7 @@ function ADDAiAi(): byte {
 /**
  * Add with carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ADCAiBi(): byte {
@@ -1525,7 +1525,7 @@ function ADCAiBi(): byte {
 /**
  * Add with carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ADCAiCi(): byte {
@@ -1536,7 +1536,7 @@ function ADCAiCi(): byte {
 /**
  * Add with carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ADCAiDi(): byte {
@@ -1547,7 +1547,7 @@ function ADCAiDi(): byte {
 /**
  * Add with carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ADCAiEi(): byte {
@@ -1558,7 +1558,7 @@ function ADCAiEi(): byte {
 /**
  * Add with carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ADCAiHi(): byte {
@@ -1569,7 +1569,7 @@ function ADCAiHi(): byte {
 /**
  * Add with carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ADCAiLi(): byte {
@@ -1580,7 +1580,7 @@ function ADCAiLi(): byte {
 /**
  * Add with carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ADCAiHLm(): byte {
@@ -1591,7 +1591,7 @@ function ADCAiHLm(): byte {
 /**
  * Add with carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ADCAiAi(): byte {
@@ -1602,7 +1602,7 @@ function ADCAiAi(): byte {
 /**
  * Subtract.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SUBAiBi(): byte {
@@ -1613,7 +1613,7 @@ function SUBAiBi(): byte {
 /**
  * Subtract.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SUBAiCi(): byte {
@@ -1624,7 +1624,7 @@ function SUBAiCi(): byte {
 /**
  * Subtract.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SUBAiDi(): byte {
@@ -1635,7 +1635,7 @@ function SUBAiDi(): byte {
 /**
  * Subtract.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SUBAiEi(): byte {
@@ -1646,7 +1646,7 @@ function SUBAiEi(): byte {
 /**
  * Subtract.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SUBAiHi(): byte {
@@ -1657,7 +1657,7 @@ function SUBAiHi(): byte {
 /**
  * Subtract.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SUBAiLi(): byte {
@@ -1668,7 +1668,7 @@ function SUBAiLi(): byte {
 /**
  * Subtract.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SUBAiHLm(): byte {
@@ -1679,7 +1679,7 @@ function SUBAiHLm(): byte {
 /**
  * Subtract.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SUBAiAi(): byte {
@@ -1690,7 +1690,7 @@ function SUBAiAi(): byte {
 /**
  * Subtract with carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SBCAiBi(): byte {
@@ -1701,7 +1701,7 @@ function SBCAiBi(): byte {
 /**
  * Subtract with carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SBCAiCi(): byte {
@@ -1712,7 +1712,7 @@ function SBCAiCi(): byte {
 /**
  * Subtract with carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SBCAiDi(): byte {
@@ -1723,7 +1723,7 @@ function SBCAiDi(): byte {
 /**
  * Subtract with carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SBCAiEi(): byte {
@@ -1734,7 +1734,7 @@ function SBCAiEi(): byte {
 /**
  * Subtract with carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SBCAiHi(): byte {
@@ -1745,7 +1745,7 @@ function SBCAiHi(): byte {
 /**
  * Subtract with carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SBCAiLi(): byte {
@@ -1756,7 +1756,7 @@ function SBCAiLi(): byte {
 /**
  * Subtract with carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SBCAiHLm(): byte {
@@ -1767,7 +1767,7 @@ function SBCAiHLm(): byte {
 /**
  * Subtract with carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SBCAiAi(): byte {
@@ -1778,7 +1778,7 @@ function SBCAiAi(): byte {
 /**
  * Logical AND.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ANDBi(): byte {
@@ -1789,7 +1789,7 @@ function ANDBi(): byte {
 /**
  * Logical AND.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ANDCi(): byte {
@@ -1800,7 +1800,7 @@ function ANDCi(): byte {
 /**
  * Logical AND.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ANDDi(): byte {
@@ -1811,7 +1811,7 @@ function ANDDi(): byte {
 /**
  * Logical AND.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ANDEi(): byte {
@@ -1822,7 +1822,7 @@ function ANDEi(): byte {
 /**
  * Logical AND.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ANDHi(): byte {
@@ -1833,7 +1833,7 @@ function ANDHi(): byte {
 /**
  * Logical AND.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ANDLi(): byte {
@@ -1844,7 +1844,7 @@ function ANDLi(): byte {
 /**
  * Logical AND.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ANDHLm(): byte {
@@ -1855,7 +1855,7 @@ function ANDHLm(): byte {
 /**
  * Logical AND.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ANDAi(): byte {
@@ -1866,7 +1866,7 @@ function ANDAi(): byte {
 /**
  * Logical XOR.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function XORBi(): byte {
@@ -1877,7 +1877,7 @@ function XORBi(): byte {
 /**
  * Logical XOR.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function XORCi(): byte {
@@ -1888,7 +1888,7 @@ function XORCi(): byte {
 /**
  * Logical XOR.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function XORDi(): byte {
@@ -1899,7 +1899,7 @@ function XORDi(): byte {
 /**
  * Logical XOR.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function XOREi(): byte {
@@ -1910,7 +1910,7 @@ function XOREi(): byte {
 /**
  * Logical XOR.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function XORHi(): byte {
@@ -1921,7 +1921,7 @@ function XORHi(): byte {
 /**
  * Logical XOR.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function XORLi(): byte {
@@ -1932,7 +1932,7 @@ function XORLi(): byte {
 /**
  * Logical XOR.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function XORHLm(): byte {
@@ -1943,7 +1943,7 @@ function XORHLm(): byte {
 /**
  * Logical XOR.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function XORAi(): byte {
@@ -1954,7 +1954,7 @@ function XORAi(): byte {
 /**
  * Logical OR.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ORBi(): byte {
@@ -1965,7 +1965,7 @@ function ORBi(): byte {
 /**
  * Logical OR.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ORCi(): byte {
@@ -1976,7 +1976,7 @@ function ORCi(): byte {
 /**
  * Logical OR.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ORDi(): byte {
@@ -1987,7 +1987,7 @@ function ORDi(): byte {
 /**
  * Logical OR.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function OREi(): byte {
@@ -1998,7 +1998,7 @@ function OREi(): byte {
 /**
  * Logical OR.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ORHi(): byte {
@@ -2009,7 +2009,7 @@ function ORHi(): byte {
 /**
  * Logical OR.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ORLi(): byte {
@@ -2020,7 +2020,7 @@ function ORLi(): byte {
 /**
  * Logical OR.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ORHLm(): byte {
@@ -2031,7 +2031,7 @@ function ORHLm(): byte {
 /**
  * Logical OR.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ORAi(): byte {
@@ -2042,7 +2042,7 @@ function ORAi(): byte {
 /**
  * Compare A with regiseter.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function CPBi(): byte {
@@ -2053,7 +2053,7 @@ function CPBi(): byte {
 /**
  * Compare A with regiseter.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function CPCi(): byte {
@@ -2064,7 +2064,7 @@ function CPCi(): byte {
 /**
  * Compare A with regiseter.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function CPDi(): byte {
@@ -2075,7 +2075,7 @@ function CPDi(): byte {
 /**
  * Compare A with regiseter.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function CPEi(): byte {
@@ -2086,7 +2086,7 @@ function CPEi(): byte {
 /**
  * Compare A with regiseter.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function CPHi(): byte {
@@ -2097,7 +2097,7 @@ function CPHi(): byte {
 /**
  * Compare A with regiseter.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function CPLi(): byte {
@@ -2108,7 +2108,7 @@ function CPLi(): byte {
 /**
  * Compare A with regiseter.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function CPHLm(): byte {
@@ -2119,7 +2119,7 @@ function CPHLm(): byte {
 /**
  * Compare A with regiseter.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function CPAi(): byte {
@@ -2130,7 +2130,7 @@ function CPAi(): byte {
 /**
  * Conditionally from a function.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 export function RETCNZ(): byte {
@@ -2144,7 +2144,7 @@ export function RETCNZ(): byte {
 /**
  * Pops to the 16-bit register, data from the stack memory.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function POPIntoBCi(): byte {
@@ -2155,7 +2155,7 @@ function POPIntoBCi(): byte {
 /**
  * Conditional jump to the absolute address.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 export function JPCNZa16(): byte {
@@ -2169,7 +2169,7 @@ export function JPCNZa16(): byte {
 /**
  * Jump to the absolute address.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function JPa16(): byte {
@@ -2180,7 +2180,7 @@ function JPa16(): byte {
 /**
  * Conditional function call to the absolute address.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 export function CALLCNZa16(): byte {
@@ -2194,7 +2194,7 @@ export function CALLCNZa16(): byte {
 /**
  * Push to the stack memory, data from the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function PUSHRegisterBCi(): byte {
@@ -2205,7 +2205,7 @@ function PUSHRegisterBCi(): byte {
 /**
  * Add.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ADDAid8i(): byte {
@@ -2216,7 +2216,7 @@ function ADDAid8i(): byte {
 /**
  * Unconditional function call to the absolute fixed address
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RSTAi00Hi(): byte {
@@ -2227,7 +2227,7 @@ function RSTAi00Hi(): byte {
 /**
  * Conditionally from a function.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 export function RETCZ(): byte {
@@ -2241,7 +2241,7 @@ export function RETCZ(): byte {
 /**
  * Return from a function.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RET(): byte {
@@ -2252,7 +2252,7 @@ function RET(): byte {
 /**
  * Conditional jump to the absolute address.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 export function JPCZa16(): byte {
@@ -2266,7 +2266,7 @@ export function JPCZa16(): byte {
 /**
  * Execute a CB-prefixed instruction.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function PREFIX(): byte {
@@ -2277,7 +2277,7 @@ function PREFIX(): byte {
 /**
  * Conditional function call to the absolute address.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 export function CALLCZa16(): byte {
@@ -2291,7 +2291,7 @@ export function CALLCZa16(): byte {
 /**
  * Function call to the absolute address.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function CALL(): byte {
@@ -2302,7 +2302,7 @@ function CALL(): byte {
 /**
  * Add with carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ADCAid8i(): byte {
@@ -2313,7 +2313,7 @@ function ADCAid8i(): byte {
 /**
  * Unconditional function call to the absolute fixed address
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RSTAi08Hi(): byte {
@@ -2324,7 +2324,7 @@ function RSTAi08Hi(): byte {
 /**
  * Conditionally from a function.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 export function RETCNC(): byte {
@@ -2338,7 +2338,7 @@ export function RETCNC(): byte {
 /**
  * Pops to the 16-bit register, data from the stack memory.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function POPIntoDEi(): byte {
@@ -2349,7 +2349,7 @@ function POPIntoDEi(): byte {
 /**
  * Conditional jump to the absolute address.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 export function JPCNCa16(): byte {
@@ -2372,7 +2372,7 @@ function IllegalD3(): byte {
 /**
  * Conditional function call to the absolute address.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 export function CALLCNCa16(): byte {
@@ -2386,7 +2386,7 @@ export function CALLCNCa16(): byte {
 /**
  * Push to the stack memory, data from the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function PUSHRegisterDEi(): byte {
@@ -2397,7 +2397,7 @@ function PUSHRegisterDEi(): byte {
 /**
  * Subtract.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SUBAid8i(): byte {
@@ -2408,7 +2408,7 @@ function SUBAid8i(): byte {
 /**
  * Unconditional function call to the absolute fixed address
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RSTAi10Hi(): byte {
@@ -2419,7 +2419,7 @@ function RSTAi10Hi(): byte {
 /**
  * Conditionally from a function.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 export function RETCC(): byte {
@@ -2433,7 +2433,7 @@ export function RETCC(): byte {
 /**
  * Return from a function.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RETI(): byte {
@@ -2444,7 +2444,7 @@ function RETI(): byte {
 /**
  * Conditional jump to the absolute address.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 export function JPCCa16(): byte {
@@ -2467,7 +2467,7 @@ function IllegalDB(): byte {
 /**
  * Conditional function call to the absolute address.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 export function CALLCCa16(): byte {
@@ -2490,7 +2490,7 @@ function IllegalDD(): byte {
 /**
  * Subtract with carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SBCAid8i(): byte {
@@ -2501,7 +2501,7 @@ function SBCAid8i(): byte {
 /**
  * Unconditional function call to the absolute fixed address
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RSTAi18Hi(): byte {
@@ -2512,7 +2512,7 @@ function RSTAi18Hi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDHa8mAi(): byte {
@@ -2523,7 +2523,7 @@ function LDHa8mAi(): byte {
 /**
  * Pops to the 16-bit register, data from the stack memory.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function POPIntoHLi(): byte {
@@ -2534,7 +2534,7 @@ function POPIntoHLi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDCmAi(): byte {
@@ -2563,7 +2563,7 @@ function IllegalE4(): byte {
 /**
  * Push to the stack memory, data from the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function PUSHRegisterHLi(): byte {
@@ -2574,7 +2574,7 @@ function PUSHRegisterHLi(): byte {
 /**
  * Logical AND.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ANDd8i(): byte {
@@ -2585,7 +2585,7 @@ function ANDd8i(): byte {
 /**
  * Unconditional function call to the absolute fixed address
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RSTAi20Hi(): byte {
@@ -2596,7 +2596,7 @@ function RSTAi20Hi(): byte {
 /**
  * Add.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ADDSPir8i(): byte {
@@ -2607,7 +2607,7 @@ function ADDSPir8i(): byte {
 /**
  * Jump to the absolute address.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function JPHL(): byte {
@@ -2618,7 +2618,7 @@ function JPHL(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDa16mAi(): byte {
@@ -2656,7 +2656,7 @@ function IllegalED(): byte {
 /**
  * Logical XOR.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function XORd8i(): byte {
@@ -2667,7 +2667,7 @@ function XORd8i(): byte {
 /**
  * Unconditional function call to the absolute fixed address
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RSTAi28Hi(): byte {
@@ -2678,7 +2678,7 @@ function RSTAi28Hi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDHAia8m(): byte {
@@ -2689,7 +2689,7 @@ function LDHAia8m(): byte {
 /**
  * Pops to the 16-bit register, data from the stack memory.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function POPIntoAFi(): byte {
@@ -2700,7 +2700,7 @@ function POPIntoAFi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDAiCm(): byte {
@@ -2711,7 +2711,7 @@ function LDAiCm(): byte {
 /**
  * Disables interrupt handling.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function DI(): byte {
@@ -2731,7 +2731,7 @@ function IllegalF4(): byte {
 /**
  * Push to the stack memory, data from the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function PUSHRegisterAFi(): byte {
@@ -2742,7 +2742,7 @@ function PUSHRegisterAFi(): byte {
 /**
  * Logical OR.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function ORd8i(): byte {
@@ -2753,7 +2753,7 @@ function ORd8i(): byte {
 /**
  * Unconditional function call to the absolute fixed address
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RSTAi30Hi(): byte {
@@ -2764,7 +2764,7 @@ function RSTAi30Hi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function LDHLiSPIncri(): byte {
@@ -2775,7 +2775,7 @@ function LDHLiSPIncri(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDSPiHLi(): byte {
@@ -2786,7 +2786,7 @@ function LDSPiHLi(): byte {
 /**
  * Load data into the register.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function LDAia16m(): byte {
@@ -2797,7 +2797,7 @@ function LDAia16m(): byte {
 /**
  * Enables interrupt handling.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function EI(): byte {
@@ -2826,7 +2826,7 @@ function IllegalFD(): byte {
 /**
  * Compare A with regiseter.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function CPd8i(): byte {
@@ -2837,7 +2837,7 @@ function CPd8i(): byte {
 /**
  * Unconditional function call to the absolute fixed address
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RSTAi38Hi(): byte {
@@ -2848,7 +2848,7 @@ function RSTAi38Hi(): byte {
 /**
  * Rotate n left. Old bit 7 to Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RLCBi(): byte {
@@ -2859,7 +2859,7 @@ function RLCBi(): byte {
 /**
  * Rotate n left. Old bit 7 to Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RLCCi(): byte {
@@ -2870,7 +2870,7 @@ function RLCCi(): byte {
 /**
  * Rotate n left. Old bit 7 to Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RLCDi(): byte {
@@ -2881,7 +2881,7 @@ function RLCDi(): byte {
 /**
  * Rotate n left. Old bit 7 to Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RLCEi(): byte {
@@ -2892,7 +2892,7 @@ function RLCEi(): byte {
 /**
  * Rotate n left. Old bit 7 to Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RLCHi(): byte {
@@ -2903,7 +2903,7 @@ function RLCHi(): byte {
 /**
  * Rotate n left. Old bit 7 to Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RLCLi(): byte {
@@ -2914,7 +2914,7 @@ function RLCLi(): byte {
 /**
  * Rotate n left. Old bit 7 to Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RLCHLm(): byte {
@@ -2925,7 +2925,7 @@ function RLCHLm(): byte {
 /**
  * Rotate n left. Old bit 7 to Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RLCAi(): byte {
@@ -2936,7 +2936,7 @@ function RLCAi(): byte {
 /**
  * Rotate n right. Old bit 0 to Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RRCBi(): byte {
@@ -2947,7 +2947,7 @@ function RRCBi(): byte {
 /**
  * Rotate n right. Old bit 0 to Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RRCCi(): byte {
@@ -2958,7 +2958,7 @@ function RRCCi(): byte {
 /**
  * Rotate n right. Old bit 0 to Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RRCDi(): byte {
@@ -2969,7 +2969,7 @@ function RRCDi(): byte {
 /**
  * Rotate n right. Old bit 0 to Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RRCEi(): byte {
@@ -2980,7 +2980,7 @@ function RRCEi(): byte {
 /**
  * Rotate n right. Old bit 0 to Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RRCHi(): byte {
@@ -2991,7 +2991,7 @@ function RRCHi(): byte {
 /**
  * Rotate n right. Old bit 0 to Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RRCLi(): byte {
@@ -3002,7 +3002,7 @@ function RRCLi(): byte {
 /**
  * Rotate n right. Old bit 0 to Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RRCHLm(): byte {
@@ -3013,7 +3013,7 @@ function RRCHLm(): byte {
 /**
  * Rotate n right. Old bit 0 to Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RRCAi(): byte {
@@ -3024,7 +3024,7 @@ function RRCAi(): byte {
 /**
  * Rotate n left through Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RLBi(): byte {
@@ -3035,7 +3035,7 @@ function RLBi(): byte {
 /**
  * Rotate n left through Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RLCi(): byte {
@@ -3046,7 +3046,7 @@ function RLCi(): byte {
 /**
  * Rotate n left through Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RLDi(): byte {
@@ -3057,7 +3057,7 @@ function RLDi(): byte {
 /**
  * Rotate n left through Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RLEi(): byte {
@@ -3068,7 +3068,7 @@ function RLEi(): byte {
 /**
  * Rotate n left through Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RLHi(): byte {
@@ -3079,7 +3079,7 @@ function RLHi(): byte {
 /**
  * Rotate n left through Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RLLi(): byte {
@@ -3090,7 +3090,7 @@ function RLLi(): byte {
 /**
  * Rotate n left through Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RLHLm(): byte {
@@ -3101,7 +3101,7 @@ function RLHLm(): byte {
 /**
  * Rotate n left through Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RLAi(): byte {
@@ -3112,7 +3112,7 @@ function RLAi(): byte {
 /**
  * Rotate n right through Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RRBi(): byte {
@@ -3123,7 +3123,7 @@ function RRBi(): byte {
 /**
  * Rotate n right through Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RRCi(): byte {
@@ -3134,7 +3134,7 @@ function RRCi(): byte {
 /**
  * Rotate n right through Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RRDi(): byte {
@@ -3145,7 +3145,7 @@ function RRDi(): byte {
 /**
  * Rotate n right through Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RREi(): byte {
@@ -3156,7 +3156,7 @@ function RREi(): byte {
 /**
  * Rotate n right through Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RRHi(): byte {
@@ -3167,7 +3167,7 @@ function RRHi(): byte {
 /**
  * Rotate n right through Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RRLi(): byte {
@@ -3178,7 +3178,7 @@ function RRLi(): byte {
 /**
  * Rotate n right through Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RRHLm(): byte {
@@ -3189,7 +3189,7 @@ function RRHLm(): byte {
 /**
  * Rotate n right through Carry flag.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function RRAi(): byte {
@@ -3200,7 +3200,7 @@ function RRAi(): byte {
 /**
  * Shift n left into Carry. LSB of n set to 0.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SLABi(): byte {
@@ -3211,7 +3211,7 @@ function SLABi(): byte {
 /**
  * Shift n left into Carry. LSB of n set to 0.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SLACi(): byte {
@@ -3222,7 +3222,7 @@ function SLACi(): byte {
 /**
  * Shift n left into Carry. LSB of n set to 0.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SLADi(): byte {
@@ -3233,7 +3233,7 @@ function SLADi(): byte {
 /**
  * Shift n left into Carry. LSB of n set to 0.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SLAEi(): byte {
@@ -3244,7 +3244,7 @@ function SLAEi(): byte {
 /**
  * Shift n left into Carry. LSB of n set to 0.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SLAHi(): byte {
@@ -3255,7 +3255,7 @@ function SLAHi(): byte {
 /**
  * Shift n left into Carry. LSB of n set to 0.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SLALi(): byte {
@@ -3266,7 +3266,7 @@ function SLALi(): byte {
 /**
  * Shift n left into Carry. LSB of n set to 0.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SLAHLm(): byte {
@@ -3277,7 +3277,7 @@ function SLAHLm(): byte {
 /**
  * Shift n left into Carry. LSB of n set to 0.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SLAAi(): byte {
@@ -3288,7 +3288,7 @@ function SLAAi(): byte {
 /**
  * Shift n right into Carry. MSB doesn't change.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SRABi(): byte {
@@ -3299,7 +3299,7 @@ function SRABi(): byte {
 /**
  * Shift n right into Carry. MSB doesn't change.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SRACi(): byte {
@@ -3310,7 +3310,7 @@ function SRACi(): byte {
 /**
  * Shift n right into Carry. MSB doesn't change.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SRADi(): byte {
@@ -3321,7 +3321,7 @@ function SRADi(): byte {
 /**
  * Shift n right into Carry. MSB doesn't change.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SRAEi(): byte {
@@ -3332,7 +3332,7 @@ function SRAEi(): byte {
 /**
  * Shift n right into Carry. MSB doesn't change.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SRAHi(): byte {
@@ -3343,7 +3343,7 @@ function SRAHi(): byte {
 /**
  * Shift n right into Carry. MSB doesn't change.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SRALi(): byte {
@@ -3354,7 +3354,7 @@ function SRALi(): byte {
 /**
  * Shift n right into Carry. MSB doesn't change.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SRAHLm(): byte {
@@ -3365,7 +3365,7 @@ function SRAHLm(): byte {
 /**
  * Shift n right into Carry. MSB doesn't change.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SRAAi(): byte {
@@ -3376,7 +3376,7 @@ function SRAAi(): byte {
 /**
  * Swap upper and lower nibbles.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SWAPBi(): byte {
@@ -3387,7 +3387,7 @@ function SWAPBi(): byte {
 /**
  * Swap upper and lower nibbles.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SWAPCi(): byte {
@@ -3398,7 +3398,7 @@ function SWAPCi(): byte {
 /**
  * Swap upper and lower nibbles.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SWAPDi(): byte {
@@ -3409,7 +3409,7 @@ function SWAPDi(): byte {
 /**
  * Swap upper and lower nibbles.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SWAPEi(): byte {
@@ -3420,7 +3420,7 @@ function SWAPEi(): byte {
 /**
  * Swap upper and lower nibbles.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SWAPHi(): byte {
@@ -3431,7 +3431,7 @@ function SWAPHi(): byte {
 /**
  * Swap upper and lower nibbles.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SWAPLi(): byte {
@@ -3442,7 +3442,7 @@ function SWAPLi(): byte {
 /**
  * Swap upper and lower nibbles.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SWAPHLm(): byte {
@@ -3453,7 +3453,7 @@ function SWAPHLm(): byte {
 /**
  * Swap upper and lower nibbles.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SWAPAi(): byte {
@@ -3464,7 +3464,7 @@ function SWAPAi(): byte {
 /**
  * Shift n right into Carry. MSB set to 0.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SRLBi(): byte {
@@ -3475,7 +3475,7 @@ function SRLBi(): byte {
 /**
  * Shift n right into Carry. MSB set to 0.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SRLCi(): byte {
@@ -3486,7 +3486,7 @@ function SRLCi(): byte {
 /**
  * Shift n right into Carry. MSB set to 0.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SRLDi(): byte {
@@ -3497,7 +3497,7 @@ function SRLDi(): byte {
 /**
  * Shift n right into Carry. MSB set to 0.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SRLEi(): byte {
@@ -3508,7 +3508,7 @@ function SRLEi(): byte {
 /**
  * Shift n right into Carry. MSB set to 0.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SRLHi(): byte {
@@ -3519,7 +3519,7 @@ function SRLHi(): byte {
 /**
  * Shift n right into Carry. MSB set to 0.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SRLLi(): byte {
@@ -3530,7 +3530,7 @@ function SRLLi(): byte {
 /**
  * Shift n right into Carry. MSB set to 0.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SRLHLm(): byte {
@@ -3541,7 +3541,7 @@ function SRLHLm(): byte {
 /**
  * Shift n right into Carry. MSB set to 0.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
 function SRLAi(): byte {
@@ -3552,7 +3552,7 @@ function SRLAi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT0iBi(): byte {
@@ -3563,7 +3563,7 @@ function BIT0iBi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT0iCi(): byte {
@@ -3574,7 +3574,7 @@ function BIT0iCi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT0iDi(): byte {
@@ -3585,7 +3585,7 @@ function BIT0iDi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT0iEi(): byte {
@@ -3596,7 +3596,7 @@ function BIT0iEi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT0iHi(): byte {
@@ -3607,7 +3607,7 @@ function BIT0iHi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT0iLi(): byte {
@@ -3618,7 +3618,7 @@ function BIT0iLi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT0iHLm(): byte {
@@ -3629,7 +3629,7 @@ function BIT0iHLm(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT0iAi(): byte {
@@ -3640,7 +3640,7 @@ function BIT0iAi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT1iBi(): byte {
@@ -3651,7 +3651,7 @@ function BIT1iBi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT1iCi(): byte {
@@ -3662,7 +3662,7 @@ function BIT1iCi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT1iDi(): byte {
@@ -3673,7 +3673,7 @@ function BIT1iDi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT1iEi(): byte {
@@ -3684,7 +3684,7 @@ function BIT1iEi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT1iHi(): byte {
@@ -3695,7 +3695,7 @@ function BIT1iHi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT1iLi(): byte {
@@ -3706,7 +3706,7 @@ function BIT1iLi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT1iHLm(): byte {
@@ -3717,7 +3717,7 @@ function BIT1iHLm(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT1iAi(): byte {
@@ -3728,7 +3728,7 @@ function BIT1iAi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT2iBi(): byte {
@@ -3739,7 +3739,7 @@ function BIT2iBi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT2iCi(): byte {
@@ -3750,7 +3750,7 @@ function BIT2iCi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT2iDi(): byte {
@@ -3761,7 +3761,7 @@ function BIT2iDi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT2iEi(): byte {
@@ -3772,7 +3772,7 @@ function BIT2iEi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT2iHi(): byte {
@@ -3783,7 +3783,7 @@ function BIT2iHi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT2iLi(): byte {
@@ -3794,7 +3794,7 @@ function BIT2iLi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT2iHLm(): byte {
@@ -3805,7 +3805,7 @@ function BIT2iHLm(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT2iAi(): byte {
@@ -3816,7 +3816,7 @@ function BIT2iAi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT3iBi(): byte {
@@ -3827,7 +3827,7 @@ function BIT3iBi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT3iCi(): byte {
@@ -3838,7 +3838,7 @@ function BIT3iCi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT3iDi(): byte {
@@ -3849,7 +3849,7 @@ function BIT3iDi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT3iEi(): byte {
@@ -3860,7 +3860,7 @@ function BIT3iEi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT3iHi(): byte {
@@ -3871,7 +3871,7 @@ function BIT3iHi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT3iLi(): byte {
@@ -3882,7 +3882,7 @@ function BIT3iLi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT3iHLm(): byte {
@@ -3893,7 +3893,7 @@ function BIT3iHLm(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT3iAi(): byte {
@@ -3904,7 +3904,7 @@ function BIT3iAi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT4iBi(): byte {
@@ -3915,7 +3915,7 @@ function BIT4iBi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT4iCi(): byte {
@@ -3926,7 +3926,7 @@ function BIT4iCi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT4iDi(): byte {
@@ -3937,7 +3937,7 @@ function BIT4iDi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT4iEi(): byte {
@@ -3948,7 +3948,7 @@ function BIT4iEi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT4iHi(): byte {
@@ -3959,7 +3959,7 @@ function BIT4iHi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT4iLi(): byte {
@@ -3970,7 +3970,7 @@ function BIT4iLi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT4iHLm(): byte {
@@ -3981,7 +3981,7 @@ function BIT4iHLm(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT4iAi(): byte {
@@ -3992,7 +3992,7 @@ function BIT4iAi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT5iBi(): byte {
@@ -4003,7 +4003,7 @@ function BIT5iBi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT5iCi(): byte {
@@ -4014,7 +4014,7 @@ function BIT5iCi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT5iDi(): byte {
@@ -4025,7 +4025,7 @@ function BIT5iDi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT5iEi(): byte {
@@ -4036,7 +4036,7 @@ function BIT5iEi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT5iHi(): byte {
@@ -4047,7 +4047,7 @@ function BIT5iHi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT5iLi(): byte {
@@ -4058,7 +4058,7 @@ function BIT5iLi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT5iHLm(): byte {
@@ -4069,7 +4069,7 @@ function BIT5iHLm(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT5iAi(): byte {
@@ -4080,7 +4080,7 @@ function BIT5iAi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT6iBi(): byte {
@@ -4091,7 +4091,7 @@ function BIT6iBi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT6iCi(): byte {
@@ -4102,7 +4102,7 @@ function BIT6iCi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT6iDi(): byte {
@@ -4113,7 +4113,7 @@ function BIT6iDi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT6iEi(): byte {
@@ -4124,7 +4124,7 @@ function BIT6iEi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT6iHi(): byte {
@@ -4135,7 +4135,7 @@ function BIT6iHi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT6iLi(): byte {
@@ -4146,7 +4146,7 @@ function BIT6iLi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT6iHLm(): byte {
@@ -4157,7 +4157,7 @@ function BIT6iHLm(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT6iAi(): byte {
@@ -4168,7 +4168,7 @@ function BIT6iAi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT7iBi(): byte {
@@ -4179,7 +4179,7 @@ function BIT7iBi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT7iCi(): byte {
@@ -4190,7 +4190,7 @@ function BIT7iCi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT7iDi(): byte {
@@ -4201,7 +4201,7 @@ function BIT7iDi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT7iEi(): byte {
@@ -4212,7 +4212,7 @@ function BIT7iEi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT7iHi(): byte {
@@ -4223,7 +4223,7 @@ function BIT7iHi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT7iLi(): byte {
@@ -4234,7 +4234,7 @@ function BIT7iLi(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT7iHLm(): byte {
@@ -4245,7 +4245,7 @@ function BIT7iHLm(): byte {
 /**
  * Test bit in register
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
 function BIT7iAi(): byte {
@@ -4256,7 +4256,7 @@ function BIT7iAi(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES0B(): byte {
@@ -4267,7 +4267,7 @@ function RES0B(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES0C(): byte {
@@ -4278,7 +4278,7 @@ function RES0C(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES0D(): byte {
@@ -4289,7 +4289,7 @@ function RES0D(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES0E(): byte {
@@ -4300,7 +4300,7 @@ function RES0E(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES0H(): byte {
@@ -4311,7 +4311,7 @@ function RES0H(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES0L(): byte {
@@ -4322,7 +4322,7 @@ function RES0L(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES0HL(): byte {
@@ -4333,7 +4333,7 @@ function RES0HL(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES0A(): byte {
@@ -4344,7 +4344,7 @@ function RES0A(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES1B(): byte {
@@ -4355,7 +4355,7 @@ function RES1B(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES1C(): byte {
@@ -4366,7 +4366,7 @@ function RES1C(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES1D(): byte {
@@ -4377,7 +4377,7 @@ function RES1D(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES1E(): byte {
@@ -4388,7 +4388,7 @@ function RES1E(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES1H(): byte {
@@ -4399,7 +4399,7 @@ function RES1H(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES1L(): byte {
@@ -4410,7 +4410,7 @@ function RES1L(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES1HL(): byte {
@@ -4421,7 +4421,7 @@ function RES1HL(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES1A(): byte {
@@ -4432,7 +4432,7 @@ function RES1A(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES2B(): byte {
@@ -4443,7 +4443,7 @@ function RES2B(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES2C(): byte {
@@ -4454,7 +4454,7 @@ function RES2C(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES2D(): byte {
@@ -4465,7 +4465,7 @@ function RES2D(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES2E(): byte {
@@ -4476,7 +4476,7 @@ function RES2E(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES2H(): byte {
@@ -4487,7 +4487,7 @@ function RES2H(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES2L(): byte {
@@ -4498,7 +4498,7 @@ function RES2L(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES2HL(): byte {
@@ -4509,7 +4509,7 @@ function RES2HL(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES2A(): byte {
@@ -4520,7 +4520,7 @@ function RES2A(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES3B(): byte {
@@ -4531,7 +4531,7 @@ function RES3B(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES3C(): byte {
@@ -4542,7 +4542,7 @@ function RES3C(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES3D(): byte {
@@ -4553,7 +4553,7 @@ function RES3D(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES3E(): byte {
@@ -4564,7 +4564,7 @@ function RES3E(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES3H(): byte {
@@ -4575,7 +4575,7 @@ function RES3H(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES3L(): byte {
@@ -4586,7 +4586,7 @@ function RES3L(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES3HL(): byte {
@@ -4597,7 +4597,7 @@ function RES3HL(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES3A(): byte {
@@ -4608,7 +4608,7 @@ function RES3A(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES4B(): byte {
@@ -4619,7 +4619,7 @@ function RES4B(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES4C(): byte {
@@ -4630,7 +4630,7 @@ function RES4C(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES4D(): byte {
@@ -4641,7 +4641,7 @@ function RES4D(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES4E(): byte {
@@ -4652,7 +4652,7 @@ function RES4E(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES4H(): byte {
@@ -4663,7 +4663,7 @@ function RES4H(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES4L(): byte {
@@ -4674,7 +4674,7 @@ function RES4L(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES4HL(): byte {
@@ -4685,7 +4685,7 @@ function RES4HL(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES4A(): byte {
@@ -4696,7 +4696,7 @@ function RES4A(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES5B(): byte {
@@ -4707,7 +4707,7 @@ function RES5B(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES5C(): byte {
@@ -4718,7 +4718,7 @@ function RES5C(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES5D(): byte {
@@ -4729,7 +4729,7 @@ function RES5D(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES5E(): byte {
@@ -4740,7 +4740,7 @@ function RES5E(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES5H(): byte {
@@ -4751,7 +4751,7 @@ function RES5H(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES5L(): byte {
@@ -4762,7 +4762,7 @@ function RES5L(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES5HL(): byte {
@@ -4773,7 +4773,7 @@ function RES5HL(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES5A(): byte {
@@ -4784,7 +4784,7 @@ function RES5A(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES6B(): byte {
@@ -4795,7 +4795,7 @@ function RES6B(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES6C(): byte {
@@ -4806,7 +4806,7 @@ function RES6C(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES6D(): byte {
@@ -4817,7 +4817,7 @@ function RES6D(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES6E(): byte {
@@ -4828,7 +4828,7 @@ function RES6E(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES6H(): byte {
@@ -4839,7 +4839,7 @@ function RES6H(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES6L(): byte {
@@ -4850,7 +4850,7 @@ function RES6L(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES6HL(): byte {
@@ -4861,7 +4861,7 @@ function RES6HL(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES6A(): byte {
@@ -4872,7 +4872,7 @@ function RES6A(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES7B(): byte {
@@ -4883,7 +4883,7 @@ function RES7B(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES7C(): byte {
@@ -4894,7 +4894,7 @@ function RES7C(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES7D(): byte {
@@ -4905,7 +4905,7 @@ function RES7D(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES7E(): byte {
@@ -4916,7 +4916,7 @@ function RES7E(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES7H(): byte {
@@ -4927,7 +4927,7 @@ function RES7H(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES7L(): byte {
@@ -4938,7 +4938,7 @@ function RES7L(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES7HL(): byte {
@@ -4949,7 +4949,7 @@ function RES7HL(): byte {
 /**
  * Reset bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function RES7A(): byte {
@@ -4960,7 +4960,7 @@ function RES7A(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET0B(): byte {
@@ -4971,7 +4971,7 @@ function SET0B(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET0C(): byte {
@@ -4982,7 +4982,7 @@ function SET0C(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET0D(): byte {
@@ -4993,7 +4993,7 @@ function SET0D(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET0E(): byte {
@@ -5004,7 +5004,7 @@ function SET0E(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET0H(): byte {
@@ -5015,7 +5015,7 @@ function SET0H(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET0L(): byte {
@@ -5026,7 +5026,7 @@ function SET0L(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET0HL(): byte {
@@ -5037,7 +5037,7 @@ function SET0HL(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET0A(): byte {
@@ -5048,7 +5048,7 @@ function SET0A(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET1B(): byte {
@@ -5059,7 +5059,7 @@ function SET1B(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET1C(): byte {
@@ -5070,7 +5070,7 @@ function SET1C(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET1D(): byte {
@@ -5081,7 +5081,7 @@ function SET1D(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET1E(): byte {
@@ -5092,7 +5092,7 @@ function SET1E(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET1H(): byte {
@@ -5103,7 +5103,7 @@ function SET1H(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET1L(): byte {
@@ -5114,7 +5114,7 @@ function SET1L(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET1HL(): byte {
@@ -5125,7 +5125,7 @@ function SET1HL(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET1A(): byte {
@@ -5136,7 +5136,7 @@ function SET1A(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET2B(): byte {
@@ -5147,7 +5147,7 @@ function SET2B(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET2C(): byte {
@@ -5158,7 +5158,7 @@ function SET2C(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET2D(): byte {
@@ -5169,7 +5169,7 @@ function SET2D(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET2E(): byte {
@@ -5180,7 +5180,7 @@ function SET2E(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET2H(): byte {
@@ -5191,7 +5191,7 @@ function SET2H(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET2L(): byte {
@@ -5202,7 +5202,7 @@ function SET2L(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET2HL(): byte {
@@ -5213,7 +5213,7 @@ function SET2HL(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET2A(): byte {
@@ -5224,7 +5224,7 @@ function SET2A(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET3B(): byte {
@@ -5235,7 +5235,7 @@ function SET3B(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET3C(): byte {
@@ -5246,7 +5246,7 @@ function SET3C(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET3D(): byte {
@@ -5257,7 +5257,7 @@ function SET3D(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET3E(): byte {
@@ -5268,7 +5268,7 @@ function SET3E(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET3H(): byte {
@@ -5279,7 +5279,7 @@ function SET3H(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET3L(): byte {
@@ -5290,7 +5290,7 @@ function SET3L(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET3HL(): byte {
@@ -5301,7 +5301,7 @@ function SET3HL(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET3A(): byte {
@@ -5312,7 +5312,7 @@ function SET3A(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET4B(): byte {
@@ -5323,7 +5323,7 @@ function SET4B(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET4C(): byte {
@@ -5334,7 +5334,7 @@ function SET4C(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET4D(): byte {
@@ -5345,7 +5345,7 @@ function SET4D(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET4E(): byte {
@@ -5356,7 +5356,7 @@ function SET4E(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET4H(): byte {
@@ -5367,7 +5367,7 @@ function SET4H(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET4L(): byte {
@@ -5378,7 +5378,7 @@ function SET4L(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET4HL(): byte {
@@ -5389,7 +5389,7 @@ function SET4HL(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET4A(): byte {
@@ -5400,7 +5400,7 @@ function SET4A(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET5B(): byte {
@@ -5411,7 +5411,7 @@ function SET5B(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET5C(): byte {
@@ -5422,7 +5422,7 @@ function SET5C(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET5D(): byte {
@@ -5433,7 +5433,7 @@ function SET5D(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET5E(): byte {
@@ -5444,7 +5444,7 @@ function SET5E(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET5H(): byte {
@@ -5455,7 +5455,7 @@ function SET5H(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET5L(): byte {
@@ -5466,7 +5466,7 @@ function SET5L(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET5HL(): byte {
@@ -5477,7 +5477,7 @@ function SET5HL(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET5A(): byte {
@@ -5488,7 +5488,7 @@ function SET5A(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET6B(): byte {
@@ -5499,7 +5499,7 @@ function SET6B(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET6C(): byte {
@@ -5510,7 +5510,7 @@ function SET6C(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET6D(): byte {
@@ -5521,7 +5521,7 @@ function SET6D(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET6E(): byte {
@@ -5532,7 +5532,7 @@ function SET6E(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET6H(): byte {
@@ -5543,7 +5543,7 @@ function SET6H(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET6L(): byte {
@@ -5554,7 +5554,7 @@ function SET6L(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET6HL(): byte {
@@ -5565,7 +5565,7 @@ function SET6HL(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET6A(): byte {
@@ -5576,7 +5576,7 @@ function SET6A(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET7B(): byte {
@@ -5587,7 +5587,7 @@ function SET7B(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET7C(): byte {
@@ -5598,7 +5598,7 @@ function SET7C(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET7D(): byte {
@@ -5609,7 +5609,7 @@ function SET7D(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET7E(): byte {
@@ -5620,7 +5620,7 @@ function SET7E(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET7H(): byte {
@@ -5631,7 +5631,7 @@ function SET7H(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET7L(): byte {
@@ -5642,7 +5642,7 @@ function SET7L(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET7HL(): byte {
@@ -5653,7 +5653,7 @@ function SET7HL(): byte {
 /**
  * Set bit b in register r.
  * @param - None
- * @returns {byte} - The number of machine cycles required.
+ * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
 function SET7A(): byte {
