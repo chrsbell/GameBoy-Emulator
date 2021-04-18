@@ -1,7 +1,4 @@
 import Emulator from '.';
-import Memory from '../Memory';
-import CPU from '../CPU';
-import PPU from '../PPU';
 import CanvasRenderer from '../CanvasRenderer';
 
 describe('Emulator', () => {
@@ -9,23 +6,21 @@ describe('Emulator', () => {
   const bios = new Uint8Array([...Array(8192).fill(1)]);
   const rom = new Uint8Array([...Array(8192).fill(1)]);
   beforeEach(() => {
-    Memory.reset();
-    CPU.reset();
-    PPU.reset();
+    gb.reset();
   });
   it('loads bios and rom files', () => {
-    const gb = new Emulator();
     expect(gb.load(bios, rom)).toEqual(true);
   });
   it('updates', () => {
-    CPU.executeInstruction = jest.fn();
-    PPU.buildGraphics = jest.fn();
-    CPU.checkInterrupts = jest.fn();
+    gb['cpu'].executeInstruction = jest.fn();
+    gb['cpu'].checkInterrupts = jest.fn();
+    gb['ppu'].buildGraphics = jest.fn();
     CanvasRenderer.draw = jest.fn();
     gb.update();
     // calls occur multiple times
-    expect(CPU.executeInstruction).toHaveBeenCalled();
-    expect(PPU.buildGraphics).toHaveBeenCalled();
-    expect(CPU.checkInterrupts).toHaveBeenCalled();
+    expect(gb['cpu'].executeInstruction).toHaveBeenCalled();
+    expect(gb['ppu'].buildGraphics).toHaveBeenCalled();
+    expect(gb['cpu'].checkInterrupts).toHaveBeenCalled();
+    expect(CanvasRenderer.draw).toHaveBeenCalledTimes(1);
   });
 });

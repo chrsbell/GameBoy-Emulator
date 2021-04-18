@@ -24,9 +24,9 @@ const Interrupt: GBInterrupt = {
 /**
  * Enables the interrupt corresponding to the index.
  */
-export const enableInterrupt = (index: number): void => {
-  const register: byte = Memory.readByte(0xff0f);
-  Memory.writeByte(0xff0f, setBit(register, index));
+export const enableInterrupt = (memory: Memory, index: number): void => {
+  const register: byte = memory.readByte(0xff0f);
+  memory.writeByte(0xff0f, setBit(register, index));
 };
 
 export default Interrupt;

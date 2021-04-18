@@ -1,9 +1,8 @@
 import type {byte, word} from '../../Types';
 import {lower, upper, toHex} from '../../Types';
-import PPU, {PPUAddress} from '../PPU';
 import CPU from '../CPU';
-import benchmark, {benchmarksEnabled} from '../Helpers/Performance';
-import {DEBUG} from '../Helpers/Debug';
+import benchmark, {benchmarksEnabled} from '../../helpers/Performance';
+import {DEBUG} from '../../helpers/Debug';
 
 interface CartridgeCode {
   [key: number]: string;
@@ -95,6 +94,19 @@ class Memory {
   private hRAM!: Uint8Array;
   // 128 bytes io register space
   private IORAM!: Uint8Array;
+  public addresses = {
+    ppu: {
+      lcdc: 0xff40,
+      stat: 0xff41,
+      scrollY: 0xff42,
+      scrollX: 0xff43,
+      scanline: 0xff44,
+      scanlineCompare: 0xff45,
+      paletteData: 0xff47,
+      windowY: 0xff4a,
+      windowX: 0xff4b,
+    },
+  };
   public constructor() {
     this.reset();
   }
@@ -158,15 +170,13 @@ class Memory {
       // hardware I/O
       // if (address === 0xff42) console.log(`scrollY: ${data}`);
       // if (address === 0xff43) console.log(`scrollX: ${data}`);
-      if (address === PPUAddress.lcdc) {
-        PPU.lcdc.update(data);
-      }
+
       if (address === 0xff46) {
         DEBUG && console.log('Initiated DMA transfer.');
         this.dmaTransfer(data);
       }
       // reset scanline if trying to write to associated register
-      else if (address === PPUAddress.scanline) {
+      else if (address === this.addresses.ppu.scanline) {
         this.IORAM[address - 0xff00] = 0;
       } else {
         this.IORAM[address - 0xff00] = data;
@@ -277,7 +287,7 @@ class Memory {
   /**
    * Loads parsed files into BIOS/ROM
    */
-  public load(bios: Uint8Array | null, rom: Uint8Array): void {
+  public load(cpu: CPU, bios: Uint8Array | null, rom: Uint8Array): void {
     this.cart.ROM = rom;
     this.cart.MBCType = this.readByte(0x147);
     this.cart.ROMSize = this.readByte(0x148);
@@ -300,9 +310,9 @@ class Memory {
       DEBUG && console.log('Loaded bios.');
     } else {
       this.inBios = false;
-      CPU.initPowerSequence();
+      cpu.initPowerSequence(this);
     }
   }
 }
 
-export default new Memory();
+export default Memory;

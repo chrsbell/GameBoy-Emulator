@@ -2,7 +2,7 @@ import * as React from 'react';
 import {useRef, useEffect, useState, FormEvent} from 'react';
 import type {AppContext} from './AppTypes';
 import axios, {AxiosRequestConfig} from 'axios';
-import {DEBUG} from '../Helpers/Debug';
+import {DEBUG} from '../../helpers/Debug';
 import './Wrapper.css';
 
 const Wrapper: React.FC<AppContext> = ({appDispatch}) => {
@@ -33,7 +33,7 @@ const Wrapper: React.FC<AppContext> = ({appDispatch}) => {
   useEffect(() => {
     appDispatch({type: 'canvas', canvas: canvasRef.current});
     DEBUG && console.log('Canvas created.');
-  }, []);
+  }, [appDispatch]);
 
   return (
     <section className="container">

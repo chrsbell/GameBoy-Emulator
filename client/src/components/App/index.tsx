@@ -42,11 +42,9 @@ const App: React.FC = () => {
   useEffect(() => {
     const {parsedROM, parsedBIOS} = appState;
     if (parsedROM && parsedBIOS) {
-      if (emulator.current.load(parsedBIOS, parsedROM)) {
-        emulator.current.update();
-      }
+      emulator.current.load(parsedBIOS, parsedROM);
     }
-  }, [appState.parsedROM, appState.parsedBIOS]);
+  }, [appState]);
 
   useEffect(() => {
     if (appState.canvas && !CanvasRenderer.initialized) {

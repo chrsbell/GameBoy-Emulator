@@ -1,5 +1,5 @@
 // Using a class to prevent accidentally setting flag outside 0/1
-import {byte, word, lower, setLower} from '../../Types';
+import {byte, lower, setLower} from '../../Types';
 import CPU from '.';
 
 class Flag {
@@ -7,8 +7,9 @@ class Flag {
   private _n: byte = 0; // set if last op was subtraction
   private _h: byte = 0; // set if result's lower half of last op overflowed past 15
   private _cy: byte = 0; // set if last op produced a result over 255 or under 0
-
-  constructor(value: byte = 0) {
+  private cpu: CPU = <CPU>{};
+  constructor(cpu: CPU, value: byte = 0) {
+    this.cpu = cpu;
     this.z = (value >> 7) & 1;
     this.n = (value >> 6) & 1;
     this.h = (value >> 5) & 1;
@@ -37,7 +38,10 @@ class Flag {
   public set z(value: byte) {
     if (value === 0 || value === 1) {
       this._z = value;
-      CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) | (value << 7));
+      this.cpu.r.af = setLower(
+        this.cpu.r.af,
+        lower(this.cpu.r.af) | (value << 7)
+      );
     } else {
       this.error();
     }
@@ -50,7 +54,10 @@ class Flag {
   public set n(value: byte) {
     if (value === 0 || value === 1) {
       this._n = value;
-      CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) | (value << 6));
+      this.cpu.r.af = setLower(
+        this.cpu.r.af,
+        lower(this.cpu.r.af) | (value << 6)
+      );
     } else {
       this.error();
     }
@@ -63,7 +70,10 @@ class Flag {
   public set h(value: byte) {
     if (value === 0 || value === 1) {
       this._h = value;
-      CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) | (value << 5));
+      this.cpu.r.af = setLower(
+        this.cpu.r.af,
+        lower(this.cpu.r.af) | (value << 5)
+      );
     } else {
       this.error();
     }
@@ -76,7 +86,10 @@ class Flag {
   public set cy(value: byte) {
     if (value === 0 || value === 1) {
       this._cy = value;
-      CPU.r.af = setLower(CPU.r.af, lower(CPU.r.af) | (value << 4));
+      this.cpu.r.af = setLower(
+        this.cpu.r.af,
+        lower(this.cpu.r.af) | (value << 4)
+      );
     } else {
       this.error();
     }

@@ -1,4 +1,4 @@
-import benchmark, {benchmarksEnabled} from '../Helpers/Performance';
+import benchmark, {benchmarksEnabled} from '../../helpers/Performance';
 import {sample} from 'lodash';
 
 export type RGB = Array<number>;
