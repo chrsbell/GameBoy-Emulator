@@ -1,5 +1,5 @@
-import benchmark, {benchmarksEnabled} from '../../helpers/Performance';
 import {sample} from 'lodash';
+import benchmark, {benchmarksEnabled} from '../../helpers/Performance';
 
 export type RGB = Array<number>;
 
@@ -8,18 +8,40 @@ const testAnimation = {
   y: 0,
 };
 
-export const Colors = {
-  white: [255, 255, 255, 255] as RGB,
-  lightGray: [170, 170, 170, 255] as RGB,
-  darkGray: [85, 85, 85, 255] as RGB,
-  black: [0, 0, 0, 255] as RGB,
+export type ColorScheme = {
+  white: RGB;
+  lightGray: RGB;
+  darkGray: RGB;
+  black: RGB;
+};
+
+const colorSchemes = {
+  default: {
+    white: <RGB>[255, 255, 255, 255],
+    lightGray: <RGB>[170, 170, 170, 255],
+    darkGray: <RGB>[85, 85, 85, 255],
+    black: <RGB>[0, 0, 0, 255],
+  },
+  classic: {
+    white: <RGB>[155, 188, 15, 255],
+    lightGray: <RGB>[139, 172, 15, 255],
+    darkGray: <RGB>[48, 98, 48, 255],
+    black: <RGB>[16, 56, 16, 255],
+  },
 };
 
 class CanvasRenderer {
-  public fps = 60;
+  public fps = 240;
   private image!: ImageData;
   private context!: CanvasRenderingContext2D;
   private _initialized = false;
+  private _colorScheme: ColorScheme = colorSchemes.classic;
+  public get colorScheme(): ColorScheme {
+    return this._colorScheme;
+  }
+  public set colorScheme(value: ColorScheme) {
+    this._colorScheme = value;
+  }
   // how many pixels should an individual image pixel take up? e.g. NxN
   private scaleFactor = 1;
   public get initialized() {
@@ -32,7 +54,10 @@ class CanvasRenderer {
   public screenHeight = 144;
 
   public constructor() {
-    if (benchmarksEnabled) this.draw = benchmark(this.draw.bind(this));
+    if (benchmarksEnabled) {
+      this.setPixel = benchmark(this.setPixel.bind(this), this);
+      this.draw = benchmark(this.draw.bind(this), this);
+    }
   }
 
   public initialize(canvas: HTMLCanvasElement, scaleFactor = 1) {
@@ -79,7 +104,11 @@ class CanvasRenderer {
       testAnimation.x = 0;
       testAnimation.y = 0;
     }
-    this.setPixel(testAnimation.x, testAnimation.y, sample(Colors) as RGB);
+    this.setPixel(
+      testAnimation.x,
+      testAnimation.y,
+      <RGB>sample(this.colorScheme)
+    );
   }
 }
 

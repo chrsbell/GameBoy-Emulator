@@ -1,8 +1,8 @@
-import * as React from 'react';
-import {useRef, useEffect, useState, FormEvent} from 'react';
-import type {AppContext} from './AppTypes';
 import axios, {AxiosRequestConfig} from 'axios';
+import * as React from 'react';
+import {FormEvent, useEffect, useRef, useState} from 'react';
 import {DEBUG} from '../../helpers/Debug';
+import type {AppContext} from './AppTypes';
 import './Wrapper.css';
 
 const Wrapper: React.FC<AppContext> = ({appDispatch}) => {

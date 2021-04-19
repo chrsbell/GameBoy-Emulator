@@ -1,14 +1,13 @@
-import * as path from 'path';
 import * as fs from 'fs';
-import * as util from 'util';
 import _ from 'lodash';
-const chalk = require('chalk');
+import * as path from 'path';
+import * as util from 'util';
 import CPU from '.';
-import PPU from '../PPU';
+import {byte, lower, upper, word} from '../../Types';
 import Memory from '../Memory';
-import {byte, word, upper, lower} from '../../Types';
+import PPU from '../PPU';
 import Flag from './Flag';
-import {instructionHelpers as helpers} from './sm83/Map';
+const chalk = require('chalk');
 
 const TEST_ROM_FOLDER = path.join(
   __dirname,

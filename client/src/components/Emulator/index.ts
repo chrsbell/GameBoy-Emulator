@@ -1,16 +1,15 @@
+import {forEach, map} from 'lodash';
+import benchmark, {
+  benchmarksEnabled,
+  getBenchmarks,
+} from '../../helpers/Performance';
+import CanvasRenderer from '../CanvasRenderer';
 import CPU from '../CPU';
 import Memory from '../Memory';
 import PPU from '../PPU';
-import CanvasRenderer from '../CanvasRenderer';
-import benchmark, {
-  getBenchmarks,
-  benchmarksEnabled,
-} from '../../helpers/Performance';
-import {map} from 'lodash';
+import chalk from 'chalk';
 
 class Emulator {
-  private x = 0;
-  private y = 0;
   private timerID!: ReturnType<typeof setTimeout>;
   private numExecuted = 0;
   private memory: Memory = <Memory>{};
@@ -20,8 +19,9 @@ class Emulator {
     this.memory = new Memory();
     this.cpu = new CPU();
     this.ppu = new PPU(this.memory);
+    this.ppu.setColorScheme(CanvasRenderer.colorScheme);
     if (benchmarksEnabled) {
-      this.update = benchmark(this.update.bind(this));
+      this.update = benchmark(this.update.bind(this), this);
     }
   }
   public reset() {
@@ -36,7 +36,7 @@ class Emulator {
   public load(bios: Uint8Array | null, rom: Uint8Array): boolean {
     this.memory.load(this.cpu, bios, rom);
     clearTimeout(this.timerID);
-    this.timerID = setInterval(this.update, 1);
+    this.timerID = setInterval(this.update, 0);
     return true;
   }
   /**
@@ -54,11 +54,9 @@ class Emulator {
       elapsed = this.cpu.executeInstruction(this.memory);
       this.numExecuted += elapsed;
       cycles += elapsed;
-      // need to update timers using elapsed cpu cycles
       this.ppu.buildGraphics(elapsed);
       this.cpu.checkInterrupts(this.memory);
     }
-    // CanvasRenderer.testAnimation();
     CanvasRenderer.draw();
   }
   /**
@@ -67,15 +65,24 @@ class Emulator {
   private logBenchmarks(): void {
     if (this.numExecuted > this.cpu.clock) {
       const times = getBenchmarks();
-      map(times, (val, key) => [
-        `Average ${key} function call duration: ${
-          (val.elapsed / val.calledTimes) * 1000
-        }ms`,
-        val.elapsed / val.calledTimes,
-      ])
-        .sort((a: Array<any>, b: Array<any>) => b[1] - a[1])
-        .map((val: Array<any>) => console.log(val[0]));
+      forEach(times, (functions: any, group: any) => {
+        console.log(`%cPerformance of ${group}:`, 'color:blue');
+        functions = map(functions, (params: any, func: any) => [
+          params.elapsed / params.calledTimes,
+          func,
+        ]).sort((a: Array<any>, b: Array<any>) => b[0] - a[0]);
+        forEach(functions, (pair: any) => {
+          console.log(
+            `%c   Average ${pair[1]} function call duration:`,
+            'color:green'
+          );
+          console.log(`%c${pair[0] * 1000}ms`, 'color:red');
+        });
+      });
       console.log('1 second passed in emulator time.');
+      console.log(
+        '---------------------------------------------------------------------------------------------------'
+      );
       this.numExecuted = 0;
     }
   }

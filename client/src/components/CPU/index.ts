@@ -1,20 +1,20 @@
-import Memory from '../Memory';
+import {DEBUG} from '../../helpers/Debug';
+import benchmark, {benchmarksEnabled} from '../../helpers/Performance';
 import {
   byte,
-  word,
-  lower,
-  setLower,
-  getBit,
-  setBit,
   clearBit,
+  getBit,
+  lower,
   OpcodeList,
+  setBit,
+  setLower,
   toHex,
+  word,
 } from '../../Types';
+import Interrupt from '../Interrupts';
+import Memory from '../Memory';
 import Opcodes from './sm83';
 import {instructionHelpers as helpers} from './sm83/Map';
-import Interrupt from '../Interrupts';
-import benchmark, {benchmarksEnabled} from '../../helpers/Performance';
-import {DEBUG} from '../../helpers/Debug';
 
 interface Registers {
   af: word;
@@ -75,8 +75,11 @@ class CPU {
   }
   public constructor() {
     if (benchmarksEnabled) {
-      this.executeInstruction = benchmark(this.executeInstruction.bind(this));
-      this.checkInterrupts = benchmark(this.checkInterrupts.bind(this));
+      this.executeInstruction = benchmark(
+        this.executeInstruction.bind(this),
+        this
+      );
+      this.checkInterrupts = benchmark(this.checkInterrupts.bind(this), this);
     }
     this.reset();
   }

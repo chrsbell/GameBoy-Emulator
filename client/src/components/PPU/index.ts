@@ -1,10 +1,19 @@
-import {byte, word, getBit, setBit, clearBit, toSigned} from '../../Types';
-import Interrupt, {enableInterrupt} from '../Interrupts';
-import PPUControl from './Control';
-import Memory from '../Memory';
-import CanvasRenderer, {Colors} from '../CanvasRenderer';
-import type {RGB} from '../CanvasRenderer';
 import benchmark, {benchmarksEnabled} from '../../helpers/Performance';
+import {
+  byte,
+  clearBit,
+  getBit,
+  setBit,
+  toSigned,
+  word,
+  upper,
+  lower,
+} from '../../Types';
+import type {ColorScheme, RGB} from '../CanvasRenderer';
+import CanvasRenderer from '../CanvasRenderer';
+import Interrupt, {enableInterrupt} from '../Interrupts';
+import Memory from '../Memory';
+import PPUControl from './Control';
 
 type StatBitsType = {
   modeLower: number;
@@ -22,7 +31,7 @@ class PPU {
   public get lcdc(): PPUControl {
     return this._lcdc;
   }
-
+  private scanlineClockMod = 5;
   private ppuModes = {
     hBlank: 0,
     vBlank: 1,
@@ -41,13 +50,8 @@ class PPU {
     },
     lycLcInterrupt: 6,
   };
-  private paletteMap: Array<RGB> = [
-    Colors.white,
-    Colors.lightGray,
-    Colors.darkGray,
-    Colors.black,
-  ];
-
+  private pixelMap!: Array<Array<byte>>;
+  private colorScheme!: Array<RGB>;
   // stat register
   private _stat = 0;
   public get stat(): byte {
@@ -128,7 +132,9 @@ class PPU {
     this._windowY = value;
     this.memory.writeByte(this.memory.addresses.ppu.windowY, value);
   }
+
   private _palette = 0;
+  private paletteMap: Array<number> = new Array(4);
   public get palette(): byte {
     return this.memory.readByte(this.memory.addresses.ppu.paletteData);
   }
@@ -137,13 +143,32 @@ class PPU {
     this.memory.writeByte(this.memory.addresses.ppu.paletteData, value);
   }
   public constructor(memory: Memory) {
-    this._lcdc = new PPUControl();
     this.memory = memory;
+    this._lcdc = new PPUControl();
+    this.pixelMap = new Array(CanvasRenderer.screenHeight);
+    for (let y = 0; y < CanvasRenderer.screenHeight; y++) {
+      this.pixelMap[y] = new Array(CanvasRenderer.screenWidth);
+    }
     this.reset();
     if (benchmarksEnabled) {
-      this.buildGraphics = benchmark(this.buildGraphics.bind(this));
-      this.drawScanline = benchmark(this.drawScanline.bind(this));
+      this.buildGraphics = benchmark(this.buildGraphics.bind(this), this);
+      this.drawScanline = benchmark(this.drawScanline.bind(this), this);
+      this.renderTiles = benchmark(this.renderTiles.bind(this), this);
+      this.readOAM = benchmark(this.readOAM.bind(this), this);
+      this.readVRAM = benchmark(this.readVRAM.bind(this), this);
+      this.vBlank = benchmark(this.vBlank.bind(this), this);
+      this.hBlank = benchmark(this.hBlank.bind(this), this);
+      this.lcdInterrupt = benchmark(this.lcdInterrupt.bind(this), this);
     }
+  }
+  /**
+   * Sets the color scheme mapping for palettes.
+   */
+  public setColorScheme(scheme: ColorScheme): void {
+    this.colorScheme[0] = scheme.white;
+    this.colorScheme[1] = scheme.lightGray;
+    this.colorScheme[2] = scheme.darkGray;
+    this.colorScheme[3] = scheme.black;
   }
   /**
    * Resets the PPU.
@@ -160,6 +185,7 @@ class PPU {
     this._windowX = 0;
     this._windowY = 0;
     this._palette = 0;
+    this.colorScheme = new Array(4);
   }
   /**
    * Returns whether lcd is enabled.
@@ -203,7 +229,12 @@ class PPU {
     if (this.clock >= 172) {
       this.mode = this.ppuModes.hBlank;
     }
-    this.drawScanline();
+    // sanctioned screen tearing to improve performance
+    if (this.clock % this.scanlineClockMod === 0) this.drawScanline();
+    this.scanlineClockMod += 1;
+    if (this.scanlineClockMod === 40) {
+      this.scanlineClockMod = 8;
+    }
   }
   private lcdInterrupt(switchedMode: boolean): void {
     const interruptBit = this.statBits.interrupt[this.mode];
@@ -219,6 +250,14 @@ class PPU {
    * Sends scanlines to the renderer.
    */
   public buildGraphics(cycles: number): void {
+    this.paletteMap[0] =
+      (getBit(this.palette, 1) << 1) | getBit(this.palette, 0);
+    this.paletteMap[1] =
+      (getBit(this.palette, 3) << 1) | getBit(this.palette, 2);
+    this.paletteMap[2] =
+      (getBit(this.palette, 5) << 1) | getBit(this.palette, 4);
+    this.paletteMap[3] =
+      (getBit(this.palette, 7) << 1) | getBit(this.palette, 6);
     // possible the lcdc register was set by the game
     this.lcdc.update(this.memory.readByte(this.memory.addresses.ppu.lcdc));
     if (this.lcdEnabled()) {
@@ -279,46 +318,6 @@ class PPU {
     return this.lcdc.bgWindowTileData ? 0x8000 : 0x8800;
   }
   /**
-   * Renders an individial pixel using tile data.
-   */
-  public renderTilePixel(
-    x: byte,
-    yPos: byte,
-    tileRow: byte,
-    windowX: byte,
-    tileDataAddress: word,
-    bgDataAddress: word,
-    isSigned: boolean
-  ): void {
-    const getXPos = () => {
-      if (this.scanlineInWindow() && x >= windowX) {
-        return x - windowX;
-      }
-      return x + this.scrollX;
-    };
-    const xPos = getXPos();
-    const tileCol = Math.floor(xPos / 8);
-    const tileAddress = bgDataAddress + tileRow + tileCol;
-    const tileId = isSigned
-      ? toSigned(this.memory.readByte(tileAddress))
-      : this.memory.readByte(tileAddress);
-    const tileLocation =
-      tileDataAddress + (isSigned ? (tileId + 128) * 16 : tileId * 16);
-    const line = (yPos % 8) * 2;
-    const lowerByte = this.memory.readByte(tileLocation + line);
-    const upperByte = this.memory.readByte(tileLocation + line + 1);
-
-    const colorBit = -((xPos % 8) - 7);
-    const colorIndex =
-      (getBit(upperByte, colorBit) << 1) | getBit(lowerByte, colorBit);
-
-    CanvasRenderer.setPixel(
-      xPos,
-      this.scanline,
-      this.colorFromPalette(colorIndex)
-    );
-  }
-  /**
    * Renders tiles.
    */
   public renderTiles(): void {
@@ -326,23 +325,41 @@ class PPU {
     const tileDataAddress = this.tileDataMapOffset();
     const isSigned = tileDataAddress === 0x8800;
     const bgDataAddress = this.bgMemoryMapOffset();
-    const getYPos = () => {
-      if (!this.scanlineInWindow()) {
-        return this.scrollY + this.scanline;
-      }
-      return this.scanline - this.windowY;
-    };
-    const yPos = getYPos();
+    let yPos;
+    const scanlineInWindow =
+      this.lcdc.windowEnable && this.scanline >= this.windowY;
+    if (!scanlineInWindow) {
+      yPos = this.scrollY + this.scanline;
+    } else {
+      yPos = this.scanline - this.windowY;
+    }
+    const line = (yPos % 8) * 2;
     const tileRow = Math.floor(yPos / 8) * 32;
+    const tileAddress = bgDataAddress + tileRow;
     for (let x = 0; x < CanvasRenderer.screenWidth; x++) {
-      this.renderTilePixel(
-        x,
-        yPos,
-        tileRow,
-        windowXOffset,
-        tileDataAddress,
-        bgDataAddress,
-        isSigned
+      let xPos;
+      if (scanlineInWindow && x >= windowXOffset) {
+        xPos = x - windowXOffset;
+      } else {
+        xPos = x + this.scrollX;
+      }
+      const tileCol = Math.floor(xPos / 8);
+      const tileAddressX = tileAddress + tileCol;
+      const tileId = isSigned
+        ? toSigned(this.memory.readByte(tileAddressX))
+        : this.memory.readByte(tileAddressX);
+      const tileLocation =
+        tileDataAddress + (isSigned ? (tileId + 128) * 16 : tileId * 16);
+      const tile = this.memory.readWord(tileLocation + line);
+      const colorBit = -((xPos % 8) - 7);
+      const colorIndex =
+        (getBit(upper(tile), colorBit) << 1) | getBit(lower(tile), colorBit);
+
+      this.pixelMap[this.scanline][xPos] = this.paletteMap[colorIndex];
+      CanvasRenderer.setPixel(
+        xPos,
+        this.scanline,
+        this.colorScheme[this.pixelMap[this.scanline][xPos]]
       );
     }
   }
@@ -350,29 +367,6 @@ class PPU {
    * Renders sprites.
    */
   public renderSprites(): void {}
-  /**
-   * Lookup the color using the currently mapped palette.
-   */
-  public colorFromPalette(index: number): RGB {
-    switch (index) {
-      case 0:
-        return this.paletteMap[
-          (getBit(this.palette, 1) << 1) | getBit(this.palette, 0)
-        ];
-      case 1:
-        return this.paletteMap[
-          (getBit(this.palette, 3) << 1) | getBit(this.palette, 2)
-        ];
-      case 2:
-        return this.paletteMap[
-          (getBit(this.palette, 5) << 1) | getBit(this.palette, 4)
-        ];
-      default:
-        return this.paletteMap[
-          (getBit(this.palette, 7) << 1) | getBit(this.palette, 6)
-        ];
-    }
-  }
   /**
    * Draws a scanline.
    */

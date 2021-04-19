@@ -1,8 +1,8 @@
-import type {byte, word} from '../../Types';
-import {lower, upper, toHex} from '../../Types';
-import CPU from '../CPU';
-import benchmark, {benchmarksEnabled} from '../../helpers/Performance';
 import {DEBUG} from '../../helpers/Debug';
+import benchmark, {benchmarksEnabled} from '../../helpers/Performance';
+import type {byte, word} from '../../Types';
+import {lower, toHex, upper} from '../../Types';
+import CPU from '../CPU';
 
 interface CartridgeCode {
   [key: number]: string;
@@ -138,8 +138,8 @@ class Memory {
     };
     this.cart.R.currROMBank = 1;
     if (benchmarksEnabled) {
-      this.readByte = benchmark(this.readByte.bind(this));
-      this.writeByte = benchmark(this.writeByte.bind(this));
+      this.readByte = benchmark(this.readByte.bind(this), this);
+      this.writeByte = benchmark(this.writeByte.bind(this), this);
     }
   }
   /**

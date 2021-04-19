@@ -1,9 +1,9 @@
 import * as React from 'react';
 import {useEffect, useReducer, useRef} from 'react';
-import Emulator from '../Emulator';
 import CanvasRenderer from '../CanvasRenderer';
+import Emulator from '../Emulator';
+import type {Action, AppContext, AppState} from './AppTypes';
 import Wrapper from './Wrapper';
-import type {AppState, Action, AppContext} from './AppTypes';
 
 const initialState: AppState = {
   canvas: null!,

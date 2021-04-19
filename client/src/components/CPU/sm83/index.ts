@@ -1,7 +1,7 @@
 import CPU from '../';
+import {byte} from '../../../Types';
 import Memory from '../../Memory';
 import OpcodeMap from './Map';
-import {byte} from '../../../Types';
 
 /**
  * No operation.

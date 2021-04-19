@@ -1,23 +1,22 @@
-import Memory from '../../Memory';
-import PPU from '../../PPU';
+import CPU from '..';
 import {
-  byte,
-  word,
-  toByte,
   addByte,
+  addLower,
+  addUpper,
+  addWord,
+  byte,
+  lower,
+  OpcodeList,
+  setLower,
+  setUpper,
+  toByte,
+  toHex,
+  toSigned,
   toWord,
   upper,
-  lower,
-  setUpper,
-  setLower,
-  addWord,
-  addUpper,
-  addLower,
-  toSigned,
-  OpcodeList,
-  toHex,
+  word,
 } from '../../../Types';
-import CPU from '..';
+import Memory from '../../Memory';
 
 function ADD(cpu: CPU, operand: byte): void {
   cpu.checkFullCarry8(upper(cpu.r.af), operand);
