@@ -1,3 +1,7 @@
+$base-width: 787px;
+$base-height: 720px;
+$baseline: 1rem;
+
 body {
   background-color: #111111;
 }
@@ -15,12 +19,19 @@ body {
   align-items: center;
 }
 
-.flex-row {
+nav {
+  min-width: $base-width;
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: space-evenly;
 }
 
 canvas {
-  border: rebeccapurple solid 2px;
+  width: $base-width;
+  height: $base-height;
+  border: rebeccapurple solid $baseline/4;
+}
+
+input {
+  display: none;
 }

@@ -7,8 +7,8 @@ import Wrapper from './Wrapper';
 
 const initialState: AppState = {
   canvas: null!,
-  parsedROM: null!,
-  parsedBIOS: null!,
+  parsedROM: new Uint8Array(),
+  parsedBIOS: new Uint8Array(),
 };
 
 const reducer = (state: AppState, action: Action) => {
@@ -41,7 +41,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const {parsedROM, parsedBIOS} = appState;
-    if (parsedROM && parsedBIOS) {
+    if (parsedROM.length) {
       emulator.current.load(parsedBIOS, parsedROM);
     }
   }, [appState]);

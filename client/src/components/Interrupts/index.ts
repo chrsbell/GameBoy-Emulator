@@ -1,4 +1,4 @@
-import {byte, setBit, word} from '../../Types';
+import {byte, setBit, word} from '../../Primitives';
 import Memory from '../Memory';
 
 interface GBInterrupt {

@@ -10,7 +10,7 @@ import {
   setLower,
   toHex,
   word,
-} from '../../Types';
+} from '../../Primitives';
 import Interrupt from '../Interrupts';
 import Memory from '../Memory';
 import Opcodes from './sm83';

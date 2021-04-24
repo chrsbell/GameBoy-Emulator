@@ -1,7 +1,7 @@
 import {DEBUG} from '../../helpers/Debug';
 import benchmark, {benchmarksEnabled} from '../../helpers/Performance';
-import type {byte, word} from '../../Types';
-import {lower, toHex, upper} from '../../Types';
+import type {byte, word} from '../../Primitives';
+import {lower, toHex, upper} from '../../Primitives';
 import CPU from '../CPU';
 
 interface CartridgeCode {
@@ -161,10 +161,12 @@ class Memory {
     } else if (address <= 0xdfff) {
       this.wRAM[address - 0xc000] = data;
     } else if (address <= 0xfdff) {
-      DEBUG && console.error(`Can't write to prohibited address.`);
+      this.wRAMShadow[address - 0xe000] = data;
+      // DEBUG && console.error(`Can't write to prohibited address.`);
     } else if (address <= 0xfe9f) {
       this.OAM[address - 0xfe00] = data;
     } else if (address <= 0xfeff) {
+      console.log(toHex(address));
       DEBUG && console.error(`Can't write to prohibited address.`);
     } else if (address <= 0xff7f) {
       // hardware I/O
@@ -199,7 +201,6 @@ class Memory {
   public readByte(address: word): byte {
     if (this.inBios) {
       if (address < 0x100) {
-        // if (address > 150) console.log(address);
         return this.bios[address];
       } else if (address === 0x100) {
         this.inBios = false;
@@ -288,6 +289,8 @@ class Memory {
    * Loads parsed files into BIOS/ROM
    */
   public load(cpu: CPU, bios: Uint8Array | null, rom: Uint8Array): void {
+    debugger;
+
     this.cart.ROM = rom;
     this.cart.MBCType = this.readByte(0x147);
     this.cart.ROMSize = this.readByte(0x148);
@@ -304,7 +307,7 @@ class Memory {
       DEBUG && console.log(`No support for MBC ${toHex(this.cart.MBCType)}.`);
     }
     DEBUG && console.log('Loaded file into ROM memory.');
-    if (bios) {
+    if (bios?.length) {
       this.bios = bios;
       this.inBios = true;
       DEBUG && console.log('Loaded bios.');

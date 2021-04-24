@@ -1,4 +1,4 @@
-import {toSigned, toWord, word} from './Types';
+import {toSigned, toWord, word} from './Primitives';
 
 describe('Primitive types', () => {
   it('creates valid words/bytes', () => {

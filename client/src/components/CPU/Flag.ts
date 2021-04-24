@@ -1,6 +1,6 @@
 // Using a class to prevent accidentally setting flag outside 0/1
 import CPU from '.';
-import {byte, lower, setLower} from '../../Types';
+import {byte, lower, setLower} from '../../Primitives';
 
 class Flag {
   private _z: byte = 0; // set if last op producted 0

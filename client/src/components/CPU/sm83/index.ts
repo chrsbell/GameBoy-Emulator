@@ -1,5 +1,5 @@
 import CPU from '../';
-import {byte} from '../../../Types';
+import {byte} from '../../../Primitives';
 import Memory from '../../Memory';
 import OpcodeMap from './Map';
 

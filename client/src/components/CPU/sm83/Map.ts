@@ -15,7 +15,7 @@ import {
   toWord,
   upper,
   word,
-} from '../../../Types';
+} from '../../../Primitives';
 import Memory from '../../Memory';
 
 function ADD(cpu: CPU, operand: byte): void {
