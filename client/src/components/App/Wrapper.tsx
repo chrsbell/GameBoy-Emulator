@@ -4,8 +4,6 @@ import {DEBUG} from '../../helpers/Debug';
 import type {AppContext} from './AppTypes';
 import './styles.scss';
 
-// const css = styles;
-// console.log(css);
 const Wrapper: React.FC<AppContext> = ({appDispatch}) => {
   const canvasRef: React.MutableRefObject<HTMLCanvasElement> = useRef(null!);
   const hiddenBIOSRef: React.MutableRefObject<HTMLInputElement> = useRef(null!);
@@ -38,7 +36,6 @@ const Wrapper: React.FC<AppContext> = ({appDispatch}) => {
 
   return (
     <>
-      {/* <style>{css}</style> */}
       <section className="container">
         <div className="flex-column">
           <nav>

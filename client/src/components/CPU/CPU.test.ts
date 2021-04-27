@@ -3,10 +3,10 @@ import _ from 'lodash';
 import * as path from 'path';
 import * as util from 'util';
 import CPU from '.';
-import {byte, lower, upper, word} from '../../Types';
+import {byte, lower, upper, word} from '../../helpers/Primitives';
 import Memory from '../Memory';
 import PPU from '../PPU';
-import Flag from './Flag';
+import Flag, {formatFlag} from './Flag';
 const chalk = require('chalk');
 
 const TEST_ROM_FOLDER = path.join(
@@ -59,6 +59,7 @@ declare global {
   namespace jest {
     interface Matchers<R> {
       toMatchRegister(
+        cpu: CPU,
         expected: byte | word,
         register: string,
         expectedState: CPUInfo
@@ -78,8 +79,8 @@ const consoleColors = [
 
 expect.extend({
   toMatchRegister(
-    cpu: CPU,
     received: byte | word,
+    cpu: CPU,
     expected: byte | word,
     register: string,
     expectedState: CPUInfo
@@ -104,7 +105,7 @@ expect.extend({
             .map(instr => _.sample(consoleColors)(instr))
             .join(' ')}\n\nExpected CPU State: ${logObject(
             expectedState
-          )}\n\nExpected Flag: ${logObject(new Flag(cpu, expectedState.f))}`,
+          )}\n\nExpected Flag: ${logObject(formatFlag(expectedState.f))}`,
         pass: false,
       };
     }
@@ -189,6 +190,7 @@ describe('CPU', () => {
     // skip initial state
     [expected, fileIndex] = readSaveState(saveState, fileIndex);
     for (let i = 0; i < saveState.length; i++) {
+      debugger;
       // Act
       const cycles = cpu.executeInstruction(memory);
       // PPU.buildGraphics(cycles);
@@ -204,15 +206,15 @@ describe('CPU', () => {
       }
 
       // Assert
-      expect(cpu.pc).toMatchRegister(expected.pc, 'PC', expected);
-      expect(cpu.sp).toMatchRegister(expected.sp, 'SP', expected);
-      expect(cpu.r.hl).toMatchRegister(expected.hl, 'HL', expected);
-      expect(upper(cpu.r.af)).toMatchRegister(expected.a, 'A', expected);
-      expect(upper(cpu.r.bc)).toMatchRegister(expected.b, 'B', expected);
-      expect(lower(cpu.r.bc)).toMatchRegister(expected.c, 'C', expected);
-      expect(upper(cpu.r.de)).toMatchRegister(expected.d, 'D', expected);
-      expect(lower(cpu.r.de)).toMatchRegister(expected.e, 'E', expected);
-      expect(lower(cpu.r.af)).toMatchRegister(expected.f, 'F', expected);
+      expect(cpu.pc).toMatchRegister(cpu, expected.pc, 'PC', expected);
+      expect(cpu.sp).toMatchRegister(cpu, expected.sp, 'SP', expected);
+      expect(cpu.r.hl).toMatchRegister(cpu, expected.hl, 'HL', expected);
+      expect(upper(cpu.r.af)).toMatchRegister(cpu, expected.a, 'A', expected);
+      expect(upper(cpu.r.bc)).toMatchRegister(cpu, expected.b, 'B', expected);
+      expect(lower(cpu.r.bc)).toMatchRegister(cpu, expected.c, 'C', expected);
+      expect(upper(cpu.r.de)).toMatchRegister(cpu, expected.d, 'D', expected);
+      expect(lower(cpu.r.de)).toMatchRegister(cpu, expected.e, 'E', expected);
+      expect(lower(cpu.r.af)).toMatchRegister(cpu, expected.f, 'F', expected);
     }
   };
 
@@ -223,6 +225,10 @@ describe('CPU', () => {
     const cycles = cpu.executeInstruction(memory);
     expect(memReadSpy).toHaveBeenCalledTimes(1);
     expect(cycles).toEqual(4);
+  });
+
+  it('exectues a ROM file', () => {
+    checkRegisters(null, path.join(TEST_ROM_FOLDER, 'tetris.gb'), 'tetris.gb');
   });
 
   xit('executes SP and HL instructions', () => {

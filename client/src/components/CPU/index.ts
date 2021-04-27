@@ -10,7 +10,7 @@ import {
   setLower,
   toHex,
   word,
-} from '../../Primitives';
+} from '../../helpers/Primitives';
 import Interrupt from '../Interrupts';
 import Memory from '../Memory';
 import Opcodes from './sm83';
@@ -151,6 +151,7 @@ class CPU {
   public executeInstruction(memory: Memory): number {
     // fetch
     const opcode: byte = memory.readByte(this.pc);
+    if (opcode === undefined) debugger;
     this.addCalledInstruction(toHex(opcode));
     this.pc += 1;
     // execute

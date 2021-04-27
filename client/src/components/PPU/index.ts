@@ -8,7 +8,7 @@ import {
   word,
   upper,
   lower,
-} from '../../Primitives';
+} from '../../helpers/Primitives';
 import type {ColorScheme, RGB} from '../CanvasRenderer';
 import CanvasRenderer from '../CanvasRenderer';
 import Interrupt, {enableInterrupt} from '../Interrupts';

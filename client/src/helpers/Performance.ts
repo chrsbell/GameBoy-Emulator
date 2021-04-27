@@ -1,13 +1,14 @@
-type benchmarkTimes = {
+interface benchmarkTimes {
   // the context
   [key: string]: {
     // the function
     [key: string]: {
-      elapsed: number;
-      calledTimes: number;
+      averageCallTime: number;
+      elapsedMilliseconds: number;
+      numberOfCalls: number;
     };
   };
-};
+}
 
 const times: benchmarkTimes = {};
 
@@ -24,12 +25,18 @@ const benchmark = (func: Function, context: any = null) => {
       if (!times[className]) times[className] = {};
       if (!times[className][func.name]) {
         times[className][func.name] = {
-          elapsed: t2 - t1,
-          calledTimes: 1,
+          averageCallTime: t2 - t1,
+          elapsedMilliseconds: t2 - t1,
+          numberOfCalls: 1,
         };
       } else {
-        times[className][func.name].elapsed += t2 - t1;
-        times[className][func.name].calledTimes += 1;
+        const {elapsedMilliseconds, numberOfCalls} = times[className][
+          func.name
+        ];
+        times[className][func.name].elapsedMilliseconds += t2 - t1;
+        times[className][func.name].numberOfCalls += 1;
+        times[className][func.name].averageCallTime =
+          elapsedMilliseconds / numberOfCalls;
       }
       return value;
     }

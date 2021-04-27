@@ -15,7 +15,7 @@ import {
   toWord,
   upper,
   word,
-} from '../../../Primitives';
+} from '../../../helpers/Primitives';
 import Memory from '../../Memory';
 
 function ADD(cpu: CPU, operand: byte): void {
@@ -248,8 +248,8 @@ const OpcodeMap: OpcodeList = {
   },
 
   0x10: function (cpu: CPU, memory: Memory): void {
-    console.log('Instruction halted.');
-    throw new Error();
+    // console.log('Instruction halted.');
+    // throw new Error();
   },
 
   0x11: function (cpu: CPU, memory: Memory): void {
@@ -1238,7 +1238,7 @@ const OpcodeMap: OpcodeList = {
   },
 
   0xd3: function (cpu: CPU, memory: Memory): void {
-    throw new Error('Tried to call illegal opcode.');
+    // throw new Error('Tried to call illegal opcode.');
   },
 
   0xd4: function (cpu: CPU, memory: Memory): boolean {
@@ -1280,7 +1280,7 @@ const OpcodeMap: OpcodeList = {
   },
 
   0xdb: function (cpu: CPU, memory: Memory): void {
-    throw new Error('Tried to call illegal opcode.');
+    // throw new Error('Tried to call illegal opcode.');
   },
 
   0xdc: function (cpu: CPU, memory: Memory): boolean {
@@ -1292,7 +1292,7 @@ const OpcodeMap: OpcodeList = {
   },
 
   0xdd: function (cpu: CPU, memory: Memory): void {
-    throw new Error('Tried to call illegal opcode.');
+    // throw new Error('Tried to call illegal opcode.');
   },
 
   0xde: function (cpu: CPU, memory: Memory): void {
@@ -1318,11 +1318,11 @@ const OpcodeMap: OpcodeList = {
   },
 
   0xe3: function (cpu: CPU, memory: Memory): void {
-    throw new Error('Tried to call illegal opcode.');
+    // throw new Error('Tried to call illegal opcode.');
   },
 
   0xe4: function (cpu: CPU, memory: Memory): void {
-    throw new Error('Tried to call illegal opcode.');
+    // throw new Error('Tried to call illegal opcode.');
   },
 
   0xe5: function (cpu: CPU, memory: Memory): void {
@@ -1358,15 +1358,15 @@ const OpcodeMap: OpcodeList = {
   },
 
   0xeb: function (cpu: CPU, memory: Memory): void {
-    throw new Error('Tried to call illegal opcode.');
+    // throw new Error('Tried to call illegal opcode.');
   },
 
   0xec: function (cpu: CPU, memory: Memory): void {
-    throw new Error('Tried to call illegal opcode.');
+    // throw new Error('Tried to call illegal opcode.');
   },
 
   0xed: function (cpu: CPU, memory: Memory): void {
-    throw new Error('Tried to call illegal opcode.');
+    // throw new Error('Tried to call illegal opcode.');
   },
 
   0xee: function (cpu: CPU, memory: Memory): void {
@@ -1403,7 +1403,7 @@ const OpcodeMap: OpcodeList = {
   },
 
   0xf4: function (cpu: CPU, memory: Memory): void {
-    throw new Error('Tried to call illegal opcode.');
+    // throw new Error('Tried to call illegal opcode.');
   },
 
   0xf5: function (cpu: CPU, memory: Memory): void {
@@ -1447,11 +1447,11 @@ const OpcodeMap: OpcodeList = {
   },
 
   0xfc: function (cpu: CPU, memory: Memory): void {
-    throw new Error('Tried to call illegal opcode.');
+    // throw new Error('Tried to call illegal opcode.');
   },
 
   0xfd: function (cpu: CPU, memory: Memory): void {
-    throw new Error('Tried to call illegal opcode.');
+    // throw new Error('Tried to call illegal opcode.');
   },
 
   0xfe: function (cpu: CPU, memory: Memory): void {

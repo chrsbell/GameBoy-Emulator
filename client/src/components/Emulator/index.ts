@@ -57,6 +57,7 @@ class Emulator {
       this.ppu.buildGraphics(elapsed);
       this.cpu.checkInterrupts(this.memory);
     }
+    console.log(`Test status: ${this.memory.readByte(0xa000)}`);
     CanvasRenderer.draw();
   }
   /**
@@ -66,23 +67,12 @@ class Emulator {
     if (this.numExecuted > this.cpu.clock) {
       const times = getBenchmarks();
       forEach(times, (functions: any, group: any) => {
-        console.log(`%cPerformance of ${group}:`, 'color:blue');
-        functions = map(functions, (params: any, func: any) => [
-          params.elapsed / params.calledTimes,
-          func,
-        ]).sort((a: Array<any>, b: Array<any>) => b[0] - a[0]);
-        forEach(functions, (pair: any) => {
-          console.log(
-            `%c   Average ${pair[1]} function call duration:`,
-            'color:green'
-          );
-          console.log(`%c${pair[0] * 1000}ms`, 'color:red');
-        });
+        console.log(
+          `%cPerformance of ${group}:`,
+          'color:#8217ab; font-weight: bold'
+        );
+        console.table(functions);
       });
-      console.log('1 second passed in emulator time.');
-      console.log(
-        '---------------------------------------------------------------------------------------------------'
-      );
       this.numExecuted = 0;
     }
   }

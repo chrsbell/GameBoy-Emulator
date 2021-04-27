@@ -1,24 +1,33 @@
 import {DEBUG} from '../../helpers/Debug';
 import benchmark, {benchmarksEnabled} from '../../helpers/Performance';
-import type {byte, word} from '../../Primitives';
-import {lower, toHex, upper} from '../../Primitives';
+import type {byte, word} from '../../helpers/Primitives';
+import {lower, toHex, upper} from '../../helpers/Primitives';
 import CPU from '../CPU';
 
 interface CartridgeCode {
   [key: number]: string;
 }
 
-interface ROMCode {
-  [key: number]: {size: string; numBanks: number};
+interface SizeCode {
+  [key: number]: {size: number; numBanks: number};
 }
 
-const ROMSizeCodes: ROMCode = {
-  0x00: {size: '32kB', numBanks: 2},
-  0x01: {size: '64kB', numBanks: 4},
-  0x02: {size: '128kB', numBanks: 8},
-  0x03: {size: '256kB', numBanks: 16},
-  0x04: {size: '512kB', numBanks: 32},
-  0x05: {size: '1MB', numBanks: 64},
+const ROMSizeCodeMap: SizeCode = {
+  0x00: {size: 32768, numBanks: 2},
+  0x01: {size: 65536, numBanks: 4},
+  0x02: {size: 131072, numBanks: 8},
+  0x03: {size: 262144, numBanks: 16},
+  0x04: {size: 524288, numBanks: 32},
+  0x05: {size: 1024000, numBanks: 64},
+};
+
+const RAMSizeCodeMap: SizeCode = {
+  0x00: {size: 0, numBanks: 0},
+  0x01: {size: 2048, numBanks: 1},
+  0x02: {size: 8192, numBanks: 1},
+  0x03: {size: 32768, numBanks: 4},
+  0x04: {size: 131072, numBanks: 16},
+  0x05: {size: 65536, numBanks: 8},
 };
 
 const CartridgeTypes: CartridgeCode = {
@@ -40,22 +49,13 @@ const CartridgeTypes: CartridgeCode = {
   0x13: 'MBC #3 + RAM + Battery',
 };
 
-const RAMSizeCodes: CartridgeCode = {
-  0x00: 'None',
-  0x01: '2kB',
-  0x02: '8kB',
-  0x03: '32kB, 4 banks',
-  0x04: '128kB, 16 banks',
-  0x05: '64kB, 8 banks',
-};
-
 interface Cartridge {
   // entire cartridge ROM
   ROM: Uint8Array;
   // the ROM size code
-  ROMSize: byte;
+  ROMSizeCode: byte;
   // external RAM size code
-  RAMSize: byte;
+  RAMSizeCode: byte;
   // the MBC type code
   MBCType: byte;
   // each ROM Bank is 16kB
@@ -120,14 +120,13 @@ class Memory {
     this.OAM = new Uint8Array(0xfe9f - 0xfe00);
     this.IORAM = new Uint8Array(0xff7f - 0xff00);
     this.hRAM = new Uint8Array(0xfffe - 0xff80);
-    // defaults to bank 1 at power on
     this.cart = {
-      ROM: new Uint8Array(),
-      ROMSize: 0,
-      RAMSize: 0,
+      ROM: null!,
+      ROMSizeCode: 0,
+      RAMSizeCode: 0,
       MBCType: 0,
-      ROMBanks: [new Uint8Array()],
-      RAMBanks: [new Uint8Array()],
+      ROMBanks: [],
+      RAMBanks: [],
       R: {
         RAMEnabled: false,
         currROMBank: 1,
@@ -136,7 +135,6 @@ class Memory {
         bankingMode: 0,
       },
     };
-    this.cart.R.currROMBank = 1;
     if (benchmarksEnabled) {
       this.readByte = benchmark(this.readByte.bind(this), this);
       this.writeByte = benchmark(this.writeByte.bind(this), this);
@@ -147,27 +145,61 @@ class Memory {
    */
   public writeByte(address: word, data: byte): void {
     if (this.inBios && address <= 0xff) return;
+    const writeAddress = this.inBios ? address : address;
+    const {RAMSizeCode, ROMSizeCode} = this.cart;
+    const {addresses} = this;
     if (address < 0x4000) {
       // ROM Bank 0 is always available
-      this.cart.ROM[address] = data;
+      if (address <= 0x1fff) {
+        // RAM enable/disable
+        this.cart.R.RAMEnabled = (data & 0b1111) === 0xa;
+      } else if (address <= 0x3fff) {
+        // ROM bank change, map new rom bank to bit mask defining number of banks
+        this.cart.R.currROMBank &= 0b1100000;
+        this.cart.R.currROMBank = ROMSizeCodeMap[ROMSizeCode].numBanks - 1;
+        if (!this.cart.R.currROMBank) this.cart.R.currROMBank = 1;
+      }
+      this.cart.ROM[writeAddress] = data;
     } else if (address <= 0x7fff) {
+      if (address <= 0x5fff) {
+        // used to select RAM bank in 32kb RAM carts
+        this.cart.R.ROMRAMMixed = data & 0b11;
+        if (this.cart.R.bankingMode === 1 && RAMSizeCode === 3) {
+          this.cart.R.currRAMBank = this.cart.R.ROMRAMMixed;
+        } else if (ROMSizeCode >= 0x05) {
+          // select bits 5-6 of ROM bank
+          this.cart.R.currROMBank &= 1100000;
+          this.cart.R.currROMBank |= (data & 0b11) << 5;
+        }
+      } else {
+        // banking mode select
+        this.cart.R.bankingMode = data & 1;
+        if (this.cart.R.bankingMode === 1 && this.cart.R.RAMEnabled) {
+          // immediately set new RAM bank if RAM banking enabled
+          this.cart.R.currRAMBank = this.cart.R.ROMRAMMixed;
+        }
+      }
       // write to ROM bank of cartridge
-      this.cart.ROM[address] = data;
+      this.cart.ROMBanks[this.cart.R.currROMBank - 1][
+        writeAddress - 0x4000
+      ] = data;
     } else if (address <= 0x9fff) {
-      this.vRAM[address - 0x8000] = data;
+      this.vRAM[writeAddress - 0x8000] = data;
     } else if (address <= 0xbfff) {
       // write to RAM bank of cartridge
-      this.cart.RAMBanks[this.cart.R.currRAMBank][address - 0xa000] = data;
+      this.cart.RAMBanks[this.cart.R.currRAMBank - 1][
+        writeAddress - 0xa000
+      ] = data;
     } else if (address <= 0xdfff) {
-      this.wRAM[address - 0xc000] = data;
+      this.wRAM[writeAddress - 0xc000] = data;
     } else if (address <= 0xfdff) {
-      this.wRAMShadow[address - 0xe000] = data;
+      this.wRAMShadow[writeAddress - 0xe000] = data;
       // DEBUG && console.error(`Can't write to prohibited address.`);
     } else if (address <= 0xfe9f) {
-      this.OAM[address - 0xfe00] = data;
+      this.OAM[writeAddress - 0xfe00] = data;
     } else if (address <= 0xfeff) {
-      console.log(toHex(address));
-      DEBUG && console.error(`Can't write to prohibited address.`);
+      console.log(toHex(writeAddress));
+      // DEBUG && console.error(`Can't write to prohibited address.`);
     } else if (address <= 0xff7f) {
       // hardware I/O
       // if (address === 0xff42) console.log(`scrollY: ${data}`);
@@ -178,13 +210,13 @@ class Memory {
         this.dmaTransfer(data);
       }
       // reset scanline if trying to write to associated register
-      else if (address === this.addresses.ppu.scanline) {
-        this.IORAM[address - 0xff00] = 0;
+      else if (address === addresses.ppu.scanline) {
+        this.IORAM[writeAddress - 0xff00] = 0;
       } else {
-        this.IORAM[address - 0xff00] = data;
+        this.IORAM[writeAddress - 0xff00] = data;
       }
     } else if (address <= 0xffff) {
-      this.hRAM[address - 0xff80] = data;
+      this.hRAM[writeAddress - 0xff80] = data;
     }
   }
 
@@ -207,30 +239,36 @@ class Memory {
         DEBUG && console.log('Exited bios.');
       }
     }
+    const readAddress = this.inBios ? address : address;
+
     if (address < 0x4000) {
       // ROM Bank 0 is always available
-      return this.cart.ROM[address];
+      return this.cart.ROM[readAddress];
     } else if (address <= 0x7fff) {
       // Reading from ROM bank of cartridge
-      return this.cart.ROM[address];
+      return this.cart.ROMBanks[this.cart.R.currROMBank - 1][
+        readAddress - 0x4000
+      ];
     } else if (address <= 0x9fff) {
-      return this.vRAM[address - 0x8000];
+      return this.vRAM[readAddress - 0x8000];
     } else if (address <= 0xbfff) {
       // reading from RAM bank of cartridge
-      return this.cart.RAMBanks[this.cart.R.currRAMBank][address - 0xa000];
+      return this.cart.RAMBanks[this.cart.R.currRAMBank - 1][
+        readAddress - 0xa000
+      ];
     } else if (address <= 0xdfff) {
-      return this.wRAM[address - 0xc000];
+      return this.wRAM[readAddress - 0xc000];
     } else if (address <= 0xfdff) {
-      return this.wRAMShadow[address - 0xe000];
+      return this.wRAMShadow[readAddress - 0xe000];
     } else if (address <= 0xfe9f) {
-      return this.OAM[address - 0xfe00];
+      return this.OAM[readAddress - 0xfe00];
     } else if (address <= 0xfeff) {
-      throw new Error('Use of this area is prohibited.');
+      // throw new Error('Use of this area is prohibited.');
     } else if (address <= 0xff7f) {
       // hardware I/O
-      return this.IORAM[address - 0xff00];
+      return this.IORAM[readAddress - 0xff00];
     } else if (address <= 0xffff) {
-      return this.hRAM[address - 0xff80];
+      return this.hRAM[readAddress - 0xff80];
     }
     throw new Error(`Tried to read out of bounds address: ${toHex(address)}.`);
   }
@@ -255,10 +293,10 @@ class Memory {
       const register = data & 0b11;
       this.cart.R.ROMRAMMixed = register;
       // swap to one of the four RAM banks if size is 32kB
-      if (this.cart.RAMSize >= 0x03) {
+      if (this.cart.RAMSizeCode >= 0x03) {
         this.cart.R.currRAMBank = register;
       }
-      if (this.cart.R.bankingMode === 0 && this.cart.ROMSize >= 0x05) {
+      if (this.cart.R.bankingMode === 0 && this.cart.ROMSizeCode >= 0x05) {
         // for 1MB ROM or larger carts, set upper 2 bits (5-6) of ROM bank number
         const {currROMBank} = this.cart.R;
         this.cart.R.currROMBank = currROMBank | (register << 4);
@@ -289,24 +327,23 @@ class Memory {
    * Loads parsed files into BIOS/ROM
    */
   public load(cpu: CPU, bios: Uint8Array | null, rom: Uint8Array): void {
-    debugger;
-
     this.cart.ROM = rom;
+    debugger;
     this.cart.MBCType = this.readByte(0x147);
-    this.cart.ROMSize = this.readByte(0x148);
-    this.cart.RAMSize = this.readByte(0x149);
-    DEBUG &&
-      console.log(
-        `ROM Size: $${JSON.stringify(ROMSizeCodes[this.cart.ROMSize])}`
-      );
-    DEBUG && console.log(`RAM Size: ${RAMSizeCodes[this.cart.RAMSize]}`);
-    DEBUG &&
+    this.cart.ROMSizeCode = this.readByte(0x148);
+    this.cart.RAMSizeCode = this.readByte(0x149);
+    this.initializeBanks();
+    if (DEBUG) {
+      console.log('ROM Size:');
+      console.dir(ROMSizeCodeMap[this.cart.RAMSizeCode]);
+      console.log('RAM Size:');
+      console.dir(RAMSizeCodeMap[this.cart.RAMSizeCode]);
       console.log(`Cartridge Type: ${CartridgeTypes[this.cart.MBCType]}`);
-
-    if (this.cart.MBCType !== 0) {
-      DEBUG && console.log(`No support for MBC ${toHex(this.cart.MBCType)}.`);
+      if (this.cart.MBCType > 1) {
+        console.log(`No support for MBC ${toHex(this.cart.MBCType)}.`);
+      }
+      console.log('Loaded file into ROM memory.');
     }
-    DEBUG && console.log('Loaded file into ROM memory.');
     if (bios?.length) {
       this.bios = bios;
       this.inBios = true;
@@ -314,6 +351,46 @@ class Memory {
     } else {
       this.inBios = false;
       cpu.initPowerSequence(this);
+    }
+  }
+  /**
+   * Adds extra ROM and RAM banks according to the MBC type.
+   */
+  private initializeBanks(): void {
+    let {MBCType, ROMSizeCode, RAMSizeCode} = this.cart;
+    switch (MBCType) {
+      case 1:
+        // default to ROM bank 1 on load
+        this.cart.R.currROMBank = 1;
+        // skip first bank, which is already mapped in ROM
+        const numROMBanks = ROMSizeCodeMap[ROMSizeCode].numBanks - 1;
+        this.cart.ROMBanks = new Array(numROMBanks);
+        for (let i = 0; i < numROMBanks; i += 0x4000) {
+          this.cart.ROMBanks[i] = new Uint8Array(
+            this.cart.ROM.slice((i + 1) * 0x4000, (i + 2) * 0x4000)
+          );
+        }
+        const numRAMBanks = RAMSizeCodeMap[RAMSizeCode].numBanks;
+        const RAMSize = RAMSizeCodeMap[RAMSizeCode].size;
+        this.cart.RAMBanks = new Array(numRAMBanks);
+        if (numRAMBanks) {
+          // only one possible combination, 4 banks of 32kb
+          for (let i = 0; i < 4; i++) {
+            this.cart.RAMBanks[i] = new Uint8Array(RAMSize);
+          }
+        } else {
+          this.cart.RAMBanks[0] = new Uint8Array(RAMSize);
+        }
+        break;
+      default:
+        // MBC 0
+        this.cart.RAMBanks = new Array(1);
+        this.cart.RAMBanks[0] = new Uint8Array(0x2000);
+        this.cart.ROMBanks = new Array(1);
+        this.cart.ROMBanks[0] = new Uint8Array(
+          this.cart.ROM.slice(0x4000, 0x8000)
+        );
+        break;
     }
   }
 }

@@ -1,6 +1,6 @@
 // Using a class to prevent accidentally setting flag outside 0/1
 import CPU from '.';
-import {byte, lower, setLower} from '../../Primitives';
+import {byte, lower, setLower} from '../../helpers/Primitives';
 
 class Flag {
   private _z: byte = 0; // set if last op producted 0
@@ -100,4 +100,12 @@ class Flag {
   }
 }
 
+const formatFlag = (value: byte): any => ({
+  z: (value >> 7) & 1,
+  n: (value >> 6) & 1,
+  h: (value >> 5) & 1,
+  cy: (value >> 4) & 1,
+});
+
 export default Flag;
+export {formatFlag};
