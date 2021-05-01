@@ -1,14 +1,14 @@
 import * as React from 'react';
 import {useEffect, useReducer, useRef} from 'react';
-import Emulator from '../Emulator';
 import CanvasRenderer from '../CanvasRenderer';
+import Emulator from '../Emulator';
+import type {Action, AppContext, AppState} from './AppTypes';
 import Wrapper from './Wrapper';
-import type {AppState, Action, AppContext} from './AppTypes';
 
 const initialState: AppState = {
   canvas: null!,
-  parsedROM: null!,
-  parsedBIOS: null!,
+  parsedROM: new Uint8Array(),
+  parsedBIOS: new Uint8Array(),
 };
 
 const reducer = (state: AppState, action: Action) => {
@@ -41,12 +41,10 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const {parsedROM, parsedBIOS} = appState;
-    if (parsedROM && parsedBIOS) {
-      if (emulator.current.load(parsedBIOS, parsedROM)) {
-        emulator.current.update();
-      }
+    if (parsedROM.length) {
+      emulator.current.load(parsedBIOS, parsedROM);
     }
-  }, [appState.parsedROM, appState.parsedBIOS]);
+  }, [appState]);
 
   useEffect(() => {
     if (appState.canvas && !CanvasRenderer.initialized) {

@@ -1,10 +1,20 @@
+import {DEBUG} from '../../helpers/Debug';
+import benchmark, {benchmarksEnabled} from '../../helpers/Performance';
+import {
+  byte,
+  clearBit,
+  getBit,
+  lower,
+  OpcodeList,
+  setBit,
+  setLower,
+  toHex,
+  word,
+} from '../../helpers/Primitives';
+import Interrupt from '../Interrupts';
 import Memory from '../Memory';
-import {byte, word, getBit, clearBit, OpcodeList, toHex} from '../../Types';
 import Opcodes from './sm83';
 import {instructionHelpers as helpers} from './sm83/Map';
-import Interrupt from '../Interrupts';
-import benchmark, {benchmarksEnabled} from '../Helpers/Performance';
-import {DEBUG} from '../Helpers/Debug';
 
 interface Registers {
   af: word;
@@ -15,9 +25,9 @@ interface Registers {
 
 class CPU {
   // number of clock ticks per second
-  private static _clock = 4194304;
+  private _clock = 4194304;
   public get clock(): number {
-    return CPU._clock;
+    return this._clock;
   }
   // 16-bit program counter
   private _pc: word = 0;
@@ -65,14 +75,17 @@ class CPU {
   }
   public constructor() {
     if (benchmarksEnabled) {
-      this.executeInstruction = benchmark(this.executeInstruction.bind(this));
-      this.checkInterrupts = benchmark(this.checkInterrupts.bind(this));
+      this.executeInstruction = benchmark(
+        this.executeInstruction.bind(this),
+        this
+      );
+      this.checkInterrupts = benchmark(this.checkInterrupts.bind(this), this);
     }
     this.reset();
   }
 
   /**
-   * Resets the CPU.
+   * Resets the this.
    */
   public reset(): void {
     this.pc = 0;
@@ -92,65 +105,66 @@ class CPU {
   /**
    * Completes the GB power sequence
    */
-  public initPowerSequence(): void {
+  public initPowerSequence(memory: Memory): void {
     this.pc = 0x100;
     this.r.af = 0x01b0;
     this.r.bc = 0x0013;
     this.r.de = 0x00d8;
     this.r.hl = 0x014d;
     this.sp = 0xfffe;
-    Memory.writeByte(0xff05, 0x00);
-    Memory.writeByte(0xff06, 0x00);
-    Memory.writeByte(0xff07, 0x00);
-    Memory.writeByte(0xff10, 0x80);
-    Memory.writeByte(0xff11, 0xbf);
-    Memory.writeByte(0xff12, 0xf3);
-    Memory.writeByte(0xff14, 0xbf);
-    Memory.writeByte(0xff16, 0x3f);
-    Memory.writeByte(0xff17, 0x00);
-    Memory.writeByte(0xff19, 0xbf);
-    Memory.writeByte(0xff1a, 0x7f);
-    Memory.writeByte(0xff1b, 0xff);
-    Memory.writeByte(0xff1c, 0x9f);
-    Memory.writeByte(0xff1e, 0xbf);
-    Memory.writeByte(0xff20, 0xff);
-    Memory.writeByte(0xff21, 0x00);
-    Memory.writeByte(0xff22, 0x00);
-    Memory.writeByte(0xff23, 0xbf);
-    Memory.writeByte(0xff24, 0x77);
-    Memory.writeByte(0xff25, 0xf3);
-    Memory.writeByte(0xff26, 0xf1);
-    Memory.writeByte(0xff40, 0x91);
-    Memory.writeByte(0xff42, 0x00);
-    Memory.writeByte(0xff43, 0x00);
-    Memory.writeByte(0xff45, 0x00);
-    Memory.writeByte(0xff47, 0xfc);
-    Memory.writeByte(0xff48, 0xff);
-    Memory.writeByte(0xff49, 0xff);
-    Memory.writeByte(0xff4a, 0x00);
-    Memory.writeByte(0xff4b, 0x00);
-    Memory.writeByte(0xffff, 0x00);
+    memory.writeByte(0xff05, 0x00);
+    memory.writeByte(0xff06, 0x00);
+    memory.writeByte(0xff07, 0x00);
+    memory.writeByte(0xff10, 0x80);
+    memory.writeByte(0xff11, 0xbf);
+    memory.writeByte(0xff12, 0xf3);
+    memory.writeByte(0xff14, 0xbf);
+    memory.writeByte(0xff16, 0x3f);
+    memory.writeByte(0xff17, 0x00);
+    memory.writeByte(0xff19, 0xbf);
+    memory.writeByte(0xff1a, 0x7f);
+    memory.writeByte(0xff1b, 0xff);
+    memory.writeByte(0xff1c, 0x9f);
+    memory.writeByte(0xff1e, 0xbf);
+    memory.writeByte(0xff20, 0xff);
+    memory.writeByte(0xff21, 0x00);
+    memory.writeByte(0xff22, 0x00);
+    memory.writeByte(0xff23, 0xbf);
+    memory.writeByte(0xff24, 0x77);
+    memory.writeByte(0xff25, 0xf3);
+    memory.writeByte(0xff26, 0xf1);
+    memory.writeByte(0xff40, 0x91);
+    memory.writeByte(0xff42, 0x00);
+    memory.writeByte(0xff43, 0x00);
+    memory.writeByte(0xff45, 0x00);
+    memory.writeByte(0xff47, 0xfc);
+    memory.writeByte(0xff48, 0xff);
+    memory.writeByte(0xff49, 0xff);
+    memory.writeByte(0xff4a, 0x00);
+    memory.writeByte(0xff4b, 0x00);
+    memory.writeByte(0xffff, 0x00);
   }
   /**
    * Executes next opcode.
    * @returns {number} the number of CPU cycles required.
    */
-  public executeInstruction(): number {
+  public executeInstruction(memory: Memory): number {
     // fetch
-    const opcode: byte = Memory.readByte(this.pc);
+    const opcode: byte = memory.readByte(this.pc);
+    if (opcode === undefined) debugger;
     this.addCalledInstruction(toHex(opcode));
     this.pc += 1;
     // execute
-    if (Memory.inBios) {
-      const numCycles: number = this.opcodes[opcode]();
+    if (memory.inBios) {
+      const numCycles: number = this.opcodes[opcode](this, memory);
       // check if finished bios execution
-      if (!Memory.inBios) {
-        DEBUG && console.log('Exiting bios from CPU.');
-        this.initPowerSequence();
+      if (!memory.inBios) {
+        DEBUG && console.log('Exiting bios from this.');
+        this.initPowerSequence(memory);
       }
       return numCycles;
     } else {
-      const numCycles: number = this.opcodes[opcode]();
+      const numCycles: number = this.opcodes[opcode](this, memory);
       return numCycles;
     }
   }
@@ -163,16 +177,15 @@ class CPU {
   /**
    * Checks if an interrupt needs to be handled.
    */
-  public checkInterrupts(): void {
+  public checkInterrupts(memory: Memory): void {
     if (this._allInterruptsEnabled) {
-      const register: byte = Memory.readByte(Interrupt.if);
+      const register: byte = memory.readByte(Interrupt.if);
       if (register) {
-        const individualEnabled = Memory.readByte(Interrupt.ie);
+        const individualEnabled = memory.readByte(Interrupt.ie);
         // 5 interrupts
         for (let i = 0; i < 5; i++) {
           if (getBit(register, i) && getBit(individualEnabled, i)) {
-            debugger;
-            this.handleInterrupts(i);
+            this.handleInterrupts(memory, i);
           }
         }
       }
@@ -181,12 +194,12 @@ class CPU {
   /**
    * Handles an interrupt.
    */
-  private handleInterrupts(interrupt: number): void {
+  private handleInterrupts(memory: Memory, interrupt: number): void {
     this.setInterruptsGlobal(false);
-    const register: byte = Memory.readByte(Interrupt.if);
-    Memory.writeByte(Interrupt.if, clearBit(register, interrupt));
+    const register: byte = memory.readByte(Interrupt.if);
+    memory.writeByte(Interrupt.if, clearBit(register, interrupt));
 
-    helpers.PUSH(this.pc);
+    helpers.PUSH(this, memory, this.pc);
     DEBUG && console.log('Handled an interrupt.');
     switch (interrupt) {
       case Interrupt.vBlank:
@@ -207,13 +220,116 @@ class CPU {
     }
   }
   /**
-   * Logs the internal state of the CPU.
+   * Logs the internal state of the this.
    */
   public log(): void {
     console.log(`JS GB Registers: ${JSON.stringify(this.r)}`);
     console.log(`JS GB PC: ${this.pc}`);
     console.log(`JS GB SP: ${this.sp}`);
   }
+  public setZFlag(value: byte): void {
+    if (value) {
+      this.r.af = setLower(this.r.af, setBit(lower(this.r.af), 7));
+    } else {
+      this.r.af = setLower(this.r.af, clearBit(lower(this.r.af), 7));
+    }
+  }
+
+  public setCYFlag(value: byte): void {
+    if (value) {
+      this.r.af = setLower(this.r.af, setBit(lower(this.r.af), 4));
+    } else {
+      this.r.af = setLower(this.r.af, clearBit(lower(this.r.af), 4));
+    }
+  }
+
+  public setHFlag(value: byte): void {
+    if (value === 1) {
+      this.r.af = setLower(this.r.af, setBit(lower(this.r.af), 5));
+    } else {
+      this.r.af = setLower(this.r.af, clearBit(lower(this.r.af), 5));
+    }
+  }
+
+  public setNFlag(value: byte): void {
+    if (value) {
+      this.r.af = setLower(this.r.af, setBit(lower(this.r.af), 6));
+    } else {
+      this.r.af = setLower(this.r.af, clearBit(lower(this.r.af), 6));
+    }
+  }
+
+  public getZFlag(): number {
+    return getBit(lower(this.r.af), 7);
+  }
+  public getCYFlag(): number {
+    return getBit(lower(this.r.af), 4);
+  }
+  public getHFlag(): number {
+    return getBit(lower(this.r.af), 5);
+  }
+  public getNFlag(): number {
+    return getBit(lower(this.r.af), 6);
+  }
+  /**
+   * Sets the Z flag if the register is 0, otherwise resets it.
+   */
+  public checkZFlag(reg: byte): void {
+    if (!reg) {
+      this.setZFlag(1);
+    } else {
+      this.setZFlag(0);
+    }
+  }
+
+  /**
+   * Sets the half carry flag if a carry will be generated from bits 3 to 4 of the sum.
+   * For 16-bit operations, this function should be called on the upper bytes of the operands.
+   * Sources:
+   * https://robdor.com/2016/08/10/gameboy-emulator-half-carry-flag/
+   * https://stackoverflow.com/questions/8868396/game-boy-what-constitutes-a-half-carry
+   * https://gbdev.io/gb-opcodes/optables/
+   */
+  public checkHalfCarry(op1: byte, op2: byte, subtraction?: boolean): void {
+    const carryBit = subtraction
+      ? ((op1 & 0xf) - (op2 & 0xf)) & 0x10
+      : ((op1 & 0xf) + (op2 & 0xf)) & 0x10;
+    this.setHFlag(carryBit === 0x10 ? 1 : 0);
+  }
+  /**
+   * Sets the carry flag if the sum will exceed the size of the data type.
+   */
+  checkFullCarry16 = (op1: word, op2: word, subtraction?: boolean): void => {
+    if (subtraction) {
+      if (op1 - op2 < 0) {
+        this.setCYFlag(1);
+      } else {
+        this.setCYFlag(0);
+      }
+    } else {
+      if (op1 + op2 > 65535) {
+        this.setCYFlag(1);
+      } else {
+        this.setCYFlag(0);
+      }
+    }
+  };
+
+  checkFullCarry8 = (op1: byte, op2: byte, subtraction?: boolean): void => {
+    if (subtraction) {
+      if (op1 - op2 < 0) {
+        this.setCYFlag(1);
+      } else {
+        this.setCYFlag(0);
+      }
+    } else {
+      if (op1 + op2 > 255) {
+        this.setCYFlag(1);
+      } else {
+        this.setCYFlag(0);
+      }
+    }
+  };
 }
 
-export default new CPU();
+export default CPU;

@@ -1,82 +1,11 @@
-import type {byte, word} from '../../Types';
-import {lower, upper, toHex} from '../../Types';
-import PPU, {PPUAddress} from '../PPU';
+import {DEBUG} from '../../helpers/Debug';
+import benchmark, {benchmarksEnabled} from '../../helpers/Performance';
+import type {byte, word} from '../../helpers/Primitives';
+import {lower, toHex, upper} from '../../helpers/Primitives';
 import CPU from '../CPU';
-import benchmark, {benchmarksEnabled} from '../Helpers/Performance';
-import {DEBUG} from '../Helpers/Debug';
-
-interface CartridgeCode {
-  [key: number]: string;
-}
-
-interface ROMCode {
-  [key: number]: {size: string; numBanks: number};
-}
-
-const ROMSizeCodes: ROMCode = {
-  0x00: {size: '32kB', numBanks: 2},
-  0x01: {size: '64kB', numBanks: 4},
-  0x02: {size: '128kB', numBanks: 8},
-  0x03: {size: '256kB', numBanks: 16},
-  0x04: {size: '512kB', numBanks: 32},
-  0x05: {size: '1MB', numBanks: 64},
-};
-
-const CartridgeTypes: CartridgeCode = {
-  0x00: 'ROM Only',
-  0x01: 'MBC #1',
-  0x02: 'MBC #1 + RAM',
-  0x03: 'MBC #1 + RAM + Battery',
-  0x05: 'MBC2',
-  0x06: 'MBC2 + Battery',
-  0x08: 'ROM + RAM',
-  0x09: 'MBCM #1',
-  0x0b: 'MBCM #1 + RAM',
-  0x0c: 'MBCM #1 + RAM + Battery',
-  0x0d: 'MBCM #1 + RAM + Battery',
-  0x0f: 'MBC #3 + Timer + Battery',
-  0x10: 'MBC #3 + Timer + RAM + Battery',
-  0x11: 'MBC #3',
-  0x12: 'MBC #3 + RAM',
-  0x13: 'MBC #3 + RAM + Battery',
-};
-
-const RAMSizeCodes: CartridgeCode = {
-  0x00: 'None',
-  0x01: '2kB',
-  0x02: '8kB',
-  0x03: '32kB, 4 banks',
-  0x04: '128kB, 16 banks',
-  0x05: '64kB, 8 banks',
-};
-
-interface Cartridge {
-  // entire cartridge ROM
-  ROM: Uint8Array;
-  // the ROM size code
-  ROMSize: byte;
-  // external RAM size code
-  RAMSize: byte;
-  // the MBC type code
-  MBCType: byte;
-  // each ROM Bank is 16kB
-  ROMBanks: Array<Uint8Array>;
-  // 4 banks for 32kB RAM sizes
-  // https://gbdev.io/pandocs/#a000-bfff-ram-bank-00-03-if-any-read-write
-  RAMBanks: Array<Uint8Array>;
-  R: {
-    // enabled with 0Ah in lower 4 bits
-    RAMEnabled: boolean;
-    // current ROM bank
-    // https://gbdev.io/pandocs/#_0000-3fff-rom-bank-00-20-40-60-read-only
-    currROMBank: byte;
-    // current RAM bank (1 bank for RAM with 2kB-8kB sizes)
-    currRAMBank: byte;
-    // 2 bit register
-    ROMRAMMixed: byte;
-    bankingMode: byte;
-  };
-}
+import Cartridge from './Cartridge';
+import MBC0 from './Cartridge/MBC0';
+import MBC1 from './Cartridge/MBC1';
 
 class Memory {
   private bios!: Uint8Array;
@@ -84,19 +13,72 @@ class Memory {
   public inBios = false;
   public cart!: Cartridge;
   // 8k vRAM
-  private vRAM!: Uint8Array;
+  private _vRAM!: Uint8Array;
+  public get vRAM(): Uint8Array {
+    return this._vRAM;
+  }
+  public set vRAM(value: Uint8Array) {
+    this._vRAM = value;
+  }
   // 8k internal RAM
-  private wRAM!: Uint8Array;
+  private _wRAM!: Uint8Array;
+  public get wRAM(): Uint8Array {
+    return this._wRAM;
+  }
+  public set wRAM(value: Uint8Array) {
+    this._wRAM = value;
+  }
   // shadow of working RAM, (8k - 512) bytes
-  private wRAMShadow!: Uint8Array;
+  private _wRAMShadow!: Uint8Array;
+  public get wRAMShadow(): Uint8Array {
+    return this._wRAMShadow;
+  }
+  public set wRAMShadow(value: Uint8Array) {
+    this._wRAMShadow = value;
+  }
   // sprite attribute table
-  private OAM!: Uint8Array;
+  private _OAM!: Uint8Array;
+  public get OAM(): Uint8Array {
+    return this._OAM;
+  }
+  public set OAM(value: Uint8Array) {
+    this._OAM = value;
+  }
   // 126 bytes high RAM
-  private hRAM!: Uint8Array;
+  private _hRAM!: Uint8Array;
+  public get hRAM(): Uint8Array {
+    return this._hRAM;
+  }
+  public set hRAM(value: Uint8Array) {
+    this._hRAM = value;
+  }
   // 128 bytes io register space
-  private IORAM!: Uint8Array;
+  private _IORAM!: Uint8Array;
+  public get IORAM(): Uint8Array {
+    return this._IORAM;
+  }
+  public set IORAM(value: Uint8Array) {
+    this._IORAM = value;
+  }
+  public addresses = {
+    ppu: {
+      lcdc: 0xff40,
+      stat: 0xff41,
+      scrollY: 0xff42,
+      scrollX: 0xff43,
+      scanline: 0xff44,
+      scanlineCompare: 0xff45,
+      paletteData: 0xff47,
+      windowY: 0xff4a,
+      windowX: 0xff4b,
+    },
+  };
   public constructor() {
     this.reset();
+    if (benchmarksEnabled) {
+      this.readByte = benchmark(this.readByte.bind(this), this);
+      this.writeByte = benchmark(this.writeByte.bind(this), this);
+    }
   }
   /**
    * Resets the Memory module.
@@ -108,65 +90,39 @@ class Memory {
     this.OAM = new Uint8Array(0xfe9f - 0xfe00);
     this.IORAM = new Uint8Array(0xff7f - 0xff00);
     this.hRAM = new Uint8Array(0xfffe - 0xff80);
-    // defaults to bank 1 at power on
-    this.cart = {
-      ROM: new Uint8Array(),
-      ROMSize: 0,
-      RAMSize: 0,
-      MBCType: 0,
-      ROMBanks: [new Uint8Array()],
-      RAMBanks: [new Uint8Array()],
-      R: {
-        RAMEnabled: false,
-        currROMBank: 1,
-        currRAMBank: 1,
-        ROMRAMMixed: 0,
-        bankingMode: 0,
-      },
-    };
-    this.cart.R.currROMBank = 1;
-    if (benchmarksEnabled) {
-      this.readByte = benchmark(this.readByte.bind(this));
-      this.writeByte = benchmark(this.writeByte.bind(this));
-    }
+    this.cart?.reset();
   }
   /**
    * Writes the provided byte to the address
    */
   public writeByte(address: word, data: byte): void {
     if (this.inBios && address <= 0xff) return;
-    if (address < 0x4000) {
-      // ROM Bank 0 is always available
-      this.cart.ROM[address] = data;
-    } else if (address <= 0x7fff) {
+    const {addresses} = this;
+    if (address <= 0x7fff) {
+      this.cart.handleRegisterChanges(address, data);
       // write to ROM bank of cartridge
-      this.cart.ROM[address] = data;
+      // this.cartOMBanks[this.cart.currROMBank - 1][address - 0x4000] = data;
     } else if (address <= 0x9fff) {
       this.vRAM[address - 0x8000] = data;
     } else if (address <= 0xbfff) {
-      // write to RAM bank of cartridge
-      this.cart.RAMBanks[this.cart.R.currRAMBank][address - 0xa000] = data;
+      this.cart.handleRegisterChanges(address, data);
     } else if (address <= 0xdfff) {
       this.wRAM[address - 0xc000] = data;
     } else if (address <= 0xfdff) {
+      this.wRAMShadow[address - 0xe000] = data;
       DEBUG && console.error(`Can't write to prohibited address.`);
     } else if (address <= 0xfe9f) {
       this.OAM[address - 0xfe00] = data;
     } else if (address <= 0xfeff) {
+      console.log(toHex(address));
       DEBUG && console.error(`Can't write to prohibited address.`);
     } else if (address <= 0xff7f) {
-      // hardware I/O
-      // if (address === 0xff42) console.log(`scrollY: ${data}`);
-      // if (address === 0xff43) console.log(`scrollX: ${data}`);
-      if (address === PPUAddress.lcdc) {
-        PPU.lcdc.update(data);
-      }
       if (address === 0xff46) {
         DEBUG && console.log('Initiated DMA transfer.');
         this.dmaTransfer(data);
       }
       // reset scanline if trying to write to associated register
-      else if (address === PPUAddress.scanline) {
+      else if (address === addresses.ppu.scanline) {
         this.IORAM[address - 0xff00] = 0;
       } else {
         this.IORAM[address - 0xff00] = data;
@@ -175,7 +131,6 @@ class Memory {
       this.hRAM[address - 0xff80] = data;
     }
   }
-
   /**
    * Writes the provided word to the address
    */
@@ -189,24 +144,22 @@ class Memory {
   public readByte(address: word): byte {
     if (this.inBios) {
       if (address < 0x100) {
-        // if (address > 150) console.log(address);
         return this.bios[address];
       } else if (address === 0x100) {
         this.inBios = false;
         DEBUG && console.log('Exited bios.');
       }
     }
+
     if (address < 0x4000) {
-      // ROM Bank 0 is always available
-      return this.cart.ROM[address];
+      return this.cart.rom[address];
     } else if (address <= 0x7fff) {
-      // Reading from ROM bank of cartridge
-      return this.cart.ROM[address];
+      return this.cart.romBanks[this.cart.currROMBank - 1][address - 0x4000];
     } else if (address <= 0x9fff) {
       return this.vRAM[address - 0x8000];
     } else if (address <= 0xbfff) {
       // reading from RAM bank of cartridge
-      return this.cart.RAMBanks[this.cart.R.currRAMBank][address - 0xa000];
+      return this.cart.ramBanks[this.cart.currRAMBank - 1][address - 0xa000];
     } else if (address <= 0xdfff) {
       return this.wRAM[address - 0xc000];
     } else if (address <= 0xfdff) {
@@ -229,35 +182,6 @@ class Memory {
   public readWord(address: word): word {
     return this.readByte(address) | (this.readByte(address + 1) << 8);
   }
-
-  /**
-   * Changes the ROM/RAM banks and associated registers
-   */
-  private changeBank(address: word, data: byte): void {
-    if (address < 0x2000) {
-      // RAM enable register
-      this.cart.R.RAMEnabled = (data & 0b00001111) === 0xa;
-    } else if (address < 0x4000) {
-      // ROM Bank change (only the lower 5 bits)
-      this.cart.R.currROMBank = data & 0b00011111;
-    } else if (address < 0x6000) {
-      const register = data & 0b11;
-      this.cart.R.ROMRAMMixed = register;
-      // swap to one of the four RAM banks if size is 32kB
-      if (this.cart.RAMSize >= 0x03) {
-        this.cart.R.currRAMBank = register;
-      }
-      if (this.cart.R.bankingMode === 0 && this.cart.ROMSize >= 0x05) {
-        // for 1MB ROM or larger carts, set upper 2 bits (5-6) of ROM bank number
-        const {currROMBank} = this.cart.R;
-        this.cart.R.currROMBank = currROMBank | (register << 4);
-      }
-      // for 1MB ROM multi carts, apply same operation but only to bits 4-5
-    } else {
-      // Banking mode select
-      this.cart.R.bankingMode = data & 0x01;
-    }
-  }
   /**
    * Used internally by the PPU/lCD to update the current scanline.
    */
@@ -277,32 +201,43 @@ class Memory {
   /**
    * Loads parsed files into BIOS/ROM
    */
-  public load(bios: Uint8Array | null, rom: Uint8Array): void {
-    this.cart.ROM = rom;
-    this.cart.MBCType = this.readByte(0x147);
-    this.cart.ROMSize = this.readByte(0x148);
-    this.cart.RAMSize = this.readByte(0x149);
-    DEBUG &&
-      console.log(
-        `ROM Size: $${JSON.stringify(ROMSizeCodes[this.cart.ROMSize])}`
-      );
-    DEBUG && console.log(`RAM Size: ${RAMSizeCodes[this.cart.RAMSize]}`);
-    DEBUG &&
-      console.log(`Cartridge Type: ${CartridgeTypes[this.cart.MBCType]}`);
+  public load(cpu: CPU, bios: Uint8Array | null, rom: Uint8Array): void {
+    debugger;
+    const mbcType = rom[0x147];
+    const romSizeCode = rom[0x148];
+    const ramSizeCode = rom[0x149];
+    this.initializeCart(rom, mbcType, romSizeCode, ramSizeCode);
 
-    if (this.cart.MBCType !== 0) {
-      DEBUG && console.log(`No support for MBC ${toHex(this.cart.MBCType)}.`);
-    }
-    DEBUG && console.log('Loaded file into ROM memory.');
-    if (bios) {
+    if (bios?.length === 0x100) {
       this.bios = bios;
       this.inBios = true;
       DEBUG && console.log('Loaded bios.');
     } else {
       this.inBios = false;
-      CPU.initPowerSequence();
+      cpu.initPowerSequence(this);
+    }
+  }
+  /**
+   * Adds extra ROM and RAM banks according to the MBC type.
+   */
+  private initializeCart(
+    rom: Uint8Array,
+    mbcType: number,
+    romSizeCode: byte,
+    ramSizeCode: byte
+  ): void {
+    switch (mbcType) {
+      case 0:
+        this.cart = new MBC0(this, rom, mbcType, romSizeCode, ramSizeCode);
+        break;
+      case 1:
+        this.cart = new MBC1(this, rom, mbcType, romSizeCode, ramSizeCode);
+        break;
+      default:
+        if (DEBUG) console.log(`No support for MBC ${toHex(mbcType)}.`);
+        break;
     }
   }
 }
 
-export default new Memory();
+export default Memory;

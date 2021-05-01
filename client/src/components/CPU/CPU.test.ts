@@ -1,13 +1,13 @@
-import * as path from 'path';
 import * as fs from 'fs';
-import * as util from 'util';
 import _ from 'lodash';
-const chalk = require('chalk');
+import * as path from 'path';
+import * as util from 'util';
 import CPU from '.';
-import PPU from '../PPU';
+import {byte, lower, upper, word} from '../../helpers/Primitives';
 import Memory from '../Memory';
-import {byte, word, upper, lower} from '../../Types';
-import Flag from './Flag';
+import PPU from '../PPU';
+import Flag, {formatFlag} from './Flag';
+const chalk = require('chalk');
 
 const TEST_ROM_FOLDER = path.join(
   __dirname,
@@ -59,6 +59,7 @@ declare global {
   namespace jest {
     interface Matchers<R> {
       toMatchRegister(
+        cpu: CPU,
         expected: byte | word,
         register: string,
         expectedState: CPUInfo
@@ -79,6 +80,7 @@ const consoleColors = [
 expect.extend({
   toMatchRegister(
     received: byte | word,
+    cpu: CPU,
     expected: byte | word,
     register: string,
     expectedState: CPUInfo
@@ -91,7 +93,7 @@ expect.extend({
     } else {
       let logged: string | byte | word = received;
       if (register === 'F') {
-        logged = logObject(new Flag(received as byte));
+        logged = logObject(new Flag(cpu, <byte>received));
       }
       return {
         message: () =>
@@ -99,11 +101,11 @@ expect.extend({
             logged
           )} to equal ${chalk.green(
             expected
-          )} after instructions: \n\n${CPU.lastExecuted
+          )} after instructions: \n\n${cpu.lastExecuted
             .map(instr => _.sample(consoleColors)(instr))
             .join(' ')}\n\nExpected CPU State: ${logObject(
             expectedState
-          )}\n\nExpected Flag: ${logObject(new Flag(expectedState.f))}`,
+          )}\n\nExpected Flag: ${logObject(formatFlag(expectedState.f))}`,
         pass: false,
       };
     }
@@ -118,7 +120,7 @@ const readSaveState = (
   saveState: Buffer,
   fileIndex: number
 ): [CPUInfo, number] => {
-  const cpuState = {} as CPUInfo;
+  const cpuState = <CPUInfo>{};
   // CPU Info
   cpuState.a = saveState[fileIndex++];
   cpuState.f = saveState[fileIndex++];
@@ -143,10 +145,13 @@ const readSaveState = (
 };
 
 describe('CPU', () => {
+  const cpu = new CPU();
+  const memory = new Memory();
+  const ppu = new PPU(memory);
   beforeEach(() => {
-    Memory.reset();
-    CPU.reset();
-    PPU.reset();
+    memory.reset();
+    cpu.reset();
+    ppu.reset();
   });
 
   /**
@@ -161,9 +166,9 @@ describe('CPU', () => {
     const ROMFile: Buffer = fs.readFileSync(testROM);
     if (biosFile) {
       const BIOSFile: Buffer = fs.readFileSync(biosFile);
-      Memory.load(BIOSFile, new Uint8Array([...ROMFile]));
+      memory.load(cpu, BIOSFile, new Uint8Array([...ROMFile]));
     } else {
-      Memory.load(null, new Uint8Array([...ROMFile]));
+      memory.load(cpu, null, new Uint8Array([...ROMFile]));
     }
     return fs.readFileSync(
       path.join(GENERATED_FOLDER, `${expectedState}.state`)
@@ -185,40 +190,45 @@ describe('CPU', () => {
     // skip initial state
     [expected, fileIndex] = readSaveState(saveState, fileIndex);
     for (let i = 0; i < saveState.length; i++) {
+      debugger;
       // Act
-      const cycles = CPU.executeInstruction();
+      const cycles = cpu.executeInstruction(memory);
       // PPU.buildGraphics(cycles);
-      // CPU.checkInterrupts();
+      // cpu.checkInterrupts();
       [expected, fileIndex] = readSaveState(saveState, fileIndex);
-      if (CPU.lastExecuted[0] === '0xf0') {
-        CPU.pc = expected.pc;
-        CPU.sp = expected.sp;
-        CPU.r.af = (expected.a << 8) | expected.f;
-        CPU.r.bc = (expected.b << 8) | expected.c;
-        CPU.r.de = (expected.d << 8) | expected.e;
-        CPU.r.hl = expected.hl;
+      if (cpu.lastExecuted[0] === '0xf0') {
+        cpu.pc = expected.pc;
+        cpu.sp = expected.sp;
+        cpu.r.af = (expected.a << 8) | expected.f;
+        cpu.r.bc = (expected.b << 8) | expected.c;
+        cpu.r.de = (expected.d << 8) | expected.e;
+        cpu.r.hl = expected.hl;
       }
 
       // Assert
-      expect(CPU.pc).toMatchRegister(expected.pc, 'PC', expected);
-      expect(CPU.sp).toMatchRegister(expected.sp, 'SP', expected);
-      expect(CPU.r.hl).toMatchRegister(expected.hl, 'HL', expected);
-      expect(upper(CPU.r.af)).toMatchRegister(expected.a, 'A', expected);
-      expect(upper(CPU.r.bc)).toMatchRegister(expected.b, 'B', expected);
-      expect(lower(CPU.r.bc)).toMatchRegister(expected.c, 'C', expected);
-      expect(upper(CPU.r.de)).toMatchRegister(expected.d, 'D', expected);
-      expect(lower(CPU.r.de)).toMatchRegister(expected.e, 'E', expected);
-      expect(lower(CPU.r.af)).toMatchRegister(expected.f, 'F', expected);
+      expect(cpu.pc).toMatchRegister(cpu, expected.pc, 'PC', expected);
+      expect(cpu.sp).toMatchRegister(cpu, expected.sp, 'SP', expected);
+      expect(cpu.r.hl).toMatchRegister(cpu, expected.hl, 'HL', expected);
+      expect(upper(cpu.r.af)).toMatchRegister(cpu, expected.a, 'A', expected);
+      expect(upper(cpu.r.bc)).toMatchRegister(cpu, expected.b, 'B', expected);
+      expect(lower(cpu.r.bc)).toMatchRegister(cpu, expected.c, 'C', expected);
+      expect(upper(cpu.r.de)).toMatchRegister(cpu, expected.d, 'D', expected);
+      expect(lower(cpu.r.de)).toMatchRegister(cpu, expected.e, 'E', expected);
+      expect(lower(cpu.r.af)).toMatchRegister(cpu, expected.f, 'F', expected);
     }
   };
 
   xit('executes an instruction', () => {
-    Memory.load(null, new Uint8Array([...Array(8192 * 2).fill(0)]));
-    const memReadSpy = jest.spyOn(Memory, 'readByte');
+    memory.load(cpu, null, new Uint8Array([...Array(8192 * 2).fill(0)]));
+    const memReadSpy = jest.spyOn(memory, 'readByte');
     // to do: NOP instruction spy
-    const cycles = CPU.executeInstruction();
+    const cycles = cpu.executeInstruction(memory);
     expect(memReadSpy).toHaveBeenCalledTimes(1);
     expect(cycles).toEqual(4);
+  });
+
+  it('exectues a ROM file', () => {
+    checkRegisters(null, path.join(TEST_ROM_FOLDER, 'tetris.gb'), 'tetris.gb');
   });
 
   xit('executes SP and HL instructions', () => {
@@ -285,11 +295,70 @@ describe('CPU', () => {
     );
   });
 
-  it('executes the bios', () => {
+  xit('executes the bios', () => {
     checkRegisters(
       path.join(ROM_FOLDER, 'bios.bin'),
       path.join(ROM_FOLDER, 'tetris.gb'),
       'bios.gb'
     );
+  });
+
+  describe('flags', () => {
+    const cpu = new CPU();
+    describe('flags', () => {
+      beforeEach(() => (cpu.r.af = 0));
+      it('sets/unsets/gets the z flag', () => {
+        cpu.setZFlag(1);
+        expect(cpu.r.af).toBe(128);
+
+        expect(cpu.getZFlag()).toBe(1);
+
+        cpu.setZFlag(0);
+        expect(cpu.r.af).toBe(0);
+      });
+      it('sets/unsets/gets the cy flag', () => {
+        cpu.setCYFlag(1);
+        expect(cpu.r.af).toBe(16);
+
+        expect(cpu.getCYFlag()).toBe(1);
+
+        cpu.setCYFlag(0);
+        expect(cpu.r.af).toBe(0);
+      });
+      it('sets/unsets/gets the h flag', () => {
+        cpu.setHFlag(1);
+        expect(cpu.r.af).toBe(32);
+
+        expect(cpu.getHFlag()).toBe(1);
+
+        cpu.setHFlag(0);
+        expect(cpu.r.af).toBe(0);
+      });
+      it('sets/unsets/gets the n flag', () => {
+        cpu.setNFlag(1);
+        expect(cpu.r.af).toBe(64);
+
+        expect(cpu.getNFlag()).toBe(1);
+
+        cpu.setNFlag(0);
+        expect(cpu.r.af).toBe(0);
+      });
+    });
+  });
+
+  describe('half carry', () => {
+    beforeEach(() => (cpu.r.af = 0));
+    it('checks half carry on addition ops', () => {
+      cpu.checkHalfCarry(62, 34);
+      expect(lower(cpu.r.af) >> 5).toBe(1);
+      cpu.checkHalfCarry(61, 34);
+      expect(lower(cpu.r.af) >> 5).toBe(0);
+    });
+    it('checks for half carry on subtraction ops', () => {
+      cpu.checkHalfCarry(11, 15, true);
+      expect(lower(cpu.r.af) >> 5).toBe(1);
+      cpu.checkHalfCarry(11, 9, true);
+      expect(lower(cpu.r.af) >> 5).toBe(0);
+    });
   });
 });

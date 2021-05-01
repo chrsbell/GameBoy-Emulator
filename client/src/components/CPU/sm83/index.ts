@@ -1,5 +1,7 @@
+import CPU from '../';
+import {byte} from '../../../helpers/Primitives';
+import Memory from '../../Memory';
 import OpcodeMap from './Map';
-import {byte} from '../../../Types';
 
 /**
  * No operation.
@@ -7,8 +9,8 @@ import {byte} from '../../../Types';
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function NOP(): byte {
-  OpcodeMap[0x00]();
+function NOP(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x00](cpu, memory);
   return 4;
 }
 
@@ -18,8 +20,8 @@ function NOP(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDBCid16i(): byte {
-  OpcodeMap[0x01]();
+function LDBCid16i(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x01](cpu, memory);
   return 12;
 }
 
@@ -29,8 +31,8 @@ function LDBCid16i(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDBCmAi(): byte {
-  OpcodeMap[0x02]();
+function LDBCmAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x02](cpu, memory);
   return 8;
 }
 
@@ -40,8 +42,8 @@ function LDBCmAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function INCBCi(): byte {
-  OpcodeMap[0x03]();
+function INCBCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x03](cpu, memory);
   return 8;
 }
 
@@ -51,8 +53,8 @@ function INCBCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function INCBi(): byte {
-  OpcodeMap[0x04]();
+function INCBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x04](cpu, memory);
   return 4;
 }
 
@@ -62,8 +64,8 @@ function INCBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function DECBi(): byte {
-  OpcodeMap[0x05]();
+function DECBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x05](cpu, memory);
   return 4;
 }
 
@@ -73,8 +75,8 @@ function DECBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDBid8i(): byte {
-  OpcodeMap[0x06]();
+function LDBid8i(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x06](cpu, memory);
   return 8;
 }
 
@@ -84,8 +86,8 @@ function LDBid8i(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RLCA(): byte {
-  OpcodeMap[0x07]();
+function RLCA(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x07](cpu, memory);
   return 4;
 }
 
@@ -95,8 +97,8 @@ function RLCA(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDa16mSPi(): byte {
-  OpcodeMap[0x08]();
+function LDa16mSPi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x08](cpu, memory);
   return 20;
 }
 
@@ -106,8 +108,8 @@ function LDa16mSPi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: N, H, C
  */
-function ADDHLiBCi(): byte {
-  OpcodeMap[0x09]();
+function ADDHLiBCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x09](cpu, memory);
   return 8;
 }
 
@@ -117,8 +119,8 @@ function ADDHLiBCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDAiBCm(): byte {
-  OpcodeMap[0x0a]();
+function LDAiBCm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x0a](cpu, memory);
   return 8;
 }
 
@@ -128,8 +130,8 @@ function LDAiBCm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function DECBCi(): byte {
-  OpcodeMap[0x0b]();
+function DECBCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x0b](cpu, memory);
   return 8;
 }
 
@@ -139,8 +141,8 @@ function DECBCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function INCCi(): byte {
-  OpcodeMap[0x0c]();
+function INCCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x0c](cpu, memory);
   return 4;
 }
 
@@ -150,8 +152,8 @@ function INCCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function DECCi(): byte {
-  OpcodeMap[0x0d]();
+function DECCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x0d](cpu, memory);
   return 4;
 }
 
@@ -161,8 +163,8 @@ function DECCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDCid8i(): byte {
-  OpcodeMap[0x0e]();
+function LDCid8i(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x0e](cpu, memory);
   return 8;
 }
 
@@ -172,8 +174,8 @@ function LDCid8i(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RRCA(): byte {
-  OpcodeMap[0x0f]();
+function RRCA(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x0f](cpu, memory);
   return 4;
 }
 
@@ -183,8 +185,8 @@ function RRCA(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function STOP(): byte {
-  OpcodeMap[0x10]();
+function STOP(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x10](cpu, memory);
   return 4;
 }
 
@@ -194,8 +196,8 @@ function STOP(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDDEid16i(): byte {
-  OpcodeMap[0x11]();
+function LDDEid16i(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x11](cpu, memory);
   return 12;
 }
 
@@ -205,8 +207,8 @@ function LDDEid16i(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDDEmAi(): byte {
-  OpcodeMap[0x12]();
+function LDDEmAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x12](cpu, memory);
   return 8;
 }
 
@@ -216,8 +218,8 @@ function LDDEmAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function INCDEi(): byte {
-  OpcodeMap[0x13]();
+function INCDEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x13](cpu, memory);
   return 8;
 }
 
@@ -227,8 +229,8 @@ function INCDEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function INCDi(): byte {
-  OpcodeMap[0x14]();
+function INCDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x14](cpu, memory);
   return 4;
 }
 
@@ -238,8 +240,8 @@ function INCDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function DECDi(): byte {
-  OpcodeMap[0x15]();
+function DECDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x15](cpu, memory);
   return 4;
 }
 
@@ -249,8 +251,8 @@ function DECDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDDid8i(): byte {
-  OpcodeMap[0x16]();
+function LDDid8i(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x16](cpu, memory);
   return 8;
 }
 
@@ -260,8 +262,8 @@ function LDDid8i(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RLA(): byte {
-  OpcodeMap[0x17]();
+function RLA(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x17](cpu, memory);
   return 4;
 }
 
@@ -271,8 +273,8 @@ function RLA(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function JRr8(): byte {
-  OpcodeMap[0x18]();
+function JRr8(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x18](cpu, memory);
   return 12;
 }
 
@@ -282,8 +284,8 @@ function JRr8(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: N, H, C
  */
-function ADDHLiDEi(): byte {
-  OpcodeMap[0x19]();
+function ADDHLiDEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x19](cpu, memory);
   return 8;
 }
 
@@ -293,8 +295,8 @@ function ADDHLiDEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDAiDEm(): byte {
-  OpcodeMap[0x1a]();
+function LDAiDEm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x1a](cpu, memory);
   return 8;
 }
 
@@ -304,8 +306,8 @@ function LDAiDEm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function DECDEi(): byte {
-  OpcodeMap[0x1b]();
+function DECDEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x1b](cpu, memory);
   return 8;
 }
 
@@ -315,8 +317,8 @@ function DECDEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function INCEi(): byte {
-  OpcodeMap[0x1c]();
+function INCEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x1c](cpu, memory);
   return 4;
 }
 
@@ -326,8 +328,8 @@ function INCEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function DECEi(): byte {
-  OpcodeMap[0x1d]();
+function DECEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x1d](cpu, memory);
   return 4;
 }
 
@@ -337,8 +339,8 @@ function DECEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDEid8i(): byte {
-  OpcodeMap[0x1e]();
+function LDEid8i(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x1e](cpu, memory);
   return 8;
 }
 
@@ -348,8 +350,8 @@ function LDEid8i(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RRA(): byte {
-  OpcodeMap[0x1f]();
+function RRA(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x1f](cpu, memory);
   return 4;
 }
 
@@ -359,8 +361,8 @@ function RRA(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-export function JRCNZr8(): byte {
-  const condition: boolean = OpcodeMap[0x20]();
+export function JRCNZr8(cpu: CPU, memory: Memory): byte {
+  const condition: boolean = OpcodeMap[0x20](cpu, memory);
   if (!condition) {
     return 8;
   }
@@ -373,8 +375,8 @@ export function JRCNZr8(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDHLid16i(): byte {
-  OpcodeMap[0x21]();
+function LDHLid16i(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x21](cpu, memory);
   return 12;
 }
 
@@ -384,8 +386,8 @@ function LDHLid16i(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDHLIncrmAi(): byte {
-  OpcodeMap[0x22]();
+function LDHLIncrmAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x22](cpu, memory);
   return 8;
 }
 
@@ -395,8 +397,8 @@ function LDHLIncrmAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function INCHLi(): byte {
-  OpcodeMap[0x23]();
+function INCHLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x23](cpu, memory);
   return 8;
 }
 
@@ -406,8 +408,8 @@ function INCHLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function INCHi(): byte {
-  OpcodeMap[0x24]();
+function INCHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x24](cpu, memory);
   return 4;
 }
 
@@ -417,8 +419,8 @@ function INCHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function DECHi(): byte {
-  OpcodeMap[0x25]();
+function DECHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x25](cpu, memory);
   return 4;
 }
 
@@ -428,8 +430,8 @@ function DECHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDHid8i(): byte {
-  OpcodeMap[0x26]();
+function LDHid8i(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x26](cpu, memory);
   return 8;
 }
 
@@ -439,8 +441,8 @@ function LDHid8i(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, H, C
  */
-function DAAA(): byte {
-  OpcodeMap[0x27]();
+function DAAA(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x27](cpu, memory);
   return 4;
 }
 
@@ -450,8 +452,8 @@ function DAAA(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-export function JRCZr8(): byte {
-  const condition: boolean = OpcodeMap[0x28]();
+export function JRCZr8(cpu: CPU, memory: Memory): byte {
+  const condition: boolean = OpcodeMap[0x28](cpu, memory);
   if (!condition) {
     return 8;
   }
@@ -464,8 +466,8 @@ export function JRCZr8(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: N, H, C
  */
-function ADDHLiHLi(): byte {
-  OpcodeMap[0x29]();
+function ADDHLiHLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x29](cpu, memory);
   return 8;
 }
 
@@ -475,8 +477,8 @@ function ADDHLiHLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDAiHLIncrm(): byte {
-  OpcodeMap[0x2a]();
+function LDAiHLIncrm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x2a](cpu, memory);
   return 8;
 }
 
@@ -486,8 +488,8 @@ function LDAiHLIncrm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function DECHLi(): byte {
-  OpcodeMap[0x2b]();
+function DECHLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x2b](cpu, memory);
   return 8;
 }
 
@@ -497,8 +499,8 @@ function DECHLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function INCLi(): byte {
-  OpcodeMap[0x2c]();
+function INCLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x2c](cpu, memory);
   return 4;
 }
 
@@ -508,8 +510,8 @@ function INCLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function DECLi(): byte {
-  OpcodeMap[0x2d]();
+function DECLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x2d](cpu, memory);
   return 4;
 }
 
@@ -519,8 +521,8 @@ function DECLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDLid8i(): byte {
-  OpcodeMap[0x2e]();
+function LDLid8i(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x2e](cpu, memory);
   return 8;
 }
 
@@ -530,8 +532,8 @@ function LDLid8i(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: N, H
  */
-function CPLA(): byte {
-  OpcodeMap[0x2f]();
+function CPLA(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x2f](cpu, memory);
   return 4;
 }
 
@@ -541,8 +543,8 @@ function CPLA(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-export function JRCNCr8(): byte {
-  const condition: boolean = OpcodeMap[0x30]();
+export function JRCNCr8(cpu: CPU, memory: Memory): byte {
+  const condition: boolean = OpcodeMap[0x30](cpu, memory);
   if (!condition) {
     return 8;
   }
@@ -555,8 +557,8 @@ export function JRCNCr8(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDSPid16i(): byte {
-  OpcodeMap[0x31]();
+function LDSPid16i(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x31](cpu, memory);
   return 12;
 }
 
@@ -566,8 +568,8 @@ function LDSPid16i(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDHLDecrmAi(): byte {
-  OpcodeMap[0x32]();
+function LDHLDecrmAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x32](cpu, memory);
   return 8;
 }
 
@@ -577,8 +579,8 @@ function LDHLDecrmAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function INCSPi(): byte {
-  OpcodeMap[0x33]();
+function INCSPi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x33](cpu, memory);
   return 8;
 }
 
@@ -588,8 +590,8 @@ function INCSPi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function INCHLm(): byte {
-  OpcodeMap[0x34]();
+function INCHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x34](cpu, memory);
   return 12;
 }
 
@@ -599,8 +601,8 @@ function INCHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function DECHLm(): byte {
-  OpcodeMap[0x35]();
+function DECHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x35](cpu, memory);
   return 12;
 }
 
@@ -610,8 +612,8 @@ function DECHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDHLmd8i(): byte {
-  OpcodeMap[0x36]();
+function LDHLmd8i(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x36](cpu, memory);
   return 12;
 }
 
@@ -621,8 +623,8 @@ function LDHLmd8i(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: N, H, C
  */
-function SCF(): byte {
-  OpcodeMap[0x37]();
+function SCF(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x37](cpu, memory);
   return 4;
 }
 
@@ -632,8 +634,8 @@ function SCF(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-export function JRCCr8(): byte {
-  const condition: boolean = OpcodeMap[0x38]();
+export function JRCCr8(cpu: CPU, memory: Memory): byte {
+  const condition: boolean = OpcodeMap[0x38](cpu, memory);
   if (!condition) {
     return 8;
   }
@@ -646,8 +648,8 @@ export function JRCCr8(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: N, H, C
  */
-function ADDHLiSPi(): byte {
-  OpcodeMap[0x39]();
+function ADDHLiSPi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x39](cpu, memory);
   return 8;
 }
 
@@ -657,8 +659,8 @@ function ADDHLiSPi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDAiHLDecrm(): byte {
-  OpcodeMap[0x3a]();
+function LDAiHLDecrm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x3a](cpu, memory);
   return 8;
 }
 
@@ -668,8 +670,8 @@ function LDAiHLDecrm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function DECSPi(): byte {
-  OpcodeMap[0x3b]();
+function DECSPi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x3b](cpu, memory);
   return 8;
 }
 
@@ -679,8 +681,8 @@ function DECSPi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function INCAi(): byte {
-  OpcodeMap[0x3c]();
+function INCAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x3c](cpu, memory);
   return 4;
 }
 
@@ -690,8 +692,8 @@ function INCAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function DECAi(): byte {
-  OpcodeMap[0x3d]();
+function DECAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x3d](cpu, memory);
   return 4;
 }
 
@@ -701,8 +703,8 @@ function DECAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDAid8i(): byte {
-  OpcodeMap[0x3e]();
+function LDAid8i(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x3e](cpu, memory);
   return 8;
 }
 
@@ -714,8 +716,8 @@ function LDAid8i(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: N, H, C
  */
-function CCF(): byte {
-  OpcodeMap[0x3f]();
+function CCF(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x3f](cpu, memory);
   return 4;
 }
 
@@ -725,8 +727,8 @@ function CCF(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDBiBi(): byte {
-  OpcodeMap[0x40]();
+function LDBiBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x40](cpu, memory);
   return 4;
 }
 
@@ -736,8 +738,8 @@ function LDBiBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDBiCi(): byte {
-  OpcodeMap[0x41]();
+function LDBiCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x41](cpu, memory);
   return 4;
 }
 
@@ -747,8 +749,8 @@ function LDBiCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDBiDi(): byte {
-  OpcodeMap[0x42]();
+function LDBiDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x42](cpu, memory);
   return 4;
 }
 
@@ -758,8 +760,8 @@ function LDBiDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDBiEi(): byte {
-  OpcodeMap[0x43]();
+function LDBiEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x43](cpu, memory);
   return 4;
 }
 
@@ -769,8 +771,8 @@ function LDBiEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDBiHi(): byte {
-  OpcodeMap[0x44]();
+function LDBiHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x44](cpu, memory);
   return 4;
 }
 
@@ -780,8 +782,8 @@ function LDBiHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDBiLi(): byte {
-  OpcodeMap[0x45]();
+function LDBiLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x45](cpu, memory);
   return 4;
 }
 
@@ -791,8 +793,8 @@ function LDBiLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDBiHLm(): byte {
-  OpcodeMap[0x46]();
+function LDBiHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x46](cpu, memory);
   return 8;
 }
 
@@ -802,8 +804,8 @@ function LDBiHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDBiAi(): byte {
-  OpcodeMap[0x47]();
+function LDBiAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x47](cpu, memory);
   return 4;
 }
 
@@ -813,8 +815,8 @@ function LDBiAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDCiBi(): byte {
-  OpcodeMap[0x48]();
+function LDCiBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x48](cpu, memory);
   return 4;
 }
 
@@ -824,8 +826,8 @@ function LDCiBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDCiCi(): byte {
-  OpcodeMap[0x49]();
+function LDCiCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x49](cpu, memory);
   return 4;
 }
 
@@ -835,8 +837,8 @@ function LDCiCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDCiDi(): byte {
-  OpcodeMap[0x4a]();
+function LDCiDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x4a](cpu, memory);
   return 4;
 }
 
@@ -846,8 +848,8 @@ function LDCiDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDCiEi(): byte {
-  OpcodeMap[0x4b]();
+function LDCiEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x4b](cpu, memory);
   return 4;
 }
 
@@ -857,8 +859,8 @@ function LDCiEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDCiHi(): byte {
-  OpcodeMap[0x4c]();
+function LDCiHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x4c](cpu, memory);
   return 4;
 }
 
@@ -868,8 +870,8 @@ function LDCiHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDCiLi(): byte {
-  OpcodeMap[0x4d]();
+function LDCiLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x4d](cpu, memory);
   return 4;
 }
 
@@ -879,8 +881,8 @@ function LDCiLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDCiHLm(): byte {
-  OpcodeMap[0x4e]();
+function LDCiHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x4e](cpu, memory);
   return 8;
 }
 
@@ -890,8 +892,8 @@ function LDCiHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDCiAi(): byte {
-  OpcodeMap[0x4f]();
+function LDCiAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x4f](cpu, memory);
   return 4;
 }
 
@@ -901,8 +903,8 @@ function LDCiAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDDiBi(): byte {
-  OpcodeMap[0x50]();
+function LDDiBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x50](cpu, memory);
   return 4;
 }
 
@@ -912,8 +914,8 @@ function LDDiBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDDiCi(): byte {
-  OpcodeMap[0x51]();
+function LDDiCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x51](cpu, memory);
   return 4;
 }
 
@@ -923,8 +925,8 @@ function LDDiCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDDiDi(): byte {
-  OpcodeMap[0x52]();
+function LDDiDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x52](cpu, memory);
   return 4;
 }
 
@@ -934,8 +936,8 @@ function LDDiDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDDiEi(): byte {
-  OpcodeMap[0x53]();
+function LDDiEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x53](cpu, memory);
   return 4;
 }
 
@@ -945,8 +947,8 @@ function LDDiEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDDiHi(): byte {
-  OpcodeMap[0x54]();
+function LDDiHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x54](cpu, memory);
   return 4;
 }
 
@@ -956,8 +958,8 @@ function LDDiHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDDiLi(): byte {
-  OpcodeMap[0x55]();
+function LDDiLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x55](cpu, memory);
   return 4;
 }
 
@@ -967,8 +969,8 @@ function LDDiLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDDiHLm(): byte {
-  OpcodeMap[0x56]();
+function LDDiHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x56](cpu, memory);
   return 8;
 }
 
@@ -978,8 +980,8 @@ function LDDiHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDDiAi(): byte {
-  OpcodeMap[0x57]();
+function LDDiAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x57](cpu, memory);
   return 4;
 }
 
@@ -989,8 +991,8 @@ function LDDiAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDEiBi(): byte {
-  OpcodeMap[0x58]();
+function LDEiBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x58](cpu, memory);
   return 4;
 }
 
@@ -1000,8 +1002,8 @@ function LDEiBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDEiCi(): byte {
-  OpcodeMap[0x59]();
+function LDEiCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x59](cpu, memory);
   return 4;
 }
 
@@ -1011,8 +1013,8 @@ function LDEiCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDEiDi(): byte {
-  OpcodeMap[0x5a]();
+function LDEiDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x5a](cpu, memory);
   return 4;
 }
 
@@ -1022,8 +1024,8 @@ function LDEiDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDEiEi(): byte {
-  OpcodeMap[0x5b]();
+function LDEiEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x5b](cpu, memory);
   return 4;
 }
 
@@ -1033,8 +1035,8 @@ function LDEiEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDEiHi(): byte {
-  OpcodeMap[0x5c]();
+function LDEiHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x5c](cpu, memory);
   return 4;
 }
 
@@ -1044,8 +1046,8 @@ function LDEiHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDEiLi(): byte {
-  OpcodeMap[0x5d]();
+function LDEiLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x5d](cpu, memory);
   return 4;
 }
 
@@ -1055,8 +1057,8 @@ function LDEiLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDEiHLm(): byte {
-  OpcodeMap[0x5e]();
+function LDEiHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x5e](cpu, memory);
   return 8;
 }
 
@@ -1066,8 +1068,8 @@ function LDEiHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDEiAi(): byte {
-  OpcodeMap[0x5f]();
+function LDEiAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x5f](cpu, memory);
   return 4;
 }
 
@@ -1077,8 +1079,8 @@ function LDEiAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDHiBi(): byte {
-  OpcodeMap[0x60]();
+function LDHiBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x60](cpu, memory);
   return 4;
 }
 
@@ -1088,8 +1090,8 @@ function LDHiBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDHiCi(): byte {
-  OpcodeMap[0x61]();
+function LDHiCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x61](cpu, memory);
   return 4;
 }
 
@@ -1099,8 +1101,8 @@ function LDHiCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDHiDi(): byte {
-  OpcodeMap[0x62]();
+function LDHiDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x62](cpu, memory);
   return 4;
 }
 
@@ -1110,8 +1112,8 @@ function LDHiDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDHiEi(): byte {
-  OpcodeMap[0x63]();
+function LDHiEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x63](cpu, memory);
   return 4;
 }
 
@@ -1121,8 +1123,8 @@ function LDHiEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDHiHi(): byte {
-  OpcodeMap[0x64]();
+function LDHiHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x64](cpu, memory);
   return 4;
 }
 
@@ -1132,8 +1134,8 @@ function LDHiHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDHiLi(): byte {
-  OpcodeMap[0x65]();
+function LDHiLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x65](cpu, memory);
   return 4;
 }
 
@@ -1143,8 +1145,8 @@ function LDHiLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDHiHLm(): byte {
-  OpcodeMap[0x66]();
+function LDHiHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x66](cpu, memory);
   return 8;
 }
 
@@ -1154,8 +1156,8 @@ function LDHiHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDHiAi(): byte {
-  OpcodeMap[0x67]();
+function LDHiAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x67](cpu, memory);
   return 4;
 }
 
@@ -1165,8 +1167,8 @@ function LDHiAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDLiBi(): byte {
-  OpcodeMap[0x68]();
+function LDLiBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x68](cpu, memory);
   return 4;
 }
 
@@ -1176,8 +1178,8 @@ function LDLiBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDLiCi(): byte {
-  OpcodeMap[0x69]();
+function LDLiCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x69](cpu, memory);
   return 4;
 }
 
@@ -1187,8 +1189,8 @@ function LDLiCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDLiDi(): byte {
-  OpcodeMap[0x6a]();
+function LDLiDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x6a](cpu, memory);
   return 4;
 }
 
@@ -1198,8 +1200,8 @@ function LDLiDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDLiEi(): byte {
-  OpcodeMap[0x6b]();
+function LDLiEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x6b](cpu, memory);
   return 4;
 }
 
@@ -1209,8 +1211,8 @@ function LDLiEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDLiHi(): byte {
-  OpcodeMap[0x6c]();
+function LDLiHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x6c](cpu, memory);
   return 4;
 }
 
@@ -1220,8 +1222,8 @@ function LDLiHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDLiLi(): byte {
-  OpcodeMap[0x6d]();
+function LDLiLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x6d](cpu, memory);
   return 4;
 }
 
@@ -1231,8 +1233,8 @@ function LDLiLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDLiHLm(): byte {
-  OpcodeMap[0x6e]();
+function LDLiHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x6e](cpu, memory);
   return 8;
 }
 
@@ -1242,8 +1244,8 @@ function LDLiHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDLiAi(): byte {
-  OpcodeMap[0x6f]();
+function LDLiAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x6f](cpu, memory);
   return 4;
 }
 
@@ -1253,8 +1255,8 @@ function LDLiAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDHLmBi(): byte {
-  OpcodeMap[0x70]();
+function LDHLmBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x70](cpu, memory);
   return 8;
 }
 
@@ -1264,8 +1266,8 @@ function LDHLmBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDHLmCi(): byte {
-  OpcodeMap[0x71]();
+function LDHLmCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x71](cpu, memory);
   return 8;
 }
 
@@ -1275,8 +1277,8 @@ function LDHLmCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDHLmDi(): byte {
-  OpcodeMap[0x72]();
+function LDHLmDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x72](cpu, memory);
   return 8;
 }
 
@@ -1286,8 +1288,8 @@ function LDHLmDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDHLmEi(): byte {
-  OpcodeMap[0x73]();
+function LDHLmEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x73](cpu, memory);
   return 8;
 }
 
@@ -1297,8 +1299,8 @@ function LDHLmEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDHLmHi(): byte {
-  OpcodeMap[0x74]();
+function LDHLmHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x74](cpu, memory);
   return 8;
 }
 
@@ -1308,8 +1310,8 @@ function LDHLmHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDHLmLi(): byte {
-  OpcodeMap[0x75]();
+function LDHLmLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x75](cpu, memory);
   return 8;
 }
 
@@ -1319,8 +1321,8 @@ function LDHLmLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function HALT(): byte {
-  OpcodeMap[0x76]();
+function HALT(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x76](cpu, memory);
   return 4;
 }
 
@@ -1330,8 +1332,8 @@ function HALT(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDHLmAi(): byte {
-  OpcodeMap[0x77]();
+function LDHLmAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x77](cpu, memory);
   return 8;
 }
 
@@ -1341,8 +1343,8 @@ function LDHLmAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDAiBi(): byte {
-  OpcodeMap[0x78]();
+function LDAiBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x78](cpu, memory);
   return 4;
 }
 
@@ -1352,8 +1354,8 @@ function LDAiBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDAiCi(): byte {
-  OpcodeMap[0x79]();
+function LDAiCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x79](cpu, memory);
   return 4;
 }
 
@@ -1363,8 +1365,8 @@ function LDAiCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDAiDi(): byte {
-  OpcodeMap[0x7a]();
+function LDAiDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x7a](cpu, memory);
   return 4;
 }
 
@@ -1374,8 +1376,8 @@ function LDAiDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDAiEi(): byte {
-  OpcodeMap[0x7b]();
+function LDAiEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x7b](cpu, memory);
   return 4;
 }
 
@@ -1385,8 +1387,8 @@ function LDAiEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDAiHi(): byte {
-  OpcodeMap[0x7c]();
+function LDAiHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x7c](cpu, memory);
   return 4;
 }
 
@@ -1396,8 +1398,8 @@ function LDAiHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDAiLi(): byte {
-  OpcodeMap[0x7d]();
+function LDAiLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x7d](cpu, memory);
   return 4;
 }
 
@@ -1407,8 +1409,8 @@ function LDAiLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDAiHLm(): byte {
-  OpcodeMap[0x7e]();
+function LDAiHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x7e](cpu, memory);
   return 8;
 }
 
@@ -1418,8 +1420,8 @@ function LDAiHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDAiAi(): byte {
-  OpcodeMap[0x7f]();
+function LDAiAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x7f](cpu, memory);
   return 4;
 }
 
@@ -1429,8 +1431,8 @@ function LDAiAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ADDAiBi(): byte {
-  OpcodeMap[0x80]();
+function ADDAiBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x80](cpu, memory);
   return 4;
 }
 
@@ -1440,8 +1442,8 @@ function ADDAiBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ADDAiCi(): byte {
-  OpcodeMap[0x81]();
+function ADDAiCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x81](cpu, memory);
   return 4;
 }
 
@@ -1451,8 +1453,8 @@ function ADDAiCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ADDAiDi(): byte {
-  OpcodeMap[0x82]();
+function ADDAiDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x82](cpu, memory);
   return 4;
 }
 
@@ -1462,8 +1464,8 @@ function ADDAiDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ADDAiEi(): byte {
-  OpcodeMap[0x83]();
+function ADDAiEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x83](cpu, memory);
   return 4;
 }
 
@@ -1473,8 +1475,8 @@ function ADDAiEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ADDAiHi(): byte {
-  OpcodeMap[0x84]();
+function ADDAiHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x84](cpu, memory);
   return 4;
 }
 
@@ -1484,8 +1486,8 @@ function ADDAiHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ADDAiLi(): byte {
-  OpcodeMap[0x85]();
+function ADDAiLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x85](cpu, memory);
   return 4;
 }
 
@@ -1495,8 +1497,8 @@ function ADDAiLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ADDAiHLm(): byte {
-  OpcodeMap[0x86]();
+function ADDAiHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x86](cpu, memory);
   return 8;
 }
 
@@ -1506,8 +1508,8 @@ function ADDAiHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ADDAiAi(): byte {
-  OpcodeMap[0x87]();
+function ADDAiAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x87](cpu, memory);
   return 4;
 }
 
@@ -1517,8 +1519,8 @@ function ADDAiAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ADCAiBi(): byte {
-  OpcodeMap[0x88]();
+function ADCAiBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x88](cpu, memory);
   return 4;
 }
 
@@ -1528,8 +1530,8 @@ function ADCAiBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ADCAiCi(): byte {
-  OpcodeMap[0x89]();
+function ADCAiCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x89](cpu, memory);
   return 4;
 }
 
@@ -1539,8 +1541,8 @@ function ADCAiCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ADCAiDi(): byte {
-  OpcodeMap[0x8a]();
+function ADCAiDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x8a](cpu, memory);
   return 4;
 }
 
@@ -1550,8 +1552,8 @@ function ADCAiDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ADCAiEi(): byte {
-  OpcodeMap[0x8b]();
+function ADCAiEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x8b](cpu, memory);
   return 4;
 }
 
@@ -1561,8 +1563,8 @@ function ADCAiEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ADCAiHi(): byte {
-  OpcodeMap[0x8c]();
+function ADCAiHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x8c](cpu, memory);
   return 4;
 }
 
@@ -1572,8 +1574,8 @@ function ADCAiHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ADCAiLi(): byte {
-  OpcodeMap[0x8d]();
+function ADCAiLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x8d](cpu, memory);
   return 4;
 }
 
@@ -1583,8 +1585,8 @@ function ADCAiLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ADCAiHLm(): byte {
-  OpcodeMap[0x8e]();
+function ADCAiHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x8e](cpu, memory);
   return 8;
 }
 
@@ -1594,8 +1596,8 @@ function ADCAiHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ADCAiAi(): byte {
-  OpcodeMap[0x8f]();
+function ADCAiAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x8f](cpu, memory);
   return 4;
 }
 
@@ -1605,8 +1607,8 @@ function ADCAiAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SUBAiBi(): byte {
-  OpcodeMap[0x90]();
+function SUBAiBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x90](cpu, memory);
   return 4;
 }
 
@@ -1616,8 +1618,8 @@ function SUBAiBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SUBAiCi(): byte {
-  OpcodeMap[0x91]();
+function SUBAiCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x91](cpu, memory);
   return 4;
 }
 
@@ -1627,8 +1629,8 @@ function SUBAiCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SUBAiDi(): byte {
-  OpcodeMap[0x92]();
+function SUBAiDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x92](cpu, memory);
   return 4;
 }
 
@@ -1638,8 +1640,8 @@ function SUBAiDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SUBAiEi(): byte {
-  OpcodeMap[0x93]();
+function SUBAiEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x93](cpu, memory);
   return 4;
 }
 
@@ -1649,8 +1651,8 @@ function SUBAiEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SUBAiHi(): byte {
-  OpcodeMap[0x94]();
+function SUBAiHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x94](cpu, memory);
   return 4;
 }
 
@@ -1660,8 +1662,8 @@ function SUBAiHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SUBAiLi(): byte {
-  OpcodeMap[0x95]();
+function SUBAiLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x95](cpu, memory);
   return 4;
 }
 
@@ -1671,8 +1673,8 @@ function SUBAiLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SUBAiHLm(): byte {
-  OpcodeMap[0x96]();
+function SUBAiHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x96](cpu, memory);
   return 8;
 }
 
@@ -1682,8 +1684,8 @@ function SUBAiHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SUBAiAi(): byte {
-  OpcodeMap[0x97]();
+function SUBAiAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x97](cpu, memory);
   return 4;
 }
 
@@ -1693,8 +1695,8 @@ function SUBAiAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SBCAiBi(): byte {
-  OpcodeMap[0x98]();
+function SBCAiBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x98](cpu, memory);
   return 4;
 }
 
@@ -1704,8 +1706,8 @@ function SBCAiBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SBCAiCi(): byte {
-  OpcodeMap[0x99]();
+function SBCAiCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x99](cpu, memory);
   return 4;
 }
 
@@ -1715,8 +1717,8 @@ function SBCAiCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SBCAiDi(): byte {
-  OpcodeMap[0x9a]();
+function SBCAiDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x9a](cpu, memory);
   return 4;
 }
 
@@ -1726,8 +1728,8 @@ function SBCAiDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SBCAiEi(): byte {
-  OpcodeMap[0x9b]();
+function SBCAiEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x9b](cpu, memory);
   return 4;
 }
 
@@ -1737,8 +1739,8 @@ function SBCAiEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SBCAiHi(): byte {
-  OpcodeMap[0x9c]();
+function SBCAiHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x9c](cpu, memory);
   return 4;
 }
 
@@ -1748,8 +1750,8 @@ function SBCAiHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SBCAiLi(): byte {
-  OpcodeMap[0x9d]();
+function SBCAiLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x9d](cpu, memory);
   return 4;
 }
 
@@ -1759,8 +1761,8 @@ function SBCAiLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SBCAiHLm(): byte {
-  OpcodeMap[0x9e]();
+function SBCAiHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x9e](cpu, memory);
   return 8;
 }
 
@@ -1770,8 +1772,8 @@ function SBCAiHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SBCAiAi(): byte {
-  OpcodeMap[0x9f]();
+function SBCAiAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x9f](cpu, memory);
   return 4;
 }
 
@@ -1781,8 +1783,8 @@ function SBCAiAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ANDBi(): byte {
-  OpcodeMap[0xa0]();
+function ANDBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xa0](cpu, memory);
   return 4;
 }
 
@@ -1792,8 +1794,8 @@ function ANDBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ANDCi(): byte {
-  OpcodeMap[0xa1]();
+function ANDCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xa1](cpu, memory);
   return 4;
 }
 
@@ -1803,8 +1805,8 @@ function ANDCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ANDDi(): byte {
-  OpcodeMap[0xa2]();
+function ANDDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xa2](cpu, memory);
   return 4;
 }
 
@@ -1814,8 +1816,8 @@ function ANDDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ANDEi(): byte {
-  OpcodeMap[0xa3]();
+function ANDEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xa3](cpu, memory);
   return 4;
 }
 
@@ -1825,8 +1827,8 @@ function ANDEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ANDHi(): byte {
-  OpcodeMap[0xa4]();
+function ANDHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xa4](cpu, memory);
   return 4;
 }
 
@@ -1836,8 +1838,8 @@ function ANDHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ANDLi(): byte {
-  OpcodeMap[0xa5]();
+function ANDLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xa5](cpu, memory);
   return 4;
 }
 
@@ -1847,8 +1849,8 @@ function ANDLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ANDHLm(): byte {
-  OpcodeMap[0xa6]();
+function ANDHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xa6](cpu, memory);
   return 8;
 }
 
@@ -1858,8 +1860,8 @@ function ANDHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ANDAi(): byte {
-  OpcodeMap[0xa7]();
+function ANDAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xa7](cpu, memory);
   return 4;
 }
 
@@ -1869,8 +1871,8 @@ function ANDAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function XORBi(): byte {
-  OpcodeMap[0xa8]();
+function XORBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xa8](cpu, memory);
   return 4;
 }
 
@@ -1880,8 +1882,8 @@ function XORBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function XORCi(): byte {
-  OpcodeMap[0xa9]();
+function XORCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xa9](cpu, memory);
   return 4;
 }
 
@@ -1891,8 +1893,8 @@ function XORCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function XORDi(): byte {
-  OpcodeMap[0xaa]();
+function XORDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xaa](cpu, memory);
   return 4;
 }
 
@@ -1902,8 +1904,8 @@ function XORDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function XOREi(): byte {
-  OpcodeMap[0xab]();
+function XOREi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xab](cpu, memory);
   return 4;
 }
 
@@ -1913,8 +1915,8 @@ function XOREi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function XORHi(): byte {
-  OpcodeMap[0xac]();
+function XORHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xac](cpu, memory);
   return 4;
 }
 
@@ -1924,8 +1926,8 @@ function XORHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function XORLi(): byte {
-  OpcodeMap[0xad]();
+function XORLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xad](cpu, memory);
   return 4;
 }
 
@@ -1935,8 +1937,8 @@ function XORLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function XORHLm(): byte {
-  OpcodeMap[0xae]();
+function XORHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xae](cpu, memory);
   return 8;
 }
 
@@ -1946,8 +1948,8 @@ function XORHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function XORAi(): byte {
-  OpcodeMap[0xaf]();
+function XORAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xaf](cpu, memory);
   return 4;
 }
 
@@ -1957,8 +1959,8 @@ function XORAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ORBi(): byte {
-  OpcodeMap[0xb0]();
+function ORBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xb0](cpu, memory);
   return 4;
 }
 
@@ -1968,8 +1970,8 @@ function ORBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ORCi(): byte {
-  OpcodeMap[0xb1]();
+function ORCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xb1](cpu, memory);
   return 4;
 }
 
@@ -1979,8 +1981,8 @@ function ORCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ORDi(): byte {
-  OpcodeMap[0xb2]();
+function ORDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xb2](cpu, memory);
   return 4;
 }
 
@@ -1990,8 +1992,8 @@ function ORDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function OREi(): byte {
-  OpcodeMap[0xb3]();
+function OREi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xb3](cpu, memory);
   return 4;
 }
 
@@ -2001,8 +2003,8 @@ function OREi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ORHi(): byte {
-  OpcodeMap[0xb4]();
+function ORHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xb4](cpu, memory);
   return 4;
 }
 
@@ -2012,8 +2014,8 @@ function ORHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ORLi(): byte {
-  OpcodeMap[0xb5]();
+function ORLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xb5](cpu, memory);
   return 4;
 }
 
@@ -2023,8 +2025,8 @@ function ORLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ORHLm(): byte {
-  OpcodeMap[0xb6]();
+function ORHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xb6](cpu, memory);
   return 8;
 }
 
@@ -2034,8 +2036,8 @@ function ORHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ORAi(): byte {
-  OpcodeMap[0xb7]();
+function ORAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xb7](cpu, memory);
   return 4;
 }
 
@@ -2045,8 +2047,8 @@ function ORAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function CPBi(): byte {
-  OpcodeMap[0xb8]();
+function CPBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xb8](cpu, memory);
   return 4;
 }
 
@@ -2056,8 +2058,8 @@ function CPBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function CPCi(): byte {
-  OpcodeMap[0xb9]();
+function CPCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xb9](cpu, memory);
   return 4;
 }
 
@@ -2067,8 +2069,8 @@ function CPCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function CPDi(): byte {
-  OpcodeMap[0xba]();
+function CPDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xba](cpu, memory);
   return 4;
 }
 
@@ -2078,8 +2080,8 @@ function CPDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function CPEi(): byte {
-  OpcodeMap[0xbb]();
+function CPEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xbb](cpu, memory);
   return 4;
 }
 
@@ -2089,8 +2091,8 @@ function CPEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function CPHi(): byte {
-  OpcodeMap[0xbc]();
+function CPHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xbc](cpu, memory);
   return 4;
 }
 
@@ -2100,8 +2102,8 @@ function CPHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function CPLi(): byte {
-  OpcodeMap[0xbd]();
+function CPLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xbd](cpu, memory);
   return 4;
 }
 
@@ -2111,8 +2113,8 @@ function CPLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function CPHLm(): byte {
-  OpcodeMap[0xbe]();
+function CPHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xbe](cpu, memory);
   return 8;
 }
 
@@ -2122,8 +2124,8 @@ function CPHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function CPAi(): byte {
-  OpcodeMap[0xbf]();
+function CPAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xbf](cpu, memory);
   return 4;
 }
 
@@ -2133,8 +2135,8 @@ function CPAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-export function RETCNZ(): byte {
-  const condition: boolean = OpcodeMap[0xc0]();
+export function RETCNZ(cpu: CPU, memory: Memory): byte {
+  const condition: boolean = OpcodeMap[0xc0](cpu, memory);
   if (!condition) {
     return 8;
   }
@@ -2147,8 +2149,8 @@ export function RETCNZ(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function POPIntoBCi(): byte {
-  OpcodeMap[0xc1]();
+function POPIntoBCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xc1](cpu, memory);
   return 12;
 }
 
@@ -2158,8 +2160,8 @@ function POPIntoBCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-export function JPCNZa16(): byte {
-  const condition: boolean = OpcodeMap[0xc2]();
+export function JPCNZa16(cpu: CPU, memory: Memory): byte {
+  const condition: boolean = OpcodeMap[0xc2](cpu, memory);
   if (!condition) {
     return 12;
   }
@@ -2172,8 +2174,8 @@ export function JPCNZa16(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function JPa16(): byte {
-  OpcodeMap[0xc3]();
+function JPa16(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xc3](cpu, memory);
   return 16;
 }
 
@@ -2183,8 +2185,8 @@ function JPa16(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-export function CALLCNZa16(): byte {
-  const condition: boolean = OpcodeMap[0xc4]();
+export function CALLCNZa16(cpu: CPU, memory: Memory): byte {
+  const condition: boolean = OpcodeMap[0xc4](cpu, memory);
   if (!condition) {
     return 12;
   }
@@ -2197,8 +2199,8 @@ export function CALLCNZa16(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function PUSHRegisterBCi(): byte {
-  OpcodeMap[0xc5]();
+function PUSHRegisterBCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xc5](cpu, memory);
   return 16;
 }
 
@@ -2208,8 +2210,8 @@ function PUSHRegisterBCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ADDAid8i(): byte {
-  OpcodeMap[0xc6]();
+function ADDAid8i(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xc6](cpu, memory);
   return 8;
 }
 
@@ -2219,8 +2221,8 @@ function ADDAid8i(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RSTAi00Hi(): byte {
-  OpcodeMap[0xc7]();
+function RSTAi00Hi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xc7](cpu, memory);
   return 16;
 }
 
@@ -2230,8 +2232,8 @@ function RSTAi00Hi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-export function RETCZ(): byte {
-  const condition: boolean = OpcodeMap[0xc8]();
+export function RETCZ(cpu: CPU, memory: Memory): byte {
+  const condition: boolean = OpcodeMap[0xc8](cpu, memory);
   if (!condition) {
     return 8;
   }
@@ -2244,8 +2246,8 @@ export function RETCZ(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RET(): byte {
-  OpcodeMap[0xc9]();
+function RET(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xc9](cpu, memory);
   return 16;
 }
 
@@ -2255,8 +2257,8 @@ function RET(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-export function JPCZa16(): byte {
-  const condition: boolean = OpcodeMap[0xca]();
+export function JPCZa16(cpu: CPU, memory: Memory): byte {
+  const condition: boolean = OpcodeMap[0xca](cpu, memory);
   if (!condition) {
     return 12;
   }
@@ -2269,8 +2271,8 @@ export function JPCZa16(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function PREFIX(): byte {
-  OpcodeMap[0xcb]();
+function PREFIX(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xcb](cpu, memory);
   return 4;
 }
 
@@ -2280,8 +2282,8 @@ function PREFIX(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-export function CALLCZa16(): byte {
-  const condition: boolean = OpcodeMap[0xcc]();
+export function CALLCZa16(cpu: CPU, memory: Memory): byte {
+  const condition: boolean = OpcodeMap[0xcc](cpu, memory);
   if (!condition) {
     return 12;
   }
@@ -2294,8 +2296,8 @@ export function CALLCZa16(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function CALL(): byte {
-  OpcodeMap[0xcd]();
+function CALL(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xcd](cpu, memory);
   return 24;
 }
 
@@ -2305,8 +2307,8 @@ function CALL(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ADCAid8i(): byte {
-  OpcodeMap[0xce]();
+function ADCAid8i(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xce](cpu, memory);
   return 8;
 }
 
@@ -2316,8 +2318,8 @@ function ADCAid8i(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RSTAi08Hi(): byte {
-  OpcodeMap[0xcf]();
+function RSTAi08Hi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xcf](cpu, memory);
   return 16;
 }
 
@@ -2327,8 +2329,8 @@ function RSTAi08Hi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-export function RETCNC(): byte {
-  const condition: boolean = OpcodeMap[0xd0]();
+export function RETCNC(cpu: CPU, memory: Memory): byte {
+  const condition: boolean = OpcodeMap[0xd0](cpu, memory);
   if (!condition) {
     return 8;
   }
@@ -2341,8 +2343,8 @@ export function RETCNC(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function POPIntoDEi(): byte {
-  OpcodeMap[0xd1]();
+function POPIntoDEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xd1](cpu, memory);
   return 12;
 }
 
@@ -2352,8 +2354,8 @@ function POPIntoDEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-export function JPCNCa16(): byte {
-  const condition: boolean = OpcodeMap[0xd2]();
+export function JPCNCa16(cpu: CPU, memory: Memory): byte {
+  const condition: boolean = OpcodeMap[0xd2](cpu, memory);
   if (!condition) {
     return 12;
   }
@@ -2364,8 +2366,8 @@ export function JPCNCa16(): byte {
  * Invalid opcode.
  * Affected flags:
  */
-function IllegalD3(): byte {
-  OpcodeMap[0xd3]();
+function IllegalD3(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xd3](cpu, memory);
   return 4;
 }
 
@@ -2375,8 +2377,8 @@ function IllegalD3(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-export function CALLCNCa16(): byte {
-  const condition: boolean = OpcodeMap[0xd4]();
+export function CALLCNCa16(cpu: CPU, memory: Memory): byte {
+  const condition: boolean = OpcodeMap[0xd4](cpu, memory);
   if (!condition) {
     return 12;
   }
@@ -2389,8 +2391,8 @@ export function CALLCNCa16(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function PUSHRegisterDEi(): byte {
-  OpcodeMap[0xd5]();
+function PUSHRegisterDEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xd5](cpu, memory);
   return 16;
 }
 
@@ -2400,8 +2402,8 @@ function PUSHRegisterDEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SUBAid8i(): byte {
-  OpcodeMap[0xd6]();
+function SUBAid8i(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xd6](cpu, memory);
   return 8;
 }
 
@@ -2411,8 +2413,8 @@ function SUBAid8i(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RSTAi10Hi(): byte {
-  OpcodeMap[0xd7]();
+function RSTAi10Hi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xd7](cpu, memory);
   return 16;
 }
 
@@ -2422,8 +2424,8 @@ function RSTAi10Hi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-export function RETCC(): byte {
-  const condition: boolean = OpcodeMap[0xd8]();
+export function RETCC(cpu: CPU, memory: Memory): byte {
+  const condition: boolean = OpcodeMap[0xd8](cpu, memory);
   if (!condition) {
     return 8;
   }
@@ -2436,8 +2438,8 @@ export function RETCC(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RETI(): byte {
-  OpcodeMap[0xd9]();
+function RETI(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xd9](cpu, memory);
   return 16;
 }
 
@@ -2447,8 +2449,8 @@ function RETI(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-export function JPCCa16(): byte {
-  const condition: boolean = OpcodeMap[0xda]();
+export function JPCCa16(cpu: CPU, memory: Memory): byte {
+  const condition: boolean = OpcodeMap[0xda](cpu, memory);
   if (!condition) {
     return 12;
   }
@@ -2459,8 +2461,8 @@ export function JPCCa16(): byte {
  * Invalid opcode.
  * Affected flags:
  */
-function IllegalDB(): byte {
-  OpcodeMap[0xdb]();
+function IllegalDB(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xdb](cpu, memory);
   return 4;
 }
 
@@ -2470,8 +2472,8 @@ function IllegalDB(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-export function CALLCCa16(): byte {
-  const condition: boolean = OpcodeMap[0xdc]();
+export function CALLCCa16(cpu: CPU, memory: Memory): byte {
+  const condition: boolean = OpcodeMap[0xdc](cpu, memory);
   if (!condition) {
     return 12;
   }
@@ -2482,8 +2484,8 @@ export function CALLCCa16(): byte {
  * Invalid opcode.
  * Affected flags:
  */
-function IllegalDD(): byte {
-  OpcodeMap[0xdd]();
+function IllegalDD(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xdd](cpu, memory);
   return 4;
 }
 
@@ -2493,8 +2495,8 @@ function IllegalDD(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SBCAid8i(): byte {
-  OpcodeMap[0xde]();
+function SBCAid8i(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xde](cpu, memory);
   return 8;
 }
 
@@ -2504,8 +2506,8 @@ function SBCAid8i(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RSTAi18Hi(): byte {
-  OpcodeMap[0xdf]();
+function RSTAi18Hi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xdf](cpu, memory);
   return 16;
 }
 
@@ -2515,8 +2517,8 @@ function RSTAi18Hi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDHa8mAi(): byte {
-  OpcodeMap[0xe0]();
+function LDHa8mAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xe0](cpu, memory);
   return 12;
 }
 
@@ -2526,8 +2528,8 @@ function LDHa8mAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function POPIntoHLi(): byte {
-  OpcodeMap[0xe1]();
+function POPIntoHLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xe1](cpu, memory);
   return 12;
 }
 
@@ -2537,8 +2539,8 @@ function POPIntoHLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDCmAi(): byte {
-  OpcodeMap[0xe2]();
+function LDCmAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xe2](cpu, memory);
   return 8;
 }
 
@@ -2546,8 +2548,8 @@ function LDCmAi(): byte {
  * Invalid opcode.
  * Affected flags:
  */
-function IllegalE3(): byte {
-  OpcodeMap[0xe3]();
+function IllegalE3(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xe3](cpu, memory);
   return 4;
 }
 
@@ -2555,8 +2557,8 @@ function IllegalE3(): byte {
  * Invalid opcode.
  * Affected flags:
  */
-function IllegalE4(): byte {
-  OpcodeMap[0xe4]();
+function IllegalE4(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xe4](cpu, memory);
   return 4;
 }
 
@@ -2566,8 +2568,8 @@ function IllegalE4(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function PUSHRegisterHLi(): byte {
-  OpcodeMap[0xe5]();
+function PUSHRegisterHLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xe5](cpu, memory);
   return 16;
 }
 
@@ -2577,8 +2579,8 @@ function PUSHRegisterHLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ANDd8i(): byte {
-  OpcodeMap[0xe6]();
+function ANDd8i(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xe6](cpu, memory);
   return 8;
 }
 
@@ -2588,8 +2590,8 @@ function ANDd8i(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RSTAi20Hi(): byte {
-  OpcodeMap[0xe7]();
+function RSTAi20Hi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xe7](cpu, memory);
   return 16;
 }
 
@@ -2599,8 +2601,8 @@ function RSTAi20Hi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ADDSPir8i(): byte {
-  OpcodeMap[0xe8]();
+function ADDSPir8i(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xe8](cpu, memory);
   return 16;
 }
 
@@ -2610,8 +2612,8 @@ function ADDSPir8i(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function JPHL(): byte {
-  OpcodeMap[0xe9]();
+function JPHL(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xe9](cpu, memory);
   return 4;
 }
 
@@ -2621,8 +2623,8 @@ function JPHL(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDa16mAi(): byte {
-  OpcodeMap[0xea]();
+function LDa16mAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xea](cpu, memory);
   return 16;
 }
 
@@ -2630,8 +2632,8 @@ function LDa16mAi(): byte {
  * Invalid opcode.
  * Affected flags:
  */
-function IllegalEB(): byte {
-  OpcodeMap[0xeb]();
+function IllegalEB(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xeb](cpu, memory);
   return 4;
 }
 
@@ -2639,8 +2641,8 @@ function IllegalEB(): byte {
  * Invalid opcode.
  * Affected flags:
  */
-function IllegalEC(): byte {
-  OpcodeMap[0xec]();
+function IllegalEC(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xec](cpu, memory);
   return 4;
 }
 
@@ -2648,8 +2650,8 @@ function IllegalEC(): byte {
  * Invalid opcode.
  * Affected flags:
  */
-function IllegalED(): byte {
-  OpcodeMap[0xed]();
+function IllegalED(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xed](cpu, memory);
   return 4;
 }
 
@@ -2659,8 +2661,8 @@ function IllegalED(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function XORd8i(): byte {
-  OpcodeMap[0xee]();
+function XORd8i(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xee](cpu, memory);
   return 8;
 }
 
@@ -2670,8 +2672,8 @@ function XORd8i(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RSTAi28Hi(): byte {
-  OpcodeMap[0xef]();
+function RSTAi28Hi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xef](cpu, memory);
   return 16;
 }
 
@@ -2681,8 +2683,8 @@ function RSTAi28Hi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDHAia8m(): byte {
-  OpcodeMap[0xf0]();
+function LDHAia8m(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xf0](cpu, memory);
   return 12;
 }
 
@@ -2692,8 +2694,8 @@ function LDHAia8m(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function POPIntoAFi(): byte {
-  OpcodeMap[0xf1]();
+function POPIntoAFi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xf1](cpu, memory);
   return 12;
 }
 
@@ -2703,8 +2705,8 @@ function POPIntoAFi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDAiCm(): byte {
-  OpcodeMap[0xf2]();
+function LDAiCm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xf2](cpu, memory);
   return 8;
 }
 
@@ -2714,8 +2716,8 @@ function LDAiCm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function DI(): byte {
-  OpcodeMap[0xf3]();
+function DI(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xf3](cpu, memory);
   return 4;
 }
 
@@ -2723,8 +2725,8 @@ function DI(): byte {
  * Invalid opcode.
  * Affected flags:
  */
-function IllegalF4(): byte {
-  OpcodeMap[0xf4]();
+function IllegalF4(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xf4](cpu, memory);
   return 4;
 }
 
@@ -2734,8 +2736,8 @@ function IllegalF4(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function PUSHRegisterAFi(): byte {
-  OpcodeMap[0xf5]();
+function PUSHRegisterAFi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xf5](cpu, memory);
   return 16;
 }
 
@@ -2745,8 +2747,8 @@ function PUSHRegisterAFi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function ORd8i(): byte {
-  OpcodeMap[0xf6]();
+function ORd8i(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xf6](cpu, memory);
   return 8;
 }
 
@@ -2756,8 +2758,8 @@ function ORd8i(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RSTAi30Hi(): byte {
-  OpcodeMap[0xf7]();
+function RSTAi30Hi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xf7](cpu, memory);
   return 16;
 }
 
@@ -2767,8 +2769,8 @@ function RSTAi30Hi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function LDHLiSPIncri(): byte {
-  OpcodeMap[0xf8]();
+function LDHLiSPIncri(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xf8](cpu, memory);
   return 12;
 }
 
@@ -2778,8 +2780,8 @@ function LDHLiSPIncri(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDSPiHLi(): byte {
-  OpcodeMap[0xf9]();
+function LDSPiHLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xf9](cpu, memory);
   return 8;
 }
 
@@ -2789,8 +2791,8 @@ function LDSPiHLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function LDAia16m(): byte {
-  OpcodeMap[0xfa]();
+function LDAia16m(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xfa](cpu, memory);
   return 16;
 }
 
@@ -2800,8 +2802,8 @@ function LDAia16m(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function EI(): byte {
-  OpcodeMap[0xfb]();
+function EI(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xfb](cpu, memory);
   return 4;
 }
 
@@ -2809,8 +2811,8 @@ function EI(): byte {
  * Invalid opcode.
  * Affected flags:
  */
-function IllegalFC(): byte {
-  OpcodeMap[0xfc]();
+function IllegalFC(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xfc](cpu, memory);
   return 4;
 }
 
@@ -2818,8 +2820,8 @@ function IllegalFC(): byte {
  * Invalid opcode.
  * Affected flags:
  */
-function IllegalFD(): byte {
-  OpcodeMap[0xfd]();
+function IllegalFD(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xfd](cpu, memory);
   return 4;
 }
 
@@ -2829,8 +2831,8 @@ function IllegalFD(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function CPd8i(): byte {
-  OpcodeMap[0xfe]();
+function CPd8i(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xfe](cpu, memory);
   return 8;
 }
 
@@ -2840,8 +2842,8 @@ function CPd8i(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RSTAi38Hi(): byte {
-  OpcodeMap[0xff]();
+function RSTAi38Hi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xff](cpu, memory);
   return 16;
 }
 
@@ -2851,8 +2853,8 @@ function RSTAi38Hi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RLCBi(): byte {
-  OpcodeMap[0x00]();
+function RLCBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x00](cpu, memory);
   return 8;
 }
 
@@ -2862,8 +2864,8 @@ function RLCBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RLCCi(): byte {
-  OpcodeMap[0x01]();
+function RLCCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x01](cpu, memory);
   return 8;
 }
 
@@ -2873,8 +2875,8 @@ function RLCCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RLCDi(): byte {
-  OpcodeMap[0x02]();
+function RLCDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x02](cpu, memory);
   return 8;
 }
 
@@ -2884,8 +2886,8 @@ function RLCDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RLCEi(): byte {
-  OpcodeMap[0x03]();
+function RLCEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x03](cpu, memory);
   return 8;
 }
 
@@ -2895,8 +2897,8 @@ function RLCEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RLCHi(): byte {
-  OpcodeMap[0x04]();
+function RLCHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x04](cpu, memory);
   return 8;
 }
 
@@ -2906,8 +2908,8 @@ function RLCHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RLCLi(): byte {
-  OpcodeMap[0x05]();
+function RLCLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x05](cpu, memory);
   return 8;
 }
 
@@ -2917,8 +2919,8 @@ function RLCLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RLCHLm(): byte {
-  OpcodeMap[0x06]();
+function RLCHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x06](cpu, memory);
   return 16;
 }
 
@@ -2928,8 +2930,8 @@ function RLCHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RLCAi(): byte {
-  OpcodeMap[0x07]();
+function RLCAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x07](cpu, memory);
   return 8;
 }
 
@@ -2939,8 +2941,8 @@ function RLCAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RRCBi(): byte {
-  OpcodeMap[0x08]();
+function RRCBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x08](cpu, memory);
   return 8;
 }
 
@@ -2950,8 +2952,8 @@ function RRCBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RRCCi(): byte {
-  OpcodeMap[0x09]();
+function RRCCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x09](cpu, memory);
   return 8;
 }
 
@@ -2961,8 +2963,8 @@ function RRCCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RRCDi(): byte {
-  OpcodeMap[0x0a]();
+function RRCDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x0a](cpu, memory);
   return 8;
 }
 
@@ -2972,8 +2974,8 @@ function RRCDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RRCEi(): byte {
-  OpcodeMap[0x0b]();
+function RRCEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x0b](cpu, memory);
   return 8;
 }
 
@@ -2983,8 +2985,8 @@ function RRCEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RRCHi(): byte {
-  OpcodeMap[0x0c]();
+function RRCHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x0c](cpu, memory);
   return 8;
 }
 
@@ -2994,8 +2996,8 @@ function RRCHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RRCLi(): byte {
-  OpcodeMap[0x0d]();
+function RRCLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x0d](cpu, memory);
   return 8;
 }
 
@@ -3005,8 +3007,8 @@ function RRCLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RRCHLm(): byte {
-  OpcodeMap[0x0e]();
+function RRCHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x0e](cpu, memory);
   return 16;
 }
 
@@ -3016,8 +3018,8 @@ function RRCHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RRCAi(): byte {
-  OpcodeMap[0x0f]();
+function RRCAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x0f](cpu, memory);
   return 8;
 }
 
@@ -3027,8 +3029,8 @@ function RRCAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RLBi(): byte {
-  OpcodeMap[0x10]();
+function RLBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x10](cpu, memory);
   return 8;
 }
 
@@ -3038,8 +3040,8 @@ function RLBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RLCi(): byte {
-  OpcodeMap[0x11]();
+function RLCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x11](cpu, memory);
   return 8;
 }
 
@@ -3049,8 +3051,8 @@ function RLCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RLDi(): byte {
-  OpcodeMap[0x12]();
+function RLDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x12](cpu, memory);
   return 8;
 }
 
@@ -3060,8 +3062,8 @@ function RLDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RLEi(): byte {
-  OpcodeMap[0x13]();
+function RLEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x13](cpu, memory);
   return 8;
 }
 
@@ -3071,8 +3073,8 @@ function RLEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RLHi(): byte {
-  OpcodeMap[0x14]();
+function RLHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x14](cpu, memory);
   return 8;
 }
 
@@ -3082,8 +3084,8 @@ function RLHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RLLi(): byte {
-  OpcodeMap[0x15]();
+function RLLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x15](cpu, memory);
   return 8;
 }
 
@@ -3093,8 +3095,8 @@ function RLLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RLHLm(): byte {
-  OpcodeMap[0x16]();
+function RLHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x16](cpu, memory);
   return 16;
 }
 
@@ -3104,8 +3106,8 @@ function RLHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RLAi(): byte {
-  OpcodeMap[0x17]();
+function RLAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x17](cpu, memory);
   return 8;
 }
 
@@ -3115,8 +3117,8 @@ function RLAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RRBi(): byte {
-  OpcodeMap[0x18]();
+function RRBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x18](cpu, memory);
   return 8;
 }
 
@@ -3126,8 +3128,8 @@ function RRBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RRCi(): byte {
-  OpcodeMap[0x19]();
+function RRCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x19](cpu, memory);
   return 8;
 }
 
@@ -3137,8 +3139,8 @@ function RRCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RRDi(): byte {
-  OpcodeMap[0x1a]();
+function RRDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x1a](cpu, memory);
   return 8;
 }
 
@@ -3148,8 +3150,8 @@ function RRDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RREi(): byte {
-  OpcodeMap[0x1b]();
+function RREi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x1b](cpu, memory);
   return 8;
 }
 
@@ -3159,8 +3161,8 @@ function RREi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RRHi(): byte {
-  OpcodeMap[0x1c]();
+function RRHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x1c](cpu, memory);
   return 8;
 }
 
@@ -3170,8 +3172,8 @@ function RRHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RRLi(): byte {
-  OpcodeMap[0x1d]();
+function RRLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x1d](cpu, memory);
   return 8;
 }
 
@@ -3181,8 +3183,8 @@ function RRLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RRHLm(): byte {
-  OpcodeMap[0x1e]();
+function RRHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x1e](cpu, memory);
   return 16;
 }
 
@@ -3192,8 +3194,8 @@ function RRHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function RRAi(): byte {
-  OpcodeMap[0x1f]();
+function RRAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x1f](cpu, memory);
   return 8;
 }
 
@@ -3203,8 +3205,8 @@ function RRAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SLABi(): byte {
-  OpcodeMap[0x20]();
+function SLABi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x20](cpu, memory);
   return 8;
 }
 
@@ -3214,8 +3216,8 @@ function SLABi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SLACi(): byte {
-  OpcodeMap[0x21]();
+function SLACi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x21](cpu, memory);
   return 8;
 }
 
@@ -3225,8 +3227,8 @@ function SLACi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SLADi(): byte {
-  OpcodeMap[0x22]();
+function SLADi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x22](cpu, memory);
   return 8;
 }
 
@@ -3236,8 +3238,8 @@ function SLADi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SLAEi(): byte {
-  OpcodeMap[0x23]();
+function SLAEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x23](cpu, memory);
   return 8;
 }
 
@@ -3247,8 +3249,8 @@ function SLAEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SLAHi(): byte {
-  OpcodeMap[0x24]();
+function SLAHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x24](cpu, memory);
   return 8;
 }
 
@@ -3258,8 +3260,8 @@ function SLAHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SLALi(): byte {
-  OpcodeMap[0x25]();
+function SLALi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x25](cpu, memory);
   return 8;
 }
 
@@ -3269,8 +3271,8 @@ function SLALi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SLAHLm(): byte {
-  OpcodeMap[0x26]();
+function SLAHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x26](cpu, memory);
   return 16;
 }
 
@@ -3280,8 +3282,8 @@ function SLAHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SLAAi(): byte {
-  OpcodeMap[0x27]();
+function SLAAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x27](cpu, memory);
   return 8;
 }
 
@@ -3291,8 +3293,8 @@ function SLAAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SRABi(): byte {
-  OpcodeMap[0x28]();
+function SRABi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x28](cpu, memory);
   return 8;
 }
 
@@ -3302,8 +3304,8 @@ function SRABi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SRACi(): byte {
-  OpcodeMap[0x29]();
+function SRACi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x29](cpu, memory);
   return 8;
 }
 
@@ -3313,8 +3315,8 @@ function SRACi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SRADi(): byte {
-  OpcodeMap[0x2a]();
+function SRADi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x2a](cpu, memory);
   return 8;
 }
 
@@ -3324,8 +3326,8 @@ function SRADi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SRAEi(): byte {
-  OpcodeMap[0x2b]();
+function SRAEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x2b](cpu, memory);
   return 8;
 }
 
@@ -3335,8 +3337,8 @@ function SRAEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SRAHi(): byte {
-  OpcodeMap[0x2c]();
+function SRAHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x2c](cpu, memory);
   return 8;
 }
 
@@ -3346,8 +3348,8 @@ function SRAHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SRALi(): byte {
-  OpcodeMap[0x2d]();
+function SRALi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x2d](cpu, memory);
   return 8;
 }
 
@@ -3357,8 +3359,8 @@ function SRALi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SRAHLm(): byte {
-  OpcodeMap[0x2e]();
+function SRAHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x2e](cpu, memory);
   return 16;
 }
 
@@ -3368,8 +3370,8 @@ function SRAHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SRAAi(): byte {
-  OpcodeMap[0x2f]();
+function SRAAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x2f](cpu, memory);
   return 8;
 }
 
@@ -3379,8 +3381,8 @@ function SRAAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SWAPBi(): byte {
-  OpcodeMap[0x30]();
+function SWAPBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x30](cpu, memory);
   return 8;
 }
 
@@ -3390,8 +3392,8 @@ function SWAPBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SWAPCi(): byte {
-  OpcodeMap[0x31]();
+function SWAPCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x31](cpu, memory);
   return 8;
 }
 
@@ -3401,8 +3403,8 @@ function SWAPCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SWAPDi(): byte {
-  OpcodeMap[0x32]();
+function SWAPDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x32](cpu, memory);
   return 8;
 }
 
@@ -3412,8 +3414,8 @@ function SWAPDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SWAPEi(): byte {
-  OpcodeMap[0x33]();
+function SWAPEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x33](cpu, memory);
   return 8;
 }
 
@@ -3423,8 +3425,8 @@ function SWAPEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SWAPHi(): byte {
-  OpcodeMap[0x34]();
+function SWAPHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x34](cpu, memory);
   return 8;
 }
 
@@ -3434,8 +3436,8 @@ function SWAPHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SWAPLi(): byte {
-  OpcodeMap[0x35]();
+function SWAPLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x35](cpu, memory);
   return 8;
 }
 
@@ -3445,8 +3447,8 @@ function SWAPLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SWAPHLm(): byte {
-  OpcodeMap[0x36]();
+function SWAPHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x36](cpu, memory);
   return 16;
 }
 
@@ -3456,8 +3458,8 @@ function SWAPHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SWAPAi(): byte {
-  OpcodeMap[0x37]();
+function SWAPAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x37](cpu, memory);
   return 8;
 }
 
@@ -3467,8 +3469,8 @@ function SWAPAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SRLBi(): byte {
-  OpcodeMap[0x38]();
+function SRLBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x38](cpu, memory);
   return 8;
 }
 
@@ -3478,8 +3480,8 @@ function SRLBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SRLCi(): byte {
-  OpcodeMap[0x39]();
+function SRLCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x39](cpu, memory);
   return 8;
 }
 
@@ -3489,8 +3491,8 @@ function SRLCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SRLDi(): byte {
-  OpcodeMap[0x3a]();
+function SRLDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x3a](cpu, memory);
   return 8;
 }
 
@@ -3500,8 +3502,8 @@ function SRLDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SRLEi(): byte {
-  OpcodeMap[0x3b]();
+function SRLEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x3b](cpu, memory);
   return 8;
 }
 
@@ -3511,8 +3513,8 @@ function SRLEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SRLHi(): byte {
-  OpcodeMap[0x3c]();
+function SRLHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x3c](cpu, memory);
   return 8;
 }
 
@@ -3522,8 +3524,8 @@ function SRLHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SRLLi(): byte {
-  OpcodeMap[0x3d]();
+function SRLLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x3d](cpu, memory);
   return 8;
 }
 
@@ -3533,8 +3535,8 @@ function SRLLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SRLHLm(): byte {
-  OpcodeMap[0x3e]();
+function SRLHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x3e](cpu, memory);
   return 16;
 }
 
@@ -3544,8 +3546,8 @@ function SRLHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
  */
-function SRLAi(): byte {
-  OpcodeMap[0x3f]();
+function SRLAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x3f](cpu, memory);
   return 8;
 }
 
@@ -3555,8 +3557,8 @@ function SRLAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT0iBi(): byte {
-  OpcodeMap[0x40]();
+function BIT0iBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x40](cpu, memory);
   return 8;
 }
 
@@ -3566,8 +3568,8 @@ function BIT0iBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT0iCi(): byte {
-  OpcodeMap[0x41]();
+function BIT0iCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x41](cpu, memory);
   return 8;
 }
 
@@ -3577,8 +3579,8 @@ function BIT0iCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT0iDi(): byte {
-  OpcodeMap[0x42]();
+function BIT0iDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x42](cpu, memory);
   return 8;
 }
 
@@ -3588,8 +3590,8 @@ function BIT0iDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT0iEi(): byte {
-  OpcodeMap[0x43]();
+function BIT0iEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x43](cpu, memory);
   return 8;
 }
 
@@ -3599,8 +3601,8 @@ function BIT0iEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT0iHi(): byte {
-  OpcodeMap[0x44]();
+function BIT0iHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x44](cpu, memory);
   return 8;
 }
 
@@ -3610,8 +3612,8 @@ function BIT0iHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT0iLi(): byte {
-  OpcodeMap[0x45]();
+function BIT0iLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x45](cpu, memory);
   return 8;
 }
 
@@ -3621,8 +3623,8 @@ function BIT0iLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT0iHLm(): byte {
-  OpcodeMap[0x46]();
+function BIT0iHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x46](cpu, memory);
   return 12;
 }
 
@@ -3632,8 +3634,8 @@ function BIT0iHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT0iAi(): byte {
-  OpcodeMap[0x47]();
+function BIT0iAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x47](cpu, memory);
   return 8;
 }
 
@@ -3643,8 +3645,8 @@ function BIT0iAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT1iBi(): byte {
-  OpcodeMap[0x48]();
+function BIT1iBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x48](cpu, memory);
   return 8;
 }
 
@@ -3654,8 +3656,8 @@ function BIT1iBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT1iCi(): byte {
-  OpcodeMap[0x49]();
+function BIT1iCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x49](cpu, memory);
   return 8;
 }
 
@@ -3665,8 +3667,8 @@ function BIT1iCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT1iDi(): byte {
-  OpcodeMap[0x4a]();
+function BIT1iDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x4a](cpu, memory);
   return 8;
 }
 
@@ -3676,8 +3678,8 @@ function BIT1iDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT1iEi(): byte {
-  OpcodeMap[0x4b]();
+function BIT1iEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x4b](cpu, memory);
   return 8;
 }
 
@@ -3687,8 +3689,8 @@ function BIT1iEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT1iHi(): byte {
-  OpcodeMap[0x4c]();
+function BIT1iHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x4c](cpu, memory);
   return 8;
 }
 
@@ -3698,8 +3700,8 @@ function BIT1iHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT1iLi(): byte {
-  OpcodeMap[0x4d]();
+function BIT1iLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x4d](cpu, memory);
   return 8;
 }
 
@@ -3709,8 +3711,8 @@ function BIT1iLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT1iHLm(): byte {
-  OpcodeMap[0x4e]();
+function BIT1iHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x4e](cpu, memory);
   return 12;
 }
 
@@ -3720,8 +3722,8 @@ function BIT1iHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT1iAi(): byte {
-  OpcodeMap[0x4f]();
+function BIT1iAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x4f](cpu, memory);
   return 8;
 }
 
@@ -3731,8 +3733,8 @@ function BIT1iAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT2iBi(): byte {
-  OpcodeMap[0x50]();
+function BIT2iBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x50](cpu, memory);
   return 8;
 }
 
@@ -3742,8 +3744,8 @@ function BIT2iBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT2iCi(): byte {
-  OpcodeMap[0x51]();
+function BIT2iCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x51](cpu, memory);
   return 8;
 }
 
@@ -3753,8 +3755,8 @@ function BIT2iCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT2iDi(): byte {
-  OpcodeMap[0x52]();
+function BIT2iDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x52](cpu, memory);
   return 8;
 }
 
@@ -3764,8 +3766,8 @@ function BIT2iDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT2iEi(): byte {
-  OpcodeMap[0x53]();
+function BIT2iEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x53](cpu, memory);
   return 8;
 }
 
@@ -3775,8 +3777,8 @@ function BIT2iEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT2iHi(): byte {
-  OpcodeMap[0x54]();
+function BIT2iHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x54](cpu, memory);
   return 8;
 }
 
@@ -3786,8 +3788,8 @@ function BIT2iHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT2iLi(): byte {
-  OpcodeMap[0x55]();
+function BIT2iLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x55](cpu, memory);
   return 8;
 }
 
@@ -3797,8 +3799,8 @@ function BIT2iLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT2iHLm(): byte {
-  OpcodeMap[0x56]();
+function BIT2iHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x56](cpu, memory);
   return 12;
 }
 
@@ -3808,8 +3810,8 @@ function BIT2iHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT2iAi(): byte {
-  OpcodeMap[0x57]();
+function BIT2iAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x57](cpu, memory);
   return 8;
 }
 
@@ -3819,8 +3821,8 @@ function BIT2iAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT3iBi(): byte {
-  OpcodeMap[0x58]();
+function BIT3iBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x58](cpu, memory);
   return 8;
 }
 
@@ -3830,8 +3832,8 @@ function BIT3iBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT3iCi(): byte {
-  OpcodeMap[0x59]();
+function BIT3iCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x59](cpu, memory);
   return 8;
 }
 
@@ -3841,8 +3843,8 @@ function BIT3iCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT3iDi(): byte {
-  OpcodeMap[0x5a]();
+function BIT3iDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x5a](cpu, memory);
   return 8;
 }
 
@@ -3852,8 +3854,8 @@ function BIT3iDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT3iEi(): byte {
-  OpcodeMap[0x5b]();
+function BIT3iEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x5b](cpu, memory);
   return 8;
 }
 
@@ -3863,8 +3865,8 @@ function BIT3iEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT3iHi(): byte {
-  OpcodeMap[0x5c]();
+function BIT3iHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x5c](cpu, memory);
   return 8;
 }
 
@@ -3874,8 +3876,8 @@ function BIT3iHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT3iLi(): byte {
-  OpcodeMap[0x5d]();
+function BIT3iLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x5d](cpu, memory);
   return 8;
 }
 
@@ -3885,8 +3887,8 @@ function BIT3iLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT3iHLm(): byte {
-  OpcodeMap[0x5e]();
+function BIT3iHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x5e](cpu, memory);
   return 12;
 }
 
@@ -3896,8 +3898,8 @@ function BIT3iHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT3iAi(): byte {
-  OpcodeMap[0x5f]();
+function BIT3iAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x5f](cpu, memory);
   return 8;
 }
 
@@ -3907,8 +3909,8 @@ function BIT3iAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT4iBi(): byte {
-  OpcodeMap[0x60]();
+function BIT4iBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x60](cpu, memory);
   return 8;
 }
 
@@ -3918,8 +3920,8 @@ function BIT4iBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT4iCi(): byte {
-  OpcodeMap[0x61]();
+function BIT4iCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x61](cpu, memory);
   return 8;
 }
 
@@ -3929,8 +3931,8 @@ function BIT4iCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT4iDi(): byte {
-  OpcodeMap[0x62]();
+function BIT4iDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x62](cpu, memory);
   return 8;
 }
 
@@ -3940,8 +3942,8 @@ function BIT4iDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT4iEi(): byte {
-  OpcodeMap[0x63]();
+function BIT4iEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x63](cpu, memory);
   return 8;
 }
 
@@ -3951,8 +3953,8 @@ function BIT4iEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT4iHi(): byte {
-  OpcodeMap[0x64]();
+function BIT4iHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x64](cpu, memory);
   return 8;
 }
 
@@ -3962,8 +3964,8 @@ function BIT4iHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT4iLi(): byte {
-  OpcodeMap[0x65]();
+function BIT4iLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x65](cpu, memory);
   return 8;
 }
 
@@ -3973,8 +3975,8 @@ function BIT4iLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT4iHLm(): byte {
-  OpcodeMap[0x66]();
+function BIT4iHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x66](cpu, memory);
   return 12;
 }
 
@@ -3984,8 +3986,8 @@ function BIT4iHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT4iAi(): byte {
-  OpcodeMap[0x67]();
+function BIT4iAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x67](cpu, memory);
   return 8;
 }
 
@@ -3995,8 +3997,8 @@ function BIT4iAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT5iBi(): byte {
-  OpcodeMap[0x68]();
+function BIT5iBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x68](cpu, memory);
   return 8;
 }
 
@@ -4006,8 +4008,8 @@ function BIT5iBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT5iCi(): byte {
-  OpcodeMap[0x69]();
+function BIT5iCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x69](cpu, memory);
   return 8;
 }
 
@@ -4017,8 +4019,8 @@ function BIT5iCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT5iDi(): byte {
-  OpcodeMap[0x6a]();
+function BIT5iDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x6a](cpu, memory);
   return 8;
 }
 
@@ -4028,8 +4030,8 @@ function BIT5iDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT5iEi(): byte {
-  OpcodeMap[0x6b]();
+function BIT5iEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x6b](cpu, memory);
   return 8;
 }
 
@@ -4039,8 +4041,8 @@ function BIT5iEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT5iHi(): byte {
-  OpcodeMap[0x6c]();
+function BIT5iHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x6c](cpu, memory);
   return 8;
 }
 
@@ -4050,8 +4052,8 @@ function BIT5iHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT5iLi(): byte {
-  OpcodeMap[0x6d]();
+function BIT5iLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x6d](cpu, memory);
   return 8;
 }
 
@@ -4061,8 +4063,8 @@ function BIT5iLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT5iHLm(): byte {
-  OpcodeMap[0x6e]();
+function BIT5iHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x6e](cpu, memory);
   return 12;
 }
 
@@ -4072,8 +4074,8 @@ function BIT5iHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT5iAi(): byte {
-  OpcodeMap[0x6f]();
+function BIT5iAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x6f](cpu, memory);
   return 8;
 }
 
@@ -4083,8 +4085,8 @@ function BIT5iAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT6iBi(): byte {
-  OpcodeMap[0x70]();
+function BIT6iBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x70](cpu, memory);
   return 8;
 }
 
@@ -4094,8 +4096,8 @@ function BIT6iBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT6iCi(): byte {
-  OpcodeMap[0x71]();
+function BIT6iCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x71](cpu, memory);
   return 8;
 }
 
@@ -4105,8 +4107,8 @@ function BIT6iCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT6iDi(): byte {
-  OpcodeMap[0x72]();
+function BIT6iDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x72](cpu, memory);
   return 8;
 }
 
@@ -4116,8 +4118,8 @@ function BIT6iDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT6iEi(): byte {
-  OpcodeMap[0x73]();
+function BIT6iEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x73](cpu, memory);
   return 8;
 }
 
@@ -4127,8 +4129,8 @@ function BIT6iEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT6iHi(): byte {
-  OpcodeMap[0x74]();
+function BIT6iHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x74](cpu, memory);
   return 8;
 }
 
@@ -4138,8 +4140,8 @@ function BIT6iHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT6iLi(): byte {
-  OpcodeMap[0x75]();
+function BIT6iLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x75](cpu, memory);
   return 8;
 }
 
@@ -4149,8 +4151,8 @@ function BIT6iLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT6iHLm(): byte {
-  OpcodeMap[0x76]();
+function BIT6iHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x76](cpu, memory);
   return 12;
 }
 
@@ -4160,8 +4162,8 @@ function BIT6iHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT6iAi(): byte {
-  OpcodeMap[0x77]();
+function BIT6iAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x77](cpu, memory);
   return 8;
 }
 
@@ -4171,8 +4173,8 @@ function BIT6iAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT7iBi(): byte {
-  OpcodeMap[0x78]();
+function BIT7iBi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x78](cpu, memory);
   return 8;
 }
 
@@ -4182,8 +4184,8 @@ function BIT7iBi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT7iCi(): byte {
-  OpcodeMap[0x79]();
+function BIT7iCi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x79](cpu, memory);
   return 8;
 }
 
@@ -4193,8 +4195,8 @@ function BIT7iCi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT7iDi(): byte {
-  OpcodeMap[0x7a]();
+function BIT7iDi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x7a](cpu, memory);
   return 8;
 }
 
@@ -4204,8 +4206,8 @@ function BIT7iDi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT7iEi(): byte {
-  OpcodeMap[0x7b]();
+function BIT7iEi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x7b](cpu, memory);
   return 8;
 }
 
@@ -4215,8 +4217,8 @@ function BIT7iEi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT7iHi(): byte {
-  OpcodeMap[0x7c]();
+function BIT7iHi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x7c](cpu, memory);
   return 8;
 }
 
@@ -4226,8 +4228,8 @@ function BIT7iHi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT7iLi(): byte {
-  OpcodeMap[0x7d]();
+function BIT7iLi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x7d](cpu, memory);
   return 8;
 }
 
@@ -4237,8 +4239,8 @@ function BIT7iLi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT7iHLm(): byte {
-  OpcodeMap[0x7e]();
+function BIT7iHLm(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x7e](cpu, memory);
   return 12;
 }
 
@@ -4248,8 +4250,8 @@ function BIT7iHLm(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H
  */
-function BIT7iAi(): byte {
-  OpcodeMap[0x7f]();
+function BIT7iAi(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x7f](cpu, memory);
   return 8;
 }
 
@@ -4259,8 +4261,8 @@ function BIT7iAi(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES0B(): byte {
-  OpcodeMap[0x80]();
+function RES0B(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x80](cpu, memory);
   return 8;
 }
 
@@ -4270,8 +4272,8 @@ function RES0B(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES0C(): byte {
-  OpcodeMap[0x81]();
+function RES0C(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x81](cpu, memory);
   return 8;
 }
 
@@ -4281,8 +4283,8 @@ function RES0C(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES0D(): byte {
-  OpcodeMap[0x82]();
+function RES0D(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x82](cpu, memory);
   return 8;
 }
 
@@ -4292,8 +4294,8 @@ function RES0D(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES0E(): byte {
-  OpcodeMap[0x83]();
+function RES0E(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x83](cpu, memory);
   return 8;
 }
 
@@ -4303,8 +4305,8 @@ function RES0E(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES0H(): byte {
-  OpcodeMap[0x84]();
+function RES0H(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x84](cpu, memory);
   return 8;
 }
 
@@ -4314,8 +4316,8 @@ function RES0H(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES0L(): byte {
-  OpcodeMap[0x85]();
+function RES0L(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x85](cpu, memory);
   return 8;
 }
 
@@ -4325,8 +4327,8 @@ function RES0L(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES0HL(): byte {
-  OpcodeMap[0x86]();
+function RES0HL(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x86](cpu, memory);
   return 16;
 }
 
@@ -4336,8 +4338,8 @@ function RES0HL(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES0A(): byte {
-  OpcodeMap[0x87]();
+function RES0A(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x87](cpu, memory);
   return 8;
 }
 
@@ -4347,8 +4349,8 @@ function RES0A(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES1B(): byte {
-  OpcodeMap[0x88]();
+function RES1B(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x88](cpu, memory);
   return 8;
 }
 
@@ -4358,8 +4360,8 @@ function RES1B(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES1C(): byte {
-  OpcodeMap[0x89]();
+function RES1C(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x89](cpu, memory);
   return 8;
 }
 
@@ -4369,8 +4371,8 @@ function RES1C(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES1D(): byte {
-  OpcodeMap[0x8a]();
+function RES1D(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x8a](cpu, memory);
   return 8;
 }
 
@@ -4380,8 +4382,8 @@ function RES1D(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES1E(): byte {
-  OpcodeMap[0x8b]();
+function RES1E(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x8b](cpu, memory);
   return 8;
 }
 
@@ -4391,8 +4393,8 @@ function RES1E(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES1H(): byte {
-  OpcodeMap[0x8c]();
+function RES1H(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x8c](cpu, memory);
   return 8;
 }
 
@@ -4402,8 +4404,8 @@ function RES1H(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES1L(): byte {
-  OpcodeMap[0x8d]();
+function RES1L(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x8d](cpu, memory);
   return 8;
 }
 
@@ -4413,8 +4415,8 @@ function RES1L(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES1HL(): byte {
-  OpcodeMap[0x8e]();
+function RES1HL(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x8e](cpu, memory);
   return 16;
 }
 
@@ -4424,8 +4426,8 @@ function RES1HL(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES1A(): byte {
-  OpcodeMap[0x8f]();
+function RES1A(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x8f](cpu, memory);
   return 8;
 }
 
@@ -4435,8 +4437,8 @@ function RES1A(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES2B(): byte {
-  OpcodeMap[0x90]();
+function RES2B(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x90](cpu, memory);
   return 8;
 }
 
@@ -4446,8 +4448,8 @@ function RES2B(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES2C(): byte {
-  OpcodeMap[0x91]();
+function RES2C(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x91](cpu, memory);
   return 8;
 }
 
@@ -4457,8 +4459,8 @@ function RES2C(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES2D(): byte {
-  OpcodeMap[0x92]();
+function RES2D(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x92](cpu, memory);
   return 8;
 }
 
@@ -4468,8 +4470,8 @@ function RES2D(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES2E(): byte {
-  OpcodeMap[0x93]();
+function RES2E(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x93](cpu, memory);
   return 8;
 }
 
@@ -4479,8 +4481,8 @@ function RES2E(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES2H(): byte {
-  OpcodeMap[0x94]();
+function RES2H(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x94](cpu, memory);
   return 8;
 }
 
@@ -4490,8 +4492,8 @@ function RES2H(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES2L(): byte {
-  OpcodeMap[0x95]();
+function RES2L(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x95](cpu, memory);
   return 8;
 }
 
@@ -4501,8 +4503,8 @@ function RES2L(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES2HL(): byte {
-  OpcodeMap[0x96]();
+function RES2HL(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x96](cpu, memory);
   return 16;
 }
 
@@ -4512,8 +4514,8 @@ function RES2HL(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES2A(): byte {
-  OpcodeMap[0x97]();
+function RES2A(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x97](cpu, memory);
   return 8;
 }
 
@@ -4523,8 +4525,8 @@ function RES2A(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES3B(): byte {
-  OpcodeMap[0x98]();
+function RES3B(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x98](cpu, memory);
   return 8;
 }
 
@@ -4534,8 +4536,8 @@ function RES3B(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES3C(): byte {
-  OpcodeMap[0x99]();
+function RES3C(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x99](cpu, memory);
   return 8;
 }
 
@@ -4545,8 +4547,8 @@ function RES3C(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES3D(): byte {
-  OpcodeMap[0x9a]();
+function RES3D(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x9a](cpu, memory);
   return 8;
 }
 
@@ -4556,8 +4558,8 @@ function RES3D(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES3E(): byte {
-  OpcodeMap[0x9b]();
+function RES3E(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x9b](cpu, memory);
   return 8;
 }
 
@@ -4567,8 +4569,8 @@ function RES3E(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES3H(): byte {
-  OpcodeMap[0x9c]();
+function RES3H(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x9c](cpu, memory);
   return 8;
 }
 
@@ -4578,8 +4580,8 @@ function RES3H(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES3L(): byte {
-  OpcodeMap[0x9d]();
+function RES3L(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x9d](cpu, memory);
   return 8;
 }
 
@@ -4589,8 +4591,8 @@ function RES3L(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES3HL(): byte {
-  OpcodeMap[0x9e]();
+function RES3HL(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x9e](cpu, memory);
   return 16;
 }
 
@@ -4600,8 +4602,8 @@ function RES3HL(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES3A(): byte {
-  OpcodeMap[0x9f]();
+function RES3A(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0x9f](cpu, memory);
   return 8;
 }
 
@@ -4611,8 +4613,8 @@ function RES3A(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES4B(): byte {
-  OpcodeMap[0xa0]();
+function RES4B(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xa0](cpu, memory);
   return 8;
 }
 
@@ -4622,8 +4624,8 @@ function RES4B(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES4C(): byte {
-  OpcodeMap[0xa1]();
+function RES4C(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xa1](cpu, memory);
   return 8;
 }
 
@@ -4633,8 +4635,8 @@ function RES4C(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES4D(): byte {
-  OpcodeMap[0xa2]();
+function RES4D(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xa2](cpu, memory);
   return 8;
 }
 
@@ -4644,8 +4646,8 @@ function RES4D(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES4E(): byte {
-  OpcodeMap[0xa3]();
+function RES4E(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xa3](cpu, memory);
   return 8;
 }
 
@@ -4655,8 +4657,8 @@ function RES4E(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES4H(): byte {
-  OpcodeMap[0xa4]();
+function RES4H(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xa4](cpu, memory);
   return 8;
 }
 
@@ -4666,8 +4668,8 @@ function RES4H(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES4L(): byte {
-  OpcodeMap[0xa5]();
+function RES4L(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xa5](cpu, memory);
   return 8;
 }
 
@@ -4677,8 +4679,8 @@ function RES4L(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES4HL(): byte {
-  OpcodeMap[0xa6]();
+function RES4HL(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xa6](cpu, memory);
   return 16;
 }
 
@@ -4688,8 +4690,8 @@ function RES4HL(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES4A(): byte {
-  OpcodeMap[0xa7]();
+function RES4A(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xa7](cpu, memory);
   return 8;
 }
 
@@ -4699,8 +4701,8 @@ function RES4A(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES5B(): byte {
-  OpcodeMap[0xa8]();
+function RES5B(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xa8](cpu, memory);
   return 8;
 }
 
@@ -4710,8 +4712,8 @@ function RES5B(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES5C(): byte {
-  OpcodeMap[0xa9]();
+function RES5C(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xa9](cpu, memory);
   return 8;
 }
 
@@ -4721,8 +4723,8 @@ function RES5C(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES5D(): byte {
-  OpcodeMap[0xaa]();
+function RES5D(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xaa](cpu, memory);
   return 8;
 }
 
@@ -4732,8 +4734,8 @@ function RES5D(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES5E(): byte {
-  OpcodeMap[0xab]();
+function RES5E(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xab](cpu, memory);
   return 8;
 }
 
@@ -4743,8 +4745,8 @@ function RES5E(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES5H(): byte {
-  OpcodeMap[0xac]();
+function RES5H(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xac](cpu, memory);
   return 8;
 }
 
@@ -4754,8 +4756,8 @@ function RES5H(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES5L(): byte {
-  OpcodeMap[0xad]();
+function RES5L(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xad](cpu, memory);
   return 8;
 }
 
@@ -4765,8 +4767,8 @@ function RES5L(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES5HL(): byte {
-  OpcodeMap[0xae]();
+function RES5HL(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xae](cpu, memory);
   return 16;
 }
 
@@ -4776,8 +4778,8 @@ function RES5HL(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES5A(): byte {
-  OpcodeMap[0xaf]();
+function RES5A(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xaf](cpu, memory);
   return 8;
 }
 
@@ -4787,8 +4789,8 @@ function RES5A(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES6B(): byte {
-  OpcodeMap[0xb0]();
+function RES6B(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xb0](cpu, memory);
   return 8;
 }
 
@@ -4798,8 +4800,8 @@ function RES6B(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES6C(): byte {
-  OpcodeMap[0xb1]();
+function RES6C(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xb1](cpu, memory);
   return 8;
 }
 
@@ -4809,8 +4811,8 @@ function RES6C(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES6D(): byte {
-  OpcodeMap[0xb2]();
+function RES6D(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xb2](cpu, memory);
   return 8;
 }
 
@@ -4820,8 +4822,8 @@ function RES6D(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES6E(): byte {
-  OpcodeMap[0xb3]();
+function RES6E(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xb3](cpu, memory);
   return 8;
 }
 
@@ -4831,8 +4833,8 @@ function RES6E(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES6H(): byte {
-  OpcodeMap[0xb4]();
+function RES6H(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xb4](cpu, memory);
   return 8;
 }
 
@@ -4842,8 +4844,8 @@ function RES6H(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES6L(): byte {
-  OpcodeMap[0xb5]();
+function RES6L(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xb5](cpu, memory);
   return 8;
 }
 
@@ -4853,8 +4855,8 @@ function RES6L(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES6HL(): byte {
-  OpcodeMap[0xb6]();
+function RES6HL(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xb6](cpu, memory);
   return 16;
 }
 
@@ -4864,8 +4866,8 @@ function RES6HL(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES6A(): byte {
-  OpcodeMap[0xb7]();
+function RES6A(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xb7](cpu, memory);
   return 8;
 }
 
@@ -4875,8 +4877,8 @@ function RES6A(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES7B(): byte {
-  OpcodeMap[0xb8]();
+function RES7B(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xb8](cpu, memory);
   return 8;
 }
 
@@ -4886,8 +4888,8 @@ function RES7B(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES7C(): byte {
-  OpcodeMap[0xb9]();
+function RES7C(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xb9](cpu, memory);
   return 8;
 }
 
@@ -4897,8 +4899,8 @@ function RES7C(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES7D(): byte {
-  OpcodeMap[0xba]();
+function RES7D(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xba](cpu, memory);
   return 8;
 }
 
@@ -4908,8 +4910,8 @@ function RES7D(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES7E(): byte {
-  OpcodeMap[0xbb]();
+function RES7E(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xbb](cpu, memory);
   return 8;
 }
 
@@ -4919,8 +4921,8 @@ function RES7E(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES7H(): byte {
-  OpcodeMap[0xbc]();
+function RES7H(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xbc](cpu, memory);
   return 8;
 }
 
@@ -4930,8 +4932,8 @@ function RES7H(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES7L(): byte {
-  OpcodeMap[0xbd]();
+function RES7L(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xbd](cpu, memory);
   return 8;
 }
 
@@ -4941,8 +4943,8 @@ function RES7L(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES7HL(): byte {
-  OpcodeMap[0xbe]();
+function RES7HL(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xbe](cpu, memory);
   return 16;
 }
 
@@ -4952,8 +4954,8 @@ function RES7HL(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function RES7A(): byte {
-  OpcodeMap[0xbf]();
+function RES7A(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xbf](cpu, memory);
   return 8;
 }
 
@@ -4963,8 +4965,8 @@ function RES7A(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET0B(): byte {
-  OpcodeMap[0xc0]();
+function SET0B(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xc0](cpu, memory);
   return 8;
 }
 
@@ -4974,8 +4976,8 @@ function SET0B(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET0C(): byte {
-  OpcodeMap[0xc1]();
+function SET0C(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xc1](cpu, memory);
   return 8;
 }
 
@@ -4985,8 +4987,8 @@ function SET0C(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET0D(): byte {
-  OpcodeMap[0xc2]();
+function SET0D(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xc2](cpu, memory);
   return 8;
 }
 
@@ -4996,8 +4998,8 @@ function SET0D(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET0E(): byte {
-  OpcodeMap[0xc3]();
+function SET0E(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xc3](cpu, memory);
   return 8;
 }
 
@@ -5007,8 +5009,8 @@ function SET0E(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET0H(): byte {
-  OpcodeMap[0xc4]();
+function SET0H(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xc4](cpu, memory);
   return 8;
 }
 
@@ -5018,8 +5020,8 @@ function SET0H(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET0L(): byte {
-  OpcodeMap[0xc5]();
+function SET0L(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xc5](cpu, memory);
   return 8;
 }
 
@@ -5029,8 +5031,8 @@ function SET0L(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET0HL(): byte {
-  OpcodeMap[0xc6]();
+function SET0HL(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xc6](cpu, memory);
   return 16;
 }
 
@@ -5040,8 +5042,8 @@ function SET0HL(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET0A(): byte {
-  OpcodeMap[0xc7]();
+function SET0A(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xc7](cpu, memory);
   return 8;
 }
 
@@ -5051,8 +5053,8 @@ function SET0A(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET1B(): byte {
-  OpcodeMap[0xc8]();
+function SET1B(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xc8](cpu, memory);
   return 8;
 }
 
@@ -5062,8 +5064,8 @@ function SET1B(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET1C(): byte {
-  OpcodeMap[0xc9]();
+function SET1C(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xc9](cpu, memory);
   return 8;
 }
 
@@ -5073,8 +5075,8 @@ function SET1C(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET1D(): byte {
-  OpcodeMap[0xca]();
+function SET1D(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xca](cpu, memory);
   return 8;
 }
 
@@ -5084,8 +5086,8 @@ function SET1D(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET1E(): byte {
-  OpcodeMap[0xcb]();
+function SET1E(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xcb](cpu, memory);
   return 8;
 }
 
@@ -5095,8 +5097,8 @@ function SET1E(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET1H(): byte {
-  OpcodeMap[0xcc]();
+function SET1H(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xcc](cpu, memory);
   return 8;
 }
 
@@ -5106,8 +5108,8 @@ function SET1H(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET1L(): byte {
-  OpcodeMap[0xcd]();
+function SET1L(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xcd](cpu, memory);
   return 8;
 }
 
@@ -5117,8 +5119,8 @@ function SET1L(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET1HL(): byte {
-  OpcodeMap[0xce]();
+function SET1HL(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xce](cpu, memory);
   return 16;
 }
 
@@ -5128,8 +5130,8 @@ function SET1HL(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET1A(): byte {
-  OpcodeMap[0xcf]();
+function SET1A(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xcf](cpu, memory);
   return 8;
 }
 
@@ -5139,8 +5141,8 @@ function SET1A(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET2B(): byte {
-  OpcodeMap[0xd0]();
+function SET2B(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xd0](cpu, memory);
   return 8;
 }
 
@@ -5150,8 +5152,8 @@ function SET2B(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET2C(): byte {
-  OpcodeMap[0xd1]();
+function SET2C(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xd1](cpu, memory);
   return 8;
 }
 
@@ -5161,8 +5163,8 @@ function SET2C(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET2D(): byte {
-  OpcodeMap[0xd2]();
+function SET2D(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xd2](cpu, memory);
   return 8;
 }
 
@@ -5172,8 +5174,8 @@ function SET2D(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET2E(): byte {
-  OpcodeMap[0xd3]();
+function SET2E(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xd3](cpu, memory);
   return 8;
 }
 
@@ -5183,8 +5185,8 @@ function SET2E(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET2H(): byte {
-  OpcodeMap[0xd4]();
+function SET2H(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xd4](cpu, memory);
   return 8;
 }
 
@@ -5194,8 +5196,8 @@ function SET2H(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET2L(): byte {
-  OpcodeMap[0xd5]();
+function SET2L(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xd5](cpu, memory);
   return 8;
 }
 
@@ -5205,8 +5207,8 @@ function SET2L(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET2HL(): byte {
-  OpcodeMap[0xd6]();
+function SET2HL(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xd6](cpu, memory);
   return 16;
 }
 
@@ -5216,8 +5218,8 @@ function SET2HL(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET2A(): byte {
-  OpcodeMap[0xd7]();
+function SET2A(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xd7](cpu, memory);
   return 8;
 }
 
@@ -5227,8 +5229,8 @@ function SET2A(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET3B(): byte {
-  OpcodeMap[0xd8]();
+function SET3B(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xd8](cpu, memory);
   return 8;
 }
 
@@ -5238,8 +5240,8 @@ function SET3B(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET3C(): byte {
-  OpcodeMap[0xd9]();
+function SET3C(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xd9](cpu, memory);
   return 8;
 }
 
@@ -5249,8 +5251,8 @@ function SET3C(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET3D(): byte {
-  OpcodeMap[0xda]();
+function SET3D(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xda](cpu, memory);
   return 8;
 }
 
@@ -5260,8 +5262,8 @@ function SET3D(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET3E(): byte {
-  OpcodeMap[0xdb]();
+function SET3E(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xdb](cpu, memory);
   return 8;
 }
 
@@ -5271,8 +5273,8 @@ function SET3E(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET3H(): byte {
-  OpcodeMap[0xdc]();
+function SET3H(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xdc](cpu, memory);
   return 8;
 }
 
@@ -5282,8 +5284,8 @@ function SET3H(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET3L(): byte {
-  OpcodeMap[0xdd]();
+function SET3L(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xdd](cpu, memory);
   return 8;
 }
 
@@ -5293,8 +5295,8 @@ function SET3L(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET3HL(): byte {
-  OpcodeMap[0xde]();
+function SET3HL(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xde](cpu, memory);
   return 16;
 }
 
@@ -5304,8 +5306,8 @@ function SET3HL(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET3A(): byte {
-  OpcodeMap[0xdf]();
+function SET3A(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xdf](cpu, memory);
   return 8;
 }
 
@@ -5315,8 +5317,8 @@ function SET3A(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET4B(): byte {
-  OpcodeMap[0xe0]();
+function SET4B(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xe0](cpu, memory);
   return 8;
 }
 
@@ -5326,8 +5328,8 @@ function SET4B(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET4C(): byte {
-  OpcodeMap[0xe1]();
+function SET4C(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xe1](cpu, memory);
   return 8;
 }
 
@@ -5337,8 +5339,8 @@ function SET4C(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET4D(): byte {
-  OpcodeMap[0xe2]();
+function SET4D(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xe2](cpu, memory);
   return 8;
 }
 
@@ -5348,8 +5350,8 @@ function SET4D(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET4E(): byte {
-  OpcodeMap[0xe3]();
+function SET4E(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xe3](cpu, memory);
   return 8;
 }
 
@@ -5359,8 +5361,8 @@ function SET4E(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET4H(): byte {
-  OpcodeMap[0xe4]();
+function SET4H(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xe4](cpu, memory);
   return 8;
 }
 
@@ -5370,8 +5372,8 @@ function SET4H(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET4L(): byte {
-  OpcodeMap[0xe5]();
+function SET4L(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xe5](cpu, memory);
   return 8;
 }
 
@@ -5381,8 +5383,8 @@ function SET4L(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET4HL(): byte {
-  OpcodeMap[0xe6]();
+function SET4HL(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xe6](cpu, memory);
   return 16;
 }
 
@@ -5392,8 +5394,8 @@ function SET4HL(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET4A(): byte {
-  OpcodeMap[0xe7]();
+function SET4A(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xe7](cpu, memory);
   return 8;
 }
 
@@ -5403,8 +5405,8 @@ function SET4A(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET5B(): byte {
-  OpcodeMap[0xe8]();
+function SET5B(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xe8](cpu, memory);
   return 8;
 }
 
@@ -5414,8 +5416,8 @@ function SET5B(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET5C(): byte {
-  OpcodeMap[0xe9]();
+function SET5C(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xe9](cpu, memory);
   return 8;
 }
 
@@ -5425,8 +5427,8 @@ function SET5C(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET5D(): byte {
-  OpcodeMap[0xea]();
+function SET5D(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xea](cpu, memory);
   return 8;
 }
 
@@ -5436,8 +5438,8 @@ function SET5D(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET5E(): byte {
-  OpcodeMap[0xeb]();
+function SET5E(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xeb](cpu, memory);
   return 8;
 }
 
@@ -5447,8 +5449,8 @@ function SET5E(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET5H(): byte {
-  OpcodeMap[0xec]();
+function SET5H(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xec](cpu, memory);
   return 8;
 }
 
@@ -5458,8 +5460,8 @@ function SET5H(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET5L(): byte {
-  OpcodeMap[0xed]();
+function SET5L(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xed](cpu, memory);
   return 8;
 }
 
@@ -5469,8 +5471,8 @@ function SET5L(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET5HL(): byte {
-  OpcodeMap[0xee]();
+function SET5HL(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xee](cpu, memory);
   return 16;
 }
 
@@ -5480,8 +5482,8 @@ function SET5HL(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET5A(): byte {
-  OpcodeMap[0xef]();
+function SET5A(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xef](cpu, memory);
   return 8;
 }
 
@@ -5491,8 +5493,8 @@ function SET5A(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET6B(): byte {
-  OpcodeMap[0xf0]();
+function SET6B(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xf0](cpu, memory);
   return 8;
 }
 
@@ -5502,8 +5504,8 @@ function SET6B(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET6C(): byte {
-  OpcodeMap[0xf1]();
+function SET6C(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xf1](cpu, memory);
   return 8;
 }
 
@@ -5513,8 +5515,8 @@ function SET6C(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET6D(): byte {
-  OpcodeMap[0xf2]();
+function SET6D(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xf2](cpu, memory);
   return 8;
 }
 
@@ -5524,8 +5526,8 @@ function SET6D(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET6E(): byte {
-  OpcodeMap[0xf3]();
+function SET6E(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xf3](cpu, memory);
   return 8;
 }
 
@@ -5535,8 +5537,8 @@ function SET6E(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET6H(): byte {
-  OpcodeMap[0xf4]();
+function SET6H(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xf4](cpu, memory);
   return 8;
 }
 
@@ -5546,8 +5548,8 @@ function SET6H(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET6L(): byte {
-  OpcodeMap[0xf5]();
+function SET6L(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xf5](cpu, memory);
   return 8;
 }
 
@@ -5557,8 +5559,8 @@ function SET6L(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET6HL(): byte {
-  OpcodeMap[0xf6]();
+function SET6HL(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xf6](cpu, memory);
   return 16;
 }
 
@@ -5568,8 +5570,8 @@ function SET6HL(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET6A(): byte {
-  OpcodeMap[0xf7]();
+function SET6A(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xf7](cpu, memory);
   return 8;
 }
 
@@ -5579,8 +5581,8 @@ function SET6A(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET7B(): byte {
-  OpcodeMap[0xf8]();
+function SET7B(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xf8](cpu, memory);
   return 8;
 }
 
@@ -5590,8 +5592,8 @@ function SET7B(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET7C(): byte {
-  OpcodeMap[0xf9]();
+function SET7C(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xf9](cpu, memory);
   return 8;
 }
 
@@ -5601,8 +5603,8 @@ function SET7C(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET7D(): byte {
-  OpcodeMap[0xfa]();
+function SET7D(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xfa](cpu, memory);
   return 8;
 }
 
@@ -5612,8 +5614,8 @@ function SET7D(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET7E(): byte {
-  OpcodeMap[0xfb]();
+function SET7E(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xfb](cpu, memory);
   return 8;
 }
 
@@ -5623,8 +5625,8 @@ function SET7E(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET7H(): byte {
-  OpcodeMap[0xfc]();
+function SET7H(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xfc](cpu, memory);
   return 8;
 }
 
@@ -5634,8 +5636,8 @@ function SET7H(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET7L(): byte {
-  OpcodeMap[0xfd]();
+function SET7L(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xfd](cpu, memory);
   return 8;
 }
 
@@ -5645,8 +5647,8 @@ function SET7L(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET7HL(): byte {
-  OpcodeMap[0xfe]();
+function SET7HL(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xfe](cpu, memory);
   return 16;
 }
 
@@ -5656,8 +5658,8 @@ function SET7HL(): byte {
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags:
  */
-function SET7A(): byte {
-  OpcodeMap[0xff]();
+function SET7A(cpu: CPU, memory: Memory): byte {
+  OpcodeMap[0xff](cpu, memory);
   return 8;
 }
 

@@ -1,168 +1,115 @@
-import {instructionHelpers as helpers} from './Map';
 import CPU from '../';
-import Flag from '../Flag';
-import {lower} from '../../../Types';
+import {instructionHelpers as helpers} from './Map';
 
 describe('helper functions', () => {
-  describe('flags', () => {
-    beforeEach(() => (CPU.r.af = 0));
-    it('sets/unsets/gets the z flag', () => {
-      helpers.setZFlag(1);
-      expect(CPU.r.af).toBe(128);
-
-      expect(helpers.getZFlag()).toBe(1);
-
-      helpers.setZFlag(0);
-      expect(CPU.r.af).toBe(0);
-    });
-    it('sets/unsets/gets the cy flag', () => {
-      helpers.setCYFlag(1);
-      expect(CPU.r.af).toBe(16);
-
-      expect(helpers.getCYFlag()).toBe(1);
-
-      helpers.setCYFlag(0);
-      expect(CPU.r.af).toBe(0);
-    });
-    it('sets/unsets/gets the h flag', () => {
-      helpers.setHFlag(1);
-      expect(CPU.r.af).toBe(32);
-
-      expect(helpers.getHFlag()).toBe(1);
-
-      helpers.setHFlag(0);
-      expect(CPU.r.af).toBe(0);
-    });
-    it('sets/unsets/gets the n flag', () => {
-      helpers.setNFlag(1);
-      expect(CPU.r.af).toBe(64);
-
-      expect(helpers.getNFlag()).toBe(1);
-
-      helpers.setNFlag(0);
-      expect(CPU.r.af).toBe(0);
-    });
+  const cpu = new CPU();
+  beforeEach(() => {
+    cpu.reset();
   });
-  describe('half carry', () => {
-    beforeEach(() => (CPU.r.af = 0));
-    it('checks half carry on addition ops', () => {
-      helpers.checkHalfCarry(62, 34);
-      expect(new Flag(lower(CPU.r.af)).h).toBe(1);
-      helpers.checkHalfCarry(61, 34);
-      expect(new Flag(lower(CPU.r.af)).h).toBe(0);
-    });
-    it('checks for half carry on subtraction ops', () => {
-      helpers.checkHalfCarry(11, 15, true);
-      expect(new Flag(lower(CPU.r.af)).h).toBe(1);
-      helpers.checkHalfCarry(11, 9, true);
-      expect(new Flag(lower(CPU.r.af)).h).toBe(0);
-    });
-  });
-
   describe('rotate instructions', () => {
     const checkFlags = () => {
-      expect(helpers.getZFlag()).toBe(0);
-      expect(helpers.getNFlag()).toBe(0);
-      expect(helpers.getHFlag()).toBe(0);
+      expect(cpu.getZFlag()).toBe(0);
+      expect(cpu.getNFlag()).toBe(0);
+      expect(cpu.getHFlag()).toBe(0);
     };
     describe('rotate left', () => {
-      beforeEach(() => (CPU.r.af = 0));
+      beforeEach(() => (cpu.r.af = 0));
       it('rotates a register left', () => {
         const reg = 0b00000001;
         const expected = 0b00000010;
-        expect(helpers.RLCn(reg)).toBe(expected);
-        expect(helpers.getCYFlag()).toBe(0);
+        expect(helpers.RLCn(cpu, reg)).toBe(expected);
+        expect(cpu.getCYFlag()).toBe(0);
         checkFlags();
       });
       it('rotates a register left and sets CY', () => {
         const reg = 0b10000001;
         const expected = 0b00000011;
-        expect(helpers.RLCn(reg)).toBe(expected);
-        expect(helpers.getCYFlag()).toBe(1);
+        expect(helpers.RLCn(cpu, reg)).toBe(expected);
+        expect(cpu.getCYFlag()).toBe(1);
         checkFlags();
       });
       describe('through carry', () => {
         it('rotates a register left when CY is not set, and sets CY', () => {
           const reg = 0b10000001;
-          helpers.setCYFlag(0);
+          cpu.setCYFlag(0);
           const expected = 0b00000010;
-          expect(helpers.RLn(reg)).toBe(expected);
-          expect(helpers.getCYFlag()).toBe(1);
+          expect(helpers.RLn(cpu, reg)).toBe(expected);
+          expect(cpu.getCYFlag()).toBe(1);
           checkFlags();
         });
         it('rotates a register left when CY is not set', () => {
           const reg = 0b00000001;
-          helpers.setCYFlag(0);
+          cpu.setCYFlag(0);
           const expected = 0b00000010;
-          expect(helpers.RLn(reg)).toBe(expected);
-          expect(helpers.getCYFlag()).toBe(0);
+          expect(helpers.RLn(cpu, reg)).toBe(expected);
+          expect(cpu.getCYFlag()).toBe(0);
           checkFlags();
         });
         it('rotates a register left when CY is set, and sets CY', () => {
           const reg = 0b10000001;
-          helpers.setCYFlag(1);
+          cpu.setCYFlag(1);
           const expected = 0b00000011;
-          expect(helpers.RLn(reg)).toBe(expected);
-          expect(helpers.getCYFlag()).toBe(1);
+          expect(helpers.RLn(cpu, reg)).toBe(expected);
+          expect(cpu.getCYFlag()).toBe(1);
           checkFlags();
         });
         it('rotates a register left when CY is set', () => {
           const reg = 0b00000001;
-          helpers.setCYFlag(1);
+          cpu.setCYFlag(1);
           const expected = 0b00000011;
-          expect(helpers.RLn(reg)).toBe(expected);
-          expect(helpers.getCYFlag()).toBe(0);
+          expect(helpers.RLn(cpu, reg)).toBe(expected);
+          expect(cpu.getCYFlag()).toBe(0);
           checkFlags();
         });
       });
     });
     describe('rotate right', () => {
-      beforeEach(() => (CPU.r.af = 0));
+      beforeEach(() => (cpu.r.af = 0));
       it('rotates a register right', () => {
         const reg = 0b00000010;
         const expected = 0b00000001;
-        expect(helpers.RRCn(reg)).toBe(expected);
-        expect(helpers.getCYFlag()).toBe(0);
+        expect(helpers.RRCn(cpu, reg)).toBe(expected);
+        expect(cpu.getCYFlag()).toBe(0);
         checkFlags();
       });
       it('rotates a register right and sets CY', () => {
         const reg = 0b00000001;
         const expected = 0b10000000;
-        expect(helpers.RRCn(reg)).toBe(expected);
-        expect(helpers.getCYFlag()).toBe(1);
+        expect(helpers.RRCn(cpu, reg)).toBe(expected);
+        expect(cpu.getCYFlag()).toBe(1);
         checkFlags();
       });
       describe('through carry', () => {
         it('rotates a register right when CY is not set, and sets CY', () => {
           const reg = 0b10000001;
-          helpers.setCYFlag(0);
+          cpu.setCYFlag(0);
           const expected = 0b01000000;
-          expect(helpers.RRn(reg)).toBe(expected);
-          expect(helpers.getCYFlag()).toBe(1);
+          expect(helpers.RRn(cpu, reg)).toBe(expected);
+          expect(cpu.getCYFlag()).toBe(1);
           checkFlags();
         });
         it('rotates a register right when CY is not set', () => {
           const reg = 0b10000010;
-          helpers.setCYFlag(0);
+          cpu.setCYFlag(0);
           const expected = 0b01000001;
-          expect(helpers.RRn(reg)).toBe(expected);
-          expect(helpers.getCYFlag()).toBe(0);
+          expect(helpers.RRn(cpu, reg)).toBe(expected);
+          expect(cpu.getCYFlag()).toBe(0);
           checkFlags();
         });
         it('rotates a register right when CY is set', () => {
           const reg = 0b10000010;
-          helpers.setCYFlag(1);
+          cpu.setCYFlag(1);
           const expected = 0b11000001;
-          expect(helpers.RRn(reg)).toBe(expected);
-          expect(helpers.getCYFlag()).toBe(0);
+          expect(helpers.RRn(cpu, reg)).toBe(expected);
+          expect(cpu.getCYFlag()).toBe(0);
           checkFlags();
         });
         it('rotates a register right when CY is set, and sets CY', () => {
           const reg = 0b10000001;
-          helpers.setCYFlag(1);
+          cpu.setCYFlag(1);
           const expected = 0b11000000;
-          expect(helpers.RRn(reg)).toBe(expected);
-          expect(helpers.getCYFlag()).toBe(1);
+          expect(helpers.RRn(cpu, reg)).toBe(expected);
+          expect(cpu.getCYFlag()).toBe(1);
           checkFlags();
         });
       });

@@ -1,18 +1,4 @@
-import {
-  byte,
-  word,
-  toByte,
-  addByte,
-  toWord,
-  upper,
-  lower,
-  setUpper,
-  setLower,
-  addWord,
-  addUpper,
-  addLower,
-  toSigned,
-} from './Types';
+import {toSigned, toWord, word} from './helpers/Primitives';
 
 describe('Primitive types', () => {
   it('creates valid words/bytes', () => {
