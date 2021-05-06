@@ -14,8 +14,8 @@ Currently developing a Game Boy emulator using TypeScript. I'm referencing many 
 
 ## Features
 
-- [x] WebGL 2.0 based
-- [ ] Basic ROM support
+- [x] Canvas API based
+- [x] Basic ROM support
 - [ ] Remappable keyboard input
 - [ ] Sound
 - [ ] Support for loading/saving states on server
@@ -26,13 +26,8 @@ Currently developing a Game Boy emulator using TypeScript. I'm referencing many 
 
 ## Installing Dependencies
 
-This emulator should run on any modern browser with WebGL 2.0 support, install command:
-
-```sh
-npm i
-```
+This emulator should run on any modern browser with WebGL support, install using yarn or npm.
 
 ## Usage
 
-- Start the server using `npm start`
-- Build for development using `npm run build-dev`
+Check `pacakge.json` for available commands.
