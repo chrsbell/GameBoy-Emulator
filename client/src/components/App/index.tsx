@@ -2,7 +2,7 @@ import * as React from 'react';
 import {useEffect, useReducer, useRef} from 'react';
 import CanvasRenderer from '../CanvasRenderer';
 import Emulator from '../Emulator';
-import type {Action, AppContext, AppState} from './AppTypes';
+import type {Action, AppContext, AppState} from './types';
 import Wrapper from './Wrapper';
 
 const initialState: AppState = {
@@ -40,15 +40,14 @@ const App: React.FC = () => {
   const emulator = useRef(new Emulator());
 
   useEffect(() => {
-    const {parsedROM, parsedBIOS} = appState;
-    if (parsedROM.length) {
-      emulator.current.load(parsedBIOS, parsedROM);
+    if (appState.parsedROM.length) {
+      emulator.current.load(appState.parsedBIOS, appState.parsedROM);
     }
-  }, [appState]);
+  }, [appState.parsedROM, appState.parsedBIOS]);
 
   useEffect(() => {
     if (appState.canvas && !CanvasRenderer.initialized) {
-      CanvasRenderer.initialize(appState.canvas, Math.round(787 / 160));
+      CanvasRenderer.initialize(appState.canvas);
     }
   }, [appState.canvas]);
 

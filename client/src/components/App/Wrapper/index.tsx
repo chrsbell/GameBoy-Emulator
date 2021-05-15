@@ -1,8 +1,8 @@
 import * as React from 'react';
 import {useEffect, useRef, useState} from 'react';
-import {DEBUG} from '../../helpers/Debug';
-import type {AppContext} from './AppTypes';
-import './styles.scss';
+import {DEBUG} from '../../../helpers/Debug';
+import styles from '../../../sass/index.module.scss';
+import type {AppContext} from '../types';
 
 const Wrapper: React.FC<AppContext> = ({appDispatch}) => {
   const canvasRef: React.MutableRefObject<HTMLCanvasElement> = useRef(null!);
@@ -36,8 +36,8 @@ const Wrapper: React.FC<AppContext> = ({appDispatch}) => {
 
   return (
     <>
-      <section className="container">
-        <div className="flex-column">
+      <section className={styles['container']}>
+        <div className={styles['flex-column']}>
           <nav>
             <button
               onClick={() => {
@@ -69,9 +69,21 @@ const Wrapper: React.FC<AppContext> = ({appDispatch}) => {
               Upload
             </button>
           </nav>
-          <div id="canvas" />
-          {/* Use a LCD size similar to GameBoy's */}
-          <canvas width="787" height="720" ref={canvasRef} />
+          <div className={styles['shell']}>
+            <div className={styles['shell-half']}>
+              <div className={styles['power']} />
+              <div className={styles['display']}>
+                <canvas
+                  width={styles['canvasWidth']}
+                  height={styles['canvasHeight']}
+                  ref={canvasRef}
+                />
+              </div>
+            </div>
+            <div className={styles['shell-half']}>
+              <div className={styles.controls} />
+            </div>
+          </div>
         </div>
       </section>
     </>

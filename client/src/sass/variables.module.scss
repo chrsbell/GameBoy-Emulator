@@ -1,0 +1,11 @@
+$lcd-width: 160px;
+$lcd-height: 144px;
+$base-line: $lcd-width / 43;
+$base-unit: $base-line;
+$shell-width: $base-unit * 78;
+$shell-height: $base-unit * 133.5;
+$screen-width: $base-unit * 70;
+$screen-height: $base-unit * 58.42;
+
+$base-color: rgb(14, 14, 14);
+$shell-color: rebeccapurple;

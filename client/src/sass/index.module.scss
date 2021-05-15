@@ -1,0 +1,86 @@
+@import './variables.module.scss';
+
+$screen-offset: calc(#{$screen-height} - #{$lcd-height});
+
+body {
+  background-color: #111111;
+}
+
+.shell {
+  width: $shell-width;
+  height: $shell-height;
+  background-color: $shell-color;
+  border-radius: #{($base-unit * 3)} #{($base-unit * 3)} #{($base-unit * 30)} #{(
+      $base-unit * 30
+    )} / #{($base-unit * 3)} #{($base-unit * 3)} #{($base-unit * 10)} #{(
+      $base-unit * 10
+    )};
+  display: flex;
+  flex-direction: column;
+
+  // clip-path: path('M100,250 C0,300 #{$shell-width},300 400,250');
+
+  > .shell-half {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+
+    > .display {
+      box-sizing: border-box;
+      margin: ($shell-width - $screen-width)/2 0 0 0;
+      width: $screen-width;
+      height: $screen-height;
+      background-color: $base-color;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: $base-unit * 2;
+
+      > .power {
+        display: inline;
+        position: absolute;
+      }
+    }
+
+    > .controls {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+    }
+  }
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+nav {
+  min-width: $shell-width;
+  margin: $base-unit * 5 0 $base-unit * 5 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
+canvas {
+  background-color: grey;
+  width: $lcd-width;
+  height: $lcd-height;
+}
+
+input {
+  display: none;
+}
+
+:export {
+  canvasWidth: $lcd-width;
+  canvasHeight: $lcd-height;
+}

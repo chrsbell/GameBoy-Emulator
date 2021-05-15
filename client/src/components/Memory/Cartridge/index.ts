@@ -1,7 +1,7 @@
-import type {byte, word} from '../../../helpers/Primitives';
 import {DEBUG} from '../../../helpers/Debug';
+import type {byte, word} from '../../../helpers/Primitives';
 import Memory from '../index';
-import {CartridgeTypes, ROMSizeCodeMap, RAMSizeCodeMap} from './const';
+import {CartridgeTypes, RAMSizeCodeMap, ROMSizeCodeMap} from './const';
 
 abstract class Cartridge {
   // entire cartridge ROM
@@ -19,7 +19,7 @@ abstract class Cartridge {
   public currROMBank: byte = 1;
   // current RAM bank (1 bank for RAM with 2kB-8kB sizes)
   public currRAMBank: byte = 1;
-  private mbcType: number = 0;
+  public mbcType: number;
 
   public constructor(
     memory: Memory,

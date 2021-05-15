@@ -248,8 +248,9 @@ const OpcodeMap: OpcodeList = {
   },
 
   0x10: function (cpu: CPU, memory: Memory): void {
-    // console.log('Instruction halted.');
-    // throw new Error();
+    cpu.halted = true;
+    console.log('Instruction halted.');
+    throw new Error();
   },
 
   0x11: function (cpu: CPU, memory: Memory): void {

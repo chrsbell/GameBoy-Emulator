@@ -1,3 +1,5 @@
+import {forEach} from 'lodash';
+
 interface benchmarkTimes {
   // the context
   [key: string]: {
@@ -12,7 +14,18 @@ interface benchmarkTimes {
 
 const times: benchmarkTimes = {};
 
-const getBenchmarks = () => times;
+/**
+ * Utility function to benchmark the emulator.
+ */
+const logBenchmarks = (): void => {
+  forEach(times, (functions: any, group: any) => {
+    console.log(
+      `%cPerformance of ${group}:`,
+      'color:#8217ab; font-weight: bold'
+    );
+    console.table(functions);
+  });
+};
 
 const benchmark = (func: Function, context: any = null) => {
   const className = context ? context.constructor.name : 'Helpers';
@@ -47,4 +60,4 @@ const benchmark = (func: Function, context: any = null) => {
 const benchmarksEnabled = true;
 
 export default benchmark;
-export {getBenchmarks, benchmarksEnabled};
+export {logBenchmarks, benchmarksEnabled};

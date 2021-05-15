@@ -151,22 +151,21 @@ class CPU {
   public executeInstruction(memory: Memory): number {
     // fetch
     const opcode: byte = memory.readByte(this.pc);
-    if (opcode === undefined) debugger;
     this.addCalledInstruction(toHex(opcode));
     this.pc += 1;
     // execute
+    let numCycles: number;
     if (memory.inBios) {
-      const numCycles: number = this.opcodes[opcode](this, memory);
+      numCycles = this.opcodes[opcode](this, memory);
       // check if finished bios execution
       if (!memory.inBios) {
         DEBUG && console.log('Exiting bios from this.');
         this.initPowerSequence(memory);
       }
-      return numCycles;
     } else {
-      const numCycles: number = this.opcodes[opcode](this, memory);
-      return numCycles;
+      numCycles = this.opcodes[opcode](this, memory);
     }
+    return numCycles;
   }
   public addCalledInstruction(opcode: string): void {
     this.lastExecuted.unshift(opcode);
@@ -307,7 +306,7 @@ class CPU {
         this.setCYFlag(0);
       }
     } else {
-      if (op1 + op2 > 65535) {
+      if (op1 + op2 > 0xffff) {
         this.setCYFlag(1);
       } else {
         this.setCYFlag(0);
@@ -323,7 +322,7 @@ class CPU {
         this.setCYFlag(0);
       }
     } else {
-      if (op1 + op2 > 255) {
+      if (op1 + op2 > 0xff) {
         this.setCYFlag(1);
       } else {
         this.setCYFlag(0);

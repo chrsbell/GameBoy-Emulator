@@ -1,11 +1,9 @@
 import Cartridge from '../index';
-import {RAMSizeCodeMap} from '../const';
 
 class MBC0 extends Cartridge {
   public initializeBanks(): void {
     this.ramBanks = new Array(1);
-    const ramSize = RAMSizeCodeMap[this.ramSizeCode].size;
-    this.ramBanks[0] = new Uint8Array(ramSize);
+    this.ramBanks[0] = new Uint8Array(0x2000);
     this.romBanks = new Array(1);
     this.romBanks[0] = new Uint8Array(this.rom.slice(0x4000, 0x8000));
   }

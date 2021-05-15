@@ -35,7 +35,7 @@ class CanvasRenderer {
   private image!: ImageData;
   private context!: CanvasRenderingContext2D;
   private _initialized = false;
-  private _colorScheme: ColorScheme = colorSchemes.classic;
+  private _colorScheme: ColorScheme = colorSchemes.default;
   public get colorScheme(): ColorScheme {
     return this._colorScheme;
   }
