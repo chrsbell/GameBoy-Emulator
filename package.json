@@ -9,7 +9,7 @@
   "scripts": {
     "start": "ts-node server/index.ts",
     "build:dev": "npx webpack --mode development --watch",
-    "test": "jest --verbose --silent --watch --coverage",
+    "test": "jest --verbose --watch --coverage",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand --verbose --silent --watch",
     "test:build": "python3 client/test/dump_pyboy.py",
     "lint": "gts lint",

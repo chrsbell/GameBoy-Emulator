@@ -1,6 +1,7 @@
 import {DEBUG} from '../../helpers/Debug';
 import benchmark, {benchmarksEnabled} from '../../helpers/Performance';
 import {
+  bit,
   byte,
   clearBit,
   getBit,
@@ -26,23 +27,23 @@ interface Registers {
 class CPU {
   // number of clock ticks per second
   private _clock = 4194304;
-  public get clock(): number {
+  get clock(): number {
     return this._clock;
   }
   // 16-bit program counter
   private _pc: word = 0;
-  public get pc(): word {
+  get pc(): word {
     return this._pc;
   }
-  public set pc(value: word) {
+  set pc(value: word) {
     this._pc = value;
   }
   // stack pointer
   private _sp: word = 0;
-  public get sp(): word {
+  get sp(): word {
     return this._sp;
   }
-  public set sp(value: word) {
+  set sp(value: word) {
     this._sp = value;
   }
   private _r: Registers = {
@@ -51,29 +52,29 @@ class CPU {
     de: 0,
     hl: 0,
   };
-  public get r(): Registers {
+  get r(): Registers {
     return this._r;
   }
-  public set r(value: Registers) {
+  set r(value: Registers) {
     this._r = value;
   }
   private _halted = false;
-  public get halted(): boolean {
+  get halted(): boolean {
     return this._halted;
   }
-  public set halted(value: boolean) {
+  set halted(value: boolean) {
     this._halted = value;
   }
   private _allInterruptsEnabled = true;
   private opcodes: OpcodeList = Opcodes;
   private _lastExecuted: Array<string> = [];
-  public get lastExecuted(): Array<string> {
+  get lastExecuted(): Array<string> {
     return this._lastExecuted;
   }
-  public set lastExecuted(value: Array<string>) {
+  set lastExecuted(value: Array<string>) {
     this._lastExecuted = value;
   }
-  public constructor() {
+  constructor() {
     if (benchmarksEnabled) {
       this.executeInstruction = benchmark(
         this.executeInstruction.bind(this),
@@ -87,7 +88,7 @@ class CPU {
   /**
    * Resets the this.
    */
-  public reset(): void {
+  public reset = (): void => {
     this.pc = 0;
     this.sp = 0;
     this.halted = false;
@@ -97,15 +98,15 @@ class CPU {
     this.r.de = 0;
     this.r.hl = 0;
     this.lastExecuted = [];
-  }
+  };
 
-  public setInterruptsGlobal(enabled: boolean): void {
+  setInterruptsGlobal(enabled: boolean): void {
     this._allInterruptsEnabled = enabled;
   }
   /**
    * Completes the GB power sequence
    */
-  public initPowerSequence(memory: Memory): void {
+  public initPowerSequence = (memory: Memory): void => {
     this.pc = 0x100;
     this.r.af = 0x01b0;
     this.r.bc = 0x0013;
@@ -143,12 +144,12 @@ class CPU {
     memory.writeByte(0xff4a, 0x00);
     memory.writeByte(0xff4b, 0x00);
     memory.writeByte(0xffff, 0x00);
-  }
+  };
   /**
    * Executes next opcode.
    * @returns {number} the number of CPU cycles required.
    */
-  public executeInstruction(memory: Memory): number {
+  public executeInstruction = (memory: Memory): number => {
     // fetch
     const opcode: byte = memory.readByte(this.pc);
     this.addCalledInstruction(toHex(opcode));
@@ -166,17 +167,17 @@ class CPU {
       numCycles = this.opcodes[opcode](this, memory);
     }
     return numCycles;
-  }
-  public addCalledInstruction(opcode: string): void {
+  };
+  public addCalledInstruction = (opcode: string): void => {
     this.lastExecuted.unshift(opcode);
     if (this.lastExecuted.length > 100) {
       this.lastExecuted.pop();
     }
-  }
+  };
   /**
    * Checks if an interrupt needs to be handled.
    */
-  public checkInterrupts(memory: Memory): void {
+  public checkInterrupts = (memory: Memory): void => {
     if (this._allInterruptsEnabled) {
       const register: byte = memory.readByte(Interrupt.if);
       if (register) {
@@ -189,7 +190,7 @@ class CPU {
         }
       }
     }
-  }
+  };
   /**
    * Handles an interrupt.
    */
@@ -221,65 +222,66 @@ class CPU {
   /**
    * Logs the internal state of the this.
    */
-  public log(): void {
+  public log = (): void => {
     console.log(`JS GB Registers: ${JSON.stringify(this.r)}`);
     console.log(`JS GB PC: ${this.pc}`);
     console.log(`JS GB SP: ${this.sp}`);
-  }
-  public setZFlag(value: byte): void {
+  };
+
+  public setZFlag = (value: byte): void => {
     if (value) {
       this.r.af = setLower(this.r.af, setBit(lower(this.r.af), 7));
     } else {
       this.r.af = setLower(this.r.af, clearBit(lower(this.r.af), 7));
     }
-  }
+  };
 
-  public setCYFlag(value: byte): void {
+  public setCYFlag = (value: byte): void => {
     if (value) {
       this.r.af = setLower(this.r.af, setBit(lower(this.r.af), 4));
     } else {
       this.r.af = setLower(this.r.af, clearBit(lower(this.r.af), 4));
     }
-  }
+  };
 
-  public setHFlag(value: byte): void {
+  public setHFlag = (value: byte): void => {
     if (value === 1) {
       this.r.af = setLower(this.r.af, setBit(lower(this.r.af), 5));
     } else {
       this.r.af = setLower(this.r.af, clearBit(lower(this.r.af), 5));
     }
-  }
+  };
 
-  public setNFlag(value: byte): void {
+  public setNFlag = (value: byte): void => {
     if (value) {
       this.r.af = setLower(this.r.af, setBit(lower(this.r.af), 6));
     } else {
       this.r.af = setLower(this.r.af, clearBit(lower(this.r.af), 6));
     }
-  }
+  };
 
-  public getZFlag(): number {
+  public getZFlag = (): bit => {
     return getBit(lower(this.r.af), 7);
-  }
-  public getCYFlag(): number {
+  };
+  public getCYFlag = (): bit => {
     return getBit(lower(this.r.af), 4);
-  }
-  public getHFlag(): number {
+  };
+  public getHFlag = (): bit => {
     return getBit(lower(this.r.af), 5);
-  }
-  public getNFlag(): number {
+  };
+  public getNFlag = (): bit => {
     return getBit(lower(this.r.af), 6);
-  }
+  };
   /**
    * Sets the Z flag if the register is 0, otherwise resets it.
    */
-  public checkZFlag(reg: byte): void {
+  public checkZFlag = (reg: byte): void => {
     if (!reg) {
       this.setZFlag(1);
     } else {
       this.setZFlag(0);
     }
-  }
+  };
 
   /**
    * Sets the half carry flag if a carry will be generated from bits 3 to 4 of the sum.
@@ -289,16 +291,24 @@ class CPU {
    * https://stackoverflow.com/questions/8868396/game-boy-what-constitutes-a-half-carry
    * https://gbdev.io/gb-opcodes/optables/
    */
-  public checkHalfCarry(op1: byte, op2: byte, subtraction?: boolean): void {
+  public checkHalfCarry = (
+    op1: byte,
+    op2: byte,
+    subtraction?: boolean
+  ): void => {
     const carryBit = subtraction
       ? ((op1 & 0xf) - (op2 & 0xf)) & 0x10
       : ((op1 & 0xf) + (op2 & 0xf)) & 0x10;
     this.setHFlag(carryBit === 0x10 ? 1 : 0);
-  }
+  };
   /**
    * Sets the carry flag if the sum will exceed the size of the data type.
    */
-  checkFullCarry16 = (op1: word, op2: word, subtraction?: boolean): void => {
+  public checkFullCarry16 = (
+    op1: word,
+    op2: word,
+    subtraction?: boolean
+  ): void => {
     if (subtraction) {
       if (op1 - op2 < 0) {
         this.setCYFlag(1);
@@ -314,7 +324,11 @@ class CPU {
     }
   };
 
-  checkFullCarry8 = (op1: byte, op2: byte, subtraction?: boolean): void => {
+  public checkFullCarry8 = (
+    op1: byte,
+    op2: byte,
+    subtraction?: boolean
+  ): void => {
     if (subtraction) {
       if (op1 - op2 < 0) {
         this.setCYFlag(1);

@@ -68,7 +68,9 @@ declare global {
   }
 }
 
-const logObject = (object: Object) => util.inspect(object, false, null, true);
+const logObject = (object: object): string =>
+  util.inspect(object, false, null, true);
+
 const consoleColors = [
   chalk.red,
   chalk.blue,
@@ -87,7 +89,7 @@ expect.extend({
   ) {
     if (received === expected) {
       return {
-        message: () => 'Success',
+        message: (): string => 'Success',
         pass: true,
       };
     } else {
@@ -96,7 +98,7 @@ expect.extend({
         logged = logObject(new Flag(cpu, <byte>received));
       }
       return {
-        message: () =>
+        message: (): string =>
           `Expected register ${chalk.green(register)} value ${chalk.red(
             logged
           )} to equal ${chalk.green(
@@ -105,6 +107,8 @@ expect.extend({
             .map(instr => _.sample(consoleColors)(instr))
             .join(' ')}\n\nExpected CPU State: ${logObject(
             expectedState
+          )}\n\nActual CPU State: ${logObject(
+            cpu
           )}\n\nExpected Flag: ${logObject(formatFlag(expectedState.f))}`,
         pass: false,
       };
@@ -168,7 +172,7 @@ describe('CPU', () => {
       const BIOSFile: Buffer = fs.readFileSync(biosFile);
       memory.load(cpu, BIOSFile, new Uint8Array([...ROMFile]));
     } else {
-      memory.load(cpu, null, new Uint8Array([...ROMFile]));
+      memory.load(cpu, [], new Uint8Array([...ROMFile]));
     }
     return fs.readFileSync(
       path.join(GENERATED_FOLDER, `${expectedState}.state`)
@@ -182,27 +186,29 @@ describe('CPU', () => {
     biosFile: string | null,
     testROM: string,
     expectedState: string
-  ) => {
+  ): void => {
     let fileIndex = 0;
     let expected: CPUInfo;
     // Arrange
     const saveState: Buffer = setupTestROM(biosFile, testROM, expectedState);
     // skip initial state
     [expected, fileIndex] = readSaveState(saveState, fileIndex);
+    debugger;
     for (let i = 0; i < saveState.length; i++) {
       // Act
+      debugger;
       cpu.executeInstruction(memory);
       // PPU.buildGraphics(cycles);
       // cpu.checkInterrupts();
       [expected, fileIndex] = readSaveState(saveState, fileIndex);
-      if (cpu.lastExecuted[0] === '0xf0') {
-        cpu.pc = expected.pc;
-        cpu.sp = expected.sp;
-        cpu.r.af = (expected.a << 8) | expected.f;
-        cpu.r.bc = (expected.b << 8) | expected.c;
-        cpu.r.de = (expected.d << 8) | expected.e;
-        cpu.r.hl = expected.hl;
-      }
+      // if (cpu.lastExecuted[0] === '0xf0') {
+      //   cpu.pc = expected.pc;
+      //   cpu.sp = expected.sp;
+      //   cpu.r.af = (expected.a << 8) | expected.f;
+      //   cpu.r.bc = (expected.b << 8) | expected.c;
+      //   cpu.r.de = (expected.d << 8) | expected.e;
+      //   cpu.r.hl = expected.hl;
+      // }
 
       // Assert
       expect(cpu.pc).toMatchRegister(cpu, expected.pc, 'PC', expected);
@@ -218,7 +224,7 @@ describe('CPU', () => {
   };
 
   xit('executes an instruction', () => {
-    memory.load(cpu, null, new Uint8Array([...Array(8192 * 2).fill(0)]));
+    memory.load(cpu, [], new Uint8Array([...Array(8192 * 2).fill(0)]));
     const memReadSpy = jest.spyOn(memory, 'readByte');
     // to do: NOP instruction spy
     const cycles = cpu.executeInstruction(memory);
@@ -226,7 +232,7 @@ describe('CPU', () => {
     expect(cycles).toEqual(4);
   });
 
-  xit('exectues a ROM file', () => {
+  it('exectues a ROM file', () => {
     checkRegisters(null, path.join(TEST_ROM_FOLDER, 'tetris.gb'), 'tetris.gb');
   });
 

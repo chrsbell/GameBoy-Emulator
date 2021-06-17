@@ -1,12 +1,12 @@
 // Using a class to prevent accidentally setting flag outside 0/1
 import CPU from '.';
-import {byte, lower, setLower} from '../../helpers/Primitives';
+import {bit, byte, lower, setLower} from '../../helpers/Primitives';
 
 class Flag {
-  private _z: byte = 0; // set if last op producted 0
-  private _n: byte = 0; // set if last op was subtraction
-  private _h: byte = 0; // set if result's lower half of last op overflowed past 15
-  private _cy: byte = 0; // set if last op produced a result over 255 or under 0
+  private _z: bit = 0; // set if last op producted 0
+  private _n: bit = 0; // set if last op was subtraction
+  private _h: bit = 0; // set if result's lower half of last op overflowed past 15
+  private _cy: bit = 0; // set if last op produced a result over 255 or under 0
   private cpu: CPU = <CPU>{};
   constructor(cpu: CPU, value: byte = 0) {
     this.cpu = cpu;
@@ -19,23 +19,23 @@ class Flag {
   /**
    * Sets the Z flag if the register is 0, otherwise resets it.
    */
-  public checkZFlag(reg: byte): void {
+  public checkZFlag = (reg: byte): void => {
     if (!reg) {
       this.z = 1;
     } else {
       this.z = 0;
     }
-  }
+  };
 
   private error(): void {
     throw new Error('Tried to set flag outside range.');
   }
 
-  public value(): byte {
+  public value = (): byte => {
     return (this.z << 7) | (this.n << 6) | (this.h << 5) | (this.cy << 4);
-  }
+  };
 
-  public set z(value: byte) {
+  set z(value: bit) {
     if (value === 0 || value === 1) {
       this._z = value;
       this.cpu.r.af = setLower(
@@ -47,11 +47,11 @@ class Flag {
     }
   }
 
-  public get z() {
+  get z(): bit {
     return this._z;
   }
 
-  public set n(value: byte) {
+  set n(value: bit) {
     if (value === 0 || value === 1) {
       this._n = value;
       this.cpu.r.af = setLower(
@@ -63,11 +63,11 @@ class Flag {
     }
   }
 
-  public get n() {
+  get n(): bit {
     return this._n;
   }
 
-  public set h(value: byte) {
+  set h(value: bit) {
     if (value === 0 || value === 1) {
       this._h = value;
       this.cpu.r.af = setLower(
@@ -79,11 +79,11 @@ class Flag {
     }
   }
 
-  public get h() {
+  get h(): bit {
     return this._h;
   }
 
-  public set cy(value: byte) {
+  set cy(value: bit) {
     if (value === 0 || value === 1) {
       this._cy = value;
       this.cpu.r.af = setLower(
@@ -95,12 +95,12 @@ class Flag {
     }
   }
 
-  public get cy() {
+  get cy(): bit {
     return this._cy;
   }
 }
 
-const formatFlag = (value: byte): any => ({
+const formatFlag = (value: byte): object => ({
   z: (value >> 7) & 1,
   n: (value >> 6) & 1,
   h: (value >> 5) & 1,

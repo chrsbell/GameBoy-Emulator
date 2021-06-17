@@ -1,7 +1,6 @@
 import type {byte, word} from '../../../../helpers/Primitives';
+import {RAMSizeCodeMap, ROMSizeCodeMap} from '../const';
 import Cartridge from '../index';
-
-import {ROMSizeCodeMap, RAMSizeCodeMap} from '../const';
 
 class MBC1 extends Cartridge {
   private ramEnabled = false;
@@ -11,7 +10,7 @@ class MBC1 extends Cartridge {
   /**
    * Adds extra ROM and RAM banks according to the MBC type.
    */
-  public initializeBanks(): void {
+  public initializeBanks = (): void => {
     // skip first bank, which is already mapped in ROM
     const numROMBanks = ROMSizeCodeMap[this.romSizeCode].numBanks - 1;
     this.romBanks = new Array(numROMBanks);
@@ -32,8 +31,8 @@ class MBC1 extends Cartridge {
       this.ramBanks = new Array(1);
       this.ramBanks[0] = new Uint8Array(0x2000);
     }
-  }
-  public handleRegisterChanges(address: word, data: byte): void {
+  };
+  public handleRegisterChanges = (address: word, data: byte): void => {
     if (address <= 0x1fff) {
       // RAM enable/disable
       this.ramEnabled = (data & 0b1111) === 0xa;
@@ -69,7 +68,7 @@ class MBC1 extends Cartridge {
       //   }
       this.ramBanks[this.currRAMBank - 1][address - 0xa000] = data;
     }
-  }
+  };
 }
 
 export default MBC1;

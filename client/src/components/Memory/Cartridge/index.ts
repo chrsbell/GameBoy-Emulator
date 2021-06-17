@@ -1,11 +1,11 @@
 import {DEBUG} from '../../../helpers/Debug';
 import type {byte, word} from '../../../helpers/Primitives';
-import Memory from '../index';
+import Memory, {byteArray} from '../index';
 import {CartridgeTypes, RAMSizeCodeMap, ROMSizeCodeMap} from './const';
 
 abstract class Cartridge {
   // entire cartridge ROM
-  public rom: Uint8Array = null!;
+  public rom: byteArray = [];
   // each ROM Bank is 16kB
   public romBanks: Array<Uint8Array> = [];
   // the ROM size code
@@ -21,9 +21,9 @@ abstract class Cartridge {
   public currRAMBank: byte = 1;
   public mbcType: number;
 
-  public constructor(
+  constructor(
     memory: Memory,
-    rom: Uint8Array,
+    rom: byteArray,
     mbcType: number,
     romSizeCode: byte,
     ramSizeCode: byte
@@ -44,7 +44,7 @@ abstract class Cartridge {
       console.log('Loaded ROM file.');
     }
   }
-  public reset() {
+  public reset = (): void => {
     this.rom = null!;
     this.romBanks = [];
     this.romSizeCode = 0;
@@ -53,7 +53,7 @@ abstract class Cartridge {
     this.currROMBank = 1;
     this.currRAMBank = 1;
     this.mbcType = 0;
-  }
+  };
   public abstract handleRegisterChanges(address: word, data: byte): void;
   public abstract initializeBanks(): void;
 }

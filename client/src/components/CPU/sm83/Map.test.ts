@@ -7,7 +7,7 @@ describe('helper functions', () => {
     cpu.reset();
   });
   describe('rotate instructions', () => {
-    const checkFlags = () => {
+    const checkFlags = (): void => {
       expect(cpu.getZFlag()).toBe(0);
       expect(cpu.getNFlag()).toBe(0);
       expect(cpu.getHFlag()).toBe(0);

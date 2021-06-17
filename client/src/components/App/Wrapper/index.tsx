@@ -10,7 +10,7 @@ const Wrapper: React.FC<AppContext> = ({appDispatch}) => {
   const hiddenROMRef: React.MutableRefObject<HTMLInputElement> = useRef(null!);
   const [ROMFile, setROMFile] = useState<Blob>(null!);
   const [BIOSFile, setBIOSFile] = useState<Blob>(null!);
-  const onSubmit = () => {
+  const onSubmit = (): void => {
     if (BIOSFile) {
       BIOSFile.arrayBuffer().then(buffer => {
         appDispatch({
@@ -40,14 +40,14 @@ const Wrapper: React.FC<AppContext> = ({appDispatch}) => {
         <div className={styles['flex-column']}>
           <nav>
             <button
-              onClick={() => {
+              onClick={(): void => {
                 hiddenROMRef.current.click();
               }}
             >
               Upload ROM
             </button>
             <button
-              onClick={() => {
+              onClick={(): void => {
                 hiddenBIOSRef.current.click();
               }}
             >
@@ -57,13 +57,13 @@ const Wrapper: React.FC<AppContext> = ({appDispatch}) => {
               type="file"
               name="rom"
               ref={hiddenROMRef}
-              onChange={e => setROMFile(e.target.files![0])}
+              onChange={(e): void => setROMFile(e.target.files![0])}
             />
             <input
               type="file"
               name="bios"
               ref={hiddenBIOSRef}
-              onChange={e => setBIOSFile(e.target.files![0])}
+              onChange={(e): void => setBIOSFile(e.target.files![0])}
             />
             <button type="button" onClick={onSubmit}>
               Upload

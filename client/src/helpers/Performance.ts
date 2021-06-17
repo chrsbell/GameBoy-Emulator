@@ -1,4 +1,5 @@
 import {forEach} from 'lodash';
+import {byte} from './Primitives';
 
 interface benchmarkTimes {
   // the context
@@ -18,7 +19,7 @@ const times: benchmarkTimes = {};
  * Utility function to benchmark the emulator.
  */
 const logBenchmarks = (): void => {
-  forEach(times, (functions: any, group: any) => {
+  forEach(times, (functions: unknown, group: unknown) => {
     console.log(
       `%cPerformance of ${group}:`,
       'color:#8217ab; font-weight: bold'
@@ -27,9 +28,9 @@ const logBenchmarks = (): void => {
   });
 };
 
-const benchmark = (func: Function, context: any = null) => {
+const benchmark = (func: Function, context: object | null = null): any => {
   const className = context ? context.constructor.name : 'Helpers';
-  return (...args: any) => {
+  return (...args: Array<unknown>): void | byte => {
     // benchmark random calls
     if (Math.random() * 1000 <= 5) {
       const t1 = performance.now();

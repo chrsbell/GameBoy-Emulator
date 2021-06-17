@@ -1,16 +1,16 @@
 import benchmark, {benchmarksEnabled} from '../../helpers/Performance';
 import CanvasRenderer from '../CanvasRenderer';
 import CPU from '../CPU';
-import Memory from '../Memory';
+import Memory, {byteArray} from '../Memory';
 import PPU from '../PPU';
 
 class Emulator {
-  private timerID!: ReturnType<typeof setTimeout>;
+  private timeout!: number;
   private numExecuted = 0;
   private memory: Memory = <Memory>{};
   private cpu: CPU = <CPU>{};
   private ppu: PPU = <PPU>{};
-  public constructor() {
+  constructor() {
     this.memory = new Memory();
     this.cpu = new CPU();
     this.ppu = new PPU(this.memory);
@@ -19,27 +19,25 @@ class Emulator {
       this.update = benchmark(this.update.bind(this), this);
     }
   }
-  public reset() {
+  public reset = (): void => {
     this.memory.reset();
     this.cpu.reset();
     this.ppu.reset();
-  }
+  };
   /**
    * Loads a bios and ROM file into the Memory module and stops the currently updating function.
    * @returns {boolean}
    */
-  public load(bios: Uint8Array | null, rom: Uint8Array): boolean {
+  public load = (bios: byteArray, rom: Uint8Array): boolean => {
     this.memory.load(this.cpu, bios, rom);
-    clearTimeout(this.timerID);
-    this.timerID = setInterval(this.update, 0);
+    // window.cancelAnimationFrame(this.timeout);
+    this.timeout = window.requestAnimationFrame(this.update);
     return true;
-  }
+  };
   /**
    * Executes the next set of opcodes and calls renderer update method.
-   * Calls itself at regular intervals according to the renderer's FPS, updating
-   * the ID of setTimeout each time.
    */
-  public update() {
+  public update = (): void => {
     const cyclesPerUpdate = this.cpu.clock / CanvasRenderer.fps;
     let cycles = 0;
     let elapsed = 0;
@@ -60,7 +58,8 @@ class Emulator {
       this.cpu.checkInterrupts(this.memory);
     }
     CanvasRenderer.draw();
-  }
+    this.timeout = window.requestAnimationFrame(this.update);
+  };
 }
 
 export default Emulator;

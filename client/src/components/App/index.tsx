@@ -11,7 +11,7 @@ const initialState: AppState = {
   parsedBIOS: new Uint8Array(),
 };
 
-const reducer = (state: AppState, action: Action) => {
+const reducer = (state: AppState, action: Action): AppState => {
   switch (action.type) {
     case 'canvas':
       return {

@@ -27,7 +27,7 @@ function ADD(cpu: CPU, operand: byte): void {
 }
 
 function ADC(cpu: CPU, operand: byte): void {
-  operand = addByte(operand, cpu.getCYFlag());
+  operand = addByte(operand, <byte>cpu.getCYFlag());
   cpu.checkFullCarry8(upper(cpu.r.af), operand);
   cpu.checkHalfCarry(upper(cpu.r.af), operand);
   cpu.r.af = addUpper(cpu.r.af, operand);
@@ -492,7 +492,7 @@ const OpcodeMap: OpcodeList = {
     cpu.pc += 1;
   },
 
-  0x2f: function (cpu: CPU, memory: Memory): void {
+  0x2f: function (cpu: CPU): void {
     cpu.r.af = setUpper(cpu.r.af, toByte(~upper(cpu.r.af)));
     cpu.setNFlag(1);
     cpu.setHFlag(1);
@@ -1388,6 +1388,7 @@ const OpcodeMap: OpcodeList = {
     // );
     cpu.r.af = setUpper(cpu.r.af, data);
     cpu.pc += 1;
+    if (cpu.pc === 565) debugger;
   },
 
   0xf1: function (cpu: CPU, memory: Memory): void {
