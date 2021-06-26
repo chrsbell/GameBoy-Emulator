@@ -1,13 +1,13 @@
+import * as chalk from 'chalk';
+import CPU from 'CPU/index';
 import * as fs from 'fs';
+import Primitive from 'helpers/Primitives';
 import _ from 'lodash';
 import * as path from 'path';
 import * as util from 'util';
-import CPU from '.';
-import {byte, lower, upper, word} from '../../helpers/Primitives';
 import Memory from '../Memory';
 import PPU from '../PPU';
 import Flag, {formatFlag} from './Flag';
-const chalk = require('chalk');
 
 const TEST_ROM_FOLDER = path.join(
   __dirname,
@@ -214,12 +214,42 @@ describe('CPU', () => {
       expect(cpu.pc).toMatchRegister(cpu, expected.pc, 'PC', expected);
       expect(cpu.sp).toMatchRegister(cpu, expected.sp, 'SP', expected);
       expect(cpu.r.hl).toMatchRegister(cpu, expected.hl, 'HL', expected);
-      expect(upper(cpu.r.af)).toMatchRegister(cpu, expected.a, 'A', expected);
-      expect(upper(cpu.r.bc)).toMatchRegister(cpu, expected.b, 'B', expected);
-      expect(lower(cpu.r.bc)).toMatchRegister(cpu, expected.c, 'C', expected);
-      expect(upper(cpu.r.de)).toMatchRegister(cpu, expected.d, 'D', expected);
-      expect(lower(cpu.r.de)).toMatchRegister(cpu, expected.e, 'E', expected);
-      expect(lower(cpu.r.af)).toMatchRegister(cpu, expected.f, 'F', expected);
+      expect(Primitive.upper(cpu.r.af)).toMatchRegister(
+        cpu,
+        expected.a,
+        'A',
+        expected
+      );
+      expect(Primitive.upper(cpu.r.bc)).toMatchRegister(
+        cpu,
+        expected.b,
+        'B',
+        expected
+      );
+      expect(Primitive.lower(cpu.r.bc)).toMatchRegister(
+        cpu,
+        expected.c,
+        'C',
+        expected
+      );
+      expect(Primitive.upper(cpu.r.de)).toMatchRegister(
+        cpu,
+        expected.d,
+        'D',
+        expected
+      );
+      expect(Primitive.lower(cpu.r.de)).toMatchRegister(
+        cpu,
+        expected.e,
+        'E',
+        expected
+      );
+      expect(Primitive.lower(cpu.r.af)).toMatchRegister(
+        cpu,
+        expected.f,
+        'F',
+        expected
+      );
     }
   };
 
@@ -355,15 +385,15 @@ describe('CPU', () => {
     beforeEach(() => (cpu.r.af = 0));
     it('checks half carry on addition ops', () => {
       cpu.checkHalfCarry(62, 34);
-      expect(lower(cpu.r.af) >> 5).toBe(1);
+      expect(Primitive.lower(cpu.r.af) >> 5).toBe(1);
       cpu.checkHalfCarry(61, 34);
-      expect(lower(cpu.r.af) >> 5).toBe(0);
+      expect(Primitive.lower(cpu.r.af) >> 5).toBe(0);
     });
     it('checks for half carry on subtraction ops', () => {
       cpu.checkHalfCarry(11, 15, true);
-      expect(lower(cpu.r.af) >> 5).toBe(1);
+      expect(Primitive.lower(cpu.r.af) >> 5).toBe(1);
       cpu.checkHalfCarry(11, 9, true);
-      expect(lower(cpu.r.af) >> 5).toBe(0);
+      expect(Primitive.lower(cpu.r.af) >> 5).toBe(0);
     });
   });
 });

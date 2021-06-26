@@ -1,4 +1,4 @@
-import benchmark, {benchmarksEnabled} from '../../helpers/Performance';
+import benchmark, {benchmarksEnabled} from 'helpers/Performance';
 
 // could render data as an image texture
 type RGB = Array<number>;

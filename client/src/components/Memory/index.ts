@@ -1,66 +1,63 @@
-import {DEBUG} from '../../helpers/Debug';
-import error from '../../helpers/Error';
-import benchmark, {benchmarksEnabled} from '../../helpers/Performance';
-import type {byte, word} from '../../helpers/Primitives';
-import {lower, toHex, upper} from '../../helpers/Primitives';
-import CPU from '../CPU';
+import CPU from 'CPU/index';
+import {DEBUG} from 'helpers/Debug';
+import error from 'helpers/Error';
+import benchmark, {benchmarksEnabled} from 'helpers/Performance';
+import Primitive from 'helpers/Primitives';
 import Cartridge from './Cartridge';
 import MBC0 from './Cartridge/MBC0';
 import MBC1 from './Cartridge/MBC1';
 
-export type byteArray = Uint8Array | Array<byte>;
-
 class Memory {
-  private bios: byteArray = [];
+  private bios: ByteArray = [];
   // whether bios execution has finished
   public inBios = false;
   public cart!: Cartridge;
   // 8k vRAM
-  private _vRAM: byteArray = [];
-  get vRAM(): byteArray {
+  private _vRAM: ByteArray = [];
+  get vRAM(): ByteArray {
     return this._vRAM;
   }
-  set vRAM(value: byteArray) {
+  set vRAM(value: ByteArray) {
     this._vRAM = value;
   }
   // 8k internal RAM
-  private _wRAM: byteArray = [];
-  get wRAM(): byteArray {
+  private _wRAM: ByteArray = [];
+  get wRAM(): ByteArray {
     return this._wRAM;
   }
-  set wRAM(value: byteArray) {
+  set wRAM(value: ByteArray) {
     this._wRAM = value;
   }
   // shadow of working RAM, (8k - 512) bytes
-  private _wRAMShadow: byteArray = [];
-  get wRAMShadow(): byteArray {
+  private _wRAMShadow: ByteArray = [];
+  get wRAMShadow(): ByteArray {
     return this._wRAMShadow;
   }
-  set wRAMShadow(value: byteArray) {
+  set wRAMShadow(value: ByteArray) {
     this._wRAMShadow = value;
   }
   // sprite attribute table
-  private _OAM: byteArray = [];
-  get OAM(): byteArray {
+  private _OAM: ByteArray = [];
+  get OAM(): ByteArray {
     return this._OAM;
   }
-  set OAM(value: byteArray) {
+  set OAM(value: ByteArray) {
     this._OAM = value;
   }
   // 126 bytes high RAM
-  private _hRAM: byteArray = [];
-  get hRAM(): byteArray {
+  private _hRAM: ByteArray = [];
+  get hRAM(): ByteArray {
     return this._hRAM;
   }
-  set hRAM(value: byteArray) {
+  set hRAM(value: ByteArray) {
     this._hRAM = value;
   }
   // 128 bytes io register space
-  private _IORAM: byteArray = [];
-  get ioRAM(): byteArray {
+  private _IORAM: ByteArray = [];
+  get ioRAM(): ByteArray {
     return this._IORAM;
   }
-  set ioRAM(value: byteArray) {
+  set ioRAM(value: ByteArray) {
     this._IORAM = value;
   }
   public addresses = {
@@ -114,11 +111,11 @@ class Memory {
     } else if (address <= 0xdfff) {
       this.wRAM[address - 0xc000] = data;
     } else if (address <= 0xfdff) {
-      error(`Can't write to prohibited address ${toHex(address)}.`);
+      error(`Can't write to prohibited address ${Primitive.toHex(address)}.`);
     } else if (address <= 0xfe9f) {
       this.OAM[address - 0xfe00] = data;
     } else if (address <= 0xfeff) {
-      error(`Can't write to prohibited address ${toHex(address)}.`);
+      error(`Can't write to prohibited address ${Primitive.toHex(address)}.`);
     } else if (address <= 0xff7f) {
       if (address === 0xff46) {
         DEBUG && console.log('Initiated DMA transfer.');
@@ -138,8 +135,8 @@ class Memory {
    * Writes the provided word to the address
    */
   public writeWord = (address: word, data: word): void => {
-    this.writeByte(address, lower(data));
-    this.writeByte(address + 1, upper(data));
+    this.writeByte(address, Primitive.lower(data));
+    this.writeByte(address + 1, Primitive.upper(data));
   };
   /**
    * Return the byte at the address as a number
@@ -177,7 +174,9 @@ class Memory {
     } else if (address <= 0xffff) {
       return this.hRAM[address - 0xff80];
     }
-    throw new Error(`Tried to read out of bounds address: ${toHex(address)}.`);
+    throw new Error(
+      `Tried to read out of bounds address: ${Primitive.toHex(address)}.`
+    );
   };
   /**
    * Return the word at the address
@@ -204,7 +203,7 @@ class Memory {
   /**
    * Loads parsed files into BIOS/ROM
    */
-  public load = (cpu: CPU, bios: byteArray, rom: byteArray): void => {
+  public load = (cpu: CPU, bios: ByteArray, rom: ByteArray): void => {
     const mbcType = rom[0x147];
     const romSizeCode = rom[0x148];
     const ramSizeCode = rom[0x149];
@@ -222,7 +221,7 @@ class Memory {
    * Adds extra ROM and RAM banks according to the MBC type.
    */
   private initializeCart(
-    rom: byteArray,
+    rom: ByteArray,
     mbcType: number,
     romSizeCode: byte,
     ramSizeCode: byte
@@ -235,7 +234,8 @@ class Memory {
         this.cart = new MBC1(this, rom, mbcType, romSizeCode, ramSizeCode);
         break;
       default:
-        if (DEBUG) console.log(`No support for MBC ${toHex(mbcType)}.`);
+        if (DEBUG)
+          console.log(`No support for MBC ${Primitive.toHex(mbcType)}.`);
         break;
     }
   }

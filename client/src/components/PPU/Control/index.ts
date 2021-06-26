@@ -1,4 +1,4 @@
-import {bit, byte, getBit} from '../../../helpers/Primitives';
+import Primitive from 'helpers/Primitives';
 
 export default class LCDControl {
   private _control: byte = 0;
@@ -61,14 +61,14 @@ export default class LCDControl {
 
   public update = (value: byte): void => {
     this._control = value;
-    this.LCDPPU = getBit(value, 7);
-    this.tileMapArea = getBit(value, 6);
-    this.windowEnable = getBit(value, 5);
-    this.bgWindowTileData = getBit(value, 4);
-    this.bgTileMapArea = getBit(value, 3);
-    this.objSize = getBit(value, 2);
-    this.objEnable = getBit(value, 1);
-    this.bgWindowEnable = getBit(value, 0);
+    this.LCDPPU = Primitive.getBit(value, 7);
+    this.tileMapArea = Primitive.getBit(value, 6);
+    this.windowEnable = Primitive.getBit(value, 5);
+    this.bgWindowTileData = Primitive.getBit(value, 4);
+    this.bgTileMapArea = Primitive.getBit(value, 3);
+    this.objSize = Primitive.getBit(value, 2);
+    this.objEnable = Primitive.getBit(value, 1);
+    this.bgWindowEnable = Primitive.getBit(value, 0);
   };
 
   public value = (): byte => {

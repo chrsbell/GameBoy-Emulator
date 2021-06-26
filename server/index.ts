@@ -1,18 +1,9 @@
-import {Response, Request} from 'express';
-const multer = require('multer');
-const express = require('express');
-const path = require('path');
+import express, {Request, Response} from 'express';
+import multer from 'multer';
+import path from 'path';
 
 const upload = multer();
 const app = express();
-
-declare global {
-  namespace Express {
-    interface Request {
-      files: {[fieldname: string]: Multer.File[]} | Express.Multer.File[];
-    }
-  }
-}
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 

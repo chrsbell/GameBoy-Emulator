@@ -1,19 +1,8 @@
-import {DEBUG} from '../../helpers/Debug';
-import benchmark, {benchmarksEnabled} from '../../helpers/Performance';
-import {
-  bit,
-  byte,
-  clearBit,
-  getBit,
-  lower,
-  OpcodeList,
-  setBit,
-  setLower,
-  toHex,
-  word,
-} from '../../helpers/Primitives';
-import Interrupt from '../Interrupts';
-import Memory from '../Memory';
+import {DEBUG} from 'helpers/Debug';
+import benchmark, {benchmarksEnabled} from 'helpers/Performance';
+import Primitive from 'helpers/Primitives';
+import Interrupt from 'Interrupts/index';
+import Memory from 'Memory/index';
 import Opcodes from './sm83';
 import {instructionHelpers as helpers} from './sm83/Map';
 
@@ -152,7 +141,7 @@ class CPU {
   public executeInstruction = (memory: Memory): number => {
     // fetch
     const opcode: byte = memory.readByte(this.pc);
-    this.addCalledInstruction(toHex(opcode));
+    this.addCalledInstruction(Primitive.toHex(opcode));
     this.pc += 1;
     // execute
     let numCycles: number;
@@ -184,7 +173,10 @@ class CPU {
         const individualEnabled = memory.readByte(Interrupt.ie);
         // 5 interrupts
         for (let i = 0; i < 5; i++) {
-          if (getBit(register, i) && getBit(individualEnabled, i)) {
+          if (
+            Primitive.getBit(register, i) &&
+            Primitive.getBit(individualEnabled, i)
+          ) {
             this.handleInterrupts(memory, i);
           }
         }
@@ -197,7 +189,7 @@ class CPU {
   private handleInterrupts(memory: Memory, interrupt: number): void {
     this.setInterruptsGlobal(false);
     const register: byte = memory.readByte(Interrupt.if);
-    memory.writeByte(Interrupt.if, clearBit(register, interrupt));
+    memory.writeByte(Interrupt.if, Primitive.clearBit(register, interrupt));
 
     helpers.PUSH(this, memory, this.pc);
     DEBUG && console.log('Handled an interrupt.');
@@ -230,47 +222,71 @@ class CPU {
 
   public setZFlag = (value: byte): void => {
     if (value) {
-      this.r.af = setLower(this.r.af, setBit(lower(this.r.af), 7));
+      this.r.af = Primitive.setLower(
+        this.r.af,
+        Primitive.setBit(Primitive.lower(this.r.af), 7)
+      );
     } else {
-      this.r.af = setLower(this.r.af, clearBit(lower(this.r.af), 7));
+      this.r.af = Primitive.setLower(
+        this.r.af,
+        Primitive.clearBit(Primitive.lower(this.r.af), 7)
+      );
     }
   };
 
   public setCYFlag = (value: byte): void => {
     if (value) {
-      this.r.af = setLower(this.r.af, setBit(lower(this.r.af), 4));
+      this.r.af = Primitive.setLower(
+        this.r.af,
+        Primitive.setBit(Primitive.lower(this.r.af), 4)
+      );
     } else {
-      this.r.af = setLower(this.r.af, clearBit(lower(this.r.af), 4));
+      this.r.af = Primitive.setLower(
+        this.r.af,
+        Primitive.clearBit(Primitive.lower(this.r.af), 4)
+      );
     }
   };
 
   public setHFlag = (value: byte): void => {
     if (value === 1) {
-      this.r.af = setLower(this.r.af, setBit(lower(this.r.af), 5));
+      this.r.af = Primitive.setLower(
+        this.r.af,
+        Primitive.setBit(Primitive.lower(this.r.af), 5)
+      );
     } else {
-      this.r.af = setLower(this.r.af, clearBit(lower(this.r.af), 5));
+      this.r.af = Primitive.setLower(
+        this.r.af,
+        Primitive.clearBit(Primitive.lower(this.r.af), 5)
+      );
     }
   };
 
   public setNFlag = (value: byte): void => {
     if (value) {
-      this.r.af = setLower(this.r.af, setBit(lower(this.r.af), 6));
+      this.r.af = Primitive.setLower(
+        this.r.af,
+        Primitive.setBit(Primitive.lower(this.r.af), 6)
+      );
     } else {
-      this.r.af = setLower(this.r.af, clearBit(lower(this.r.af), 6));
+      this.r.af = Primitive.setLower(
+        this.r.af,
+        Primitive.clearBit(Primitive.lower(this.r.af), 6)
+      );
     }
   };
 
   public getZFlag = (): bit => {
-    return getBit(lower(this.r.af), 7);
+    return Primitive.getBit(Primitive.lower(this.r.af), 7);
   };
   public getCYFlag = (): bit => {
-    return getBit(lower(this.r.af), 4);
+    return Primitive.getBit(Primitive.lower(this.r.af), 4);
   };
   public getHFlag = (): bit => {
-    return getBit(lower(this.r.af), 5);
+    return Primitive.getBit(Primitive.lower(this.r.af), 5);
   };
   public getNFlag = (): bit => {
-    return getBit(lower(this.r.af), 6);
+    return Primitive.getBit(Primitive.lower(this.r.af), 6);
   };
   /**
    * Sets the Z flag if the register is 0, otherwise resets it.

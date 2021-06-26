@@ -1,5 +1,4 @@
 import {forEach} from 'lodash';
-import {byte} from './Primitives';
 
 interface benchmarkTimes {
   // the context

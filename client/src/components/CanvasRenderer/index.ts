@@ -1,18 +1,9 @@
+import benchmark, {benchmarksEnabled} from 'helpers/Performance';
 import {sample} from 'lodash';
-import benchmark, {benchmarksEnabled} from '../../helpers/Performance';
-
-export type RGB = Array<number>;
 
 const testAnimation = {
   x: 0,
   y: 0,
-};
-
-export type ColorScheme = {
-  white: RGB;
-  lightGray: RGB;
-  darkGray: RGB;
-  black: RGB;
 };
 
 const colorSchemes = {
@@ -31,36 +22,25 @@ const colorSchemes = {
 };
 
 class CanvasRenderer {
+  private timeout!: number;
   public fps = 240;
   private image!: ImageData;
   private context!: CanvasRenderingContext2D;
-  private _initialized = false;
-  private _colorScheme: ColorScheme = colorSchemes.default;
-  public get colorScheme(): ColorScheme {
-    return this._colorScheme;
-  }
-  public set colorScheme(value: ColorScheme) {
-    this._colorScheme = value;
-  }
+  public initialized = false;
+  public colorScheme: ColorScheme = colorSchemes.default;
   // how many pixels should an individual image pixel take up? e.g. NxN
   private scaleFactor = 1;
-  public get initialized() {
-    return this._initialized;
-  }
-  public set initialized(value) {
-    this._initialized = value;
-  }
   public screenWidth = 160;
   public screenHeight = 144;
 
-  public constructor() {
+  constructor() {
     if (benchmarksEnabled) {
       this.setPixel = benchmark(this.setPixel.bind(this), this);
       this.draw = benchmark(this.draw.bind(this), this);
     }
   }
 
-  public initialize(canvas: HTMLCanvasElement, scaleFactor = 1) {
+  public initialize = (canvas: HTMLCanvasElement, scaleFactor = 1): void => {
     if (canvas && !this.initialized) {
       this.scaleFactor = scaleFactor;
       this.context = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -69,10 +49,11 @@ class CanvasRenderer {
         this.screenHeight * this.scaleFactor
       );
       this.initialized = true;
+      this.timeout = window.requestAnimationFrame(this.draw);
     }
-  }
+  };
 
-  public setPixel(x: number, y: number, color: RGB): void {
+  public setPixel = (x: number, y: number, color: RGB): void => {
     x *= this.scaleFactor;
     y *= this.scaleFactor;
 
@@ -88,13 +69,14 @@ class CanvasRenderer {
         this.image.data[offset + 3] = color[3];
       }
     }
-  }
+  };
 
-  public draw() {
+  private draw = (): void => {
     this.context.putImageData(this.image, 0, 0);
-  }
+    this.timeout = window.requestAnimationFrame(this.draw);
+  };
 
-  public testAnimation() {
+  public testAnimation = (): void => {
     testAnimation.x += 1;
     if (testAnimation.x === this.screenWidth) {
       testAnimation.y += 1;
@@ -109,7 +91,7 @@ class CanvasRenderer {
       testAnimation.y,
       <RGB>sample(this.colorScheme)
     );
-  }
+  };
 }
 
 export default new CanvasRenderer();

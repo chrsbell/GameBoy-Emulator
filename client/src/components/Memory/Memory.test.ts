@@ -1,5 +1,5 @@
-import Memory, {byteArray} from '.';
-import CPU from '../CPU';
+import CPU from 'CPU/index';
+import Memory from '.';
 
 describe('Memory', () => {
   const memory = new Memory();
@@ -8,10 +8,10 @@ describe('Memory', () => {
     memory.reset();
     cpu.reset();
   });
-  const setupMBC0 = (bios: byteArray = []): void => {
+  const setupMBC0 = (bios: ByteArray = []): void => {
     memory.load(cpu, bios, new Uint8Array([...Array(32768).fill(0)]));
   };
-  const setupMBC1 = (bios: byteArray = []): void => {
+  const setupMBC1 = (bios: ByteArray = []): void => {
     const rom = new Uint8Array([...Array(65536).fill(0)]);
     rom[0x147] = 1;
     memory.load(cpu, bios, rom);

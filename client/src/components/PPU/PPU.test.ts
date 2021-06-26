@@ -1,5 +1,5 @@
+import Memory from 'Memory/index';
 import PPU from '.';
-import Memory from '../Memory';
 
 describe('PPU', () => {
   const memory = new Memory();

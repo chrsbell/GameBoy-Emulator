@@ -1,9 +1,8 @@
+import Wrapper from 'App/Wrapper';
+import CanvasRenderer from 'CanvasRenderer/index';
+import Emulator from 'Emulator/index';
 import * as React from 'react';
 import {useEffect, useReducer, useRef} from 'react';
-import CanvasRenderer from '../CanvasRenderer';
-import Emulator from '../Emulator';
-import type {Action, AppContext, AppState} from './types';
-import Wrapper from './Wrapper';
 
 const initialState: AppState = {
   canvas: null!,
@@ -41,6 +40,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (appState.parsedROM.length) {
+      debugger;
       emulator.current.load(appState.parsedBIOS, appState.parsedROM);
     }
   }, [appState.parsedROM, appState.parsedBIOS]);

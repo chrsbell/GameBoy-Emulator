@@ -1,5 +1,4 @@
 const path = require('path');
-const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 
 const SRC_DIR = path.join(__dirname, '/client/src');
 const DIST_DIR = path.join(__dirname, '/public/dist');
@@ -14,6 +13,7 @@ module.exports = (env, argv) => ({
     path: DIST_DIR,
     filename: 'bundle.js',
     sourceMapFilename: 'bundle.map',
+    clean: true,
   },
   module: {
     rules: [
@@ -36,6 +36,10 @@ module.exports = (env, argv) => ({
   },
   resolve: {
     extensions: ['.ts', '.js', '.jsx', '.tsx'],
+    modules: [
+      path.resolve(SRC_DIR),
+      path.resolve(SRC_DIR, 'components'),
+      path.resolve(__dirname, 'node_modules'),
+    ],
   },
-  plugins: [new CleanWebpackPlugin()],
 });

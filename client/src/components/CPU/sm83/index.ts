@@ -1,7 +1,6 @@
-import CPU from '../';
-import {byte} from '../../../helpers/Primitives';
-import Memory from '../../Memory';
-import OpcodeMap from './Map';
+import CPU from 'CPU/index';
+import OpcodeMap from 'CPU/sm83/Map';
+import Memory from 'Memory/index';
 
 /**
  * No operation.
@@ -3376,7 +3375,7 @@ function SRAAi(cpu: CPU, memory: Memory): byte {
 }
 
 /**
- * Swap upper and lower nibbles.
+ * Swap Primitive.upper and Primitive.lower nibbles.
  * @param - None
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
@@ -3387,7 +3386,7 @@ function SWAPBi(cpu: CPU, memory: Memory): byte {
 }
 
 /**
- * Swap upper and lower nibbles.
+ * Swap Primitive.upper and Primitive.lower nibbles.
  * @param - None
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
@@ -3398,7 +3397,7 @@ function SWAPCi(cpu: CPU, memory: Memory): byte {
 }
 
 /**
- * Swap upper and lower nibbles.
+ * Swap Primitive.upper and Primitive.lower nibbles.
  * @param - None
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
@@ -3409,7 +3408,7 @@ function SWAPDi(cpu: CPU, memory: Memory): byte {
 }
 
 /**
- * Swap upper and lower nibbles.
+ * Swap Primitive.upper and Primitive.lower nibbles.
  * @param - None
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
@@ -3420,7 +3419,7 @@ function SWAPEi(cpu: CPU, memory: Memory): byte {
 }
 
 /**
- * Swap upper and lower nibbles.
+ * Swap Primitive.upper and Primitive.lower nibbles.
  * @param - None
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
@@ -3431,7 +3430,7 @@ function SWAPHi(cpu: CPU, memory: Memory): byte {
 }
 
 /**
- * Swap upper and lower nibbles.
+ * Swap Primitive.upper and Primitive.lower nibbles.
  * @param - None
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
@@ -3442,7 +3441,7 @@ function SWAPLi(cpu: CPU, memory: Memory): byte {
 }
 
 /**
- * Swap upper and lower nibbles.
+ * Swap Primitive.upper and Primitive.lower nibbles.
  * @param - None
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C
@@ -3453,7 +3452,7 @@ function SWAPHLm(cpu: CPU, memory: Memory): byte {
 }
 
 /**
- * Swap upper and lower nibbles.
+ * Swap Primitive.upper and Primitive.lower nibbles.
  * @param - None
  * @returns {byte} - The number of system clock ticks required.
  * Affected flags: Z, N, H, C

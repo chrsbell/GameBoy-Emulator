@@ -1,11 +1,10 @@
-// Using a class to prevent accidentally setting flag outside 0/1
-import CPU from '.';
-import {bit, byte, lower, setLower} from '../../helpers/Primitives';
+import CPU from 'CPU/index';
+import Primitive from 'helpers/Primitives';
 
 class Flag {
   private _z: bit = 0; // set if last op producted 0
   private _n: bit = 0; // set if last op was subtraction
-  private _h: bit = 0; // set if result's lower half of last op overflowed past 15
+  private _h: bit = 0; // set if result's Primitive.lower half of last op overflowed past 15
   private _cy: bit = 0; // set if last op produced a result over 255 or under 0
   private cpu: CPU = <CPU>{};
   constructor(cpu: CPU, value: byte = 0) {
@@ -38,9 +37,9 @@ class Flag {
   set z(value: bit) {
     if (value === 0 || value === 1) {
       this._z = value;
-      this.cpu.r.af = setLower(
+      this.cpu.r.af = Primitive.setLower(
         this.cpu.r.af,
-        lower(this.cpu.r.af) | (value << 7)
+        Primitive.lower(this.cpu.r.af) | (value << 7)
       );
     } else {
       this.error();
@@ -54,9 +53,9 @@ class Flag {
   set n(value: bit) {
     if (value === 0 || value === 1) {
       this._n = value;
-      this.cpu.r.af = setLower(
+      this.cpu.r.af = Primitive.setLower(
         this.cpu.r.af,
-        lower(this.cpu.r.af) | (value << 6)
+        Primitive.lower(this.cpu.r.af) | (value << 6)
       );
     } else {
       this.error();
@@ -70,9 +69,9 @@ class Flag {
   set h(value: bit) {
     if (value === 0 || value === 1) {
       this._h = value;
-      this.cpu.r.af = setLower(
+      this.cpu.r.af = Primitive.setLower(
         this.cpu.r.af,
-        lower(this.cpu.r.af) | (value << 5)
+        Primitive.lower(this.cpu.r.af) | (value << 5)
       );
     } else {
       this.error();
@@ -86,9 +85,9 @@ class Flag {
   set cy(value: bit) {
     if (value === 0 || value === 1) {
       this._cy = value;
-      this.cpu.r.af = setLower(
+      this.cpu.r.af = Primitive.setLower(
         this.cpu.r.af,
-        lower(this.cpu.r.af) | (value << 4)
+        Primitive.lower(this.cpu.r.af) | (value << 4)
       );
     } else {
       this.error();

@@ -1,18 +1,8 @@
-import benchmark, {benchmarksEnabled} from '../../helpers/Performance';
-import {
-  byte,
-  clearBit,
-  getBit,
-  lower,
-  setBit,
-  toSigned,
-  upper,
-  word,
-} from '../../helpers/Primitives';
-import type {ColorScheme, RGB} from '../CanvasRenderer';
-import CanvasRenderer from '../CanvasRenderer';
-import Interrupt, {enableInterrupt} from '../Interrupts';
-import Memory from '../Memory';
+import CanvasRenderer from 'CanvasRenderer/index';
+import benchmark, {benchmarksEnabled} from 'helpers/Performance';
+import Primitive from 'helpers/Primitives';
+import Interrupt, {enableInterrupt} from 'Interrupts/index';
+import Memory from 'Memory/index';
 import PPUControl from './Control';
 
 type StatBitsType = {
@@ -67,8 +57,8 @@ class PPU {
   private _mode = 2;
   set mode(value) {
     let register: byte = this.stat;
-    register = clearBit(register, this.statBits.modeLower);
-    register = clearBit(register, this.statBits.modeUpper);
+    register = Primitive.clearBit(register, this.statBits.modeLower);
+    register = Primitive.clearBit(register, this.statBits.modeUpper);
     register |= value;
     this.stat = register;
   }
@@ -249,7 +239,7 @@ class PPU {
     const interruptBit = this.statBits.interrupt[this.mode];
     // only certain modes trigger an interrupt
     if (interruptBit >= 0) {
-      const interruptModeBit = getBit(this.stat, interruptBit);
+      const interruptModeBit = Primitive.getBit(this.stat, interruptBit);
       if (interruptModeBit && switchedMode) {
         enableInterrupt(this.memory, Interrupt.lcdStat);
       }
@@ -260,13 +250,17 @@ class PPU {
    */
   public buildGraphics = (cycles: number): void => {
     this.paletteMap[0] =
-      (getBit(this.palette, 1) << 1) | getBit(this.palette, 0);
+      (Primitive.getBit(this.palette, 1) << 1) |
+      Primitive.getBit(this.palette, 0);
     this.paletteMap[1] =
-      (getBit(this.palette, 3) << 1) | getBit(this.palette, 2);
+      (Primitive.getBit(this.palette, 3) << 1) |
+      Primitive.getBit(this.palette, 2);
     this.paletteMap[2] =
-      (getBit(this.palette, 5) << 1) | getBit(this.palette, 4);
+      (Primitive.getBit(this.palette, 5) << 1) |
+      Primitive.getBit(this.palette, 4);
     this.paletteMap[3] =
-      (getBit(this.palette, 7) << 1) | getBit(this.palette, 6);
+      (Primitive.getBit(this.palette, 7) << 1) |
+      Primitive.getBit(this.palette, 6);
     // possible the lcdc register was set by the game
     this.lcdc.update(this.memory.readByte(this.memory.addresses.ppu.lcdc));
     if (this.lcdEnabled()) {
@@ -298,12 +292,12 @@ class PPU {
   public compareLcLyc = (): void => {
     const register: byte = this.stat;
     if (this.scanline === this.scanlineCompare) {
-      this.stat = setBit(register, this.statBits.lycLc);
-      if (getBit(this.stat, this.statBits.lycLcInterrupt)) {
+      this.stat = Primitive.setBit(register, this.statBits.lycLc);
+      if (Primitive.getBit(this.stat, this.statBits.lycLcInterrupt)) {
         enableInterrupt(this.memory, Interrupt.lcdStat);
       }
     } else {
-      this.stat = clearBit(register, this.statBits.lycLc);
+      this.stat = Primitive.clearBit(register, this.statBits.lycLc);
     }
   };
   /**
@@ -355,14 +349,15 @@ class PPU {
       const tileCol = Math.floor(xPos / 8);
       const tileAddressX = tileAddress + tileCol;
       const tileId = isSigned
-        ? toSigned(this.memory.readByte(tileAddressX))
+        ? Primitive.toSigned(this.memory.readByte(tileAddressX))
         : this.memory.readByte(tileAddressX);
       const tileLocation =
         tileDataAddress + (isSigned ? (tileId + 128) * 16 : tileId * 16);
       const tile = this.memory.readWord(tileLocation + line);
       const colorBit = -((xPos % 8) - 7);
       const colorIndex =
-        (getBit(upper(tile), colorBit) << 1) | getBit(lower(tile), colorBit);
+        (Primitive.getBit(Primitive.upper(tile), colorBit) << 1) |
+        Primitive.getBit(Primitive.lower(tile), colorBit);
 
       this.pixelMap[this.scanline][xPos] = this.paletteMap[colorIndex];
       CanvasRenderer.setPixel(

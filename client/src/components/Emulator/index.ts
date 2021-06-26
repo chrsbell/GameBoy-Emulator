@@ -1,8 +1,8 @@
-import benchmark, {benchmarksEnabled} from '../../helpers/Performance';
-import CanvasRenderer from '../CanvasRenderer';
-import CPU from '../CPU';
-import Memory, {byteArray} from '../Memory';
-import PPU from '../PPU';
+import CanvasRenderer from 'CanvasRenderer/index';
+import CPU from 'CPU/index';
+import benchmark, {benchmarksEnabled} from 'helpers/Performance';
+import Memory from 'Memory/index';
+import PPU from 'PPU/index';
 
 class Emulator {
   private timeout!: number;
@@ -28,9 +28,9 @@ class Emulator {
    * Loads a bios and ROM file into the Memory module and stops the currently updating function.
    * @returns {boolean}
    */
-  public load = (bios: byteArray, rom: Uint8Array): boolean => {
+  public load = (bios: ByteArray, rom: Uint8Array): boolean => {
     this.memory.load(this.cpu, bios, rom);
-    // window.cancelAnimationFrame(this.timeout);
+    if (this.timeout !== null) window.cancelAnimationFrame(this.timeout);
     this.timeout = window.requestAnimationFrame(this.update);
     return true;
   };
@@ -57,7 +57,6 @@ class Emulator {
       this.ppu.buildGraphics(elapsed);
       this.cpu.checkInterrupts(this.memory);
     }
-    CanvasRenderer.draw();
     this.timeout = window.requestAnimationFrame(this.update);
   };
 }

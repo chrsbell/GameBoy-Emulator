@@ -5,19 +5,6 @@ const pad = (str: string, width: number, replacement = '0'): string => {
   return Array(width - str.length).join(replacement) + str;
 };
 
-interface Flavoring<FlavorT> {
-  _type?: FlavorT;
-}
-
-type Primitive<T, FlavorT> = T & Flavoring<FlavorT>;
-
-export type bit = Primitive<number, 'bit'>;
-export type byte = Primitive<number, 'byte'>;
-export type word = Primitive<number, 'word'>;
-export interface OpcodeList {
-  [key: string]: Function;
-}
-
 /**
  * Casts a number to a byte.
  * @returns {byte}
@@ -119,7 +106,7 @@ const clearBit = (value: byte, bit: number): byte => {
   return value & ~(1 << bit);
 };
 
-export {
+const Primitive = {
   toByte,
   addByte,
   toWord,
@@ -136,3 +123,5 @@ export {
   setBit,
   clearBit,
 };
+
+export default Primitive;

@@ -1,4 +1,4 @@
-import {DEBUG} from './Debug';
+import {DEBUG} from 'helpers/Debug';
 
 const error = (text: string): void => {
   if (DEBUG) {

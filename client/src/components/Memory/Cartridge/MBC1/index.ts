@@ -1,6 +1,4 @@
-import type {byte, word} from '../../../../helpers/Primitives';
-import {RAMSizeCodeMap, ROMSizeCodeMap} from '../const';
-import Cartridge from '../index';
+import Cartridge, {RAMSizeCodeMap, ROMSizeCodeMap} from 'Memory/Cartridge';
 
 class MBC1 extends Cartridge {
   private ramEnabled = false;

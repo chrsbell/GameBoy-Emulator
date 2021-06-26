@@ -1,5 +1,5 @@
-import CPU from '../';
-import {instructionHelpers as helpers} from './Map';
+import CPU from 'CPU/index';
+import {instructionHelpers as helpers} from 'CPU/sm83/Map';
 
 describe('helper functions', () => {
   const cpu = new CPU();

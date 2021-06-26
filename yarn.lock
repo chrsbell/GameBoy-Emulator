@@ -2370,7 +2370,7 @@ cacheable-request@^6.0.0:
     get-stream "^5.1.0"
     http-cache-semantics "^4.0.0"
     keyv "^3.0.0"
-    lowercase-keys "^2.0.0"
+    Primitive.lowercase-keys "^2.0.0"
     normalize-url "^4.1.0"
     responselike "^1.0.2"
 
@@ -3886,7 +3886,7 @@ got@^9.6.0:
     decompress-response "^3.3.0"
     duplexer3 "^0.1.4"
     get-stream "^4.1.0"
-    lowercase-keys "^1.0.1"
+    Primitive.lowercase-keys "^1.0.1"
     mimic-response "^1.0.1"
     p-cancelable "^1.0.0"
     to-readable-stream "^1.0.0"
@@ -5192,14 +5192,14 @@ loud-rejection@^1.0.0:
     currently-unhandled "^0.4.1"
     signal-exit "^3.0.0"
 
-lowercase-keys@^1.0.0, lowercase-keys@^1.0.1:
+Primitive.lowercase-keys@^1.0.0, Primitive.lowercase-keys@^1.0.1:
   version "1.0.1"
-  resolved "https://registry.yarnpkg.com/lowercase-keys/-/lowercase-keys-1.0.1.tgz#6f9e30b47084d971a7c820ff15a6c5167b74c26f"
+  resolved "https://registry.yarnpkg.com/Primitive.lowercase-keys/-/Primitive.lowercase-keys-1.0.1.tgz#6f9e30b47084d971a7c820ff15a6c5167b74c26f"
   integrity sha512-G2Lj61tXDnVFFOi8VZds+SoQjtQC3dgokKdDG2mTm1tx4m50NUHBOZSBwQQHyy0V12A0JTG4icfZQH+xPyh8VA==
 
-lowercase-keys@^2.0.0:
+Primitive.lowercase-keys@^2.0.0:
   version "2.0.0"
-  resolved "https://registry.yarnpkg.com/lowercase-keys/-/lowercase-keys-2.0.0.tgz#2603e78b7b4b0006cbca2fbcc8a3202558ac9479"
+  resolved "https://registry.yarnpkg.com/Primitive.lowercase-keys/-/Primitive.lowercase-keys-2.0.0.tgz#2603e78b7b4b0006cbca2fbcc8a3202558ac9479"
   integrity sha512-tqNXrS78oMOE73NMxK4EMLQsQowWf8jKooH9g7xPavRT706R6bkQJ6DY2Te7QukaZsulxa30wQ7bk0pm4XiHmA==
 
 lru-cache@^6.0.0:
@@ -6479,7 +6479,7 @@ responselike@^1.0.2:
   resolved "https://registry.yarnpkg.com/responselike/-/responselike-1.0.2.tgz#918720ef3b631c5642be068f15ade5a46f4ba1e7"
   integrity sha1-kYcg7ztjHFZCvgaPFa3lpG9Loec=
   dependencies:
-    lowercase-keys "^1.0.0"
+    Primitive.lowercase-keys "^1.0.0"
 
 restore-cursor@^3.1.0:
   version "3.1.0"

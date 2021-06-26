@@ -1,8 +1,7 @@
+import {DEBUG} from 'helpers/Debug';
 import * as React from 'react';
 import {useEffect, useRef, useState} from 'react';
-import {DEBUG} from '../../../helpers/Debug';
-import styles from '../../../sass/index.module.scss';
-import type {AppContext} from '../types';
+import styles from './sass/index.module.scss';
 
 const Wrapper: React.FC<AppContext> = ({appDispatch}) => {
   const canvasRef: React.MutableRefObject<HTMLCanvasElement> = useRef(null!);
