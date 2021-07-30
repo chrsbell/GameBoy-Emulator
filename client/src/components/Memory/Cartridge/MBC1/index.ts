@@ -1,24 +1,37 @@
 import Cartridge, {RAMSizeCodeMap, ROMSizeCodeMap} from 'Memory/Cartridge';
+import Memory from 'Memory/index';
 
 class MBC1 extends Cartridge {
   private ramEnabled = false;
   private romRAMMixed = 0;
   private bankingMode = 0;
 
+  constructor(
+    memory: Memory,
+    rom: ByteArray,
+    mbcType: number,
+    romSizeCode: byte,
+    ramSizeCode: byte
+  ) {
+    super(memory, rom, mbcType, romSizeCode, ramSizeCode);
+    this.initializeBanks();
+  }
   /**
    * Adds extra ROM and RAM banks according to the MBC type.
    */
   public initializeBanks = (): void => {
     // skip first bank, which is already mapped in ROM
-    const numROMBanks = ROMSizeCodeMap[this.romSizeCode].numBanks - 1;
-    this.romBanks = new Array(numROMBanks);
-    for (let i = 0; i < numROMBanks; i += 0x4000) {
-      this.romBanks[i] = new Uint8Array(
+    const numROMBanks = ROMSizeCodeMap[this.romSizeCode].numBanks;
+    // the rom bank index starts at 1, so offset the buffers
+    this.romBanks = new Array(numROMBanks + 1);
+    for (let i = 0; i < numROMBanks - 1; i += 1) {
+      this.romBanks[i + 1] = new Uint8Array(
         this.rom.slice((i + 1) * 0x4000, (i + 2) * 0x4000)
       );
     }
     const numRAMBanks = RAMSizeCodeMap[this.ramSizeCode].numBanks;
     const ramSize = RAMSizeCodeMap[this.ramSizeCode].size;
+    debugger;
     if (numRAMBanks) {
       this.ramBanks = new Array(numRAMBanks);
       for (let i = 0; i < numROMBanks; i++) {

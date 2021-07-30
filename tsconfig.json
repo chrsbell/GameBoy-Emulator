@@ -15,7 +15,7 @@
     // "resolveJsonModule": true,
     // "isolatedModules": true,
     // "noEmit": true,
-    "noImplicitReturns": true,
+    // "noImplicitReturns": true,
     // "downlevelIteration": true
     // "paths": {
     //   "*": ["client/src/components/common/*.d.ts"]
@@ -30,6 +30,7 @@
       "Interrupts/*": ["client/src/components/Interrupts/*"],
       "Memory/*": ["client/src/components/Memory/*"],
       "PPU/*": ["client/src/components/PPU/*"],
+      "PPUBridge/*": ["client/src/components/PPUBridge/*"],
       "helpers/*": ["client/src/helpers/*"],
       "CPU/*": ["client/src/components/CPU/*"]
     }

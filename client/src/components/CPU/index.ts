@@ -1,7 +1,7 @@
 import {DEBUG} from 'helpers/Debug';
-import benchmark, {benchmarksEnabled} from 'helpers/Performance';
+import benchmark from 'helpers/Performance';
 import Primitive from 'helpers/Primitives';
-import Interrupt from 'Interrupts/index';
+import InterruptService from 'Interrupts/index';
 import Memory from 'Memory/index';
 import Opcodes from './sm83';
 import {instructionHelpers as helpers} from './sm83/Map';
@@ -54,23 +54,13 @@ class CPU {
   set halted(value: boolean) {
     this._halted = value;
   }
-  private _allInterruptsEnabled = true;
+  private allInterruptsEnabled = true;
   private opcodes: OpcodeList = Opcodes;
-  private _lastExecuted: Array<string> = [];
-  get lastExecuted(): Array<string> {
-    return this._lastExecuted;
-  }
-  set lastExecuted(value: Array<string>) {
-    this._lastExecuted = value;
-  }
+  private lastExecuted: Array<string> = [];
   constructor() {
-    if (benchmarksEnabled) {
-      this.executeInstruction = benchmark(
-        this.executeInstruction.bind(this),
-        this
-      );
-      this.checkInterrupts = benchmark(this.checkInterrupts.bind(this), this);
-    }
+    this.executeInstruction = benchmark(this, 'executeInstruction');
+    this.checkInterrupts = benchmark(this, 'checkInterrupts');
+
     this.reset();
   }
 
@@ -81,7 +71,7 @@ class CPU {
     this.pc = 0;
     this.sp = 0;
     this.halted = false;
-    this._allInterruptsEnabled = true;
+    this.allInterruptsEnabled = true;
     this.r.af = 0;
     this.r.bc = 0;
     this.r.de = 0;
@@ -90,7 +80,7 @@ class CPU {
   };
 
   setInterruptsGlobal(enabled: boolean): void {
-    this._allInterruptsEnabled = enabled;
+    this.allInterruptsEnabled = enabled;
   }
   /**
    * Completes the GB power sequence
@@ -143,6 +133,7 @@ class CPU {
     const opcode: byte = memory.readByte(this.pc);
     this.addCalledInstruction(Primitive.toHex(opcode));
     this.pc += 1;
+    this.pc &= 0xffff;
     // execute
     let numCycles: number;
     if (memory.inBios) {
@@ -167,10 +158,12 @@ class CPU {
    * Checks if an interrupt needs to be handled.
    */
   public checkInterrupts = (memory: Memory): void => {
-    if (this._allInterruptsEnabled) {
-      const register: byte = memory.readByte(Interrupt.if);
+    if (this.allInterruptsEnabled) {
+      const register: byte = memory.readByte(Memory.addresses.interrupt.if);
       if (register) {
-        const individualEnabled = memory.readByte(Interrupt.ie);
+        const individualEnabled = memory.readByte(
+          Memory.addresses.interrupt.ie
+        );
         // 5 interrupts
         for (let i = 0; i < 5; i++) {
           if (
@@ -188,25 +181,28 @@ class CPU {
    */
   private handleInterrupts(memory: Memory, interrupt: number): void {
     this.setInterruptsGlobal(false);
-    const register: byte = memory.readByte(Interrupt.if);
-    memory.writeByte(Interrupt.if, Primitive.clearBit(register, interrupt));
+    const register: byte = memory.readByte(Memory.addresses.interrupt.if);
+    memory.writeByte(
+      InterruptService.flags.if,
+      Primitive.clearBit(register, interrupt)
+    );
 
     helpers.PUSH(this, memory, this.pc);
     DEBUG && console.log('Handled an interrupt.');
     switch (interrupt) {
-      case Interrupt.vBlank:
+      case InterruptService.flags.vBlank:
         this.pc = 0x40;
         break;
-      case Interrupt.lcdStat:
+      case InterruptService.flags.lcdStat:
         this.pc = 0x48;
         break;
-      case Interrupt.timer:
+      case InterruptService.flags.timer:
         this.pc = 0x50;
         break;
-      case Interrupt.serial:
+      case InterruptService.flags.serial:
         this.pc = 0x58;
         break;
-      case Interrupt.joypad:
+      case InterruptService.flags.joypad:
         this.pc = 0x40;
         break;
     }

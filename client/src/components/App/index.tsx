@@ -34,20 +34,21 @@ const reducer = (state: AppState, action: Action): AppState => {
   }
 };
 
-const App: React.FC = () => {
+const App = (): JSX.Element => {
   const [appState, appDispatch] = useReducer(reducer, initialState);
-  const emulator = useRef(new Emulator());
+  const emulator: React.MutableRefObject<Emulator> = useRef(null!);
 
   useEffect(() => {
     if (appState.parsedROM.length) {
-      debugger;
       emulator.current.load(appState.parsedBIOS, appState.parsedROM);
     }
   }, [appState.parsedROM, appState.parsedBIOS]);
 
   useEffect(() => {
-    if (appState.canvas && !CanvasRenderer.initialized) {
-      CanvasRenderer.initialize(appState.canvas);
+    if (appState.canvas && !emulator.current) {
+      const canvasRenderer = new CanvasRenderer();
+      canvasRenderer.initialize(appState.canvas);
+      emulator.current = new Emulator(canvasRenderer);
     }
   }, [appState.canvas]);
 

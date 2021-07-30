@@ -4,7 +4,7 @@ const SRC_DIR = path.join(__dirname, '/client/src');
 const DIST_DIR = path.join(__dirname, '/public/dist');
 
 module.exports = (env, argv) => ({
-  devtool: 'source-map',
+  devtool: 'inline-source-map',
   mode: argv.mode,
   entry: {
     main: path.join(SRC_DIR, 'index.tsx'),
@@ -12,7 +12,7 @@ module.exports = (env, argv) => ({
   output: {
     path: DIST_DIR,
     filename: 'bundle.js',
-    sourceMapFilename: 'bundle.map',
+    // sourceMapFilename: 'bundle.map',
     clean: true,
   },
   module: {

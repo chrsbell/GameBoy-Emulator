@@ -30,17 +30,34 @@ declare interface AppState {
 
 declare type RGB = Array<number>;
 
-declare type ColorScheme = {
-  white: RGB;
-  lightGray: RGB;
-  darkGray: RGB;
-  black: RGB;
-};
+declare interface ColorScheme {
+  [key: string]: RGB;
+}
 
 declare interface SizeCode {
   [key: number]: {size: number; numBanks: number};
 }
 
-declare interface CartridgeCode {
+declare interface NumStrIdx {
   [key: number]: string;
+}
+
+declare interface NumNumIdx {
+  [key: number]: number;
+}
+
+declare interface StrBoolIdx {
+  [key: string]: boolean;
+}
+
+declare interface StrNumIdx {
+  [key: string]: number;
+}
+
+declare interface StrStrIdx {
+  [key: string]: string;
+}
+
+declare interface NumFuncIdx {
+  [key: number]: Function;
 }

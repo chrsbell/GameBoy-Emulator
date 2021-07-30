@@ -1449,7 +1449,7 @@ const OpcodeMap: OpcodeList = {
     // );
     cpu.r.af = Primitive.setUpper(cpu.r.af, data);
     cpu.pc += 1;
-    if (cpu.pc === 565) debugger;
+    // if (cpu.pc === 565) debugger;
   },
 
   0xf1: function (cpu: CPU, memory: Memory): void {

@@ -1,4 +1,9 @@
+import CanvasRenderer from 'CanvasRenderer/index';
+import CPU from 'CPU/index';
+import Emulator from 'Emulator/index';
 import {forEach} from 'lodash';
+import Memory from 'Memory/index';
+import PPU from 'PPU/index';
 
 interface benchmarkTimes {
   // the context
@@ -27,34 +32,44 @@ const logBenchmarks = (): void => {
   });
 };
 
-const benchmark = (func: Function, context: object | null = null): any => {
-  const className = context ? context.constructor.name : 'Helpers';
-  return (...args: Array<unknown>): void | byte => {
-    // benchmark random calls
-    if (Math.random() * 1000 <= 5) {
-      const t1 = performance.now();
-      const value = func(...args);
-      const t2 = performance.now();
-      if (!times[className]) times[className] = {};
-      if (!times[className][func.name]) {
-        times[className][func.name] = {
-          averageCallTime: t2 - t1,
-          elapsedMilliseconds: t2 - t1,
-          numberOfCalls: 1,
-        };
-      } else {
-        const {elapsedMilliseconds, numberOfCalls} = times[className][
-          func.name
-        ];
-        times[className][func.name].elapsedMilliseconds += t2 - t1;
-        times[className][func.name].numberOfCalls += 1;
-        times[className][func.name].averageCallTime =
-          elapsedMilliseconds / numberOfCalls;
+type classTypes = CanvasRenderer | Emulator | Memory | PPU | CPU;
+
+const benchmark = <T extends classTypes>(
+  context: T,
+  funcName: string = ''
+): any => {
+  const func = context[funcName];
+  if (benchmarksEnabled) {
+    const className = context ? context.constructor.name : 'Helpers';
+    return (...args: Array<unknown>): any => {
+      // benchmark random calls
+      if (Math.random() * 1000 <= 5) {
+        const t1 = performance.now();
+        // funcName = 'object' as const;
+        const value = func(...args);
+        const t2 = performance.now();
+        if (!times[className]) times[className] = {};
+        if (!times[className][funcName]) {
+          times[className][funcName] = {
+            averageCallTime: t2 - t1,
+            elapsedMilliseconds: t2 - t1,
+            numberOfCalls: 1,
+          };
+        } else {
+          const {elapsedMilliseconds, numberOfCalls} = times[className][
+            funcName
+          ];
+          times[className][funcName].elapsedMilliseconds += t2 - t1;
+          times[className][funcName].numberOfCalls += 1;
+          times[className][funcName].averageCallTime =
+            elapsedMilliseconds / numberOfCalls;
+        }
+        return value;
       }
-      return value;
-    }
-    return func(...args);
-  };
+      return func(...args);
+    };
+  }
+  return func;
 };
 
 const benchmarksEnabled = true;

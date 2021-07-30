@@ -3,7 +3,7 @@ import * as React from 'react';
 import {useEffect, useRef, useState} from 'react';
 import styles from './sass/index.module.scss';
 
-const Wrapper: React.FC<AppContext> = ({appDispatch}) => {
+const Wrapper = ({appDispatch}: AppContext): JSX.Element => {
   const canvasRef: React.MutableRefObject<HTMLCanvasElement> = useRef(null!);
   const hiddenBIOSRef: React.MutableRefObject<HTMLInputElement> = useRef(null!);
   const hiddenROMRef: React.MutableRefObject<HTMLInputElement> = useRef(null!);

@@ -19,7 +19,7 @@ const RAMSizeCodeMap: SizeCode = {
   0x05: {size: 65536, numBanks: 8},
 };
 
-const CartridgeTypes: CartridgeCode = {
+const CartridgeTypes: NumStrIdx = {
   0x00: 'ROM Only',
   0x01: 'MBC #1',
   0x02: 'MBC #1 + RAM',

@@ -1,66 +1,39 @@
 import CPU from 'CPU/index';
 import {DEBUG} from 'helpers/Debug';
 import error from 'helpers/Error';
-import benchmark, {benchmarksEnabled} from 'helpers/Performance';
+import benchmark from 'helpers/Performance';
 import Primitive from 'helpers/Primitives';
+import PPU from 'PPU/index';
 import Cartridge from './Cartridge';
 import MBC0 from './Cartridge/MBC0';
 import MBC1 from './Cartridge/MBC1';
+import PPUBridge from './PPUBridge';
 
 class Memory {
+  private ppuBridge!: PPUBridge;
   private bios: ByteArray = [];
   // whether bios execution has finished
   public inBios = false;
+  private ppu!: PPU;
   public cart!: Cartridge;
   // 8k vRAM
-  private _vRAM: ByteArray = [];
-  get vRAM(): ByteArray {
-    return this._vRAM;
-  }
-  set vRAM(value: ByteArray) {
-    this._vRAM = value;
-  }
+  public vRAM: ByteArray = [];
   // 8k internal RAM
-  private _wRAM: ByteArray = [];
-  get wRAM(): ByteArray {
-    return this._wRAM;
-  }
-  set wRAM(value: ByteArray) {
-    this._wRAM = value;
-  }
+  private wRAM: ByteArray = [];
   // shadow of working RAM, (8k - 512) bytes
-  private _wRAMShadow: ByteArray = [];
-  get wRAMShadow(): ByteArray {
-    return this._wRAMShadow;
-  }
-  set wRAMShadow(value: ByteArray) {
-    this._wRAMShadow = value;
-  }
+  private wRAMShadow: ByteArray = [];
   // sprite attribute table
-  private _OAM: ByteArray = [];
-  get OAM(): ByteArray {
-    return this._OAM;
-  }
-  set OAM(value: ByteArray) {
-    this._OAM = value;
-  }
+  private OAM: ByteArray = [];
   // 126 bytes high RAM
-  private _hRAM: ByteArray = [];
-  get hRAM(): ByteArray {
-    return this._hRAM;
-  }
-  set hRAM(value: ByteArray) {
-    this._hRAM = value;
-  }
+  private hRAM: ByteArray = [];
   // 128 bytes io register space
-  private _IORAM: ByteArray = [];
-  get ioRAM(): ByteArray {
-    return this._IORAM;
-  }
-  set ioRAM(value: ByteArray) {
-    this._IORAM = value;
-  }
-  public addresses = {
+  // the ppu bridge needs to use this
+  public ioRAM: ByteArray = [];
+  public static addresses = {
+    interrupt: {
+      ie: 0xffff,
+      if: 0xff0f,
+    },
     ppu: {
       lcdc: 0xff40,
       stat: 0xff41,
@@ -68,17 +41,75 @@ class Memory {
       scrollX: 0xff43,
       scanline: 0xff44,
       scanlineCompare: 0xff45,
+      dma: 0xff46,
       paletteData: 0xff47,
       windowY: 0xff4a,
       windowX: 0xff4b,
     },
   };
-  constructor() {
+  private readMemoryHIOMap: NumFuncIdx = {
+    0x00: (addr: word): byte => this.ioRAM[addr - 0xff00],
+    0x80: (addr: word): byte => this.hRAM[addr & 0x7f],
+  };
+  private readMemoryByteHMap: NumFuncIdx = {
+    0x000: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
+    0x100: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
+    0x200: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
+    0x300: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
+    0x400: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
+    0x500: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
+    0x600: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
+    0x700: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
+    0x800: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
+    0x900: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
+    0xa00: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
+    0xb00: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
+    0xc00: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
+    0xd00: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
+    0xe00: (addr: word): byte => (addr <= 0xfe9f ? this.OAM[addr - 0xfe00] : 0), //address >= 0xfea0 is techincally outside OAM memory, revisit this
+    0xf00: (addr: word): byte => this.readMemoryHIOMap[addr & 0x80](addr),
+  };
+  private readMemoryByteMap: NumFuncIdx = {
+    0x0000: (addr: word): byte => {
+      if (this.inBios) {
+        if (addr < 0x100) {
+          return this.bios[addr];
+        } else if (addr === 0x100) {
+          this.inBios = false;
+          DEBUG && console.log('Exited bios.');
+        }
+      }
+      return this.cart.rom[addr];
+    },
+    0x1000: (addr: word): byte => this.cart.rom[addr],
+    0x2000: (addr: word): byte => this.cart.rom[addr],
+    0x3000: (addr: word): byte => this.cart.rom[addr],
+    0x4000: (addr: word): byte =>
+      this.cart.romBanks[this.cart.currROMBank][addr - 0x4000],
+    0x5000: (addr: word): byte =>
+      this.cart.romBanks[this.cart.currROMBank][addr - 0x4000],
+    0x6000: (addr: word): byte =>
+      this.cart.romBanks[this.cart.currROMBank][addr - 0x4000],
+    0x7000: (addr: word): byte =>
+      this.cart.romBanks[this.cart.currROMBank][addr - 0x4000],
+    0x8000: (addr: word): byte => this.vRAM[addr - 0x8000],
+    0x9000: (addr: word): byte => this.vRAM[addr - 0x8000],
+    0xa000: (addr: word): byte =>
+      this.cart.ramBanks[this.cart.currRAMBank][addr - 0xa000],
+    0xb000: (addr: word): byte =>
+      this.cart.ramBanks[this.cart.currRAMBank][addr - 0xa000],
+    0xc000: (addr: word): byte => this.wRAM[addr - 0xc000],
+    0xd000: (addr: word): byte => this.wRAM[addr - 0xc000],
+    0xf000: (addr: word): byte => {
+      const hAddr = addr & 0xf00;
+      return this.readMemoryByteHMap[hAddr](addr);
+    },
+  };
+  constructor(ppuBridge: PPUBridge) {
+    this.ppuBridge = ppuBridge;
     this.reset();
-    if (benchmarksEnabled) {
-      this.readByte = benchmark(this.readByte.bind(this), this);
-      this.writeByte = benchmark(this.writeByte.bind(this), this);
-    }
+    this.readByte = benchmark(this, 'readByte');
+    this.writeByte = benchmark(this, 'writeByte');
   }
   /**
    * Resets the Memory module.
@@ -86,12 +117,12 @@ class Memory {
   reset(): void {
     this.bios = [];
     this.inBios = false;
-    this.vRAM = new Uint8Array(0x9fff - 0x8000 + 1);
-    this.wRAM = new Uint8Array(0xdfff - 0xc000 + 1);
-    this.wRAMShadow = new Uint8Array(0xfdff - 0xe000 + 1);
-    this.OAM = new Uint8Array(0xfe9f - 0xfe00 + 1);
-    this.hRAM = new Uint8Array(0xfffe - 0xff80 + 1);
-    this.ioRAM = new Uint8Array(0xff7f - 0xff00 + 1);
+    this.vRAM = new Uint8Array(0xa000 - 0x8000);
+    this.wRAM = new Uint8Array(0xe000 - 0xc000);
+    this.wRAMShadow = new Uint8Array(0xfe00 - 0xe000);
+    this.OAM = new Uint8Array(0xfea0 - 0xfe00);
+    this.hRAM = new Uint8Array(0xffff - 0xff80);
+    this.ioRAM = new Uint8Array(0xff80 - 0xff00);
     this.cart?.reset();
   }
   /**
@@ -99,13 +130,14 @@ class Memory {
    */
   public writeByte = (address: word, data: byte): void => {
     if (this.inBios && address <= 0xff) return;
-    const {addresses} = this;
     if (address <= 0x7fff) {
       this.cart.handleRegisterChanges(address, data);
       // write to ROM bank of cartridge
       // this.cartOMBanks[this.cart.currROMBank - 1][address - 0x4000] = data;
     } else if (address <= 0x9fff) {
-      this.vRAM[address - 0x8000] = data;
+      address = address - 0x8000;
+      this.vRAM[address] = data;
+      this.ppuBridge.updateTiles(address, data);
     } else if (address <= 0xbfff) {
       this.cart.handleRegisterChanges(address, data);
     } else if (address <= 0xdfff) {
@@ -117,16 +149,7 @@ class Memory {
     } else if (address <= 0xfeff) {
       error(`Can't write to prohibited address ${Primitive.toHex(address)}.`);
     } else if (address <= 0xff7f) {
-      if (address === 0xff46) {
-        DEBUG && console.log('Initiated DMA transfer.');
-        this.dmaTransfer(data);
-      }
-      // reset scanline if trying to write to associated register
-      let ioByte = data;
-      if (address === addresses.ppu.scanline) {
-        ioByte = 0;
-      }
-      this.ioRAM[address - 0xff00] = ioByte;
+      this.ppuBridge.writeIORam(address, data);
     } else if (address <= 0xffff) {
       this.hRAM[address - 0xff80] = data;
     }
@@ -142,6 +165,7 @@ class Memory {
    * Return the byte at the address as a number
    */
   public readByte = (address: word): byte => {
+    // return this.readMemoryByteMap[address & 0xf000](address);
     if (this.inBios) {
       if (address < 0x100) {
         return this.bios[address];
@@ -154,7 +178,7 @@ class Memory {
     if (address < 0x4000) {
       return this.cart.rom[address];
     } else if (address <= 0x7fff) {
-      return this.cart.romBanks[this.cart.currROMBank - 1][address - 0x4000];
+      return this.cart.romBanks[this.cart.currROMBank][address - 0x4000];
     } else if (address <= 0x9fff) {
       return this.vRAM[address - 0x8000];
     } else if (address <= 0xbfff) {
@@ -184,12 +208,7 @@ class Memory {
   public readWord = (address: word): word => {
     return this.readByte(address) | (this.readByte(address + 1) << 8);
   };
-  /**
-   * Used internally by the PPU/lCD to update the current scanline.
-   */
-  public updateScanline = (scanline: byte): void => {
-    this.ioRAM[0xff44 - 0xff00] = scanline;
-  };
+
   /**
    * Performs direct memory address transfer of sprite data.
    * Pretty much copied from http://www.codeslinger.co.uk/pages/projects/gameboy/dma.html

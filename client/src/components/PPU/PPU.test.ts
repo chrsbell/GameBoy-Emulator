@@ -1,9 +1,11 @@
+import CanvasRenderer from 'CanvasRenderer/index';
 import Memory from 'Memory/index';
 import PPU from '.';
 
 describe('PPU', () => {
   const memory = new Memory();
-  const ppu = new PPU(memory);
+  const canvasRenderer = new CanvasRenderer();
+  const ppu = new PPU(memory, canvasRenderer);
   beforeEach(() => {
     memory.reset();
     ppu.reset();
