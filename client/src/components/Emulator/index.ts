@@ -1,7 +1,8 @@
 import CanvasRenderer from 'CanvasRenderer/index';
 import CPU from 'CPU/index';
-import benchmark from 'helpers/Performance';
+import benchmark, {logBenchmarks} from 'helpers/Performance';
 import Input, {Key} from 'Input/index';
+import InterruptService from 'Interrupts/index';
 import Memory from 'Memory/index';
 import PPUBridge from 'Memory/PPUBridge';
 import PPU from 'PPU/index';
@@ -14,15 +15,26 @@ class Emulator {
   private cpu!: CPU;
   private ppuBridge!: PPUBridge;
   private ppu!: PPU;
+  private input!: Input;
+  private interruptService!: InterruptService;
   private stopped = false;
   constructor(canvasRenderer: CanvasRenderer) {
     this.canvasRenderer = canvasRenderer;
-    this.cpu = new CPU();
     this.ppuBridge = new PPUBridge();
+    this.interruptService = this.ppuBridge.interruptService;
     this.memory = this.ppuBridge.memory;
+    this.cpu = new CPU(this.memory);
     this.ppu = this.ppuBridge.ppu;
+    this.input = new Input();
     this.canvasRenderer.setPPU(this.ppuBridge.ppu);
-    this.update = benchmark(this, 'update');
+    benchmark(this.ppuBridge);
+    benchmark(this.memory);
+    benchmark(this.cpu);
+    benchmark(this.ppu);
+    benchmark(this.input);
+    benchmark(this.canvasRenderer);
+    benchmark(this.interruptService);
+    benchmark(this);
   }
   public reset = (): void => {
     this.memory.reset();
@@ -33,13 +45,13 @@ class Emulator {
     this.memory.load(this.cpu, bios, rom);
     if (this.timeout !== null) window.cancelAnimationFrame(this.timeout);
     this.update();
-    this.timeout = window.setInterval(this.update);
+    this.timeout = window.setInterval(this.update, 1);
     return true;
   };
   public update = (): void => {
     if (!this.stopped) {
-      if (Input.pressed(Key.Space)) {
-        Input.debounce(Key.Space);
+      if (this.input.pressed(Key.Space)) {
+        this.input.debounce(Key.Space);
         this.stopped = true;
         console.log('stopped emulator');
       }
@@ -47,42 +59,30 @@ class Emulator {
       const cyclesPerUpdate = this.cpu.clock;
       let elapsed = 0;
       if (this.numExecuted > this.cpu.clock) {
-        // logBenchmarks();
-        // for (let i = 0; i < 30; i++) {
-        //   console.log(`tile #${i}`);
-        //   console.table(this.ppu.tileData[i]);
-        // }
+        logBenchmarks();
         this.numExecuted = 0;
       }
       // elapse time according to number of cpu cycles used
       while (cycles < cyclesPerUpdate) {
         if (!this.cpu.halted) {
-          elapsed = this.cpu.executeInstruction(this.memory);
+          elapsed = this.cpu.executeInstruction();
           this.numExecuted += elapsed;
           cycles += elapsed;
-        } else {
-          console.log('CPU is halted.');
         }
-        this.ppuBridge.ppu.buildGraphics(elapsed);
-        this.cpu.checkInterrupts(this.memory);
+        //   } else {
+        //     console.log('CPU is halted.');
+        //   }
+        this.ppuBridge.ppu.buildGraphics(this.canvasRenderer, elapsed);
+        //   this.cpu.checkInterrupts(this.memory);
       }
-      this.canvasRenderer.draw();
-      this.canvasRenderer.drawOnScreen();
+      this.canvasRenderer.buildImage();
     } else {
-      if (Input.pressed(Key.Space)) {
-        Input.debounce(Key.Space);
+      if (this.input.pressed(Key.Space)) {
+        this.input.debounce(Key.Space);
         console.log('unpaused emulator');
         this.stopped = false;
       }
     }
-    // }
-    // this.canvasRenderer.draw(this.ppu);
-    // cycles = 0;
-    // elapsed = 0;
-    // setTimeout(this.update, 0);
-    // this.update();
-    // this.timeout = window.requestAnimationFrame(this.update);
-    // }
   };
 }
 

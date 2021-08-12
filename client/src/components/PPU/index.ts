@@ -1,5 +1,4 @@
 import CanvasRenderer from 'CanvasRenderer/index';
-import benchmark from 'helpers/Performance';
 import Primitive from 'helpers/Primitives';
 import InterruptService from 'Interrupts/index';
 import Memory from 'Memory/index';
@@ -18,6 +17,7 @@ class PPU {
   private ppuBridge!: PPUBridge;
   private interruptService!: InterruptService;
   private _lcdc!: PPUControl;
+  private scanlineClockMod = 5;
   get lcdc(): PPUControl {
     return this._lcdc;
   }
@@ -84,24 +84,16 @@ class PPU {
     this.interruptService = interruptService;
     this.ppuBridge = ppuBridge;
     this._lcdc = new PPUControl();
-    this.buildGraphics = benchmark(this, 'buildGraphics');
-    this.drawScanline = benchmark(this, 'drawScanline');
-    this.renderTiles = benchmark(this, 'renderTiles');
-    this.readOAM = benchmark(this, 'readOAM');
-    this.readVRAM = benchmark(this, 'readVRAM');
-    this.vBlank = benchmark(this, 'vBlank');
-    this.hBlank = benchmark(this, 'hBlank');
-    this.lcdInterrupt = benchmark(this, 'lcdInterrupt');
   }
   public reset = (): void => {
     this.lcdc.update(0);
-    this.pixelMap = new Array(CanvasRenderer.screenHeight).fill(
-      new Array(CanvasRenderer.screenWidth).fill(0)
-    );
-    this.tileData = new Array(384).fill(
-      new Array(8).fill(new Array(8).fill(0))
-    );
-    this.tileMap = new Array(2).fill(new Array(1024).fill(0));
+    this.pixelMap = new Array(CanvasRenderer.screenHeight)
+      .fill(0)
+      .map(y => new Array(CanvasRenderer.screenWidth).fill(0));
+    this.tileData = new Array(384)
+      .fill(0)
+      .map(y => new Array(8).fill(0).map(x => new Array(8).fill(0)));
+    this.tileMap = new Array(2).fill(0).map(m => new Array(1024).fill(0));
     this.paletteMap = [0, 0, 0, 0];
     this.stat = 0;
     this.mode = 2;
@@ -114,7 +106,7 @@ class PPU {
     this.windowY = 0;
     this.palette = 0;
   };
-  private vBlank = (): void => {
+  private vBlank = (canvasRenderer: CanvasRenderer): void => {
     if (this.clock >= 456) {
       this.updateScanline(this.scanline + 1);
       this.clock = 0;
@@ -126,6 +118,7 @@ class PPU {
   };
   private hBlank = (): void => {
     if (this.clock >= 204) {
+      this.drawScanline();
       this.updateScanline(this.scanline + 1);
       if (this.scanline === CanvasRenderer.screenHeight) {
         this.mode = PPU.ppuModes.vBlank;
@@ -144,7 +137,6 @@ class PPU {
     if (this.clock >= 172) {
       this.mode = PPU.ppuModes.hBlank;
     }
-    this.drawScanline();
   };
   private lcdInterrupt = (switchedMode: boolean): void => {
     const interruptBit = PPU.statBits.interrupt[this.mode];
@@ -159,19 +151,10 @@ class PPU {
   /**
    * Updates internal representation of graphics
    */
-  public buildGraphics = (cycles: number): void => {
-    this.paletteMap[0] =
-      (Primitive.getBit(this.palette, 1) << 1) |
-      Primitive.getBit(this.palette, 0);
-    this.paletteMap[1] =
-      (Primitive.getBit(this.palette, 3) << 1) |
-      Primitive.getBit(this.palette, 2);
-    this.paletteMap[2] =
-      (Primitive.getBit(this.palette, 5) << 1) |
-      Primitive.getBit(this.palette, 4);
-    this.paletteMap[3] =
-      (Primitive.getBit(this.palette, 7) << 1) |
-      Primitive.getBit(this.palette, 6);
+  public buildGraphics = (
+    canvasRenderer: CanvasRenderer,
+    cycles: number
+  ): void => {
     if (this.lcdc.enable) {
       this.clock += cycles;
       const oldMode = this.mode;
@@ -180,7 +163,7 @@ class PPU {
           this.hBlank();
           break;
         case PPU.ppuModes.vBlank:
-          this.vBlank();
+          this.vBlank(canvasRenderer);
           break;
         case PPU.ppuModes.readOAM:
           this.readOAM();
@@ -198,7 +181,6 @@ class PPU {
   public compareLcLyc = (): void => {
     const register: byte = this.stat;
     if (this.scanline === this.scanlineCompare) {
-      console.log('scanline compare condition');
       this.stat = Primitive.setBit(register, PPU.statBits.lycLc);
       if (Primitive.getBit(this.stat, PPU.statBits.lycLcInterrupt)) {
         this.interruptService.enable(InterruptService.flags.lcdStat);
@@ -227,164 +209,43 @@ class PPU {
     return testBit ? 0x9c00 : 0x9800;
   }
   public renderTiles = (): void => {
-    // there are 2 tile maps which map indices to tiles. Each map stores 32x32 tiles.Each tile index is a byte.
+    // there are 2 tile maps which map indices to tiles. Each map stores 32x32 tiles. Each tile index is a byte. Each tile is 8x8 pixels, which using 2bpp means 16 bytes per tile.
 
-    // which tile map to use?
-    // const tileMapOffset = this.tileMapMemoryIndex() - 0x1800;
+    const mapIndex = !this.lcdc.bgTileMapArea ? 0 : 1;
 
-    // const windowVisible = this.windowVisible();
-    const tileMapMode = this.lcdc.bgTileMapArea;
-
-    // ? this.lcdc.windowTileMapArea
-    // : this.lcdc.bgTileMapArea;
-    const mapIndex = !tileMapMode ? 0 : 1;
-    // const mapOffset = mapIndex ? 0x1c00 : 0x1800;
     // Background:
     // scy and scx specify top left origin of visible 160x144 pixel area within 256x256 tile map. If the visible area exceeds bounds of tile map, wraps around
 
     // Window:
     // const windowXOffset = this.windowX - 7;
     // const bgDataAddressIndex = this.bgMemoryMapIndex();
-    // if (bgDataAddressIndex === 1) {
-    // }
-    // tile index x offset
-    // if (this.scrollY !== 80 && this.scrollY !== 100) console.log(this.scrollY);
-    // this.scrollY = 0;
-    let tileCol = (this.scrollX / 8) & 31;
-    const tileRow = Math.floor(
-      Primitive.toByte(this.scanline + this.scrollY) / 8
-    );
-    // console.log(`tile x index: ${tileCol}, y index: ${tileRow}`);
-    let tileIndex =
-      // this.memory.vRAM[mapOffset + tileCol + tileRow];
-      this.tileMap[0][tileCol + tileRow * 32];
+    let tileCol = (this.scrollX >> 3) & 31;
+    const tileYOffset = this.scanline + this.scrollY;
+    const tileRow = Primitive.toByte(tileYOffset) >> 3;
 
-    // if (
-    //   [
-    //     0x110,
-    //     0x12f,
-    //     0x12e,
-    //     0x12d,
-    //     0x12c,
-    //     0x12b,
-    //     0x12a,
-    //     0x129,
-    //     0x128,
-    //     0x127,
-    //     0x126,
-    //     0x125,
-    //     0x124,
-    //     0x10f,
-    //     0x10e,
-    //     0x10d,
-    //     0x10c,
-    //     0x10b,
-    //     0x10a,
-    //     0x109,
-    //     0x108,
-    //     0x107,
-    //     0x106,
-    //     0x105,
-    //     0x104,
-    //   ].includes(addr)
-    // )
-    //   console.log(`map index: ${Primitive.toHex(tileCol + tileRow * 32)}`);
+    let tileIndex = this.tileMap[mapIndex][tileCol + (tileRow << 5)];
 
     let tileX = this.scrollX & 7;
-    const tileY = (this.scanline + this.scrollY) & 7;
-    // const windowVisible =
-    // this.lcdc.windowEnable && this.scanline >= this.windowY;
-    // if (!windowVisible) {
-    //   yPos = this.scrollY + this.scanline;
-    // } else {
-    //   yPos = this.scanline - this.windowY;
-    // }
-    // which tile data to use?
+    let tileY = this.tileData[tileIndex][tileYOffset & 7];
+
     // When using tile lookup method 1, 8000 is the base pointer. Block 0 (8000-87ff) maps to indices 0-127 and Block 1 (8800-8fff) maps to indices 128-255
 
     // Using method 2, 9000 is the base pointer and the indices are signed. Indices 128-255 (or -127-0) map to block 1 and indices 0-127 map to block 2 (9000-97ff)
-    // let yPos;
-    const tileDataBaseAddress = this.lcdc.bgWindowTileData ? 0x8000 : 0x9000;
-    const isSigned = tileDataBaseAddress === 0x9000;
-    // console.log(isSigned);
-    // console.log(tileDataBaseAddress);
-    // console.log(!tileMapMode ? '9800' : '9c00');
+    const isSigned = this.lcdc.bgWindowTileData === 0;
     // start from block 2 if using signed data
-    if (tileIndex <= 127) tileIndex += 256;
+    if (isSigned && tileIndex <= 127) tileIndex += 256;
     for (let x = 0; x < CanvasRenderer.screenWidth; x++) {
-      // let xPos;
-      // if (windowVisible && x >= windowXOffset) {
-      //   xPos = x - windowXOffset;
-      // } else {
-      //   xPos = x + this.scrollX;
-      // }
-      this.pixelMap[this.scanline][x] = [0, 1, 2, 3][
-        this.tileData[tileIndex][tileY][tileX]
-      ];
-
-      // if (
-      //   [
-      //     0x110,
-      //     0x12f,
-      //     0x12e,
-      //     0x12d,
-      //     0x12c,
-      //     0x12b,
-      //     0x12a,
-      //     0x129,
-      //     0x128,
-      //     0x127,
-      //     0x126,
-      //     0x125,
-      //     0x124,
-      //     0x10f,
-      //     0x10e,
-      //     0x10d,
-      //     0x10c,
-      //     0x10b,
-      //     0x10a,
-      //     0x109,
-      //     0x108,
-      //     0x107,
-      //     0x106,
-      //     0x105,
-      //     0x104,
-      //   ].includes(tileCol + tileRow * 32)
-      // )
-      //   console.log(`tile data: ${this.tileData[tileIndex][tileY][tileX]}`);
-      // console.log(
-      //   `map index: ${Primitive.toHex(
-      //     tileCol + tileRow * 32
-      //   )}, tile index: ${tileIndex}`
-      // );
-
-      // if (this.tileData[tileIndex][tileY][tileX])
-
+      this.pixelMap[this.scanline][x] = this.paletteMap[tileY[tileX]];
       tileX += 1;
       if (tileX === 8) {
         tileX = 0;
         tileCol += 1;
         // wrap around screen if reached last tile
         if (tileCol === 32) tileCol = 0;
-        tileIndex = this.tileMap[0][tileCol + tileRow * 32];
-        if (tileIndex <= 127) tileIndex += 256;
-        // console.log(isSigned);
-        // if (isSigned && tileIndex <= 127) tileIndex += 256;
+        tileIndex = this.tileMap[mapIndex][tileCol + (tileRow << 5)];
+        if (isSigned && tileIndex <= 127) tileIndex += 256;
+        tileY = this.tileData[tileIndex][(this.scanline + this.scrollY) & 7];
       }
-      // const tileCol = Math.floor(xPos / 8);
-      // const tileAddressX = tileAddress + tileCol;
-      // const tileId = isSigned
-      //   ? Primitive.toSigned(this.memory.readByte(tileAddressX))
-      //   : this.memory.readByte(tileAddressX);
-      // const tileLocation =
-      //   tileDataAddress + (isSigned ? (tileId + 128) * 16 : tileId * 16);
-      // const tile = this.memory.readWord(tileLocation + line);
-      // const colorBit = -((xPos % 8) - 7);
-      // const colorIndex =
-      //   (Primitive.getBit(Primitive.upper(tile), colorBit) << 1) |
-      //   Primitive.getBit(Primitive.lower(tile), colorBit);
-
-      // this.pixelMap[this.scanline][xPos] = this.paletteMap[colorIndex];
     }
   };
   public renderSprites = (): void => {};

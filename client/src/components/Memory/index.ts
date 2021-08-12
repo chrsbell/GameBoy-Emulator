@@ -1,7 +1,6 @@
 import CPU from 'CPU/index';
 import {DEBUG} from 'helpers/Debug';
 import error from 'helpers/Error';
-import benchmark from 'helpers/Performance';
 import Primitive from 'helpers/Primitives';
 import PPU from 'PPU/index';
 import Cartridge from './Cartridge';
@@ -108,8 +107,6 @@ class Memory {
   constructor(ppuBridge: PPUBridge) {
     this.ppuBridge = ppuBridge;
     this.reset();
-    this.readByte = benchmark(this, 'readByte');
-    this.writeByte = benchmark(this, 'writeByte');
   }
   /**
    * Resets the Memory module.
@@ -135,8 +132,7 @@ class Memory {
       // write to ROM bank of cartridge
       // this.cartOMBanks[this.cart.currROMBank - 1][address - 0x4000] = data;
     } else if (address <= 0x9fff) {
-      address = address - 0x8000;
-      this.vRAM[address] = data;
+      this.vRAM[address - 0x8000] = data;
       this.ppuBridge.updateTiles(address, data);
     } else if (address <= 0xbfff) {
       this.cart.handleRegisterChanges(address, data);

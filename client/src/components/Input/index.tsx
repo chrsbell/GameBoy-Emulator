@@ -60,5 +60,5 @@ class Input {
     this.down(key) && !this.keydebounce[key];
 }
 
-export default new Input();
+export default Input;
 export {Key};

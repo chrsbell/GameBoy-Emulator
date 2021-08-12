@@ -10,6 +10,7 @@
   "scripts": {
     "start": "ts-node server/index.ts",
     "build:dev": "npx webpack --mode development --watch",
+    "build": "npx webpack --mode production",
     "test": "jest --verbose --watch --coverage",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand --verbose --silent --watch",
     "test:build": "python3 client/test/dump_pyboy.py",

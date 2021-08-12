@@ -1,7 +1,7 @@
 import Emulator from '.';
 
 describe('Emulator', () => {
-  const gb = new Emulator();
+  const gb: Emulator = new Emulator();
   const bios = new Uint8Array([...Array(8192).fill(1)]);
   const rom = new Uint8Array([...Array(8192).fill(1)]);
   const setupGb = (): void => {

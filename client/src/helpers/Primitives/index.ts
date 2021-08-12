@@ -61,13 +61,13 @@ const addWord = (opOne: word, opTwo: word | byte): word =>
  * @returns {word}
  */
 const addUpper = (value: word, operand: byte): word =>
-  lower(value) | (addByte(upper(value), operand) << 8);
+  (value & 255) | (addByte(upper(value), operand) << 8);
 
 /**
  * Adds the operand to the lower byte.
  */
 const addLower = (value: word, operand: byte): word =>
-  (upper(value) << 8) | addByte(lower(value), operand);
+  (upper(value) << 8) | ((value + operand) & 255);
 
 /**
  * Formats the byte/word as a hex value
@@ -86,23 +86,14 @@ const toSigned = (value: byte): byte => {
 };
 
 const getBit = (value: byte, bit: number): bit => {
-  if (bit > 7) {
-    throw new Error('Tried to get bit outside of range.');
-  }
   return (value >> bit) & 1;
 };
 
 const setBit = (value: byte, bit: number): byte => {
-  if (bit > 7) {
-    throw new Error('Tried to set bit outside of range.');
-  }
   return value | (1 << bit);
 };
 
 const clearBit = (value: byte, bit: number): byte => {
-  if (bit > 7) {
-    throw new Error('Tried to clear bit outside of range.');
-  }
   return value & ~(1 << bit);
 };
 

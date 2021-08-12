@@ -31,7 +31,6 @@ class MBC1 extends Cartridge {
     }
     const numRAMBanks = RAMSizeCodeMap[this.ramSizeCode].numBanks;
     const ramSize = RAMSizeCodeMap[this.ramSizeCode].size;
-    debugger;
     if (numRAMBanks) {
       this.ramBanks = new Array(numRAMBanks);
       for (let i = 0; i < numROMBanks; i++) {

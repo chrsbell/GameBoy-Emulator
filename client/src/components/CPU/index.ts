@@ -1,9 +1,8 @@
 import {DEBUG} from 'helpers/Debug';
-import benchmark from 'helpers/Performance';
 import Primitive from 'helpers/Primitives';
 import InterruptService from 'Interrupts/index';
 import Memory from 'Memory/index';
-import Opcodes from './sm83';
+import Opcodes from './sm83/index';
 import {instructionHelpers as helpers} from './sm83/Map';
 
 interface Registers {
@@ -14,6 +13,7 @@ interface Registers {
 }
 
 class CPU {
+  private memory!: Memory;
   // number of clock ticks per second
   private _clock = 4194304;
   get clock(): number {
@@ -57,9 +57,12 @@ class CPU {
   private allInterruptsEnabled = true;
   private opcodes: OpcodeList = Opcodes;
   private lastExecuted: Array<string> = [];
-  constructor() {
-    this.executeInstruction = benchmark(this, 'executeInstruction');
-    this.checkInterrupts = benchmark(this, 'checkInterrupts');
+  constructor(memory: Memory) {
+    this.memory = memory;
+
+    Object.entries(this.opcodes).forEach(([name, func]) => {
+      this.opcodes[name] = func.bind(this, this, memory);
+    });
 
     this.reset();
   }
@@ -128,23 +131,22 @@ class CPU {
    * Executes next opcode.
    * @returns {number} the number of CPU cycles required.
    */
-  public executeInstruction = (memory: Memory): number => {
+  public executeInstruction = (): number => {
     // fetch
-    const opcode: byte = memory.readByte(this.pc);
-    this.addCalledInstruction(Primitive.toHex(opcode));
+    const opcode: byte = this.memory.readByte(this.pc);
     this.pc += 1;
     this.pc &= 0xffff;
     // execute
     let numCycles: number;
-    if (memory.inBios) {
-      numCycles = this.opcodes[opcode](this, memory);
-      // check if finished bios execution
-      if (!memory.inBios) {
+    // check if finished bios execution
+    if (this.memory.inBios) {
+      numCycles = this.opcodes[opcode]();
+      if (!this.memory.inBios) {
         DEBUG && console.log('Exiting bios from this.');
-        this.initPowerSequence(memory);
+        this.initPowerSequence(this.memory);
       }
     } else {
-      numCycles = this.opcodes[opcode](this, memory);
+      numCycles = this.opcodes[opcode]();
     }
     return numCycles;
   };
@@ -216,83 +218,47 @@ class CPU {
     console.log(`JS GB SP: ${this.sp}`);
   };
 
-  public setZFlag = (value: byte): void => {
+  public setCYFlag = (value: boolean | byte): void => {
     if (value) {
-      this.r.af = Primitive.setLower(
-        this.r.af,
-        Primitive.setBit(Primitive.lower(this.r.af), 7)
-      );
+      this.r.af |= 1 << 4;
     } else {
-      this.r.af = Primitive.setLower(
-        this.r.af,
-        Primitive.clearBit(Primitive.lower(this.r.af), 7)
-      );
+      this.r.af &= ~(1 << 4);
     }
   };
 
-  public setCYFlag = (value: byte): void => {
+  public setHFlag = (value: boolean | byte): void => {
     if (value) {
-      this.r.af = Primitive.setLower(
-        this.r.af,
-        Primitive.setBit(Primitive.lower(this.r.af), 4)
-      );
+      this.r.af |= 1 << 5;
     } else {
-      this.r.af = Primitive.setLower(
-        this.r.af,
-        Primitive.clearBit(Primitive.lower(this.r.af), 4)
-      );
+      this.r.af &= ~(1 << 5);
     }
   };
 
-  public setHFlag = (value: byte): void => {
-    if (value === 1) {
-      this.r.af = Primitive.setLower(
-        this.r.af,
-        Primitive.setBit(Primitive.lower(this.r.af), 5)
-      );
-    } else {
-      this.r.af = Primitive.setLower(
-        this.r.af,
-        Primitive.clearBit(Primitive.lower(this.r.af), 5)
-      );
-    }
-  };
-
-  public setNFlag = (value: byte): void => {
+  public setNFlag = (value: boolean | byte): void => {
     if (value) {
-      this.r.af = Primitive.setLower(
-        this.r.af,
-        Primitive.setBit(Primitive.lower(this.r.af), 6)
-      );
+      this.r.af |= 1 << 6;
     } else {
-      this.r.af = Primitive.setLower(
-        this.r.af,
-        Primitive.clearBit(Primitive.lower(this.r.af), 6)
-      );
+      this.r.af &= ~(1 << 6);
     }
   };
 
-  public getZFlag = (): bit => {
-    return Primitive.getBit(Primitive.lower(this.r.af), 7);
+  public setZFlag = (value: boolean | byte): void => {
+    if (value) {
+      this.r.af |= 1 << 7;
+    } else {
+      this.r.af &= ~(1 << 7);
+    }
   };
-  public getCYFlag = (): bit => {
-    return Primitive.getBit(Primitive.lower(this.r.af), 4);
-  };
-  public getHFlag = (): bit => {
-    return Primitive.getBit(Primitive.lower(this.r.af), 5);
-  };
-  public getNFlag = (): bit => {
-    return Primitive.getBit(Primitive.lower(this.r.af), 6);
-  };
+
+  public getCYFlag = (): bit => (this.r.af >> 4) & 1;
+  public getHFlag = (): bit => (this.r.af >> 5) & 1;
+  public getNFlag = (): bit => (this.r.af >> 6) & 1;
+  public getZFlag = (): bit => (this.r.af >> 7) & 1;
   /**
    * Sets the Z flag if the register is 0, otherwise resets it.
    */
   public checkZFlag = (reg: byte): void => {
-    if (!reg) {
-      this.setZFlag(1);
-    } else {
-      this.setZFlag(0);
-    }
+    this.setZFlag(!reg);
   };
 
   /**
@@ -311,7 +277,7 @@ class CPU {
     const carryBit = subtraction
       ? ((op1 & 0xf) - (op2 & 0xf)) & 0x10
       : ((op1 & 0xf) + (op2 & 0xf)) & 0x10;
-    this.setHFlag(carryBit === 0x10 ? 1 : 0);
+    this.setHFlag(carryBit === 0x10);
   };
   /**
    * Sets the carry flag if the sum will exceed the size of the data type.
@@ -322,17 +288,9 @@ class CPU {
     subtraction?: boolean
   ): void => {
     if (subtraction) {
-      if (op1 - op2 < 0) {
-        this.setCYFlag(1);
-      } else {
-        this.setCYFlag(0);
-      }
+      this.setCYFlag(op1 - op2 < 0);
     } else {
-      if (op1 + op2 > 0xffff) {
-        this.setCYFlag(1);
-      } else {
-        this.setCYFlag(0);
-      }
+      this.setCYFlag(op1 + op2 > 0xffff);
     }
   };
 
@@ -342,17 +300,9 @@ class CPU {
     subtraction?: boolean
   ): void => {
     if (subtraction) {
-      if (op1 - op2 < 0) {
-        this.setCYFlag(1);
-      } else {
-        this.setCYFlag(0);
-      }
+      this.setCYFlag(op1 - op2 < 0);
     } else {
-      if (op1 + op2 > 0xff) {
-        this.setCYFlag(1);
-      } else {
-        this.setCYFlag(0);
-      }
+      this.setCYFlag(op1 + op2 > 0xffff);
     }
   };
 }

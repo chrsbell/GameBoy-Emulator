@@ -1,4 +1,3 @@
-import benchmark, {benchmarksEnabled} from 'helpers/Performance';
 import {sample} from 'lodash';
 import PPU from 'PPU/index';
 
@@ -37,12 +36,7 @@ class CanvasRenderer {
   public static screenHeight = 144;
   public fps = 60;
 
-  constructor() {
-    if (benchmarksEnabled) {
-      this.setPixel = benchmark<CanvasRenderer>(this, 'setPixel');
-      this.draw = benchmark<CanvasRenderer>(this, 'draw');
-    }
-  }
+  constructor() {}
 
   public initialize = (canvas: HTMLCanvasElement, scaleFactor = 1): void => {
     if (canvas && !this.initialized) {
@@ -59,7 +53,7 @@ class CanvasRenderer {
         CanvasRenderer.screenHeight * this.scaleFactor
       );
       this.initialized = true;
-      // this.timeout = window.requestAnimationFrame(this.draw);
+      this.timeout = window.requestAnimationFrame(this.drawOnScreen);
     }
   };
 
@@ -84,7 +78,7 @@ class CanvasRenderer {
     }
   };
 
-  public draw = (): void => {
+  public buildImage = (): void => {
     for (let y = 0; y < CanvasRenderer.screenHeight; y++) {
       for (let x = 0; x < CanvasRenderer.screenWidth; x++) {
         this.setPixel(x, y, this.colorScheme[this.ppu.pixelMap[y][x]]);
@@ -100,6 +94,7 @@ class CanvasRenderer {
 
   public drawOnScreen = (): void => {
     this.context.drawImage(this.canvasOffscreen, 0, 0);
+    this.timeout = window.requestAnimationFrame(this.drawOnScreen);
     // setTimeout(this.drawOnScreen, 100);
   };
 

@@ -1249,7 +1249,6 @@ const OpcodeMap: OpcodeList = {
 
   0xcb: function (cpu: CPU, memory: Memory): void {
     const opcode: byte = memory.readByte(cpu.pc);
-    cpu.addCalledInstruction(`CB: ${Primitive.toHex(opcode)}`);
     cbMap[opcode](cpu, memory);
     cpu.pc += 1;
   },

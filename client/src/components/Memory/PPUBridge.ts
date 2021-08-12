@@ -1,5 +1,6 @@
 import {DEBUG} from 'helpers/Debug';
 import InterruptService from 'Interrupts/index';
+import Primitive from '../../helpers/Primitives';
 import Memory from '../Memory/index';
 import PPU from '../PPU/index';
 
@@ -9,7 +10,7 @@ import PPU from '../PPU/index';
 class PPUBridge {
   public ppu!: PPU;
   public memory!: Memory;
-  private interruptService!: InterruptService;
+  public interruptService!: InterruptService;
   constructor() {
     this.memory = new Memory(this);
     this.interruptService = new InterruptService(this.memory);
@@ -30,63 +31,33 @@ class PPUBridge {
 
     // https://www.huderlem.com/demos/gameboy2bpp.html
 
-    // row 0
-    // [0,0,0,0,0,0,0,0],
-    // [0,0,0,0,0,0,0,0]
-
-    // row 1
-    // [0,0,0,0,0,0,0,0],
-    // [0,0,0,0,0,0,0,0]
-
     // writing to tile data in vram
-    if (address < 0x1800) {
-      const tileIndex = (address >> 4) & 511; //Math.floor(address / 16);
-      // if (data) console.log(`writing to tile ibndex ${tileIndex}`);
-      if (address & 1) {
-        address -= 1;
-      }
+    if (address < 0x9800) {
+      // using the 2bpp system, the low byte must be on an even address
+      // 00000000 -> 0
+      // 11111111 -> 1
+      if (address % 2 === 1) address -= 1;
+      const lowByte = this.memory.readByte(address);
+      const highByte = this.memory.readByte(address + 1);
+      const tileIndex = Math.floor((address - 0x8000) / 16);
       const y = (address >> 1) & 7;
-      let lowByte;
-      let highByte;
+
+      let lowBit: bit;
+      let highBit: bit;
 
       for (let x = 7; x >= 0; x--) {
-        // using the 2bpp system, the low byte must be on an even address
-        //   highByte = data & x; //Primitive.getBit(data, x);
-        //   lowByte = this.memory.vRAM[address - 1] & x; //Primitive.getBit(this.vRAM[address - 0x8000 - 1], x);
-        // } else {
-
-        lowByte = data & x; //Primitive.getBit(data, x);
-        highByte = this.memory.vRAM[address + 1] & x; //Primitive.getBit(this.vRAM[address - 0x8000 - 1], x);
-        const tileData = (lowByte ? 1 : 0) | (highByte ? 2 : 0);
-        if (tileData > 1) console.log(`something cool happened ${tileData}`);
+        lowBit = Primitive.getBit(lowByte, x);
+        highBit = Primitive.getBit(highByte, x);
+        const tileData = (lowBit ? 1 : 0) | (highBit ? 2 : 0);
         this.ppu.tileData[tileIndex][y][7 - x] = tileData;
       }
-      // if (f) console.log(JSON.stringify(tilearr));
-      // if (
-      //   tilearr.reduce(
-      //     (acc, col) => acc || col.find((x: number) => x !== 0),
-      //     false
-      //   )
-      // )
-      //   console.log(`Wrote tile info ${tilearr}`);
-    } else if (address <= 0x1bff) {
-      this.ppu.tileMap[0][address - 0x1800] = data;
-      // if (data)
-      //   console.log(
-      //     `Wrote ${data} at address ${Primitive.toHex(
-      //       address - 0x9800
-      //     )} at x ${
-      //       address - 0x9800 - Math.floor((address - 0x9800) / 32) * 32
-      //     }, y ${Math.floor((address - 0x9800) / 32)}`
-      //   );
+    } else if (address <= 0x9bff) {
+      this.ppu.tileMap[0][address - 0x9800] = data;
     } else {
-      this.ppu.tileMap[1][address - 0x1c00] = data;
-      // if (data !== 0)
-      //   console.log(
-      //     `updated tile map index: ${address - 0x9800} with data ${data}`
-      //   );
+      this.ppu.tileMap[1][address - 0x9c00] = data;
     }
   };
+
   public writeIORam = (address: word, data: byte): void => {
     if (address === Memory.addresses.ppu.lcdc) this.ppu.lcdc.update(data);
     else if (address === Memory.addresses.ppu.stat) this.ppu.stat = data;
@@ -101,8 +72,15 @@ class PPUBridge {
       DEBUG && console.log('Initiated DMA transfer.');
       this.memory.dmaTransfer(data);
     } else if (address === Memory.addresses.ppu.paletteData) {
-      console.log(`updated palette with ${data.toString(2)}`);
       this.ppu.palette = data;
+      this.ppu.paletteMap[0] =
+        (Primitive.getBit(data, 1) << 1) | Primitive.getBit(data, 0);
+      this.ppu.paletteMap[1] =
+        (Primitive.getBit(data, 3) << 1) | Primitive.getBit(data, 2);
+      this.ppu.paletteMap[2] =
+        (Primitive.getBit(data, 5) << 1) | Primitive.getBit(data, 4);
+      this.ppu.paletteMap[3] =
+        (Primitive.getBit(data, 7) << 1) | Primitive.getBit(data, 6);
     } else if (address === Memory.addresses.ppu.windowX)
       this.ppu.windowX = data;
     else if (address === Memory.addresses.ppu.windowY) this.ppu.windowY = data;
