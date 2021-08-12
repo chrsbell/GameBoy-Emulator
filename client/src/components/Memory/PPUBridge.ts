@@ -21,7 +21,7 @@ class PPUBridge {
    * Used internally by the PPU/lCD to update the current scanline.
    */
   public updateScanline = (scanline: byte): void => {
-    this.memory.ram[Memory.addresses.ppu.scanline] = scanline;
+    this.memory.ram[0xff44] = scanline;
   };
   public writeIORamOnly = (address: word, data: byte): void => {
     this.memory.ram[address] = data;
@@ -59,8 +59,11 @@ class PPUBridge {
   };
 
   public writeIORam = (address: word, data: byte): void => {
+    if (address === Memory.addresses.ppu.stat) {
+      this.ppu.setStat(data);
+      return;
+    }
     if (address === Memory.addresses.ppu.lcdc) this.ppu.lcdc.update(data);
-    else if (address === Memory.addresses.ppu.stat) this.ppu.stat = data;
     else if (address === Memory.addresses.ppu.scrollY) this.ppu.scrollY = data;
     else if (address === Memory.addresses.ppu.scrollX) this.ppu.scrollX = data;
     // reset scanline if trying to write to associated register

@@ -42,26 +42,29 @@ class PPU {
   // internal representation of canvas, copied over during update
   public pixelMap!: byte[][];
   // stat register
-  private _stat = 0;
-  set stat(value: number) {
-    this._stat = value;
-    this._mode = value & 0b11;
-    this.ppuBridge.writeIORamOnly(Memory.addresses.ppu.stat, this._stat);
-  }
-  get stat(): number {
-    return this._stat;
-  }
-  private _mode = 2;
-  set mode(value: number) {
-    this._mode = value;
-    this._stat = Primitive.clearBit(this._stat, PPU.statBits.modeLower);
-    this._stat = Primitive.clearBit(this._stat, PPU.statBits.modeUpper);
-    this._stat |= value;
-    this.ppuBridge.writeIORamOnly(Memory.addresses.ppu.stat, this._stat);
-  }
-  get mode(): number {
-    return this.stat & 0b11;
-  }
+  private stat = 0;
+  public setStat = (value: number): void => {
+    this.stat = value;
+    this.mode = value & 0b11;
+    this.ppuBridge.writeIORamOnly(Memory.addresses.ppu.stat, this.stat);
+  };
+  private mode = 2;
+  public setMode = (value: number): void => {
+    // lcd mode switch interrupt condition
+    // only certain modes trigger an interrupt
+    const interruptBit = PPU.statBits.interrupt[this.mode];
+    if (interruptBit >= 0) {
+      const interruptModeBit = (this.stat >> interruptBit) & 1; //Primitive.getBit(reg, interruptBit);
+      if (interruptModeBit && value !== this.mode) {
+        this.interruptService.enable(InterruptService.flags.lcdStat);
+      }
+    }
+    this.mode = value;
+    this.stat = Primitive.clearBit(this.stat, PPU.statBits.modeLower);
+    this.stat = Primitive.clearBit(this.stat, PPU.statBits.modeUpper);
+    this.stat |= value;
+    this.ppuBridge.writeIORamOnly(Memory.addresses.ppu.stat, this.stat);
+  };
   // clock used to determine the draw mode, elapsed according to cpu t-states
   private clock = 0;
   // the scanline currently being rendererd (0-153)
@@ -69,6 +72,17 @@ class PPU {
   public updateScanline = (value: byte): void => {
     this.scanline = value;
     this.ppuBridge.updateScanline(value);
+    // scanline compare interrupt condition
+    let reg: byte = this.stat;
+    if (this.scanline === this.scanlineCompare) {
+      reg |= 1 << 2;
+      if ((reg >> 6) & 1) {
+        this.interruptService.enable(1);
+      }
+    } else {
+      reg &= ~(1 << 2);
+    }
+    this.setStat(reg);
   };
   public scanlineCompare: byte = 0;
   public scrollX: byte = 0;
@@ -95,8 +109,8 @@ class PPU {
       .map(y => new Array(8).fill(0).map(x => new Array(8).fill(0)));
     this.tileMap = new Array(2).fill(0).map(m => new Array(1024).fill(0));
     this.paletteMap = [0, 0, 0, 0];
-    this.stat = 0;
-    this.mode = 2;
+    this.setStat(0);
+    this.setMode(2);
     this.clock = 0;
     this.scanline = 0;
     this.scanlineCompare = 0;
@@ -106,12 +120,12 @@ class PPU {
     this.windowY = 0;
     this.palette = 0;
   };
-  private vBlank = (canvasRenderer: CanvasRenderer): void => {
+  private vBlank = (): void => {
     if (this.clock >= 456) {
       this.updateScanline(this.scanline + 1);
       this.clock = 0;
       if (this.scanline > 153) {
-        this.mode = PPU.ppuModes.readOAM;
+        this.setMode(PPU.ppuModes.readOAM);
         this.updateScanline(0);
       }
     }
@@ -121,21 +135,21 @@ class PPU {
       this.drawScanline();
       this.updateScanline(this.scanline + 1);
       if (this.scanline === CanvasRenderer.screenHeight) {
-        this.mode = PPU.ppuModes.vBlank;
+        this.setMode(PPU.ppuModes.vBlank);
         this.interruptService.enable(InterruptService.flags.vBlank);
       } else {
-        this.mode = PPU.ppuModes.readOAM;
+        this.setMode(PPU.ppuModes.readOAM);
       }
     }
   };
   private readOAM = (): void => {
     if (this.clock >= 80) {
-      this.mode = PPU.ppuModes.readVRAM;
+      this.setMode(PPU.ppuModes.readVRAM);
     }
   };
   private readVRAM = (): void => {
     if (this.clock >= 172) {
-      this.mode = PPU.ppuModes.hBlank;
+      this.setMode(PPU.ppuModes.hBlank);
     }
   };
   private lcdInterrupt = (switchedMode: boolean): void => {
@@ -151,49 +165,73 @@ class PPU {
   /**
    * Updates internal representation of graphics
    */
-  public buildGraphics = (
-    canvasRenderer: CanvasRenderer,
-    cycles: number
-  ): void => {
-    if (this.lcdc.enable) {
+  public buildGraphics = (cycles: number): void => {
+    const {lcdc} = this;
+    if (lcdc.enable) {
       this.clock += cycles;
       const oldMode = this.mode;
-      switch (this.mode) {
-        case PPU.ppuModes.hBlank:
-          this.hBlank();
+      switch (oldMode) {
+        case 0:
+          if (this.clock >= 204) {
+            if (lcdc.bgWindowEnable) {
+              this.renderTiles();
+            }
+            if (lcdc.objEnable) {
+              this.renderSprites();
+            }
+            this.updateScanline(this.scanline + 1);
+            if (this.scanline === CanvasRenderer.screenHeight) {
+              this.setMode(1);
+              this.interruptService.enable(1);
+            } else {
+              this.setMode(2);
+            }
+          }
           break;
-        case PPU.ppuModes.vBlank:
-          this.vBlank(canvasRenderer);
+        case 1:
+          if (this.clock >= 456) {
+            this.updateScanline(this.scanline + 1);
+            this.clock = 0;
+            if (this.scanline > 153) {
+              this.setMode(2);
+              this.updateScanline(0);
+            }
+          }
           break;
-        case PPU.ppuModes.readOAM:
-          this.readOAM();
+        case 2:
+          if (this.clock >= 80) {
+            this.setMode(PPU.ppuModes.readVRAM);
+          }
           break;
-        case PPU.ppuModes.readVRAM:
-          this.readVRAM();
+        case 3:
+          if (this.clock >= 172) {
+            this.setMode(PPU.ppuModes.hBlank);
+          }
           break;
       }
-      this.lcdInterrupt(oldMode !== this.mode);
-      this.compareLcLyc();
     } else {
-      this.resetVBlank();
+      // reset v blank
+      this.clock = 0;
+      this.scanline = 0;
+      this.setMode(PPU.ppuModes.vBlank);
     }
   };
   public compareLcLyc = (): void => {
     const register: byte = this.stat;
     if (this.scanline === this.scanlineCompare) {
-      this.stat = Primitive.setBit(register, PPU.statBits.lycLc);
+      this.setStat(Primitive.setBit(register, PPU.statBits.lycLc));
       if (Primitive.getBit(this.stat, PPU.statBits.lycLcInterrupt)) {
         this.interruptService.enable(InterruptService.flags.lcdStat);
       }
     } else {
-      this.stat = Primitive.clearBit(register, PPU.statBits.lycLc);
+      this.setStat(Primitive.clearBit(register, PPU.statBits.lycLc));
     }
     this.ppuBridge.writeIORam(Memory.addresses.ppu.stat, this.stat);
   };
   public resetVBlank = (): void => {
     this.clock = 0;
     this.scanline = 0;
-    this.mode = PPU.ppuModes.vBlank;
+    this.setMode(PPU.ppuModes.vBlank);
   };
   private windowVisible(): boolean {
     return (
