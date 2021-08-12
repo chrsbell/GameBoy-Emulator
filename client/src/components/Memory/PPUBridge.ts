@@ -21,10 +21,10 @@ class PPUBridge {
    * Used internally by the PPU/lCD to update the current scanline.
    */
   public updateScanline = (scanline: byte): void => {
-    this.memory.ioRAM[Memory.addresses.ppu.scanline - 0xff00] = scanline;
+    this.memory.ram[Memory.addresses.ppu.scanline] = scanline;
   };
   public writeIORamOnly = (address: word, data: byte): void => {
-    this.memory.ioRAM[address - 0xff00] = data;
+    this.memory.ram[address] = data;
   };
   public updateTiles = (address: word, data: byte): void => {
     // each tile (384 tiles) takes up 16 bytes in vram (range 0x8000 to 0x97ff). each tile is 8x8 pixels. A horizontal row of 8 pixels can be represented using 2 bytes, where the first byte contains the least sig bit of the color ID for each pixel. The second byte contains the most sig bit of the color ID.

@@ -15,19 +15,7 @@ class Memory {
   public inBios = false;
   private ppu!: PPU;
   public cart!: Cartridge;
-  // 8k vRAM
-  public vRAM: ByteArray = [];
-  // 8k internal RAM
-  private wRAM: ByteArray = [];
-  // shadow of working RAM, (8k - 512) bytes
-  private wRAMShadow: ByteArray = [];
-  // sprite attribute table
-  private OAM: ByteArray = [];
-  // 126 bytes high RAM
-  private hRAM: ByteArray = [];
-  // 128 bytes io register space
-  // the ppu bridge needs to use this
-  public ioRAM: ByteArray = [];
+  public ram: ByteArray = [];
   public static addresses = {
     interrupt: {
       ie: 0xffff,
@@ -47,25 +35,25 @@ class Memory {
     },
   };
   private readMemoryHIOMap: NumFuncIdx = {
-    0x00: (addr: word): byte => this.ioRAM[addr - 0xff00],
-    0x80: (addr: word): byte => this.hRAM[addr & 0x7f],
+    0x00: (addr: word): byte => this.ram[addr],
+    0x80: (addr: word): byte => this.ram[addr],
   };
   private readMemoryByteHMap: NumFuncIdx = {
-    0x000: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
-    0x100: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
-    0x200: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
-    0x300: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
-    0x400: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
-    0x500: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
-    0x600: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
-    0x700: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
-    0x800: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
-    0x900: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
-    0xa00: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
-    0xb00: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
-    0xc00: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
-    0xd00: (addr: word): byte => this.wRAMShadow[addr - 0xe000],
-    0xe00: (addr: word): byte => (addr <= 0xfe9f ? this.OAM[addr - 0xfe00] : 0), //address >= 0xfea0 is techincally outside OAM memory, revisit this
+    0x000: (addr: word): byte => this.ram[addr],
+    0x100: (addr: word): byte => this.ram[addr],
+    0x200: (addr: word): byte => this.ram[addr],
+    0x300: (addr: word): byte => this.ram[addr],
+    0x400: (addr: word): byte => this.ram[addr],
+    0x500: (addr: word): byte => this.ram[addr],
+    0x600: (addr: word): byte => this.ram[addr],
+    0x700: (addr: word): byte => this.ram[addr],
+    0x800: (addr: word): byte => this.ram[addr],
+    0x900: (addr: word): byte => this.ram[addr],
+    0xa00: (addr: word): byte => this.ram[addr],
+    0xb00: (addr: word): byte => this.ram[addr],
+    0xc00: (addr: word): byte => this.ram[addr],
+    0xd00: (addr: word): byte => this.ram[addr],
+    0xe00: (addr: word): byte => (addr <= 0xfe9f ? this.ram[addr - 0xfe00] : 0), //address >= 0xfea0 is techincally outside OAM memory, revisit this
     0xf00: (addr: word): byte => this.readMemoryHIOMap[addr & 0x80](addr),
   };
   private readMemoryByteMap: NumFuncIdx = {
@@ -91,14 +79,14 @@ class Memory {
       this.cart.romBanks[this.cart.currROMBank][addr - 0x4000],
     0x7000: (addr: word): byte =>
       this.cart.romBanks[this.cart.currROMBank][addr - 0x4000],
-    0x8000: (addr: word): byte => this.vRAM[addr - 0x8000],
-    0x9000: (addr: word): byte => this.vRAM[addr - 0x8000],
+    0x8000: (addr: word): byte => this.ram[addr],
+    0x9000: (addr: word): byte => this.ram[addr],
     0xa000: (addr: word): byte =>
       this.cart.ramBanks[this.cart.currRAMBank][addr - 0xa000],
     0xb000: (addr: word): byte =>
       this.cart.ramBanks[this.cart.currRAMBank][addr - 0xa000],
-    0xc000: (addr: word): byte => this.wRAM[addr - 0xc000],
-    0xd000: (addr: word): byte => this.wRAM[addr - 0xc000],
+    0xc000: (addr: word): byte => this.ram[addr],
+    0xd000: (addr: word): byte => this.ram[addr],
     0xf000: (addr: word): byte => {
       const hAddr = addr & 0xf00;
       return this.readMemoryByteHMap[hAddr](addr);
@@ -114,12 +102,7 @@ class Memory {
   reset(): void {
     this.bios = [];
     this.inBios = false;
-    this.vRAM = new Uint8Array(0xa000 - 0x8000);
-    this.wRAM = new Uint8Array(0xe000 - 0xc000);
-    this.wRAMShadow = new Uint8Array(0xfe00 - 0xe000);
-    this.OAM = new Uint8Array(0xfea0 - 0xfe00);
-    this.hRAM = new Uint8Array(0xffff - 0xff80);
-    this.ioRAM = new Uint8Array(0xff80 - 0xff00);
+    this.ram = new Uint8Array(0xffff);
     this.cart?.reset();
   }
   /**
@@ -132,22 +115,24 @@ class Memory {
       // write to ROM bank of cartridge
       // this.cartOMBanks[this.cart.currROMBank - 1][address - 0x4000] = data;
     } else if (address <= 0x9fff) {
-      this.vRAM[address - 0x8000] = data;
+      this.ram[address] = data;
       this.ppuBridge.updateTiles(address, data);
     } else if (address <= 0xbfff) {
       this.cart.handleRegisterChanges(address, data);
     } else if (address <= 0xdfff) {
-      this.wRAM[address - 0xc000] = data;
+      this.ram[address] = data;
+      // write to shadow ram
+      // if (address <= 0xddff) this.ram[address + 0x1000] = data;
     } else if (address <= 0xfdff) {
       error(`Can't write to prohibited address ${Primitive.toHex(address)}.`);
     } else if (address <= 0xfe9f) {
-      this.OAM[address - 0xfe00] = data;
+      this.ram[address] = data;
     } else if (address <= 0xfeff) {
       error(`Can't write to prohibited address ${Primitive.toHex(address)}.`);
     } else if (address <= 0xff7f) {
       this.ppuBridge.writeIORam(address, data);
     } else if (address <= 0xffff) {
-      this.hRAM[address - 0xff80] = data;
+      this.ram[address] = data;
     }
   };
   /**
@@ -161,7 +146,7 @@ class Memory {
    * Return the byte at the address as a number
    */
   public readByte = (address: word): byte => {
-    // return this.readMemoryByteMap[address & 0xf000](address);
+    return this.readMemoryByteMap[address & 0xf000](address);
     if (this.inBios) {
       if (address < 0x100) {
         return this.bios[address];
@@ -176,23 +161,16 @@ class Memory {
     } else if (address <= 0x7fff) {
       return this.cart.romBanks[this.cart.currROMBank][address - 0x4000];
     } else if (address <= 0x9fff) {
-      return this.vRAM[address - 0x8000];
+      return this.ram[address];
     } else if (address <= 0xbfff) {
       // reading from RAM bank of cartridge
       return this.cart.ramBanks[this.cart.currRAMBank - 1][address - 0xa000];
-    } else if (address <= 0xdfff) {
-      return this.wRAM[address - 0xc000];
-    } else if (address <= 0xfdff) {
-      return this.wRAMShadow[address - 0xe000];
     } else if (address <= 0xfe9f) {
-      return this.OAM[address - 0xfe00];
+      return this.ram[address];
     } else if (address <= 0xfeff) {
       throw new Error('Use of this area is prohibited.');
-    } else if (address <= 0xff7f) {
-      // hardware I/O
-      return this.ioRAM[address - 0xff00];
     } else if (address <= 0xffff) {
-      return this.hRAM[address - 0xff80];
+      return this.ram[address];
     }
     throw new Error(
       `Tried to read out of bounds address: ${Primitive.toHex(address)}.`
