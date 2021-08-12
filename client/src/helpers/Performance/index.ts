@@ -85,32 +85,31 @@ const benchmarkFunction = <T extends ClassType, K extends keyof T>(
   funcName: string
 ): MethodType<T, K> => {
   const func: MethodType<T, K> = context[funcName];
-  console.log(context.constructor.name);
   if (BENCHMARKS_ENABLED) {
     const className = context ? context.constructor.name : 'Helpers';
     return (
       ...args: ArgumentTypes<typeof context, typeof funcName, typeof func>
     ): ReturnType<typeof func> => {
       // benchmark random calls
-      const t1 = performance.now();
+      // const t1 = performance.now();
       const value = func(...args);
-      const t2 = performance.now();
-      if (!times[className]) times[className] = {};
-      if (!times[className][<string>funcName]) {
-        times[className][<string>funcName] = {
-          averageCallTime: t2 - t1,
-          elapsedMilliseconds: t2 - t1,
-          numberOfCalls: 1,
-        };
-      } else {
-        const {elapsedMilliseconds, numberOfCalls} = times[className][
-          <string>funcName
-        ];
-        times[className][funcName].elapsedMilliseconds += t2 - t1;
-        times[className][funcName].numberOfCalls += 1;
-        times[className][funcName].averageCallTime =
-          elapsedMilliseconds / numberOfCalls;
-      }
+      // const t2 = performance.now();
+      // if (!times[className]) times[className] = {};
+      // if (!times[className][<string>funcName]) {
+      //   times[className][<string>funcName] = {
+      //     averageCallTime: t2 - t1,
+      //     elapsedMilliseconds: t2 - t1,
+      //     numberOfCalls: 1,
+      //   };
+      // } else {
+      //   const {elapsedMilliseconds, numberOfCalls} = times[className][
+      //     <string>funcName
+      //   ];
+      //   times[className][funcName].elapsedMilliseconds += t2 - t1;
+      //   times[className][funcName].numberOfCalls += 1;
+      //   times[className][funcName].averageCallTime =
+      //     elapsedMilliseconds / numberOfCalls;
+      // }
       return value;
 
       // return func(...args);
@@ -120,4 +119,4 @@ const benchmarkFunction = <T extends ClassType, K extends keyof T>(
 };
 
 export default benchmark;
-export {logBenchmarks, benchmark};
+export {logBenchmarks, benchmark, benchmarkFunction};

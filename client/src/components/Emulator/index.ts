@@ -1,7 +1,7 @@
 import CanvasRenderer from 'CanvasRenderer/index';
 import CPU from 'CPU/index';
 import benchmark, {logBenchmarks} from 'helpers/Performance';
-import Input, {Key} from 'Input/index';
+import Input from 'Input/index';
 import InterruptService from 'Interrupts/index';
 import Memory from 'Memory/index';
 import PPUBridge from 'Memory/PPUBridge';
@@ -49,41 +49,42 @@ class Emulator {
     return true;
   };
   public update = (): void => {
-    if (!this.stopped) {
-      if (this.input.pressed(Key.Space)) {
-        this.input.debounce(Key.Space);
-        this.stopped = true;
-        console.log('stopped emulator');
-      }
-      let cycles = 0;
-      const cyclesPerUpdate = this.cpu.clock;
-      let elapsed = 0;
-      if (this.numExecuted > this.cpu.clock) {
-        logBenchmarks();
-        this.numExecuted = 0;
-      }
-      // elapse time according to number of cpu cycles used
-      while (cycles < cyclesPerUpdate) {
-        if (!this.cpu.halted) {
-          elapsed = this.cpu.executeInstruction();
-          this.numExecuted += elapsed;
-          cycles += elapsed;
-        }
-        //   } else {
-        //     console.log('CPU is halted.');
-        //   }
-        this.ppuBridge.ppu.buildGraphics(this.canvasRenderer, elapsed);
-        //   this.cpu.checkInterrupts(this.memory);
-      }
-      this.canvasRenderer.buildImage();
-    } else {
-      if (this.input.pressed(Key.Space)) {
-        this.input.debounce(Key.Space);
-        console.log('unpaused emulator');
-        this.stopped = false;
-      }
+    // if (!this.stopped) {
+    //   if (this.input.pressed(Key.Space)) {
+    //     this.input.debounce(Key.Space);
+    //     this.stopped = true;
+    //     console.log('stopped emulator');
+    //   }
+    let cycles = 0;
+    const cyclesPerUpdate = this.cpu.clock;
+    let elapsed = 0;
+    if (this.numExecuted > this.cpu.clock) {
+      logBenchmarks();
+      this.numExecuted = 0;
     }
+    // elapse time according to number of cpu cycles used
+    while (cycles < cyclesPerUpdate) {
+      if (!this.cpu.halted) {
+        elapsed = this.cpu.executeInstruction();
+        this.numExecuted += elapsed;
+        cycles += elapsed;
+      }
+      //   } else {
+      //     console.log('CPU is halted.');
+      //   }
+      this.ppuBridge.ppu.buildGraphics(this.canvasRenderer, elapsed);
+      this.cpu.checkInterrupts(this.memory);
+    }
+    this.canvasRenderer.buildImage();
   };
+  // else {
+  //   if (this.input.pressed(Key.Space)) {
+  //     this.input.debounce(Key.Space);
+  //     console.log('unpaused emulator');
+  //     this.stopped = false;
+  //   }
+  // }
+  // };
 }
 
 export default Emulator;

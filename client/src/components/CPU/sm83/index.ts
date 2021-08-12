@@ -1,5 +1,6 @@
 import CPU from 'CPU/index';
 import OpcodeMap from 'CPU/sm83/Map';
+import Primitive from 'helpers/Primitives';
 import Memory from 'Memory/index';
 
 /**
@@ -20,7 +21,8 @@ function NOP(cpu: CPU, memory: Memory): byte {
  * Affected flags:
  */
 function LDBCid16i(cpu: CPU, memory: Memory): byte {
-  OpcodeMap[0x01](cpu, memory);
+  cpu.r.bc = memory.readWord(cpu.pc);
+  cpu.pc += 2;
   return 12;
 }
 
@@ -31,7 +33,7 @@ function LDBCid16i(cpu: CPU, memory: Memory): byte {
  * Affected flags:
  */
 function LDBCmAi(cpu: CPU, memory: Memory): byte {
-  OpcodeMap[0x02](cpu, memory);
+  memory.writeByte(cpu.r.bc, Primitive.upper(cpu.r.af));
   return 8;
 }
 
@@ -42,7 +44,7 @@ function LDBCmAi(cpu: CPU, memory: Memory): byte {
  * Affected flags:
  */
 function INCBCi(cpu: CPU, memory: Memory): byte {
-  OpcodeMap[0x03](cpu, memory);
+  cpu.r.bc = Primitive.addWord(cpu.r.bc, 1);
   return 8;
 }
 
@@ -53,7 +55,16 @@ function INCBCi(cpu: CPU, memory: Memory): byte {
  * Affected flags: Z, N, H
  */
 function INCBi(cpu: CPU, memory: Memory): byte {
-  OpcodeMap[0x04](cpu, memory);
+  // convert operand to unsigned
+  let operand: byte = 1;
+  // check for half carry on affected byte only
+  cpu.checkHalfCarry(Primitive.upper(cpu.r.bc), operand);
+  // perform addition
+  operand = Primitive.addByte(operand, Primitive.upper(cpu.r.bc));
+  cpu.r.bc = Primitive.setUpper(cpu.r.bc, operand);
+
+  cpu.checkZFlag(Primitive.upper(cpu.r.bc));
+  cpu.setNFlag(0);
   return 4;
 }
 
@@ -64,7 +75,10 @@ function INCBi(cpu: CPU, memory: Memory): byte {
  * Affected flags: Z, N, H
  */
 function DECBi(cpu: CPU, memory: Memory): byte {
-  OpcodeMap[0x05](cpu, memory);
+  cpu.checkHalfCarry(Primitive.upper(cpu.r.bc), 1, true);
+  cpu.r.bc = Primitive.addUpper(cpu.r.bc, Primitive.toByte(-1));
+  cpu.checkZFlag(Primitive.upper(cpu.r.bc));
+  cpu.setNFlag(1);
   return 4;
 }
 
@@ -75,7 +89,12 @@ function DECBi(cpu: CPU, memory: Memory): byte {
  * Affected flags:
  */
 function LDBid8i(cpu: CPU, memory: Memory): byte {
-  OpcodeMap[0x06](cpu, memory);
+  // load into B from pc (immediate)
+  cpu.r.bc = Primitive.setUpper(
+    cpu.r.bc,
+    Primitive.toByte(memory.readByte(cpu.pc))
+  );
+  cpu.pc += 1;
   return 8;
 }
 
@@ -86,7 +105,18 @@ function LDBid8i(cpu: CPU, memory: Memory): byte {
  * Affected flags: Z, N, H, C
  */
 function RLCA(cpu: CPU, memory: Memory): byte {
-  OpcodeMap[0x07](cpu, memory);
+  // check carry flag
+  cpu.setCYFlag(Primitive.upper(cpu.r.af) >> 7);
+  // left shift
+  const shifted: byte = Primitive.upper(cpu.r.af) << 1;
+  cpu.r.af = Primitive.setUpper(
+    cpu.r.af,
+    Primitive.toByte(shifted | (shifted >> 8))
+  );
+  // flag resets
+  cpu.setNFlag(0);
+  cpu.setHFlag(0);
+  cpu.setZFlag(0);
   return 4;
 }
 
@@ -97,7 +127,7 @@ function RLCA(cpu: CPU, memory: Memory): byte {
  * Affected flags:
  */
 function LDa16mSPi(cpu: CPU, memory: Memory): byte {
-  OpcodeMap[0x08](cpu, memory);
+  memory.writeWord(memory.readWord(cpu.pc), cpu.sp);
   return 20;
 }
 
@@ -108,7 +138,10 @@ function LDa16mSPi(cpu: CPU, memory: Memory): byte {
  * Affected flags: N, H, C
  */
 function ADDHLiBCi(cpu: CPU, memory: Memory): byte {
-  OpcodeMap[0x09](cpu, memory);
+  cpu.checkFullCarry16(cpu.r.hl, cpu.r.bc);
+  cpu.checkHalfCarry(Primitive.upper(cpu.r.hl), Primitive.upper(cpu.r.bc));
+  cpu.r.hl = Primitive.addWord(cpu.r.hl, cpu.r.bc);
+  cpu.setNFlag(0);
   return 8;
 }
 
@@ -119,7 +152,10 @@ function ADDHLiBCi(cpu: CPU, memory: Memory): byte {
  * Affected flags:
  */
 function LDAiBCm(cpu: CPU, memory: Memory): byte {
-  OpcodeMap[0x0a](cpu, memory);
+  cpu.r.af = Primitive.setUpper(
+    cpu.r.af,
+    Primitive.toByte(memory.readByte(cpu.r.bc))
+  );
   return 8;
 }
 
@@ -130,7 +166,7 @@ function LDAiBCm(cpu: CPU, memory: Memory): byte {
  * Affected flags:
  */
 function DECBCi(cpu: CPU, memory: Memory): byte {
-  OpcodeMap[0x0b](cpu, memory);
+  cpu.r.bc = Primitive.addWord(cpu.r.bc, -1);
   return 8;
 }
 
@@ -141,7 +177,16 @@ function DECBCi(cpu: CPU, memory: Memory): byte {
  * Affected flags: Z, N, H
  */
 function INCCi(cpu: CPU, memory: Memory): byte {
-  OpcodeMap[0x0c](cpu, memory);
+  // convert operand to unsigned
+  let operand: byte = 1;
+  // check for half carry on affected byte only
+  cpu.checkHalfCarry(Primitive.lower(cpu.r.bc), operand);
+  // perform addition
+  operand = Primitive.addByte(operand, Primitive.lower(cpu.r.bc));
+  cpu.r.bc = Primitive.setLower(cpu.r.bc, operand);
+
+  cpu.checkZFlag(Primitive.lower(cpu.r.bc));
+  cpu.setNFlag(0);
   return 4;
 }
 
@@ -152,7 +197,11 @@ function INCCi(cpu: CPU, memory: Memory): byte {
  * Affected flags: Z, N, H
  */
 function DECCi(cpu: CPU, memory: Memory): byte {
-  OpcodeMap[0x0d](cpu, memory);
+  // convert operand to unsigned
+  cpu.checkHalfCarry(Primitive.lower(cpu.r.bc), 1, true);
+  cpu.r.bc = Primitive.addLower(cpu.r.bc, Primitive.toByte(-1));
+  cpu.checkZFlag(Primitive.lower(cpu.r.bc));
+  cpu.setNFlag(1);
   return 4;
 }
 
@@ -163,7 +212,12 @@ function DECCi(cpu: CPU, memory: Memory): byte {
  * Affected flags:
  */
 function LDCid8i(cpu: CPU, memory: Memory): byte {
-  OpcodeMap[0x0e](cpu, memory);
+  // load into C from pc (immediate)
+  cpu.r.bc = Primitive.setLower(
+    cpu.r.bc,
+    Primitive.toByte(memory.readByte(cpu.pc))
+  );
+  cpu.pc += 1;
   return 8;
 }
 
@@ -174,7 +228,19 @@ function LDCid8i(cpu: CPU, memory: Memory): byte {
  * Affected flags: Z, N, H, C
  */
 function RRCA(cpu: CPU, memory: Memory): byte {
-  OpcodeMap[0x0f](cpu, memory);
+  // check carry flag
+  const bitZero = Primitive.upper(cpu.r.af) & 1;
+  cpu.setCYFlag(bitZero);
+  // right shift
+  const shifted: byte = Primitive.upper(cpu.r.af) >> 1;
+  cpu.r.af = Primitive.setUpper(
+    cpu.r.af,
+    Primitive.toByte(shifted | (bitZero << 7))
+  );
+  // flag resets
+  cpu.setNFlag(0);
+  cpu.setHFlag(0);
+  cpu.setZFlag(0);
   return 4;
 }
 
@@ -185,7 +251,9 @@ function RRCA(cpu: CPU, memory: Memory): byte {
  * Affected flags:
  */
 function STOP(cpu: CPU, memory: Memory): byte {
-  OpcodeMap[0x10](cpu, memory);
+  cpu.halted = true;
+  console.log('Instruction halted.');
+  throw new Error();
   return 4;
 }
 
@@ -196,7 +264,8 @@ function STOP(cpu: CPU, memory: Memory): byte {
  * Affected flags:
  */
 function LDDEid16i(cpu: CPU, memory: Memory): byte {
-  OpcodeMap[0x11](cpu, memory);
+  cpu.r.de = memory.readWord(cpu.pc);
+  cpu.pc += 2;
   return 12;
 }
 
@@ -207,7 +276,7 @@ function LDDEid16i(cpu: CPU, memory: Memory): byte {
  * Affected flags:
  */
 function LDDEmAi(cpu: CPU, memory: Memory): byte {
-  OpcodeMap[0x12](cpu, memory);
+  memory.writeByte(cpu.r.de, Primitive.upper(cpu.r.af));
   return 8;
 }
 
@@ -218,7 +287,7 @@ function LDDEmAi(cpu: CPU, memory: Memory): byte {
  * Affected flags:
  */
 function INCDEi(cpu: CPU, memory: Memory): byte {
-  OpcodeMap[0x13](cpu, memory);
+  cpu.r.de = Primitive.addWord(cpu.r.de, 1);
   return 8;
 }
 
