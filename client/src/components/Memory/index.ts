@@ -10,12 +10,24 @@ import PPUBridge from './PPUBridge';
 
 class Memory {
   private ppuBridge!: PPUBridge;
-  private bios: ByteArray = [];
+  public bios: ByteArray = [];
   // whether bios execution has finished
   public inBios = false;
   private ppu!: PPU;
   public cart!: Cartridge;
   public ram: ByteArray = [];
+  private specialAddr = new Set([
+    0,
+    0x1000,
+    0x2000,
+    0x3000,
+    0x4000,
+    0x5000,
+    0x6000,
+    0x7000,
+    0xa000,
+    0xb000,
+  ]);
   public static addresses = {
     interrupt: {
       ie: 0xffff,
@@ -146,7 +158,7 @@ class Memory {
    * Return the byte at the address as a number
    */
   public readByte = (address: word): byte => {
-    return this.readMemoryByteMap[address & 0xf000](address);
+    // return this.readMemoryByteMap[address & 0xf000](address);
     if (this.inBios) {
       if (address < 0x100) {
         return this.bios[address];
@@ -156,11 +168,29 @@ class Memory {
       }
     }
 
-    if (address < 0x4000) {
-      return this.cart.rom[address];
-    } else if (address <= 0x7fff) {
-      return this.cart.romBanks[this.cart.currROMBank][address - 0x4000];
-    } else if (address <= 0x9fff) {
+    if (!this.specialAddr.has(address & 0xf000)) return this.ram[address];
+
+    switch (address & 0xf000) {
+      case 0:
+      case 0x1000:
+      case 0x2000:
+      case 0x3000:
+        return this.cart.rom[address];
+      case 0x4000:
+      case 0x5000:
+      case 0x6000:
+      case 0x7000:
+        return this.cart.romBanks[this.cart.currROMBank][address - 0x4000];
+      case 0xa000:
+      case 0xb000:
+        return this.cart.ramBanks[this.cart.currRAMBank - 1][address - 0xa000];
+    }
+
+    // if (address < 0x4000) {
+    //   return this.cart.rom[address];
+    // } else if (address <= 0x7fff) {
+    //   return this.cart.romBanks[this.cart.currROMBank][address - 0x4000];
+    if (address <= 0x9fff) {
       return this.ram[address];
     } else if (address <= 0xbfff) {
       // reading from RAM bank of cartridge
@@ -168,7 +198,8 @@ class Memory {
     } else if (address <= 0xfe9f) {
       return this.ram[address];
     } else if (address <= 0xfeff) {
-      throw new Error('Use of this area is prohibited.');
+      // throw new Error('Use of this area is prohibited.');
+      return 1;
     } else if (address <= 0xffff) {
       return this.ram[address];
     }

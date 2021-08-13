@@ -1,6 +1,6 @@
 import CanvasRenderer from 'CanvasRenderer/index';
 import CPU from 'CPU/index';
-import benchmark, {logBenchmarks} from 'helpers/Performance';
+import {logBenchmarks} from 'helpers/Performance';
 import Input from 'Input/index';
 import InterruptService from 'Interrupts/index';
 import Memory from 'Memory/index';
@@ -27,14 +27,14 @@ class Emulator {
     this.ppu = this.ppuBridge.ppu;
     this.input = new Input();
     this.canvasRenderer.setPPU(this.ppuBridge.ppu);
-    benchmark(this.ppuBridge);
-    benchmark(this.memory);
-    benchmark(this.cpu);
-    benchmark(this.ppu);
-    benchmark(this.input);
-    benchmark(this.canvasRenderer);
-    benchmark(this.interruptService);
-    benchmark(this);
+    // benchmark(this.ppuBridge);
+    // benchmark(this.memory);
+    // benchmark(this.cpu);
+    // benchmark(this.ppu);
+    // benchmark(this.input);
+    // benchmark(this.canvasRenderer);
+    // benchmark(this.interruptService);
+    // benchmark(this);
   }
   public reset = (): void => {
     this.memory.reset();
@@ -43,6 +43,7 @@ class Emulator {
   };
   public load = (bios: ByteArray, rom: Uint8Array): boolean => {
     this.memory.load(this.cpu, bios, rom);
+    if (!this.memory.inBios) this.cpu.execute = this.cpu.executeInstruction;
     if (this.timeout !== null) window.cancelAnimationFrame(this.timeout);
     this.update();
     this.timeout = window.setInterval(this.update, 1);
@@ -64,16 +65,28 @@ class Emulator {
     }
     // elapse time according to number of cpu cycles used
     while (cycles < cyclesPerUpdate) {
+      // this.numExecuted += 6;
+      // cycles += 6;
       if (!this.cpu.halted) {
-        elapsed = this.cpu.executeInstruction();
+        elapsed = this.cpu.execute();
         this.numExecuted += elapsed;
         cycles += elapsed;
       }
       //   } else {
       //     console.log('CPU is halted.');
       //   }
-      this.ppuBridge.ppu.buildGraphics(this.canvasRenderer, elapsed);
-      this.cpu.checkInterrupts(this.memory);
+      this.ppu.buildGraphics(elapsed);
+      // if (this.cpu.allInterruptsEnabled) {
+      //   if (this.memory.ram[0xff0f]) {
+      //     const interruptsTriggered =
+      //       this.memory.ram[0xff0f] & this.memory.ram[0xffff];
+      //     if (interruptsTriggered) {
+      //       this.cpu.handleInterrupts(this.memory, interruptsTriggered);
+      //     }
+      //   }
+      // }
+      // }
+      // this.cpu.checkInterrupts();
     }
     this.canvasRenderer.buildImage();
   };

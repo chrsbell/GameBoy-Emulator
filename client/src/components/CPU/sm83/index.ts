@@ -10,7 +10,6 @@ import Memory from 'Memory/index';
  * Affected flags:
  */
 function NOP(cpu: CPU, memory: Memory): byte {
-  OpcodeMap[0x00](cpu, memory);
   return 4;
 }
 

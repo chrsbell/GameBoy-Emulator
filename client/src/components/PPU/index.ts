@@ -45,25 +45,24 @@ class PPU {
   private stat = 0;
   public setStat = (value: number): void => {
     this.stat = value;
-    this.mode = value & 0b11;
-    this.ppuBridge.writeIORamOnly(Memory.addresses.ppu.stat, this.stat);
+    // this.mode = value & 0b11;
+    // this.ppuBridge.writeIORamOnly(Memory.addresses.ppu.stat, this.stat);
   };
   private mode = 2;
   public setMode = (value: number): void => {
     // lcd mode switch interrupt condition
     // only certain modes trigger an interrupt
-    const interruptBit = PPU.statBits.interrupt[this.mode];
-    if (interruptBit >= 0) {
-      const interruptModeBit = (this.stat >> interruptBit) & 1; //Primitive.getBit(reg, interruptBit);
-      if (interruptModeBit && value !== this.mode) {
-        this.interruptService.enable(InterruptService.flags.lcdStat);
-      }
-    }
+    // const interruptBit = PPU.statBits.interrupt[this.mode];
+    // if (interruptBit >= 0) {
+    //   const interruptModeBit = (this.stat >> interruptBit) & 1; //Primitive.getBit(reg, interruptBit);
+    //   if (interruptModeBit && value !== this.mode) {
+    //     this.interruptService.enable(InterruptService.flags.lcdStat);
+    //   }
+    // }
     this.mode = value;
-    this.stat = Primitive.clearBit(this.stat, PPU.statBits.modeLower);
-    this.stat = Primitive.clearBit(this.stat, PPU.statBits.modeUpper);
-    this.stat |= value;
-    this.ppuBridge.writeIORamOnly(Memory.addresses.ppu.stat, this.stat);
+    // clear the mode bits and set new mode
+    this.stat = ((this.stat >> 2) << 2) | value;
+    // this.ppuBridge.writeIORamOnly(Memory.addresses.ppu.stat, this.stat);
   };
   // clock used to determine the draw mode, elapsed according to cpu t-states
   private clock = 0;
@@ -71,18 +70,19 @@ class PPU {
   private scanline = 0;
   public updateScanline = (value: byte): void => {
     this.scanline = value;
-    this.ppuBridge.updateScanline(value);
+    this.ppuBridge.memory.ram[0xff44] = value;
     // scanline compare interrupt condition
-    let reg: byte = this.stat;
     if (this.scanline === this.scanlineCompare) {
+      let reg: byte = this.stat;
       reg |= 1 << 2;
       if ((reg >> 6) & 1) {
         this.interruptService.enable(1);
       }
+      this.setStat(reg);
     } else {
-      reg &= ~(1 << 2);
+      // clear stat interrupt bit
+      this.setStat(this.stat & ~(1 << 2));
     }
-    this.setStat(reg);
   };
   public scanlineCompare: byte = 0;
   public scrollX: byte = 0;
@@ -166,17 +166,15 @@ class PPU {
    * Updates internal representation of graphics
    */
   public buildGraphics = (cycles: number): void => {
-    const {lcdc} = this;
-    if (lcdc.enable) {
+    if (this.lcdc.enable) {
       this.clock += cycles;
-      const oldMode = this.mode;
-      switch (oldMode) {
+      switch (this.mode) {
         case 0:
           if (this.clock >= 204) {
-            if (lcdc.bgWindowEnable) {
+            if (this.lcdc.bgWindowEnable) {
               this.renderTiles();
             }
-            if (lcdc.objEnable) {
+            if (this.lcdc.objEnable) {
               this.renderSprites();
             }
             this.updateScanline(this.scanline + 1);
@@ -200,12 +198,12 @@ class PPU {
           break;
         case 2:
           if (this.clock >= 80) {
-            this.setMode(PPU.ppuModes.readVRAM);
+            this.setMode(3);
           }
           break;
         case 3:
           if (this.clock >= 172) {
-            this.setMode(PPU.ppuModes.hBlank);
+            this.setMode(0);
           }
           break;
       }
