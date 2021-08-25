@@ -11,3 +11,6 @@ cpu.txt
 **.jar
 **.state
 **/coverage
+*.wasm
+*.wasm.map
+*.asm.js

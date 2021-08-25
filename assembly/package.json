@@ -1,0 +1,14 @@
+{
+  "name": "wasm",
+  "version": "1.0.0",
+  "description": "WebAssembly Modules for GB Emulator",
+  "main": "index.js",
+  "scripts": {
+    "test": "node tests",
+    "asbuild:untouched": "asc ../client/src/wasm.ts --target debug",
+    "asbuild:optimized": "asc ../client/src/wasm.ts --target release",
+    "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
+  },
+  "author": "Chris Bell",
+  "license": "ISC"
+}

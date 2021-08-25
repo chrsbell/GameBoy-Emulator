@@ -14,7 +14,7 @@ app.post(
     {name: 'bios', maxCount: 1},
   ]),
   (req: Request, res: Response) => {
-    if ('rom' in req.files && 'bios' in req.files) {
+    if ('rom' in req?.files && 'bios' in req?.files) {
       res.status(201).json({
         rom: new Uint8Array([...req.files['rom'][0].buffer]),
         bios: new Uint8Array([...req.files['bios'][0].buffer]),
