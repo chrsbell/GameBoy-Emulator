@@ -15,45 +15,18 @@ interface Registers {
 class CPU {
   private memory!: Memory;
   // number of clock ticks per second
-  private _clock = 4194304;
-  get clock(): number {
-    return this._clock;
-  }
+  private clock = 4194304;
   // 16-bit program counter
-  private _pc: word = 0;
-  get pc(): word {
-    return this._pc;
-  }
-  set pc(value: word) {
-    this._pc = value;
-  }
+  public pc: word = 0;
   // stack pointer
-  private _sp: word = 0;
-  get sp(): word {
-    return this._sp;
-  }
-  set sp(value: word) {
-    this._sp = value;
-  }
-  private _r: Registers = {
+  private sp: word = 0;
+  private r: Registers = {
     af: 0,
     bc: 0,
     de: 0,
     hl: 0,
   };
-  get r(): Registers {
-    return this._r;
-  }
-  set r(value: Registers) {
-    this._r = value;
-  }
-  private _halted = false;
-  get halted(): boolean {
-    return this._halted;
-  }
-  set halted(value: boolean) {
-    this._halted = value;
-  }
+  private halted = false;
   private allInterruptsEnabled = true;
   private opcodes: OpcodeList = Opcodes;
   private lastExecuted: Array<string> = [];

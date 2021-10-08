@@ -6,20 +6,8 @@ class Input {
   private keydebounceTimeout: KeyDebounceTimeout = {};
   private static DEBOUNCE_DELAY = 100;
 
-  private _mouseX = 0;
-  get mouseX(): number {
-    return this._mouseX;
-  }
-  set mouseX(value) {
-    this._mouseX = value;
-  }
-  private _mouseY = 0;
-  get mouseY(): number {
-    return this._mouseY;
-  }
-  set mouseY(value) {
-    this._mouseY = value;
-  }
+  public mouseX = 0;
+  public mouseY = 0;
   constructor() {
     // Object.values(Key).forEach(code => (this.keystate[code] = false));
     window.addEventListener('keydown', this.setKey);
@@ -33,8 +21,8 @@ class Input {
     window.removeEventListener('mousemove', this.setMousePosition);
   };
   private setMousePosition = (e: MouseEvent): void => {
-    this._mouseX = e.x;
-    this._mouseY = e.y;
+    this.mouseX = e.x;
+    this.mouseY = e.y;
   };
   public unsetKey = (key: string): void => {
     this.keystate[key] = false;

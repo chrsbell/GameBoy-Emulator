@@ -72,7 +72,7 @@ class Emulator {
       //   } else {
       //     console.log('CPU is halted.');
       //   }
-      this.ppuBridge.ppu.buildGraphics(this.canvasRenderer, elapsed);
+      this.ppuBridge.ppu.buildGraphics(elapsed);
       this.cpu.checkInterrupts(this.memory);
     }
     this.canvasRenderer.buildImage();

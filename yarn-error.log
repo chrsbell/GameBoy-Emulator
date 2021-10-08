@@ -1,5 +1,5 @@
 Arguments: 
-  /home/chris/.nvm/versions/node/v14.15.0/bin/node /home/chris/.nvm/versions/node/v14.15.0/bin/yarn
+  /home/chris/.nvm/versions/node/v14.15.0/bin/node /home/chris/.nvm/versions/node/v14.15.0/bin/yarn add multer
 
 PATH: 
   /home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/home/chris/.local/bin:/home/chris/.nvm/versions/node/v14.15.0/bin:/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/home/chris/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/chris/.dotnet/tools:/home/chris/chromedriver:/opt/microchip/xc16/v1.50/bin:/home/chris/.dotnet/tools:/opt/microchip/xc16/v1.50/bin:/home/chris/chromedriver:/opt/microchip/xc16/v1.50/bin:/opt/microchip/xc16/v1.50/bin
@@ -14,7 +14,7 @@ Platform:
   linux x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/Primitive.lowercase-keys/-/Primitive.lowercase-keys-2.0.0.tgz: Request failed "404 Not Found"
+  Error: https://registry.yarnpkg.com/Primitive.lowercase-keys/-/Primitive.lowercase-keys-1.0.1.tgz: Request failed "404 Not Found"
       at ResponseError.ExtendableBuiltin (/home/chris/.nvm/versions/node/v14.15.0/lib/node_modules/yarn/lib/cli.js:696:66)
       at new ResponseError (/home/chris/.nvm/versions/node/v14.15.0/lib/node_modules/yarn/lib/cli.js:802:124)
       at Request.<anonymous> (/home/chris/.nvm/versions/node/v14.15.0/lib/node_modules/yarn/lib/cli.js:67058:16)
@@ -37,8 +37,9 @@ npm manifest:
     "description": "An original GameBoy Emulator",
     "main": "index.js",
     "scripts": {
-      "start": "ts-node server/index.ts",
+      "start": "node server/index.js",
       "build:dev": "npx webpack --mode development --watch",
+      "build": "npx webpack --mode production",
       "test": "jest --verbose --watch --coverage",
       "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand --verbose --silent --watch",
       "test:build": "python3 client/test/dump_pyboy.py",
@@ -79,7 +80,6 @@ npm manifest:
       "@types/jest": "^26.0.20",
       "@types/jquery": "^3.5.5",
       "@types/lodash": "^4.14.168",
-      "@types/multer": "^1.4.5",
       "@types/node": "^14.11.2",
       "@types/node-sass": "^4.11.1",
       "@types/react": "^17.0.0",

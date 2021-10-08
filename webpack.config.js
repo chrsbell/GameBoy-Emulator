@@ -42,4 +42,7 @@ module.exports = (env, argv) => ({
       path.resolve(__dirname, 'node_modules'),
     ],
   },
+  optimization: {
+    minimize: argv.mode !== 'development',
+  },
 });
