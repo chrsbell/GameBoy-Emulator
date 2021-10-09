@@ -89,11 +89,11 @@ const getBit = (value: byte, bit: number): bit => {
   return (value >> bit) & 1;
 };
 
-const setBit = (value: byte, bit: number): byte => {
+const setBit = (value: byte | word, bit: number): byte | word => {
   return value | (1 << bit);
 };
 
-const clearBit = (value: byte, bit: number): byte => {
+const clearBit = (value: byte | word, bit: number): byte | word => {
   return value & ~(1 << bit);
 };
 

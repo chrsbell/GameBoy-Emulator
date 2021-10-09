@@ -34,64 +34,6 @@ class Memory {
       windowX: 0xff4b,
     },
   };
-  private readMemoryHIOMap: NumFuncIdx = {
-    0x00: (addr: word): byte => this.ram[addr],
-    0x80: (addr: word): byte => this.ram[addr],
-  };
-  private readMemoryByteHMap: NumFuncIdx = {
-    0x000: (addr: word): byte => this.ram[addr],
-    0x100: (addr: word): byte => this.ram[addr],
-    0x200: (addr: word): byte => this.ram[addr],
-    0x300: (addr: word): byte => this.ram[addr],
-    0x400: (addr: word): byte => this.ram[addr],
-    0x500: (addr: word): byte => this.ram[addr],
-    0x600: (addr: word): byte => this.ram[addr],
-    0x700: (addr: word): byte => this.ram[addr],
-    0x800: (addr: word): byte => this.ram[addr],
-    0x900: (addr: word): byte => this.ram[addr],
-    0xa00: (addr: word): byte => this.ram[addr],
-    0xb00: (addr: word): byte => this.ram[addr],
-    0xc00: (addr: word): byte => this.ram[addr],
-    0xd00: (addr: word): byte => this.ram[addr],
-    0xe00: (addr: word): byte => (addr <= 0xfe9f ? this.ram[addr - 0xfe00] : 0), //address >= 0xfea0 is techincally outside OAM memory, revisit this
-    0xf00: (addr: word): byte => this.readMemoryHIOMap[addr & 0x80](addr),
-  };
-  private readMemoryByteMap: NumFuncIdx = {
-    0x0000: (addr: word): byte => {
-      if (this.inBios) {
-        if (addr < 0x100) {
-          return this.bios[addr];
-        } else if (addr === 0x100) {
-          this.inBios = false;
-          DEBUG && console.log('Exited bios.');
-        }
-      }
-      return this.cart.rom[addr];
-    },
-    0x1000: (addr: word): byte => this.cart.rom[addr],
-    0x2000: (addr: word): byte => this.cart.rom[addr],
-    0x3000: (addr: word): byte => this.cart.rom[addr],
-    0x4000: (addr: word): byte =>
-      this.cart.romBanks[this.cart.currROMBank][addr - 0x4000],
-    0x5000: (addr: word): byte =>
-      this.cart.romBanks[this.cart.currROMBank][addr - 0x4000],
-    0x6000: (addr: word): byte =>
-      this.cart.romBanks[this.cart.currROMBank][addr - 0x4000],
-    0x7000: (addr: word): byte =>
-      this.cart.romBanks[this.cart.currROMBank][addr - 0x4000],
-    0x8000: (addr: word): byte => this.ram[addr],
-    0x9000: (addr: word): byte => this.ram[addr],
-    0xa000: (addr: word): byte =>
-      this.cart.ramBanks[this.cart.currRAMBank][addr - 0xa000],
-    0xb000: (addr: word): byte =>
-      this.cart.ramBanks[this.cart.currRAMBank][addr - 0xa000],
-    0xc000: (addr: word): byte => this.ram[addr],
-    0xd000: (addr: word): byte => this.ram[addr],
-    0xf000: (addr: word): byte => {
-      const hAddr = addr & 0xf00;
-      return this.readMemoryByteHMap[hAddr](addr);
-    },
-  };
   constructor(ppuBridge: PPUBridge) {
     this.ppuBridge = ppuBridge;
     this.reset();
@@ -146,7 +88,6 @@ class Memory {
    * Return the byte at the address as a number
    */
   public readByte = (address: word): byte => {
-    return this.readMemoryByteMap[address & 0xf000](address);
     if (this.inBios) {
       if (address < 0x100) {
         return this.bios[address];
@@ -166,6 +107,7 @@ class Memory {
       // reading from RAM bank of cartridge
       return this.cart.ramBanks[this.cart.currRAMBank - 1][address - 0xa000];
     } else if (address <= 0xfe9f) {
+      //address >= 0xfea0 is techincally outside OAM memory, revisit this
       return this.ram[address];
     } else if (address <= 0xfeff) {
       throw new Error('Use of this area is prohibited.');
