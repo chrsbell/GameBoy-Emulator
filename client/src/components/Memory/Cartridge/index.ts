@@ -1,4 +1,4 @@
-import {DEBUG} from 'helpers/Debug';
+import {DEBUG} from 'helpers/index';
 import Memory from 'Memory/index';
 
 const ROMSizeCodeMap: SizeCode = {

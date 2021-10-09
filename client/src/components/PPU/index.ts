@@ -1,5 +1,5 @@
 import CanvasRenderer from 'CanvasRenderer/index';
-import Primitive from 'helpers/Primitives';
+import {Primitive} from 'helpers/index';
 import InterruptService from 'Interrupts/index';
 import PPUBridge from 'Memory/PPUBridge';
 import PPUControl from './LCDC';
@@ -211,6 +211,8 @@ class PPU {
           }
           break;
       }
+      this.lcdInterrupt(oldMode !== mode);
+      this.compareLcLyc();
     } else {
       // reset v blank
       clock = 0;
@@ -229,11 +231,6 @@ class PPU {
       this.setStat(Primitive.clearBit(register, PPU.statBits.lycLc));
     }
     ppuBridgeRef.writeIORam(0xff41, stat);
-  };
-  public resetVBlank = (): void => {
-    clock = 0;
-    scanline = 0;
-    this.setMode(PPU.ppuModes.vBlank);
   };
   private windowVisible(): boolean {
     return (
@@ -262,20 +259,17 @@ class PPU {
     const tileYOffset = scanline + scrollY;
     const tileRow = (tileYOffset & 255) >> 3;
     let tileIndex = currentMap[tileCol + (tileRow << 5)];
+    const isSigned = lcdc.bgWindowTileData === 0;
+    // start from block 2 if using signed data
+    if (isSigned && tileIndex <= 127) tileIndex += 256;
     let tileX = scrollX & 7;
     let tileY = tileDataRef[tileIndex][tileYOffset & 7];
     // When using tile lookup method 1, 8000 is the base pointer. Block 0 (8000-87ff) maps to indices 0-127 and Block 1 (8800-8fff) maps to indices 128-255
     // Using method 2, 9000 is the base pointer and the indices are signed. Indices 128-255 (or -127-0) map to block 1 and indices 0-127 map to block 2 (9000-97ff)
-    const isSigned = lcdc.bgWindowTileData === 0;
-    // start from block 2 if using signed data
-    if (isSigned && tileIndex <= 127) tileIndex += 256;
     for (let x = 0; x < 160; x++) {
-      // a |= paletteMap[tileY[tileX]];
-      // a = a << 2;
       for (tileX; tileX < 7; tileX++) {
         currentLine[x] = paletteMapRef[tileY[tileX]];
         x += 1;
-        // currentLine[x] = paletteMap[(tileY >> (x << 1)) & 3];
       }
       currentLine[x] = paletteMapRef[tileY[tileX]];
       tileX = 0;
@@ -286,8 +280,6 @@ class PPU {
       if (isSigned && tileIndex <= 127) tileIndex += 256;
       tileY = tileDataRef[tileIndex][(scanline + scrollY) & 7];
     }
-
-    // this.pixelMap = pixelMap;
   };
   public renderSprites = (): void => {};
   public drawScanline = (): void => {

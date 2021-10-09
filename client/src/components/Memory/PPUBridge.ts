@@ -1,6 +1,5 @@
-import {DEBUG} from 'helpers/Debug';
 import InterruptService from 'Interrupts/index';
-import Primitive from '../../helpers/Primitives';
+import {DEBUG, Primitive} from '../../helpers/index';
 import Memory from '../Memory/index';
 import PPU from '../PPU/index';
 
@@ -42,8 +41,8 @@ class PPUBridge {
       // 00000000 -> 0
       // 11111111 -> 1
       if (address % 2 === 1) address -= 1;
-      const lowByte = this.memory.readByte(address);
-      const highByte = this.memory.readByte(address + 1);
+      const lowByte = memoryRef.readByte(address);
+      const highByte = memoryRef.readByte(address + 1);
       const tileIndex = Math.floor((address - 0x8000) / 16);
       const y = (address >> 1) & 7;
 
@@ -54,12 +53,6 @@ class PPUBridge {
         lowBit = Primitive.getBit(lowByte, x);
         highBit = Primitive.getBit(highByte, x);
         const tileData = (lowBit ? 1 : 0) | (highBit ? 2 : 0);
-        // let data = ppuRef.tileData[tileIndex][y];
-        // if (lowBit) data = <word>Primitive.setBit(data, (7 - x) * 2);
-        // else data = <word>Primitive.clearBit(data, (7 - x) * 2);
-
-        // if (highBit) data = <word>Primitive.setBit(data, (7 - x) * 2 + 1);
-        // else data = <word>Primitive.clearBit(data, (7 - x) * 2 + 1);
         ppuRef.tileData[tileIndex][y][7 - x] = tileData;
       }
     } else if (address <= 0x9bff) {
@@ -84,7 +77,7 @@ class PPUBridge {
       ppuRef.scanlineCompare = data;
     else if (address === Memory.addresses.ppu.dma) {
       DEBUG && console.log('Initiated DMA transfer.');
-      this.memory.dmaTransfer(data);
+      memoryRef.dmaTransfer(data);
     } else if (address === Memory.addresses.ppu.paletteData) {
       ppuRef.palette = data;
       ppuRef.paletteMap[0] =

@@ -1,9 +1,8 @@
-import {DEBUG} from 'helpers/Debug';
-import Primitive from 'helpers/Primitives';
+import {DEBUG, Primitive} from 'helpers/index';
 import InterruptService from 'Interrupts/index';
 import Memory from 'Memory/index';
 
-interface Registers {
+export interface Registers {
   af: word;
   bc: word;
   de: word;
@@ -68,7 +67,7 @@ const checkZFlag = (reg: byte): void => {
 
 /**
  * Sets the half carry flag if a carry will be generated from bits 3 to 4 of the sum.
- * For 16-bit operations, this private should =  be called o=>n the upper bytes of the operands.
+ * For 16-bit operations, this should be called on the upper bytes of the operands.
  * Sources:
  * https://robdor.com/2016/08/10/gameboy-emulator-half-carry-flag/
  * https://stackoverflow.com/questions/8868396/game-boy-what-constitutes-a-half-carry
@@ -99,7 +98,7 @@ const checkFullCarry8 = (op1: byte, op2: byte, subtraction?: boolean): void => {
   if (subtraction) {
     setCYFlag(op1 - op2 < 0);
   } else {
-    setCYFlag(op1 + op2 > 0xffff);
+    setCYFlag(op1 + op2 > 0xff);
   }
 };
 
@@ -110,12 +109,17 @@ class CPU {
   // stack pointer
 
   public halted = false;
-  public lastExecuted: Array<string> = [];
+  public lastExecuted: Array<byte> = [];
 
   constructor(memory: Memory) {
     memoryRef = memory;
     this.reset();
   }
+
+  public getPC = (): word => pc;
+  public getR = (): Registers => r;
+  public getSP = (): word => sp;
+  public getIE = (): boolean => allInterruptsEnabled;
 
   public reset = (): void => {
     pc = 0;
@@ -179,29 +183,27 @@ class CPU {
    * @returns {number} the number of CPU cycles required.
    */
   public executeInstruction = (): number => {
-    // const {memoryRef} = this;
-    // fetch
+    pc += 1;
+    pc &= 0xffff;
+    return this.opcodes[memoryRef.readByte(pc)]();
+  };
+  public execute: () => number = this.executeInstruction;
+  public executeBios = (): number => {
     const opcode: byte = memoryRef.readByte(pc);
     pc += 1;
     pc &= 0xffff;
-    // execute
-    let numCycles: number;
-    // check if finished bios execution
-    if (memoryRef.inBios) {
-      numCycles = this.opcodes[opcode]();
-      if (!memoryRef.inBios) {
-        DEBUG && console.log('Exiting bios from this.');
-        this.initPowerSequence();
-      }
-    } else {
-      numCycles = this.opcodes[opcode]();
+    const numCycles = this.opcodes[opcode]();
+    if (!memoryRef.inBios) {
+      this.initPowerSequence();
+      this.execute = this.executeInstruction;
     }
+    this.addCalledInstruction(opcode);
     return numCycles;
   };
-  public addCalledInstruction = (opcode: string): void => {
-    this.lastExecuted.unshift(opcode);
+  public addCalledInstruction = (opcode: byte): void => {
+    this.lastExecuted.push(opcode);
     if (this.lastExecuted.length > 100) {
-      this.lastExecuted.pop();
+      this.lastExecuted = this.lastExecuted.slice(1);
     }
   };
   /**
@@ -226,7 +228,7 @@ class CPU {
     const register: byte = memoryRef.readByte(Memory.addresses.interrupt.if);
     memoryRef.writeByte(
       InterruptService.flags.if,
-      Primitive.clearBit(register, interrupt)
+      <byte>Primitive.clearBit(register, interrupt)
     );
 
     PUSH(pc);
@@ -507,7 +509,7 @@ class CPU {
   private STOP = (): byte => {
     this.halted = true;
     console.log('Instruction halted.');
-    throw new Error();
+    // throw new Error();
 
     return 4;
   };
@@ -2111,7 +2113,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ADCAiBi = (): byte => {
-    ADC(Primitive.upper(r.bc));
+    ADC(r.bc >> 8);
 
     return 4;
   };
@@ -5903,7 +5905,7 @@ class CPU {
    * Affected flags:
    */
   private SET0B = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, SET(0, Primitive.upper(r.bc)));
+    r.bc |= 0b100000000;
 
     return 8;
   };
@@ -5915,8 +5917,7 @@ class CPU {
    * Affected flags:
    */
   private SET0C = (): byte => {
-    r.bc = Primitive.setLower(r.bc, SET(0, Primitive.lower(r.bc)));
-
+    r.bc |= 0b1;
     return 8;
   };
 
@@ -5927,7 +5928,7 @@ class CPU {
    * Affected flags:
    */
   private SET0D = (): byte => {
-    r.de = Primitive.setUpper(r.de, SET(0, Primitive.upper(r.de)));
+    r.de |= 0b100000000;
 
     return 8;
   };
@@ -5939,8 +5940,7 @@ class CPU {
    * Affected flags:
    */
   private SET0E = (): byte => {
-    r.de = Primitive.setLower(r.de, SET(0, Primitive.lower(r.de)));
-
+    r.de |= 0b1;
     return 8;
   };
 
@@ -5951,7 +5951,7 @@ class CPU {
    * Affected flags:
    */
   private SET0H = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, SET(0, Primitive.upper(r.hl)));
+    r.hl |= 0b100000000;
 
     return 8;
   };
@@ -5963,7 +5963,7 @@ class CPU {
    * Affected flags:
    */
   private SET0L = (): byte => {
-    r.hl = Primitive.setLower(r.hl, SET(0, Primitive.lower(r.hl)));
+    r.hl |= 0b1;
 
     return 8;
   };
@@ -5975,7 +5975,7 @@ class CPU {
    * Affected flags:
    */
   private SET0HL = (): byte => {
-    memoryRef.writeByte(r.hl, SET(0, memoryRef.readByte(r.hl)));
+    memoryRef.writeByte(r.hl, memoryRef.readByte(r.hl) | 0b1);
 
     return 16;
   };
@@ -5987,7 +5987,7 @@ class CPU {
    * Affected flags:
    */
   private SET0A = (): byte => {
-    r.af = Primitive.setUpper(r.af, SET(0, Primitive.lower(r.af)));
+    r.af |= 0b100000000;
 
     return 8;
   };
@@ -5999,7 +5999,7 @@ class CPU {
    * Affected flags:
    */
   private SET1B = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, SET(1, Primitive.upper(r.bc)));
+    r.bc |= 0b1000000000;
 
     return 8;
   };
@@ -6011,7 +6011,7 @@ class CPU {
    * Affected flags:
    */
   private SET1C = (): byte => {
-    r.bc = Primitive.setLower(r.bc, SET(1, Primitive.lower(r.bc)));
+    r.bc |= 0b10;
 
     return 8;
   };
@@ -6023,7 +6023,7 @@ class CPU {
    * Affected flags:
    */
   private SET1D = (): byte => {
-    r.de = Primitive.setUpper(r.de, SET(1, Primitive.upper(r.de)));
+    r.de |= 0b1000000000;
 
     return 8;
   };
@@ -6035,7 +6035,7 @@ class CPU {
    * Affected flags:
    */
   private SET1E = (): byte => {
-    r.de = Primitive.setLower(r.de, SET(1, Primitive.lower(r.de)));
+    r.de |= 0b10;
 
     return 8;
   };
@@ -6047,7 +6047,7 @@ class CPU {
    * Affected flags:
    */
   private SET1H = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, SET(1, Primitive.upper(r.hl)));
+    r.hl |= 0b1000000000;
 
     return 8;
   };
@@ -6059,7 +6059,7 @@ class CPU {
    * Affected flags:
    */
   private SET1L = (): byte => {
-    r.hl = Primitive.setLower(r.hl, SET(1, Primitive.lower(r.hl)));
+    r.hl |= 0b10;
 
     return 8;
   };
@@ -6071,7 +6071,7 @@ class CPU {
    * Affected flags:
    */
   private SET1HL = (): byte => {
-    memoryRef.writeByte(r.hl, SET(1, memoryRef.readByte(r.hl)));
+    memoryRef.writeByte(r.hl, memoryRef.readByte(r.hl) | 0b10);
 
     return 16;
   };
@@ -6083,7 +6083,7 @@ class CPU {
    * Affected flags:
    */
   private SET1A = (): byte => {
-    r.af = Primitive.setUpper(r.af, SET(1, Primitive.upper(r.af)));
+    r.af |= 0b1000000000;
 
     return 8;
   };
@@ -6095,7 +6095,7 @@ class CPU {
    * Affected flags:
    */
   private SET2B = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, SET(2, Primitive.upper(r.bc)));
+    r.bc |= 0b10000000000;
 
     return 8;
   };
@@ -6107,7 +6107,7 @@ class CPU {
    * Affected flags:
    */
   private SET2C = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, SET(2, Primitive.lower(r.bc)));
+    r.bc |= 0b100;
 
     return 8;
   };
@@ -6119,7 +6119,7 @@ class CPU {
    * Affected flags:
    */
   private SET2D = (): byte => {
-    r.de = Primitive.setUpper(r.de, SET(2, Primitive.upper(r.de)));
+    r.de |= 0b10000000000;
 
     return 8;
   };
@@ -6131,8 +6131,7 @@ class CPU {
    * Affected flags:
    */
   private SET2E = (): byte => {
-    r.de = Primitive.setLower(r.de, SET(2, Primitive.lower(r.de)));
-
+    r.de |= 0b100;
     return 8;
   };
 
@@ -6143,7 +6142,7 @@ class CPU {
    * Affected flags:
    */
   private SET2H = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, SET(2, Primitive.upper(r.hl)));
+    r.hl |= 0b10000000000;
 
     return 8;
   };
@@ -6155,7 +6154,7 @@ class CPU {
    * Affected flags:
    */
   private SET2L = (): byte => {
-    r.hl = Primitive.setLower(r.hl, SET(2, Primitive.lower(r.hl)));
+    r.hl |= 0b100;
 
     return 8;
   };
@@ -6167,7 +6166,7 @@ class CPU {
    * Affected flags:
    */
   private SET2HL = (): byte => {
-    memoryRef.writeByte(r.hl, SET(2, memoryRef.readByte(r.hl)));
+    memoryRef.writeByte(r.hl, memoryRef.readByte(r.hl) | 0b100);
 
     return 16;
   };
@@ -6179,7 +6178,7 @@ class CPU {
    * Affected flags:
    */
   private SET2A = (): byte => {
-    r.af = Primitive.setUpper(r.af, SET(2, Primitive.upper(r.af)));
+    r.af |= 0b10000000000;
 
     return 8;
   };
@@ -6191,7 +6190,7 @@ class CPU {
    * Affected flags:
    */
   private SET3B = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, SET(3, Primitive.upper(r.bc)));
+    r.bc |= 0b100000000000;
 
     return 8;
   };
@@ -6203,7 +6202,7 @@ class CPU {
    * Affected flags:
    */
   private SET3C = (): byte => {
-    r.bc = Primitive.setLower(r.bc, SET(3, Primitive.lower(r.bc)));
+    r.bc |= 0b1000;
 
     return 8;
   };
@@ -6215,7 +6214,7 @@ class CPU {
    * Affected flags:
    */
   private SET3D = (): byte => {
-    r.de = Primitive.setUpper(r.de, SET(3, Primitive.upper(r.de)));
+    r.de |= 0b100000000000;
 
     return 8;
   };
@@ -6227,7 +6226,7 @@ class CPU {
    * Affected flags:
    */
   private SET3E = (): byte => {
-    r.de = Primitive.setLower(r.de, SET(3, Primitive.lower(r.de)));
+    r.de |= 0b1000;
 
     return 8;
   };
@@ -6239,7 +6238,7 @@ class CPU {
    * Affected flags:
    */
   private SET3H = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, SET(3, Primitive.upper(r.hl)));
+    r.hl |= 0b100000000000;
 
     return 8;
   };
@@ -6251,7 +6250,7 @@ class CPU {
    * Affected flags:
    */
   private SET3L = (): byte => {
-    r.hl = Primitive.setLower(r.hl, SET(3, Primitive.lower(r.hl)));
+    r.hl |= 0b1000;
 
     return 8;
   };
@@ -6263,7 +6262,7 @@ class CPU {
    * Affected flags:
    */
   private SET3HL = (): byte => {
-    memoryRef.writeByte(r.hl, SET(3, memoryRef.readByte(r.hl)));
+    memoryRef.writeByte(r.hl, memoryRef.readByte(r.hl) | 0b1000);
 
     return 16;
   };
@@ -6275,7 +6274,7 @@ class CPU {
    * Affected flags:
    */
   private SET3A = (): byte => {
-    r.af = Primitive.setUpper(r.af, SET(3, Primitive.upper(r.af)));
+    r.af |= 0b100000000000;
 
     return 8;
   };
@@ -6287,7 +6286,7 @@ class CPU {
    * Affected flags:
    */
   private SET4B = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, SET(4, Primitive.upper(r.bc)));
+    r.bc |= 0b1000000000000;
 
     return 8;
   };
@@ -6299,7 +6298,7 @@ class CPU {
    * Affected flags:
    */
   private SET4C = (): byte => {
-    r.bc = Primitive.setLower(r.bc, SET(4, Primitive.lower(r.bc)));
+    r.bc |= 0b10000;
 
     return 8;
   };
@@ -6311,7 +6310,7 @@ class CPU {
    * Affected flags:
    */
   private SET4D = (): byte => {
-    r.de = Primitive.setUpper(r.de, SET(4, Primitive.upper(r.de)));
+    r.de |= 0b1000000000000;
 
     return 8;
   };
@@ -6323,7 +6322,7 @@ class CPU {
    * Affected flags:
    */
   private SET4E = (): byte => {
-    r.de = Primitive.setLower(r.de, SET(4, Primitive.lower(r.de)));
+    r.de |= 0b10000;
 
     return 8;
   };
@@ -6335,7 +6334,7 @@ class CPU {
    * Affected flags:
    */
   private SET4H = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, SET(4, Primitive.upper(r.hl)));
+    r.hl |= 0b1000000000000;
 
     return 8;
   };
@@ -6347,7 +6346,7 @@ class CPU {
    * Affected flags:
    */
   private SET4L = (): byte => {
-    r.hl = Primitive.setLower(r.hl, SET(4, Primitive.lower(r.hl)));
+    r.hl |= 0b10000;
 
     return 8;
   };
@@ -6359,7 +6358,7 @@ class CPU {
    * Affected flags:
    */
   private SET4HL = (): byte => {
-    memoryRef.writeByte(r.hl, SET(4, memoryRef.readByte(r.hl)));
+    memoryRef.writeByte(r.hl, memoryRef.readByte(r.hl) | 0b10000);
 
     return 16;
   };
@@ -6371,7 +6370,7 @@ class CPU {
    * Affected flags:
    */
   private SET4A = (): byte => {
-    r.af = Primitive.setUpper(r.af, SET(4, Primitive.upper(r.af)));
+    r.af |= 0b1000000000000;
 
     return 8;
   };
@@ -6383,7 +6382,7 @@ class CPU {
    * Affected flags:
    */
   private SET5B = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, SET(5, Primitive.upper(r.bc)));
+    r.bc |= 0b10000000000000;
 
     return 8;
   };
@@ -6395,7 +6394,7 @@ class CPU {
    * Affected flags:
    */
   private SET5C = (): byte => {
-    r.bc = Primitive.setLower(r.bc, SET(5, Primitive.lower(r.bc)));
+    r.bc |= 0b100000;
 
     return 8;
   };
@@ -6407,7 +6406,7 @@ class CPU {
    * Affected flags:
    */
   private SET5D = (): byte => {
-    r.de = Primitive.setUpper(r.de, SET(5, Primitive.upper(r.de)));
+    r.de |= 0b10000000000000;
 
     return 8;
   };
@@ -6419,7 +6418,7 @@ class CPU {
    * Affected flags:
    */
   private SET5E = (): byte => {
-    r.de = Primitive.setLower(r.de, SET(5, Primitive.lower(r.de)));
+    r.de |= 0b100000;
 
     return 8;
   };
@@ -6431,7 +6430,7 @@ class CPU {
    * Affected flags:
    */
   private SET5H = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, SET(5, Primitive.upper(r.hl)));
+    r.hl |= 0b10000000000000;
 
     return 8;
   };
@@ -6443,7 +6442,7 @@ class CPU {
    * Affected flags:
    */
   private SET5L = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, SET(5, Primitive.lower(r.hl)));
+    r.hl |= 0b100000;
 
     return 8;
   };
@@ -6455,7 +6454,7 @@ class CPU {
    * Affected flags:
    */
   private SET5HL = (): byte => {
-    memoryRef.writeByte(r.hl, SET(5, memoryRef.readByte(r.hl)));
+    memoryRef.writeByte(r.hl, memoryRef.readByte(r.hl) | 0b100000);
 
     return 16;
   };
@@ -6467,7 +6466,7 @@ class CPU {
    * Affected flags:
    */
   private SET5A = (): byte => {
-    r.af = Primitive.setUpper(r.af, SET(5, Primitive.upper(r.af)));
+    r.af |= 0b10000000000000;
 
     return 8;
   };
@@ -6479,7 +6478,7 @@ class CPU {
    * Affected flags:
    */
   private SET6B = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, SET(6, Primitive.upper(r.bc)));
+    r.bc |= 0b100000000000000;
 
     return 8;
   };
@@ -6491,7 +6490,7 @@ class CPU {
    * Affected flags:
    */
   private SET6C = (): byte => {
-    r.bc = Primitive.setLower(r.bc, SET(6, Primitive.lower(r.bc)));
+    r.bc |= 0b1000000;
 
     return 8;
   };
@@ -6503,7 +6502,7 @@ class CPU {
    * Affected flags:
    */
   private SET6D = (): byte => {
-    r.de = Primitive.setUpper(r.de, SET(6, Primitive.upper(r.de)));
+    r.de |= 0b100000000000000;
 
     return 8;
   };
@@ -6515,7 +6514,7 @@ class CPU {
    * Affected flags:
    */
   private SET6E = (): byte => {
-    r.de = Primitive.setLower(r.de, SET(6, Primitive.lower(r.de)));
+    r.de |= 0b1000000;
 
     return 8;
   };
@@ -6527,7 +6526,7 @@ class CPU {
    * Affected flags:
    */
   private SET6H = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, SET(6, Primitive.upper(r.hl)));
+    r.hl |= 0b100000000000000;
 
     return 8;
   };
@@ -6539,7 +6538,7 @@ class CPU {
    * Affected flags:
    */
   private SET6L = (): byte => {
-    r.hl = Primitive.setLower(r.hl, SET(6, Primitive.lower(r.hl)));
+    r.hl |= 0b1000000;
 
     return 8;
   };
@@ -6551,7 +6550,7 @@ class CPU {
    * Affected flags:
    */
   private SET6HL = (): byte => {
-    memoryRef.writeByte(r.hl, SET(6, memoryRef.readByte(r.hl)));
+    memoryRef.writeByte(r.hl, memoryRef.readByte(r.hl) | 0b1000000);
 
     return 16;
   };
@@ -6563,7 +6562,7 @@ class CPU {
    * Affected flags:
    */
   private SET6A = (): byte => {
-    r.af = Primitive.setUpper(r.af, SET(6, Primitive.upper(r.af)));
+    r.af |= 0b100000000000000;
 
     return 8;
   };
@@ -6575,7 +6574,7 @@ class CPU {
    * Affected flags:
    */
   private SET7B = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, SET(7, Primitive.upper(r.bc)));
+    r.bc |= 0b1000000000000000;
 
     return 8;
   };
@@ -6587,7 +6586,7 @@ class CPU {
    * Affected flags:
    */
   private SET7C = (): byte => {
-    r.bc = Primitive.setLower(r.bc, SET(7, Primitive.lower(r.bc)));
+    r.bc |= 0b10000000;
 
     return 8;
   };
@@ -6599,7 +6598,7 @@ class CPU {
    * Affected flags:
    */
   private SET7D = (): byte => {
-    r.de = Primitive.setUpper(r.de, SET(7, Primitive.upper(r.de)));
+    r.de |= 0b1000000000000000;
 
     return 8;
   };
@@ -6611,7 +6610,7 @@ class CPU {
    * Affected flags:
    */
   private SET7E = (): byte => {
-    r.de = Primitive.setLower(r.de, SET(7, Primitive.lower(r.de)));
+    r.de |= 0b10000000;
 
     return 8;
   };
@@ -6623,7 +6622,7 @@ class CPU {
    * Affected flags:
    */
   private SET7H = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, SET(7, Primitive.upper(r.hl)));
+    r.hl |= 0b1000000000000000;
 
     return 8;
   };
@@ -6635,7 +6634,7 @@ class CPU {
    * Affected flags:
    */
   private SET7L = (): byte => {
-    r.hl = Primitive.setLower(r.hl, SET(7, Primitive.lower(r.hl)));
+    r.hl |= 0b10000000;
 
     return 8;
   };
@@ -6647,7 +6646,7 @@ class CPU {
    * Affected flags:
    */
   private SET7HL = (): byte => {
-    memoryRef.writeByte(r.hl, SET(7, memoryRef.readByte(r.hl)));
+    memoryRef.writeByte(r.hl, memoryRef.readByte(r.hl) | 0b10000000);
 
     return 16;
   };
@@ -6659,7 +6658,7 @@ class CPU {
    * Affected flags:
    */
   private SET7A = (): byte => {
-    r.af = Primitive.setUpper(r.af, SET(7, Primitive.upper(r.af)));
+    r.af |= 0b1000000000000000;
 
     return 8;
   };
@@ -7205,19 +7204,24 @@ function RLn(reg: byte): byte {
 }
 
 function ADD(operand: byte): void {
-  checkFullCarry8(Primitive.upper(r.af), operand);
-  checkHalfCarry(Primitive.upper(r.af), operand);
-  r.af = Primitive.addUpper(r.af, operand);
-  checkZFlag(Primitive.upper(r.af));
+  let a = r.af >> 8;
+  checkFullCarry8(a, operand);
+  checkHalfCarry(a, operand);
+  a = (a + operand) & 255;
+  r.af = (a << 8) | (r.af & 255);
+  checkZFlag(a);
   setNFlag(0);
 }
 
 function ADC(operand: byte): void {
-  operand = Primitive.addByte(operand, <byte>getCYFlag());
-  checkFullCarry8(Primitive.upper(r.af), operand);
-  checkHalfCarry(Primitive.upper(r.af), operand);
-  r.af = Primitive.addUpper(r.af, operand);
-  checkZFlag(Primitive.upper(r.af));
+  let a = r.af >> 8;
+  const cy = getCYFlag();
+  setHFlag(((operand & 0xf) + (a & 0xf) + cy) & 0x10);
+  operand += cy;
+  checkFullCarry8(operand, a);
+  a = (a + operand) & 255;
+  r.af = (a << 8) | (r.af & 255);
+  checkZFlag(a);
   setNFlag(0);
 }
 
@@ -7230,12 +7234,13 @@ function SUB(operand: byte): void {
 }
 
 function SBC(operand: byte): void {
-  const carry = getCYFlag() ? -1 : 0;
-  operand = Primitive.addByte(operand, carry);
-  checkFullCarry8(Primitive.upper(r.af), operand, true);
-  checkHalfCarry(Primitive.upper(r.af), operand, true);
-  r.af = Primitive.toWord(Primitive.addUpper(r.af, -operand));
-  checkZFlag(Primitive.upper(r.af));
+  let a = r.af >> 8;
+  const cy = getCYFlag();
+  setHFlag((a & 0xf) - (operand & 0xf) - cy < 0);
+  setCYFlag(a - operand - cy < 0);
+  a = (a - operand - cy) & 255;
+  r.af = (a << 8) | (r.af & 255);
+  checkZFlag(a);
   setNFlag(1);
 }
 
@@ -7421,4 +7426,98 @@ function SWAP(reg: byte): byte {
   return result;
 }
 
+class Flag implements Flag {
+  private _z: bit = 0; // set if last op producted 0
+  private _n: bit = 0; // set if last op was subtraction
+  private _h: bit = 0; // set if result's Primitive.lower half of last op overflowed past 15
+  private _cy: bit = 0; // set if last op produced a result over 255 or under 0
+  private cpu: CPU = <CPU>{};
+  constructor(cpu: CPU, value: byte = 0) {
+    this.cpu = cpu;
+    this.z = (value >> 7) & 1;
+    this.n = (value >> 6) & 1;
+    this.h = (value >> 5) & 1;
+    this.cy = (value >> 4) & 1;
+  }
+
+  /**
+   * Sets the Z flag if the register is 0, otherwise resets it.
+   */
+  public checkZFlag = (reg: byte): void => {
+    if (!reg) {
+      this.z = 1;
+    } else {
+      this.z = 0;
+    }
+  };
+
+  private error(): void {
+    throw new Error('Tried to set flag outside range.');
+  }
+
+  public value = (): byte => {
+    return (this.z << 7) | (this.n << 6) | (this.h << 5) | (this.cy << 4);
+  };
+
+  set z(value: bit) {
+    if (value === 0 || value === 1) {
+      this._z = value;
+      r.af = Primitive.setLower(r.af, Primitive.lower(r.af) | (value << 7));
+    } else {
+      this.error();
+    }
+  }
+
+  get z(): bit {
+    return this._z;
+  }
+
+  set n(value: bit) {
+    if (value === 0 || value === 1) {
+      this._n = value;
+      r.af = Primitive.setLower(r.af, Primitive.lower(r.af) | (value << 6));
+    } else {
+      this.error();
+    }
+  }
+
+  get n(): bit {
+    return this._n;
+  }
+
+  set h(value: bit) {
+    if (value === 0 || value === 1) {
+      this._h = value;
+      r.af = Primitive.setLower(r.af, Primitive.lower(r.af) | (value << 5));
+    } else {
+      this.error();
+    }
+  }
+
+  get h(): bit {
+    return this._h;
+  }
+
+  set cy(value: bit) {
+    if (value === 0 || value === 1) {
+      this._cy = value;
+      r.af = Primitive.setLower(r.af, Primitive.lower(r.af) | (value << 4));
+    } else {
+      this.error();
+    }
+  }
+
+  get cy(): bit {
+    return this._cy;
+  }
+
+  public static formatFlag = (value: byte): object => ({
+    z: (value >> 7) & 1,
+    n: (value >> 6) & 1,
+    h: (value >> 5) & 1,
+    cy: (value >> 4) & 1,
+  });
+}
+
 export default CPU;
+export {Flag};

@@ -26,7 +26,7 @@ module.exports = (env, argv) => ({
           /\.test.tsx$/,
           /node_modules/,
         ],
-        loader: 'babel-loader',
+        loader: 'ts-loader',
       },
       {
         test: /\.s[ac]ss$/i,

@@ -1,4 +1,4 @@
-import Primitive from 'helpers/Primitives';
+import {Primitive} from 'helpers/index';
 import Memory from 'Memory/index';
 
 class InterruptService {
@@ -17,7 +17,7 @@ class InterruptService {
     const register: byte = this.memory.readByte(Memory.addresses.interrupt.if);
     this.memory.writeByte(
       Memory.addresses.interrupt.if,
-      Primitive.setBit(register, index)
+      <byte>Primitive.setBit(register, index)
     );
   };
 }

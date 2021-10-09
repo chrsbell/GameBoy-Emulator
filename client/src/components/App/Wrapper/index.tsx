@@ -1,4 +1,4 @@
-import {DEBUG} from 'helpers/Debug';
+import {DEBUG} from 'helpers/index';
 import * as React from 'react';
 import {useEffect, useRef, useState} from 'react';
 import styles from './sass/index.module.scss';

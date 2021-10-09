@@ -56,7 +56,7 @@ class Emulator {
         console.log('stopped emulator');
       }
       const {cpu, ppu, canvasRenderer, memory} = this;
-      const {executeInstruction, checkInterrupts} = cpu;
+      const {execute, checkInterrupts} = cpu;
       const {buildGraphics} = ppu;
       let cycles = 0;
       const cyclesPerUpdate = this.cpu.clock;
@@ -64,7 +64,7 @@ class Emulator {
       // elapse time according to number of cpu cycles used
       while (cycles < cyclesPerUpdate) {
         if (!cpu.halted) {
-          elapsed = executeInstruction();
+          elapsed = execute();
           cycles += elapsed;
         }
         buildGraphics(elapsed);

@@ -1,4 +1,4 @@
-import Primitive from 'helpers/Primitives';
+import {Primitive} from 'helpers/index';
 
 describe('Primitive types', () => {
   it('creates valid words/bytes', () => {

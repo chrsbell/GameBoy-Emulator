@@ -1,19 +1,18 @@
-import * as chalk from 'chalk';
-import CPU from 'CPU/index';
+import {green, red} from 'chalk';
+import CPU, {Flag, Registers} from 'CPU/index';
 import * as fs from 'fs';
-import Primitive from 'helpers/Primitives';
-import _ from 'lodash';
+import {Primitive} from 'helpers/index';
+import PPUBridge from 'Memory/PPUBridge';
 import * as path from 'path';
 import * as util from 'util';
-import Memory from '../Memory';
-import PPU from '../PPU';
-import Flag, {formatFlag} from './Flag';
 
 const TEST_ROM_FOLDER = path.join(
   __dirname,
   '..',
   '..',
   '..',
+  '..',
+  'client',
   'test',
   'gb-test-roms',
   'cpu_instrs',
@@ -71,14 +70,6 @@ declare global {
 const logObject = (object: object): string =>
   util.inspect(object, false, null, true);
 
-const consoleColors = [
-  chalk.red,
-  chalk.blue,
-  chalk.green,
-  chalk.cyan,
-  chalk.magenta,
-];
-
 expect.extend({
   toMatchRegister(
     received: byte | word,
@@ -99,17 +90,28 @@ expect.extend({
       }
       return {
         message: (): string =>
-          `Expected register ${chalk.green(register)} value ${chalk.red(
+          `Expected register ${green(register)} value ${red(
             logged
-          )} to equal ${chalk.green(
+          )} to equal ${green(
             expected
           )} after instructions: \n\n${cpu.lastExecuted
-            .map(instr => _.sample(consoleColors)(instr))
+            .map(instr => red(Primitive.toHex(instr)))
+            .reverse()
             .join(' ')}\n\nExpected CPU State: ${logObject(
             expectedState
-          )}\n\nActual CPU State: ${logObject(
-            cpu
-          )}\n\nExpected Flag: ${logObject(formatFlag(expectedState.f))}`,
+          )}\n\nActual CPU State: ${logObject({
+            a: cpu.getR().af >> 8,
+            f: cpu.getR().af & 255,
+            b: cpu.getR().bc >> 8,
+            c: cpu.getR().bc & 255,
+            d: cpu.getR().de >> 8,
+            e: cpu.getR().de & 255,
+            hl: cpu.getR().hl >> 8,
+            sp: cpu.getSP(),
+            pc: cpu.getPC(),
+            interruptsEnabled: cpu.getIE(),
+            halted: cpu.halted,
+          })}\n\nExpected Flag: ${logObject(Flag.formatFlag(expectedState.f))}`,
         pass: false,
       };
     }
@@ -149,9 +151,10 @@ const readSaveState = (
 };
 
 describe('CPU', () => {
-  const cpu = new CPU();
-  const memory = new Memory();
-  const ppu = new PPU(memory);
+  const ppuBridge = new PPUBridge();
+  const cpu = new CPU(ppuBridge.memory);
+  const memory = ppuBridge.memory;
+  const ppu = ppuBridge.ppu;
   beforeEach(() => {
     memory.reset();
     cpu.reset();
@@ -197,54 +200,55 @@ describe('CPU', () => {
     for (let i = 0; i < saveState.length; i++) {
       // Act
       debugger;
-      cpu.executeInstruction(memory);
+      cpu.executeInstruction();
       // PPU.buildGraphics(cycles);
       // cpu.checkInterrupts();
       [expected, fileIndex] = readSaveState(saveState, fileIndex);
       // if (cpu.lastExecuted[0] === '0xf0') {
       //   cpu.pc = expected.pc;
       //   cpu.sp = expected.sp;
-      //   cpu.r.af = (expected.a << 8) | expected.f;
-      //   cpu.r.bc = (expected.b << 8) | expected.c;
-      //   cpu.r.de = (expected.d << 8) | expected.e;
-      //   cpu.r.hl = expected.hl;
+      //   r.af = (expected.a << 8) | expected.f;
+      //   r.bc = (expected.b << 8) | expected.c;
+      //   r.de = (expected.d << 8) | expected.e;
+      //   r.hl = expected.hl;
       // }
 
       // Assert
-      expect(cpu.pc).toMatchRegister(cpu, expected.pc, 'PC', expected);
-      expect(cpu.sp).toMatchRegister(cpu, expected.sp, 'SP', expected);
-      expect(cpu.r.hl).toMatchRegister(cpu, expected.hl, 'HL', expected);
-      expect(Primitive.upper(cpu.r.af)).toMatchRegister(
+      const r: Registers = cpu.getR();
+      expect(cpu.getPC()).toMatchRegister(cpu, expected.pc, 'PC', expected);
+      expect(cpu.getSP()).toMatchRegister(cpu, expected.sp, 'SP', expected);
+      expect(r.hl).toMatchRegister(cpu, expected.hl, 'HL', expected);
+      expect(Primitive.upper(r.af)).toMatchRegister(
         cpu,
         expected.a,
         'A',
         expected
       );
-      expect(Primitive.upper(cpu.r.bc)).toMatchRegister(
+      expect(Primitive.upper(r.bc)).toMatchRegister(
         cpu,
         expected.b,
         'B',
         expected
       );
-      expect(Primitive.lower(cpu.r.bc)).toMatchRegister(
+      expect(Primitive.lower(r.bc)).toMatchRegister(
         cpu,
         expected.c,
         'C',
         expected
       );
-      expect(Primitive.upper(cpu.r.de)).toMatchRegister(
+      expect(Primitive.upper(r.de)).toMatchRegister(
         cpu,
         expected.d,
         'D',
         expected
       );
-      expect(Primitive.lower(cpu.r.de)).toMatchRegister(
+      expect(Primitive.lower(r.de)).toMatchRegister(
         cpu,
         expected.e,
         'E',
         expected
       );
-      expect(Primitive.lower(cpu.r.af)).toMatchRegister(
+      expect(Primitive.lower(r.af)).toMatchRegister(
         cpu,
         expected.f,
         'F',
@@ -257,7 +261,7 @@ describe('CPU', () => {
     memory.load(cpu, [], new Uint8Array([...Array(8192 * 2).fill(0)]));
     const memReadSpy = jest.spyOn(memory, 'readByte');
     // to do: NOP instruction spy
-    const cycles = cpu.executeInstruction(memory);
+    const cycles = cpu.executeInstruction();
     expect(memReadSpy).toHaveBeenCalledTimes(1);
     expect(cycles).toEqual(4);
   });
@@ -338,62 +342,63 @@ describe('CPU', () => {
     );
   });
 
-  describe('flags', () => {
-    const cpu = new CPU();
-    describe('flags', () => {
-      beforeEach(() => (cpu.r.af = 0));
-      it('sets/unsets/gets the z flag', () => {
-        cpu.setZFlag(1);
-        expect(cpu.r.af).toBe(128);
+  // describe('flags', () => {
+  //   const ppuBridge = new PPUBridge();
+  //   const cpu = new CPU(ppuBridge.memory);
+  //   describe('flags', () => {
+  //     beforeEach(() => (r.af = 0));
+  //     it('sets/unsets/gets the z flag', () => {
+  //       cpu.setZFlag(1);
+  //       expect(r.af).toBe(128);
 
-        expect(cpu.getZFlag()).toBe(1);
+  //       expect(cpu.getZFlag()).toBe(1);
 
-        cpu.setZFlag(0);
-        expect(cpu.r.af).toBe(0);
-      });
-      it('sets/unsets/gets the cy flag', () => {
-        cpu.setCYFlag(1);
-        expect(cpu.r.af).toBe(16);
+  //       cpu.setZFlag(0);
+  //       expect(r.af).toBe(0);
+  //     });
+  //     it('sets/unsets/gets the cy flag', () => {
+  //       cpu.setCYFlag(1);
+  //       expect(r.af).toBe(16);
 
-        expect(cpu.getCYFlag()).toBe(1);
+  //       expect(cpu.getCYFlag()).toBe(1);
 
-        cpu.setCYFlag(0);
-        expect(cpu.r.af).toBe(0);
-      });
-      it('sets/unsets/gets the h flag', () => {
-        cpu.setHFlag(1);
-        expect(cpu.r.af).toBe(32);
+  //       cpu.setCYFlag(0);
+  //       expect(r.af).toBe(0);
+  //     });
+  //     it('sets/unsets/gets the h flag', () => {
+  //       cpu.setHFlag(1);
+  //       expect(r.af).toBe(32);
 
-        expect(cpu.getHFlag()).toBe(1);
+  //       expect(cpu.getHFlag()).toBe(1);
 
-        cpu.setHFlag(0);
-        expect(cpu.r.af).toBe(0);
-      });
-      it('sets/unsets/gets the n flag', () => {
-        cpu.setNFlag(1);
-        expect(cpu.r.af).toBe(64);
+  //       cpu.setHFlag(0);
+  //       expect(r.af).toBe(0);
+  //     });
+  //     it('sets/unsets/gets the n flag', () => {
+  //       cpu.setNFlag(1);
+  //       expect(r.af).toBe(64);
 
-        expect(cpu.getNFlag()).toBe(1);
+  //       expect(cpu.getNFlag()).toBe(1);
 
-        cpu.setNFlag(0);
-        expect(cpu.r.af).toBe(0);
-      });
-    });
-  });
+  //       cpu.setNFlag(0);
+  //       expect(r.af).toBe(0);
+  //     });
+  //   });
+  // });
 
-  describe('half carry', () => {
-    beforeEach(() => (cpu.r.af = 0));
-    it('checks half carry on addition ops', () => {
-      cpu.checkHalfCarry(62, 34);
-      expect(Primitive.lower(cpu.r.af) >> 5).toBe(1);
-      cpu.checkHalfCarry(61, 34);
-      expect(Primitive.lower(cpu.r.af) >> 5).toBe(0);
-    });
-    it('checks for half carry on subtraction ops', () => {
-      cpu.checkHalfCarry(11, 15, true);
-      expect(Primitive.lower(cpu.r.af) >> 5).toBe(1);
-      cpu.checkHalfCarry(11, 9, true);
-      expect(Primitive.lower(cpu.r.af) >> 5).toBe(0);
-    });
-  });
+  // describe('half carry', () => {
+  //   beforeEach(() => (r.af = 0));
+  //   it('checks half carry on addition ops', () => {
+  //     cpu.checkHalfCarry(62, 34);
+  //     expect(Primitive.lower(r.af) >> 5).toBe(1);
+  //     cpu.checkHalfCarry(61, 34);
+  //     expect(Primitive.lower(r.af) >> 5).toBe(0);
+  //   });
+  //   it('checks for half carry on subtraction ops', () => {
+  //     cpu.checkHalfCarry(11, 15, true);
+  //     expect(Primitive.lower(r.af) >> 5).toBe(1);
+  //     cpu.checkHalfCarry(11, 9, true);
+  //     expect(Primitive.lower(r.af) >> 5).toBe(0);
+  //   });
+  // });
 });
