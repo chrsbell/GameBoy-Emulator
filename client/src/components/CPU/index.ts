@@ -2,8 +2,6 @@ import {DEBUG} from 'helpers/Debug';
 import Primitive from 'helpers/Primitives';
 import InterruptService from 'Interrupts/index';
 import Memory from 'Memory/index';
-import Opcodes from './sm83/index';
-import {instructionHelpers as helpers} from './sm83/Map';
 
 interface Registers {
   af: word;
@@ -12,111 +10,188 @@ interface Registers {
   hl: word;
 }
 
+const r: Registers = {
+  af: 0,
+  bc: 0,
+  de: 0,
+  hl: 0,
+};
+let pc: word = 0;
+let sp: word = 0;
+
+let allInterruptsEnabled = true;
+let memoryRef!: Memory;
+
+const setCYFlag = (value: boolean | byte): void => {
+  if (value) {
+    r.af |= 1 << 4;
+  } else {
+    r.af &= ~(1 << 4);
+  }
+};
+
+const setHFlag = (value: boolean | byte): void => {
+  if (value) {
+    r.af |= 1 << 5;
+  } else {
+    r.af &= ~(1 << 5);
+  }
+};
+
+const setNFlag = (value: boolean | byte): void => {
+  if (value) {
+    r.af |= 1 << 6;
+  } else {
+    r.af &= ~(1 << 6);
+  }
+};
+
+const setZFlag = (value: boolean | byte): void => {
+  if (value) {
+    r.af |= 1 << 7;
+  } else {
+    r.af &= ~(1 << 7);
+  }
+};
+
+const getCYFlag = (): bit => (r.af >> 4) & 1;
+const getHFlag = (): bit => (r.af >> 5) & 1;
+const getNFlag = (): bit => (r.af >> 6) & 1;
+const getZFlag = (): bit => (r.af >> 7) & 1;
+
+/**
+ * Sets the Z flag if the register is 0, otherwise resets it.
+ */
+const checkZFlag = (reg: byte): void => {
+  setZFlag(!reg);
+};
+
+/**
+ * Sets the half carry flag if a carry will be generated from bits 3 to 4 of the sum.
+ * For 16-bit operations, this private should =  be called o=>n the upper bytes of the operands.
+ * Sources:
+ * https://robdor.com/2016/08/10/gameboy-emulator-half-carry-flag/
+ * https://stackoverflow.com/questions/8868396/game-boy-what-constitutes-a-half-carry
+ * https://gbdev.io/gb-opcodes/optables/
+ */
+const checkHalfCarry = (op1: byte, op2: byte, subtraction?: boolean): void => {
+  const carryBit = subtraction
+    ? ((op1 & 0xf) - (op2 & 0xf)) & 0x10
+    : ((op1 & 0xf) + (op2 & 0xf)) & 0x10;
+  setHFlag(carryBit === 0x10);
+};
+/**
+ * Sets the carry flag if the sum will exceed the size of the data type.
+ */
+const checkFullCarry16 = (
+  op1: word,
+  op2: word,
+  subtraction?: boolean
+): void => {
+  if (subtraction) {
+    setCYFlag(op1 - op2 < 0);
+  } else {
+    setCYFlag(op1 + op2 > 0xffff);
+  }
+};
+
+const checkFullCarry8 = (op1: byte, op2: byte, subtraction?: boolean): void => {
+  if (subtraction) {
+    setCYFlag(op1 - op2 < 0);
+  } else {
+    setCYFlag(op1 + op2 > 0xffff);
+  }
+};
+
 class CPU {
-  private memory!: Memory;
   // number of clock ticks per second
-  private clock = 4194304;
+  public clock = 4194304;
   // 16-bit program counter
-  public pc: word = 0;
   // stack pointer
-  private sp: word = 0;
-  private r: Registers = {
-    af: 0,
-    bc: 0,
-    de: 0,
-    hl: 0,
-  };
-  private halted = false;
-  private allInterruptsEnabled = true;
-  private opcodes: OpcodeList = Opcodes;
-  private lastExecuted: Array<string> = [];
+
+  public halted = false;
+  public lastExecuted: Array<string> = [];
+
   constructor(memory: Memory) {
-    this.memory = memory;
-
-    Object.entries(this.opcodes).forEach(([name, func]) => {
-      this.opcodes[name] = func.bind(this, this, memory);
-    });
-
+    memoryRef = memory;
     this.reset();
   }
 
-  /**
-   * Resets the this.
-   */
   public reset = (): void => {
-    this.pc = 0;
-    this.sp = 0;
+    pc = 0;
+    sp = 0;
     this.halted = false;
-    this.allInterruptsEnabled = true;
-    this.r.af = 0;
-    this.r.bc = 0;
-    this.r.de = 0;
-    this.r.hl = 0;
+    allInterruptsEnabled = true;
+    r.af = 0;
+    r.bc = 0;
+    r.de = 0;
+    r.hl = 0;
     this.lastExecuted = [];
   };
 
   setInterruptsGlobal(enabled: boolean): void {
-    this.allInterruptsEnabled = enabled;
+    allInterruptsEnabled = enabled;
   }
   /**
    * Completes the GB power sequence
    */
-  public initPowerSequence = (memory: Memory): void => {
-    this.pc = 0x100;
-    this.r.af = 0x01b0;
-    this.r.bc = 0x0013;
-    this.r.de = 0x00d8;
-    this.r.hl = 0x014d;
-    this.sp = 0xfffe;
-    memory.writeByte(0xff05, 0x00);
-    memory.writeByte(0xff06, 0x00);
-    memory.writeByte(0xff07, 0x00);
-    memory.writeByte(0xff10, 0x80);
-    memory.writeByte(0xff11, 0xbf);
-    memory.writeByte(0xff12, 0xf3);
-    memory.writeByte(0xff14, 0xbf);
-    memory.writeByte(0xff16, 0x3f);
-    memory.writeByte(0xff17, 0x00);
-    memory.writeByte(0xff19, 0xbf);
-    memory.writeByte(0xff1a, 0x7f);
-    memory.writeByte(0xff1b, 0xff);
-    memory.writeByte(0xff1c, 0x9f);
-    memory.writeByte(0xff1e, 0xbf);
-    memory.writeByte(0xff20, 0xff);
-    memory.writeByte(0xff21, 0x00);
-    memory.writeByte(0xff22, 0x00);
-    memory.writeByte(0xff23, 0xbf);
-    memory.writeByte(0xff24, 0x77);
-    memory.writeByte(0xff25, 0xf3);
-    memory.writeByte(0xff26, 0xf1);
-    memory.writeByte(0xff40, 0x91);
-    memory.writeByte(0xff42, 0x00);
-    memory.writeByte(0xff43, 0x00);
-    memory.writeByte(0xff45, 0x00);
-    memory.writeByte(0xff47, 0xfc);
-    memory.writeByte(0xff48, 0xff);
-    memory.writeByte(0xff49, 0xff);
-    memory.writeByte(0xff4a, 0x00);
-    memory.writeByte(0xff4b, 0x00);
-    memory.writeByte(0xffff, 0x00);
+  public initPowerSequence = (): void => {
+    pc = 0x100;
+    r.af = 0x01b0;
+    r.bc = 0x0013;
+    r.de = 0x00d8;
+    r.hl = 0x014d;
+    sp = 0xfffe;
+    memoryRef.writeByte(0xff05, 0x00);
+    memoryRef.writeByte(0xff06, 0x00);
+    memoryRef.writeByte(0xff07, 0x00);
+    memoryRef.writeByte(0xff10, 0x80);
+    memoryRef.writeByte(0xff11, 0xbf);
+    memoryRef.writeByte(0xff12, 0xf3);
+    memoryRef.writeByte(0xff14, 0xbf);
+    memoryRef.writeByte(0xff16, 0x3f);
+    memoryRef.writeByte(0xff17, 0x00);
+    memoryRef.writeByte(0xff19, 0xbf);
+    memoryRef.writeByte(0xff1a, 0x7f);
+    memoryRef.writeByte(0xff1b, 0xff);
+    memoryRef.writeByte(0xff1c, 0x9f);
+    memoryRef.writeByte(0xff1e, 0xbf);
+    memoryRef.writeByte(0xff20, 0xff);
+    memoryRef.writeByte(0xff21, 0x00);
+    memoryRef.writeByte(0xff22, 0x00);
+    memoryRef.writeByte(0xff23, 0xbf);
+    memoryRef.writeByte(0xff24, 0x77);
+    memoryRef.writeByte(0xff25, 0xf3);
+    memoryRef.writeByte(0xff26, 0xf1);
+    memoryRef.writeByte(0xff40, 0x91);
+    memoryRef.writeByte(0xff42, 0x00);
+    memoryRef.writeByte(0xff43, 0x00);
+    memoryRef.writeByte(0xff45, 0x00);
+    memoryRef.writeByte(0xff47, 0xfc);
+    memoryRef.writeByte(0xff48, 0xff);
+    memoryRef.writeByte(0xff49, 0xff);
+    memoryRef.writeByte(0xff4a, 0x00);
+    memoryRef.writeByte(0xff4b, 0x00);
+    memoryRef.writeByte(0xffff, 0x00);
   };
   /**
    * Executes next opcode.
    * @returns {number} the number of CPU cycles required.
    */
   public executeInstruction = (): number => {
+    // const {memoryRef} = this;
     // fetch
-    const opcode: byte = this.memory.readByte(this.pc);
-    this.pc += 1;
-    this.pc &= 0xffff;
+    const opcode: byte = memoryRef.readByte(pc);
+    pc += 1;
+    pc &= 0xffff;
     // execute
     let numCycles: number;
     // check if finished bios execution
-    if (this.memory.inBios) {
+    if (memoryRef.inBios) {
       numCycles = this.opcodes[opcode]();
-      if (!this.memory.inBios) {
+      if (!memoryRef.inBios) {
         DEBUG && console.log('Exiting bios from this.');
-        this.initPowerSequence(this.memory);
+        this.initPowerSequence();
       }
     } else {
       numCycles = this.opcodes[opcode]();
@@ -132,53 +207,45 @@ class CPU {
   /**
    * Checks if an interrupt needs to be handled.
    */
-  public checkInterrupts = (memory: Memory): void => {
-    if (this.allInterruptsEnabled) {
-      const register: byte = memory.readByte(Memory.addresses.interrupt.if);
+  public checkInterrupts = (memoryRef: Memory): void => {
+    if (allInterruptsEnabled) {
+      const register: byte = memoryRef.readByte(0xff0f);
       if (register) {
-        const individualEnabled = memory.readByte(
-          Memory.addresses.interrupt.ie
-        );
+        const individualEnabled = memoryRef.readByte(0xffff);
         // 5 interrupts
         for (let i = 0; i < 5; i++) {
-          if (
-            Primitive.getBit(register, i) &&
-            Primitive.getBit(individualEnabled, i)
-          ) {
-            this.handleInterrupts(memory, i);
+          if ((register >> i) & 1 && (individualEnabled >> i) & 1) {
+            this.handleInterrupts(memoryRef, i);
           }
         }
       }
     }
   };
-  /**
-   * Handles an interrupt.
-   */
-  private handleInterrupts(memory: Memory, interrupt: number): void {
+  private handleInterrupts(memoryRef: Memory, interrupt: number): void {
     this.setInterruptsGlobal(false);
-    const register: byte = memory.readByte(Memory.addresses.interrupt.if);
-    memory.writeByte(
+    const register: byte = memoryRef.readByte(Memory.addresses.interrupt.if);
+    memoryRef.writeByte(
       InterruptService.flags.if,
       Primitive.clearBit(register, interrupt)
     );
 
-    helpers.PUSH(this, memory, this.pc);
+    PUSH(pc);
     DEBUG && console.log('Handled an interrupt.');
     switch (interrupt) {
       case InterruptService.flags.vBlank:
-        this.pc = 0x40;
+        pc = 0x40;
         break;
       case InterruptService.flags.lcdStat:
-        this.pc = 0x48;
+        pc = 0x48;
         break;
       case InterruptService.flags.timer:
-        this.pc = 0x50;
+        pc = 0x50;
         break;
       case InterruptService.flags.serial:
-        this.pc = 0x58;
+        pc = 0x58;
         break;
       case InterruptService.flags.joypad:
-        this.pc = 0x40;
+        pc = 0x40;
         break;
     }
   }
@@ -186,98 +253,7172 @@ class CPU {
    * Logs the internal state of the this.
    */
   public log = (): void => {
-    console.log(`JS GB Registers: ${JSON.stringify(this.r)}`);
-    console.log(`JS GB PC: ${this.pc}`);
-    console.log(`JS GB SP: ${this.sp}`);
-  };
-
-  public setCYFlag = (value: boolean | byte): void => {
-    if (value) {
-      this.r.af |= 1 << 4;
-    } else {
-      this.r.af &= ~(1 << 4);
-    }
-  };
-
-  public setHFlag = (value: boolean | byte): void => {
-    if (value) {
-      this.r.af |= 1 << 5;
-    } else {
-      this.r.af &= ~(1 << 5);
-    }
-  };
-
-  public setNFlag = (value: boolean | byte): void => {
-    if (value) {
-      this.r.af |= 1 << 6;
-    } else {
-      this.r.af &= ~(1 << 6);
-    }
-  };
-
-  public setZFlag = (value: boolean | byte): void => {
-    if (value) {
-      this.r.af |= 1 << 7;
-    } else {
-      this.r.af &= ~(1 << 7);
-    }
-  };
-
-  public getCYFlag = (): bit => (this.r.af >> 4) & 1;
-  public getHFlag = (): bit => (this.r.af >> 5) & 1;
-  public getNFlag = (): bit => (this.r.af >> 6) & 1;
-  public getZFlag = (): bit => (this.r.af >> 7) & 1;
-  /**
-   * Sets the Z flag if the register is 0, otherwise resets it.
-   */
-  public checkZFlag = (reg: byte): void => {
-    this.setZFlag(!reg);
+    console.log(`JS GB Registers: ${JSON.stringify(r)}`);
+    console.log(`JS GB PC: ${pc}`);
+    console.log(`JS GB SP: ${sp}`);
   };
 
   /**
-   * Sets the half carry flag if a carry will be generated from bits 3 to 4 of the sum.
-   * For 16-bit operations, this function should be called on the upper bytes of the operands.
-   * Sources:
-   * https://robdor.com/2016/08/10/gameboy-emulator-half-carry-flag/
-   * https://stackoverflow.com/questions/8868396/game-boy-what-constitutes-a-half-carry
-   * https://gbdev.io/gb-opcodes/optables/
+   * No operation.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
    */
-  public checkHalfCarry = (
-    op1: byte,
-    op2: byte,
-    subtraction?: boolean
-  ): void => {
-    const carryBit = subtraction
-      ? ((op1 & 0xf) - (op2 & 0xf)) & 0x10
-      : ((op1 & 0xf) + (op2 & 0xf)) & 0x10;
-    this.setHFlag(carryBit === 0x10);
-  };
-  /**
-   * Sets the carry flag if the sum will exceed the size of the data type.
-   */
-  public checkFullCarry16 = (
-    op1: word,
-    op2: word,
-    subtraction?: boolean
-  ): void => {
-    if (subtraction) {
-      this.setCYFlag(op1 - op2 < 0);
-    } else {
-      this.setCYFlag(op1 + op2 > 0xffff);
-    }
+  private NOP = (): byte => {
+    return 4;
   };
 
-  public checkFullCarry8 = (
-    op1: byte,
-    op2: byte,
-    subtraction?: boolean
-  ): void => {
-    if (subtraction) {
-      this.setCYFlag(op1 - op2 < 0);
-    } else {
-      this.setCYFlag(op1 + op2 > 0xffff);
-    }
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDBCid16i = (): byte => {
+    r.bc = memoryRef.readWord(pc);
+    pc += 2;
+
+    return 12;
   };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDBCmAi = (): byte => {
+    memoryRef.writeByte(r.bc, Primitive.upper(r.af));
+
+    return 8;
+  };
+
+  /**
+   * Increment register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private INCBCi = (): byte => {
+    r.bc = Primitive.addWord(r.bc, 1);
+
+    return 8;
+  };
+
+  /**
+   * Increment register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private INCBi = (): byte => {
+    // convert operand to unsigned
+    let operand: byte = 1;
+    // check for half carry on affected byte only
+    checkHalfCarry(Primitive.upper(r.bc), operand);
+    // perform addition
+    operand = Primitive.addByte(operand, Primitive.upper(r.bc));
+    r.bc = Primitive.setUpper(r.bc, operand);
+
+    checkZFlag(Primitive.upper(r.bc));
+    setNFlag(0);
+
+    return 4;
+  };
+
+  /**
+   * Decrement register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private DECBi = (): byte => {
+    checkHalfCarry(Primitive.upper(r.bc), 1, true);
+    r.bc = Primitive.addUpper(r.bc, Primitive.toByte(-1));
+    checkZFlag(Primitive.upper(r.bc));
+    setNFlag(1);
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDBid8i = (): byte => {
+    // load into B from pc (immediate)
+    r.bc = Primitive.setUpper(r.bc, Primitive.toByte(memoryRef.readByte(pc)));
+    pc += 1;
+
+    return 8;
+  };
+
+  /**
+   * Rotate A left. Old bit 7 to Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RLCA = (): byte => {
+    // check carry flag
+    setCYFlag(Primitive.upper(r.af) >> 7);
+    // left shift
+    const shifted: byte = Primitive.upper(r.af) << 1;
+    r.af = Primitive.setUpper(r.af, Primitive.toByte(shifted | (shifted >> 8)));
+    // flag resets
+    setNFlag(0);
+    setHFlag(0);
+    setZFlag(0);
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDa16mSPi = (): byte => {
+    memoryRef.writeWord(memoryRef.readWord(pc), sp);
+
+    return 20;
+  };
+
+  /**
+   * Add.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: N, H, C
+   */
+  private ADDHLiBCi = (): byte => {
+    checkFullCarry16(r.hl, r.bc);
+    checkHalfCarry(Primitive.upper(r.hl), Primitive.upper(r.bc));
+    r.hl = Primitive.addWord(r.hl, r.bc);
+    setNFlag(0);
+
+    return 8;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDAiBCm = (): byte => {
+    r.af = Primitive.setUpper(r.af, Primitive.toByte(memoryRef.readByte(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Decrement register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private DECBCi = (): byte => {
+    r.bc = Primitive.addWord(r.bc, -1);
+
+    return 8;
+  };
+
+  /**
+   * Increment register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private INCCi = (): byte => {
+    // convert operand to unsigned
+    let operand: byte = 1;
+    // check for half carry on affected byte only
+    checkHalfCarry(Primitive.lower(r.bc), operand);
+    // perform addition
+    operand = Primitive.addByte(operand, Primitive.lower(r.bc));
+    r.bc = Primitive.setLower(r.bc, operand);
+
+    checkZFlag(Primitive.lower(r.bc));
+    setNFlag(0);
+
+    return 4;
+  };
+
+  /**
+   * Decrement register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private DECCi = (): byte => {
+    // convert operand to unsigned
+    checkHalfCarry(Primitive.lower(r.bc), 1, true);
+    r.bc = Primitive.addLower(r.bc, Primitive.toByte(-1));
+    checkZFlag(Primitive.lower(r.bc));
+    setNFlag(1);
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDCid8i = (): byte => {
+    // load into C from pc (immediate)
+    r.bc = Primitive.setLower(r.bc, Primitive.toByte(memoryRef.readByte(pc)));
+    pc += 1;
+
+    return 8;
+  };
+
+  /**
+   * Rotate A right. Old bit 0 to Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RRCA = (): byte => {
+    // check carry flag
+    const bitZero = Primitive.upper(r.af) & 1;
+    setCYFlag(bitZero);
+    // right shift
+    const shifted: byte = Primitive.upper(r.af) >> 1;
+    r.af = Primitive.setUpper(r.af, Primitive.toByte(shifted | (bitZero << 7)));
+    // flag resets
+    setNFlag(0);
+    setHFlag(0);
+    setZFlag(0);
+
+    return 4;
+  };
+
+  /**
+   *  Halt CPU & LCD display until button pressed.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private STOP = (): byte => {
+    this.halted = true;
+    console.log('Instruction halted.');
+    throw new Error();
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDDEid16i = (): byte => {
+    r.de = memoryRef.readWord(pc);
+    pc += 2;
+
+    return 12;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDDEmAi = (): byte => {
+    memoryRef.writeByte(r.de, Primitive.upper(r.af));
+
+    return 8;
+  };
+
+  /**
+   * Increment register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private INCDEi = (): byte => {
+    r.de = Primitive.addWord(r.de, 1);
+
+    return 8;
+  };
+
+  /**
+   * Increment register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private INCDi = (): byte => {
+    // convert operand to unsigned
+    let operand: byte = 1;
+    // check for half carry on affected byte only
+    checkHalfCarry(Primitive.upper(r.de), operand);
+    // perform addition
+    operand = Primitive.addByte(operand, Primitive.upper(r.de));
+    r.de = Primitive.setUpper(r.de, operand);
+
+    checkZFlag(Primitive.upper(r.de));
+    setNFlag(0);
+
+    return 4;
+  };
+
+  /**
+   * Decrement register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private DECDi = (): byte => {
+    // check for half carry on affected byte only
+    checkHalfCarry(Primitive.upper(r.de), 1, true);
+    r.de = Primitive.addUpper(r.de, Primitive.toByte(-1));
+    checkZFlag(Primitive.upper(r.de));
+    setNFlag(1);
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDDid8i = (): byte => {
+    r.de = Primitive.setUpper(r.de, Primitive.toByte(memoryRef.readByte(pc)));
+    pc += 1;
+
+    return 8;
+  };
+
+  /**
+   * Rotate A left through Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RLA = (): byte => {
+    // need to rotate left through the carry flag
+    // get the old carry value
+    const oldCY = getCYFlag();
+    // set the carry flag to the 7th bit of A
+    setCYFlag(Primitive.upper(r.af) >> 7);
+    // rotate left
+    const shifted = Primitive.upper(r.af) << 1;
+    // combine old flag and shifted, set to A
+    r.af = Primitive.setUpper(r.af, Primitive.toByte(shifted | oldCY));
+    setHFlag(0);
+    setNFlag(0);
+    setZFlag(0);
+
+    return 4;
+  };
+
+  /**
+   * Jump to the relative address.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private JRr8 = (): byte => {
+    pc = Primitive.addWord(pc, Primitive.toSigned(memoryRef.readByte(pc)));
+    pc += 1;
+
+    return 12;
+  };
+
+  /**
+   * Add.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: N, H, C
+   */
+  private ADDHLiDEi = (): byte => {
+    checkFullCarry16(r.hl, r.de);
+    checkHalfCarry(Primitive.upper(r.hl), Primitive.upper(r.de));
+    r.hl = Primitive.addWord(r.hl, r.de);
+    setNFlag(0);
+
+    return 8;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDAiDEm = (): byte => {
+    r.af = Primitive.setUpper(r.af, Primitive.toByte(memoryRef.readByte(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Decrement register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private DECDEi = (): byte => {
+    r.de = Primitive.addWord(r.de, -1);
+
+    return 8;
+  };
+
+  /**
+   * Increment register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private INCEi = (): byte => {
+    // convert operand to unsigned
+    let operand: byte = 1;
+    // check for half carry on affected byte only
+    checkHalfCarry(Primitive.lower(r.de), operand);
+    // perform addition
+    operand = Primitive.addByte(operand, Primitive.lower(r.de));
+    r.de = Primitive.setLower(r.de, operand);
+
+    checkZFlag(Primitive.lower(r.de));
+    setNFlag(0);
+
+    return 4;
+  };
+
+  /**
+   * Decrement register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private DECEi = (): byte => {
+    // check for half carry on affected byte only
+    checkHalfCarry(Primitive.lower(r.de), 1, true);
+    r.de = Primitive.addLower(r.de, Primitive.toByte(-1));
+    checkZFlag(Primitive.lower(r.de));
+    setNFlag(1);
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDEid8i = (): byte => {
+    r.de = Primitive.setLower(r.de, Primitive.toByte(memoryRef.readByte(pc)));
+    pc += 1;
+
+    return 8;
+  };
+
+  /**
+   * Rotate A right through Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RRA = (): byte => {
+    // rotate right through the carry flag
+    // get the old carry value
+    const oldCY = getCYFlag();
+    // set the carry flag to the 0th bit of A
+    setCYFlag(Primitive.upper(r.af) & 1);
+    // rotate right
+    const shifted = Primitive.upper(r.af) >> 1;
+    // combine old flag and shifted, set to A
+    r.af = Primitive.setUpper(r.af, Primitive.toByte(shifted | (oldCY << 7)));
+    setHFlag(0);
+    setNFlag(0);
+    setZFlag(0);
+
+    return 4;
+  };
+
+  /**
+   * Conditional jump to the relative address.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private JRCNZr8 = (): byte => {
+    const incr = Primitive.toSigned(memoryRef.readByte(pc));
+    pc += 1;
+
+    if (!getZFlag()) {
+      // increment pc if zero flag was reset
+      pc = Primitive.addWord(pc, incr);
+      return 12;
+    }
+    return 8;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDHLid16i = (): byte => {
+    r.hl = memoryRef.readWord(pc);
+    pc += 2;
+
+    return 12;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDHLIncrmAi = (): byte => {
+    memoryRef.writeByte(r.hl, Primitive.upper(r.af));
+    r.hl = Primitive.addWord(r.hl, 1);
+
+    return 8;
+  };
+
+  /**
+   * Increment register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private INCHLi = (): byte => {
+    r.hl = Primitive.addWord(r.hl, 1);
+
+    return 8;
+  };
+
+  /**
+   * Increment register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private INCHi = (): byte => {
+    // convert operand to unsigned
+    let operand: byte = 1;
+    // check for half carry on affected byte only
+    checkHalfCarry(Primitive.upper(r.hl), operand);
+    // perform addition
+    operand = Primitive.addByte(operand, Primitive.upper(r.hl));
+    r.hl = Primitive.setUpper(r.hl, operand);
+
+    checkZFlag(operand);
+    setNFlag(0);
+
+    return 4;
+  };
+
+  /**
+   * Decrement register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private DECHi = (): byte => {
+    checkHalfCarry(Primitive.upper(r.hl), 1, true);
+    r.hl = Primitive.addUpper(r.hl, Primitive.toByte(-1));
+    checkZFlag(Primitive.upper(r.hl));
+    setNFlag(1);
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDHid8i = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, Primitive.toByte(memoryRef.readByte(pc)));
+    pc += 1;
+
+    return 8;
+  };
+
+  /**
+   * Decimal adjust register A.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, H, C
+   */
+  private DAAA = (): byte => {
+    // note: assumes a is a uint8_t and wraps from 0xff to 0
+    if (!getNFlag()) {
+      // after an addition, adjust if (half-)carry occurred or if result is out of bounds
+      if (getCYFlag() || Primitive.upper(r.af) > 0x99) {
+        r.af = Primitive.addUpper(r.af, 0x60);
+        setCYFlag(1);
+      }
+      if (getHFlag() || (Primitive.upper(r.af) & 0x0f) > 0x09) {
+        r.af = Primitive.addUpper(r.af, 0x6);
+      }
+    } else {
+      // after a subtraction, only adjust if (half-)carry occurred
+      if (getCYFlag()) {
+        r.af = Primitive.addUpper(r.af, -0x60);
+      }
+      if (getHFlag()) {
+        r.af = Primitive.addUpper(r.af, -0x6);
+      }
+    }
+    // these flags are always updated
+    checkZFlag(Primitive.upper(r.af));
+    setHFlag(0); // h flag is always cleared
+
+    return 4;
+  };
+
+  /**
+   * Conditional jump to the relative address.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private JRCZr8 = (): byte => {
+    const incr = Primitive.toSigned(memoryRef.readByte(pc));
+    pc += 1;
+    if (getZFlag()) {
+      pc = Primitive.addWord(pc, incr);
+      return 12;
+    }
+    return 8;
+  };
+
+  /**
+   * Add.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: N, H, C
+   */
+  private ADDHLiHLi = (): byte => {
+    checkFullCarry16(r.hl, r.hl);
+    checkHalfCarry(Primitive.upper(r.hl), Primitive.upper(r.hl));
+    r.hl = Primitive.addWord(r.hl, r.hl);
+    setNFlag(0);
+
+    return 8;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDAiHLIncrm = (): byte => {
+    r.af = Primitive.setUpper(r.af, Primitive.toByte(memoryRef.readByte(r.hl)));
+    r.hl = Primitive.addWord(r.hl, 1);
+
+    return 8;
+  };
+
+  /**
+   * Decrement register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private DECHLi = (): byte => {
+    r.hl = Primitive.addWord(r.hl, -1);
+
+    return 8;
+  };
+
+  /**
+   * Increment register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private INCLi = (): byte => {
+    checkHalfCarry(Primitive.lower(r.hl), 1);
+    r.hl = Primitive.addLower(r.hl, 1);
+    checkZFlag(Primitive.lower(r.hl));
+    setNFlag(0);
+
+    return 4;
+  };
+
+  /**
+   * Decrement register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private DECLi = (): byte => {
+    checkHalfCarry(Primitive.lower(r.hl), 1, true);
+    r.hl = Primitive.addLower(r.hl, Primitive.toByte(-1));
+    checkZFlag(Primitive.lower(r.hl));
+    setNFlag(1);
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDLid8i = (): byte => {
+    r.hl = Primitive.setLower(r.hl, Primitive.toByte(memoryRef.readByte(pc)));
+    pc += 1;
+
+    return 8;
+  };
+
+  /**
+   * Complement A register. (Flip all bits.)
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: N, H
+   */
+  private CPLA = (): byte => {
+    r.af = Primitive.setUpper(r.af, Primitive.toByte(~Primitive.upper(r.af)));
+    setNFlag(1);
+    setHFlag(1);
+
+    return 4;
+  };
+
+  /**
+   * Conditional jump to the relative address.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private JRCNCr8 = (): byte => {
+    const incr = Primitive.toSigned(memoryRef.readByte(pc));
+    pc += 1;
+    if (!getCYFlag()) {
+      pc = Primitive.addWord(pc, incr);
+      return 12;
+    }
+    return 8;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDSPid16i = (): byte => {
+    sp = memoryRef.readWord(pc);
+    pc += 2;
+
+    return 12;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDHLDecrmAi = (): byte => {
+    memoryRef.writeByte(r.hl, Primitive.upper(r.af));
+    r.hl = Primitive.addWord(r.hl, -1);
+
+    return 8;
+  };
+
+  /**
+   * Increment register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private INCSPi = (): byte => {
+    sp = Primitive.addWord(sp, 1);
+
+    return 8;
+  };
+
+  /**
+   * Increment register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private INCHLm = (): byte => {
+    // convert operand to unsigned
+    let operand: byte = 1;
+    const newVal: byte = Primitive.toByte(memoryRef.readByte(r.hl));
+    // check for half carry on affected byte only
+    checkHalfCarry(newVal, operand);
+    operand = Primitive.addByte(operand, newVal);
+    memoryRef.writeByte(r.hl, operand);
+
+    checkZFlag(operand);
+    setNFlag(0);
+
+    return 12;
+  };
+
+  /**
+   * Decrement register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private DECHLm = (): byte => {
+    // convert operand to unsigned
+    let newVal: byte = Primitive.toByte(memoryRef.readByte(r.hl));
+    // check for half carry on affected byte only
+    checkHalfCarry(newVal, 1, true);
+    newVal = Primitive.addByte(newVal, Primitive.toByte(-1));
+    memoryRef.writeByte(r.hl, newVal);
+    checkZFlag(newVal);
+    setNFlag(1);
+
+    return 12;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDHLmd8i = (): byte => {
+    memoryRef.writeByte(r.hl, Primitive.toByte(memoryRef.readByte(pc)));
+    pc += 1;
+
+    return 12;
+  };
+
+  /**
+   *  Set Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: N, H, C
+   */
+  private SCF = (): byte => {
+    setCYFlag(1);
+    setNFlag(0);
+    setHFlag(0);
+
+    return 4;
+  };
+
+  /**
+   * Conditional jump to the relative address.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private JRCCr8 = (): byte => {
+    const incr = Primitive.toSigned(memoryRef.readByte(pc));
+    pc += 1;
+    if (getCYFlag()) {
+      pc = Primitive.addWord(pc, incr);
+      return 12;
+    }
+    return 8;
+  };
+
+  /**
+   * Add.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: N, H, C
+   */
+  private ADDHLiSPi = (): byte => {
+    checkFullCarry16(r.hl, sp);
+    checkHalfCarry(Primitive.upper(r.hl), Primitive.upper(sp));
+    r.hl = Primitive.addWord(r.hl, sp);
+    setNFlag(0);
+
+    return 8;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDAiHLDecrm = (): byte => {
+    r.af = Primitive.setUpper(r.af, Primitive.toByte(memoryRef.readByte(r.hl)));
+    r.hl = Primitive.addWord(r.hl, -1);
+
+    return 8;
+  };
+
+  /**
+   * Decrement register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private DECSPi = (): byte => {
+    sp = Primitive.addWord(sp, -1);
+
+    return 8;
+  };
+
+  /**
+   * Increment register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private INCAi = (): byte => {
+    let operand: byte = 1;
+    checkHalfCarry(Primitive.upper(r.af), operand);
+    operand = Primitive.addByte(operand, Primitive.upper(r.af));
+    r.af = Primitive.setUpper(r.af, operand);
+    checkZFlag(operand);
+    setNFlag(0);
+
+    return 4;
+  };
+
+  /**
+   * Decrement register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private DECAi = (): byte => {
+    checkHalfCarry(Primitive.upper(r.af), 1, true);
+    r.af = Primitive.addUpper(r.af, Primitive.toByte(-1));
+    checkZFlag(Primitive.upper(r.af));
+    setNFlag(1);
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDAid8i = (): byte => {
+    r.af = Primitive.setUpper(r.af, Primitive.toByte(memoryRef.readByte(pc)));
+    pc += 1;
+
+    return 8;
+  };
+
+  /**
+   * Complement carry flag.
+   * If C flag is set, then reset it.
+   * If C flag is reset, then set it.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: N, H, C
+   */
+  private CCF = (): byte => {
+    if (getCYFlag()) {
+      setCYFlag(0);
+    } else {
+      setCYFlag(1);
+    }
+    setNFlag(0);
+    setHFlag(0);
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDBiBi = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, Primitive.upper(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDBiCi = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, Primitive.lower(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDBiDi = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, Primitive.upper(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDBiEi = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, Primitive.lower(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDBiHi = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, Primitive.upper(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDBiLi = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, Primitive.lower(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDBiHLm = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, Primitive.toByte(memoryRef.readByte(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDBiAi = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, Primitive.upper(r.af));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDCiBi = (): byte => {
+    r.bc = Primitive.setLower(r.bc, Primitive.upper(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDCiCi = (): byte => {
+    r.bc = Primitive.setLower(r.bc, Primitive.lower(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDCiDi = (): byte => {
+    r.bc = Primitive.setLower(r.bc, Primitive.upper(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDCiEi = (): byte => {
+    r.bc = Primitive.setLower(r.bc, Primitive.lower(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDCiHi = (): byte => {
+    r.bc = Primitive.setLower(r.bc, Primitive.upper(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDCiLi = (): byte => {
+    r.bc = Primitive.setLower(r.bc, Primitive.lower(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDCiHLm = (): byte => {
+    r.bc = Primitive.setLower(r.bc, Primitive.toByte(memoryRef.readByte(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDCiAi = (): byte => {
+    r.bc = Primitive.setLower(r.bc, Primitive.upper(r.af));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDDiBi = (): byte => {
+    r.de = Primitive.setUpper(r.de, Primitive.upper(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDDiCi = (): byte => {
+    r.de = Primitive.setUpper(r.de, Primitive.lower(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDDiDi = (): byte => {
+    r.de = Primitive.setUpper(r.de, Primitive.upper(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDDiEi = (): byte => {
+    r.de = Primitive.setUpper(r.de, Primitive.lower(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDDiHi = (): byte => {
+    r.de = Primitive.setUpper(r.de, Primitive.upper(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDDiLi = (): byte => {
+    r.de = Primitive.setUpper(r.de, Primitive.lower(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDDiHLm = (): byte => {
+    r.de = Primitive.setUpper(r.de, Primitive.toByte(memoryRef.readByte(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDDiAi = (): byte => {
+    r.de = Primitive.setUpper(r.de, Primitive.upper(r.af));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDEiBi = (): byte => {
+    r.de = Primitive.setLower(r.de, Primitive.upper(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDEiCi = (): byte => {
+    r.de = Primitive.setLower(r.de, Primitive.upper(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDEiDi = (): byte => {
+    r.de = Primitive.setLower(r.de, Primitive.upper(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDEiEi = (): byte => {
+    r.de = Primitive.setLower(r.de, Primitive.lower(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDEiHi = (): byte => {
+    r.de = Primitive.setLower(r.de, Primitive.upper(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDEiLi = (): byte => {
+    r.de = Primitive.setLower(r.de, Primitive.lower(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDEiHLm = (): byte => {
+    r.de = Primitive.setLower(r.de, Primitive.toByte(memoryRef.readByte(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDEiAi = (): byte => {
+    r.de = Primitive.setLower(r.de, Primitive.upper(r.af));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDHiBi = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, Primitive.upper(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDHiCi = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, Primitive.lower(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDHiDi = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, Primitive.upper(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDHiEi = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, Primitive.lower(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDHiHi = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, Primitive.upper(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDHiLi = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, Primitive.lower(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDHiHLm = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, Primitive.toByte(memoryRef.readByte(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDHiAi = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, Primitive.upper(r.af));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDLiBi = (): byte => {
+    r.hl = Primitive.setLower(r.hl, Primitive.upper(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDLiCi = (): byte => {
+    r.hl = Primitive.setLower(r.hl, Primitive.lower(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDLiDi = (): byte => {
+    r.hl = Primitive.setLower(r.hl, Primitive.upper(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDLiEi = (): byte => {
+    r.hl = Primitive.setLower(r.hl, Primitive.lower(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDLiHi = (): byte => {
+    r.hl = Primitive.setLower(r.hl, Primitive.upper(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDLiLi = (): byte => {
+    r.hl = Primitive.setLower(r.hl, Primitive.lower(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDLiHLm = (): byte => {
+    r.hl = Primitive.setLower(r.hl, Primitive.toByte(memoryRef.readByte(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDLiAi = (): byte => {
+    r.hl = Primitive.setLower(r.hl, Primitive.upper(r.af));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDHLmBi = (): byte => {
+    memoryRef.writeByte(r.hl, Primitive.upper(r.bc));
+
+    return 8;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDHLmCi = (): byte => {
+    memoryRef.writeByte(r.hl, Primitive.lower(r.bc));
+
+    return 8;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDHLmDi = (): byte => {
+    memoryRef.writeByte(r.hl, Primitive.upper(r.de));
+
+    return 8;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDHLmEi = (): byte => {
+    memoryRef.writeByte(r.hl, Primitive.lower(r.de));
+
+    return 8;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDHLmHi = (): byte => {
+    memoryRef.writeByte(r.hl, Primitive.upper(r.hl));
+
+    return 8;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDHLmLi = (): byte => {
+    memoryRef.writeByte(r.hl, Primitive.lower(r.hl));
+
+    return 8;
+  };
+
+  /**
+   * Disables interrupt handling.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private HALT = (): byte => {
+    this.halted = true;
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDHLmAi = (): byte => {
+    memoryRef.writeByte(r.hl, Primitive.upper(r.af));
+
+    return 8;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDAiBi = (): byte => {
+    r.af = Primitive.setUpper(r.af, Primitive.upper(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDAiCi = (): byte => {
+    r.af = Primitive.setUpper(r.af, Primitive.lower(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDAiDi = (): byte => {
+    r.af = Primitive.setUpper(r.af, Primitive.upper(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDAiEi = (): byte => {
+    r.af = Primitive.setUpper(r.af, Primitive.lower(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDAiHi = (): byte => {
+    r.af = Primitive.setUpper(r.af, Primitive.upper(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDAiLi = (): byte => {
+    r.af = Primitive.setUpper(r.af, Primitive.lower(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDAiHLm = (): byte => {
+    r.af = Primitive.setUpper(r.af, Primitive.toByte(memoryRef.readByte(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDAiAi = (): byte => {
+    r.af = Primitive.setUpper(r.af, Primitive.upper(r.af));
+
+    return 4;
+  };
+
+  /**
+   * Add.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ADDAiBi = (): byte => {
+    ADD(Primitive.upper(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Add.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ADDAiCi = (): byte => {
+    ADD(Primitive.lower(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Add.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ADDAiDi = (): byte => {
+    ADD(Primitive.upper(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Add.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ADDAiEi = (): byte => {
+    ADD(Primitive.lower(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Add.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ADDAiHi = (): byte => {
+    ADD(Primitive.upper(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Add.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ADDAiLi = (): byte => {
+    ADD(Primitive.lower(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Add.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ADDAiHLm = (): byte => {
+    ADD(Primitive.toByte(memoryRef.readByte(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Add.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ADDAiAi = (): byte => {
+    ADD(Primitive.upper(r.af));
+
+    return 4;
+  };
+
+  /**
+   * Add with carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ADCAiBi = (): byte => {
+    ADC(Primitive.upper(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Add with carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ADCAiCi = (): byte => {
+    ADC(Primitive.lower(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Add with carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ADCAiDi = (): byte => {
+    ADC(Primitive.upper(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Add with carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ADCAiEi = (): byte => {
+    ADC(Primitive.lower(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Add with carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ADCAiHi = (): byte => {
+    ADC(Primitive.upper(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Add with carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ADCAiLi = (): byte => {
+    ADC(Primitive.lower(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Add with carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ADCAiHLm = (): byte => {
+    ADC(Primitive.toByte(memoryRef.readByte(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Add with carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ADCAiAi = (): byte => {
+    ADC(Primitive.upper(r.af));
+
+    return 4;
+  };
+
+  /**
+   * Subtract.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SUBAiBi = (): byte => {
+    SUB(Primitive.upper(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Subtract.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SUBAiCi = (): byte => {
+    SUB(Primitive.lower(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Subtract.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SUBAiDi = (): byte => {
+    SUB(Primitive.upper(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Subtract.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SUBAiEi = (): byte => {
+    SUB(Primitive.lower(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Subtract.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SUBAiHi = (): byte => {
+    SUB(Primitive.upper(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Subtract.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SUBAiLi = (): byte => {
+    SUB(Primitive.lower(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Subtract.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SUBAiHLm = (): byte => {
+    SUB(Primitive.toByte(memoryRef.readByte(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Subtract.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SUBAiAi = (): byte => {
+    SUB(Primitive.upper(r.af));
+
+    return 4;
+  };
+
+  /**
+   * Subtract with carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SBCAiBi = (): byte => {
+    SBC(Primitive.upper(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Subtract with carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SBCAiCi = (): byte => {
+    SBC(Primitive.lower(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Subtract with carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SBCAiDi = (): byte => {
+    SBC(Primitive.upper(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Subtract with carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SBCAiEi = (): byte => {
+    SBC(Primitive.lower(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Subtract with carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SBCAiHi = (): byte => {
+    SBC(Primitive.upper(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Subtract with carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SBCAiLi = (): byte => {
+    SBC(Primitive.lower(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Subtract with carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SBCAiHLm = (): byte => {
+    SBC(Primitive.toByte(memoryRef.readByte(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Subtract with carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SBCAiAi = (): byte => {
+    SBC(Primitive.upper(r.af));
+
+    return 4;
+  };
+
+  /**
+   * Logical AND.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ANDBi = (): byte => {
+    AND(Primitive.upper(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Logical AND.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ANDCi = (): byte => {
+    AND(Primitive.lower(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Logical AND.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ANDDi = (): byte => {
+    AND(Primitive.upper(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Logical AND.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ANDEi = (): byte => {
+    AND(Primitive.lower(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Logical AND.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ANDHi = (): byte => {
+    AND(Primitive.upper(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Logical AND.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ANDLi = (): byte => {
+    AND(Primitive.lower(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Logical AND.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ANDHLm = (): byte => {
+    AND(memoryRef.readByte(r.hl));
+
+    return 8;
+  };
+
+  /**
+   * Logical AND.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ANDAi = (): byte => {
+    AND(Primitive.upper(r.af));
+
+    return 4;
+  };
+
+  /**
+   * Logical XOR.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private XORBi = (): byte => {
+    XOR(Primitive.upper(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Logical XOR.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private XORCi = (): byte => {
+    XOR(Primitive.lower(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Logical XOR.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private XORDi = (): byte => {
+    XOR(Primitive.upper(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Logical XOR.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private XOREi = (): byte => {
+    XOR(Primitive.lower(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Logical XOR.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private XORHi = (): byte => {
+    XOR(Primitive.upper(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Logical XOR.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private XORLi = (): byte => {
+    XOR(Primitive.lower(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Logical XOR.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private XORHLm = (): byte => {
+    XOR(memoryRef.readByte(r.hl));
+
+    return 8;
+  };
+
+  /**
+   * Logical XOR.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private XORAi = (): byte => {
+    XOR(Primitive.upper(r.af));
+
+    return 4;
+  };
+
+  /**
+   * Logical OR.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ORBi = (): byte => {
+    OR(Primitive.upper(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Logical OR.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ORCi = (): byte => {
+    OR(Primitive.lower(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Logical OR.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ORDi = (): byte => {
+    OR(Primitive.upper(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Logical OR.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private OREi = (): byte => {
+    OR(Primitive.lower(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Logical OR.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ORHi = (): byte => {
+    OR(Primitive.upper(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Logical OR.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ORLi = (): byte => {
+    OR(Primitive.lower(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Logical OR.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ORHLm = (): byte => {
+    OR(memoryRef.readByte(r.hl));
+
+    return 8;
+  };
+
+  /**
+   * Logical OR.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ORAi = (): byte => {
+    OR(Primitive.upper(r.af));
+
+    return 4;
+  };
+
+  /**
+   * Compare A with regiseter.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private CPBi = (): byte => {
+    CP(Primitive.upper(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Compare A with regiseter.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private CPCi = (): byte => {
+    CP(Primitive.lower(r.bc));
+
+    return 4;
+  };
+
+  /**
+   * Compare A with regiseter.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private CPDi = (): byte => {
+    CP(Primitive.upper(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Compare A with regiseter.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private CPEi = (): byte => {
+    CP(Primitive.lower(r.de));
+
+    return 4;
+  };
+
+  /**
+   * Compare A with regiseter.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private CPHi = (): byte => {
+    CP(Primitive.upper(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Compare A with regiseter.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private CPLi = (): byte => {
+    CP(Primitive.lower(r.hl));
+
+    return 4;
+  };
+
+  /**
+   * Compare A with regiseter.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private CPHLm = (): byte => {
+    CP(Primitive.toByte(memoryRef.readByte(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Compare A with regiseter.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private CPAi = (): byte => {
+    CP(Primitive.upper(r.af));
+
+    return 4;
+  };
+
+  /**
+   * Conditionally from a private. =
+   * @param =>- None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RETCNZ = (): byte => {
+    if (RETH(!getZFlag())) {
+      return 20;
+    }
+
+    return 8;
+  };
+
+  /**
+   * Pops to the 16-bit register, data from the stack memoryRef.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private POPIntoBCi = (): byte => {
+    r.bc = POP();
+
+    return 12;
+  };
+
+  /**
+   * Conditional jump to the absolute address.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private JPCNZa16 = (): byte => {
+    if (Jpcc(!getZFlag())) {
+      return 16;
+    }
+    pc += 2;
+    return 12;
+  };
+
+  /**
+   * Jump to the absolute address.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private JPa16 = (): byte => {
+    pc = memoryRef.readWord(pc);
+
+    return 16;
+  };
+
+  /**
+   * Conditional private call =  to the absolut=>e address.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private CALLCNZa16 = (): byte => {
+    if (CALLH(!getZFlag())) {
+      return 24;
+    }
+    pc += 2;
+    return 12;
+  };
+
+  /**
+   * Push to the stack memory, data from the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private PUSHRegisterBCi = (): byte => {
+    PUSH(r.bc);
+
+    return 16;
+  };
+
+  /**
+   * Add.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ADDAid8i = (): byte => {
+    const value = Primitive.toByte(memoryRef.readByte(pc));
+    checkFullCarry8(Primitive.upper(r.af), value);
+    checkHalfCarry(Primitive.upper(r.af), value);
+    r.af = Primitive.addUpper(r.af, value);
+    checkZFlag(Primitive.upper(r.af));
+    pc += 1;
+    setNFlag(0);
+
+    return 8;
+  };
+
+  /**
+   * Unconditional private call =  to the absolut=>e fixed address
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RSTAi00Hi = (): byte => {
+    RST(0x00);
+
+    return 16;
+  };
+
+  /**
+   * Conditionally from a private. =
+   * @param =>- None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RETCZ = (): byte => {
+    if (getZFlag()) {
+      const address: word = memoryRef.readWord(sp);
+      pc = address;
+      sp = Primitive.addWord(sp, 2);
+      return 20;
+    }
+    return 8;
+  };
+
+  /**
+   * Return from a private. =
+   * @param =>- None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RET = (): byte => {
+    RETH(true);
+
+    return 16;
+  };
+
+  /**
+   * Conditional jump to the absolute address.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private JPCZa16 = (): byte => {
+    if (Jpcc(getZFlag() === 0)) {
+      return 16;
+    }
+    pc += 2;
+    return 12;
+  };
+
+  /**
+   * Execute a CB-prefixed instruction.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private PREFIX = (): byte => {
+    const opcode: byte = memoryRef.readByte(pc);
+    this.cbOpcodes[opcode]();
+    pc += 1;
+
+    return 4;
+  };
+
+  /**
+   * Conditional private call =  to the absolut=>e address.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private CALLCZa16 = (): byte => {
+    if (CALLH(getZFlag() === 1)) {
+      return 24;
+    }
+    pc += 2;
+    return 12;
+  };
+
+  /**
+   * private call =  to the absolut=>e address.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private CALL = (): byte => {
+    CALLH(true);
+
+    return 24;
+  };
+
+  /**
+   * Add with carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ADCAid8i = (): byte => {
+    ADC(Primitive.toByte(memoryRef.readByte(pc)));
+    pc += 1;
+
+    return 8;
+  };
+
+  /**
+   * Unconditional private call =  to the absolut=>e fixed address
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RSTAi08Hi = (): byte => {
+    RST(0x08);
+
+    return 16;
+  };
+
+  /**
+   * Conditionally from a private. =
+   * @param =>- None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RETCNC = (): byte => {
+    if (RETH(!getCYFlag())) {
+      return 20;
+    }
+    return 8;
+  };
+
+  /**
+   * Pops to the 16-bit register, data from the stack memoryRef.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private POPIntoDEi = (): byte => {
+    r.de = POP();
+
+    return 12;
+  };
+
+  /**
+   * Conditional jump to the absolute address.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private JPCNCa16 = (): byte => {
+    if (Jpcc(getZFlag() === 0)) {
+      return 16;
+    }
+    pc += 2;
+    return 12;
+  };
+
+  /**
+   * Invalid opcode.
+   * Affected flags:
+   */
+  private IllegalD3 = (): byte => {
+    // throw new Error('Tried to call illegal opcode.');
+
+    return 4;
+  };
+
+  /**
+   * Conditional private call =  to the absolut=>e address.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private CALLCNCa16 = (): byte => {
+    if (CALLH(!getCYFlag())) {
+      return 24;
+    }
+    pc += 2;
+    return 12;
+  };
+
+  /**
+   * Push to the stack memory, data from the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private PUSHRegisterDEi = (): byte => {
+    PUSH(r.de);
+
+    return 16;
+  };
+
+  /**
+   * Subtract.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SUBAid8i = (): byte => {
+    SUB(memoryRef.readByte(pc));
+    pc += 1;
+
+    return 8;
+  };
+
+  /**
+   * Unconditional private call =  to the absolut=>e fixed address
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RSTAi10Hi = (): byte => {
+    RST(0x10);
+
+    return 16;
+  };
+
+  /**
+   * Conditionally from a private. =
+   * @param =>- None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RETCC = (): byte => {
+    if (RETH(getCYFlag() === 1)) {
+      return 20;
+    }
+    return 8;
+  };
+
+  /**
+   * Return from a private. =
+   * @param =>- None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RETI = (): byte => {
+    RETH(true);
+    this.setInterruptsGlobal(true);
+
+    return 16;
+  };
+
+  /**
+   * Conditional jump to the absolute address.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private JPCCa16 = (): byte => {
+    if (Jpcc(getCYFlag() === 0)) {
+      return 16;
+    }
+    pc += 2;
+    return 12;
+  };
+
+  /**
+   * Invalid opcode.
+   * Affected flags:
+   */
+  private IllegalDB = (): byte => {
+    // throw new Error('Tried to call illegal opcode.');
+
+    return 4;
+  };
+
+  /**
+   * Conditional private call =  to the absolut=>e address.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private CALLCCa16 = (): byte => {
+    if (CALLH(getCYFlag() === 1)) {
+      return 24;
+    }
+    pc += 2;
+    return 12;
+  };
+
+  /**
+   * Invalid opcode.
+   * Affected flags:
+   */
+  private IllegalDD = (): byte => {
+    // throw new Error('Tried to call illegal opcode.');
+
+    return 4;
+  };
+
+  /**
+   * Subtract with carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SBCAid8i = (): byte => {
+    SBC(Primitive.toByte(memoryRef.readByte(pc)));
+    pc += 1;
+
+    return 8;
+  };
+
+  /**
+   * Unconditional private call =  to the absolut=>e fixed address
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RSTAi18Hi = (): byte => {
+    RST(0x18);
+
+    return 16;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDHa8mAi = (): byte => {
+    memoryRef.writeByte(0xff00 + memoryRef.readByte(pc), Primitive.upper(r.af));
+    pc += 1;
+
+    return 12;
+  };
+
+  /**
+   * Pops to the 16-bit register, data from the stack memoryRef.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private POPIntoHLi = (): byte => {
+    r.hl = POP();
+
+    return 12;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDCmAi = (): byte => {
+    memoryRef.writeByte(0xff00 + Primitive.lower(r.bc), Primitive.upper(r.af));
+
+    return 8;
+  };
+
+  /**
+   * Invalid opcode.
+   * Affected flags:
+   */
+  private IllegalE3 = (): byte => {
+    // throw new Error('Tried to call illegal opcode.');
+
+    return 4;
+  };
+
+  /**
+   * Invalid opcode.
+   * Affected flags:
+   */
+  private IllegalE4 = (): byte => {
+    // throw new Error('Tried to call illegal opcode.');
+
+    return 4;
+  };
+
+  /**
+   * Push to the stack memory, data from the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private PUSHRegisterHLi = (): byte => {
+    PUSH(r.hl);
+
+    return 16;
+  };
+
+  /**
+   * Logical AND.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ANDd8i = (): byte => {
+    AND(memoryRef.readByte(pc));
+    pc += 1;
+
+    return 8;
+  };
+
+  /**
+   * Unconditional private call =  to the absolut=>e fixed address
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RSTAi20Hi = (): byte => {
+    RST(0x20);
+
+    return 16;
+  };
+
+  /**
+   * Add.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ADDSPir8i = (): byte => {
+    const operand = Primitive.toWord(
+      Primitive.toSigned(memoryRef.readByte(pc))
+    );
+    checkFullCarry16(sp, operand);
+    checkHalfCarry(Primitive.upper(sp), Primitive.upper(operand));
+    sp = Primitive.addWord(sp, operand);
+    pc += 1;
+    setZFlag(0);
+    setNFlag(0);
+
+    return 16;
+  };
+
+  /**
+   * Jump to the absolute address.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private JPHL = (): byte => {
+    pc = r.hl;
+
+    return 4;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDa16mAi = (): byte => {
+    memoryRef.writeByte(memoryRef.readWord(pc), Primitive.upper(r.af));
+    pc += 2;
+
+    return 16;
+  };
+
+  /**
+   * Invalid opcode.
+   * Affected flags:
+   */
+  private IllegalEB = (): byte => {
+    // throw new Error('Tried to call illegal opcode.');
+
+    return 4;
+  };
+
+  /**
+   * Invalid opcode.
+   * Affected flags:
+   */
+  private IllegalEC = (): byte => {
+    // throw new Error('Tried to call illegal opcode.');
+
+    return 4;
+  };
+
+  /**
+   * Invalid opcode.
+   * Affected flags:
+   */
+  private IllegalED = (): byte => {
+    // throw new Error('Tried to call illegal opcode.');
+
+    return 4;
+  };
+
+  /**
+   * Logical XOR.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private XORd8i = (): byte => {
+    XOR(Primitive.toByte(memoryRef.readByte(pc)));
+    pc += 1;
+
+    return 8;
+  };
+
+  /**
+   * Unconditional private call =  to the absolut=>e fixed address
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RSTAi28Hi = (): byte => {
+    RST(0x28);
+
+    return 16;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDHAia8m = (): byte => {
+    const data = memoryRef.readByte(0xff00 + memoryRef.readByte(pc));
+    // console.log(
+    //   `Tried to read address ${Number(
+    //     0xff00 + memoryRef.readByte(pc)
+    //   ).toString(16)}`
+    // );
+    r.af = Primitive.setUpper(r.af, data);
+    pc += 1;
+    // if (pc === 565) debugger;
+
+    return 12;
+  };
+
+  /**
+   * Pops to the 16-bit register, data from the stack memoryRef.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private POPIntoAFi = (): byte => {
+    r.af = POP();
+
+    return 12;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDAiCm = (): byte => {
+    const data = memoryRef.readByte(0xff00 + Primitive.lower(r.bc));
+    r.af = Primitive.setUpper(r.af, data);
+
+    return 8;
+  };
+
+  /**
+   * Disables interrupt handling.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private DI = (): byte => {
+    this.setInterruptsGlobal(false);
+
+    return 4;
+  };
+
+  /**
+   * Invalid opcode.
+   * Affected flags:
+   */
+  private IllegalF4 = (): byte => {
+    // throw new Error('Tried to call illegal opcode.');
+
+    return 4;
+  };
+
+  /**
+   * Push to the stack memory, data from the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private PUSHRegisterAFi = (): byte => {
+    PUSH(r.af);
+
+    return 16;
+  };
+
+  /**
+   * Logical OR.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private ORd8i = (): byte => {
+    OR(memoryRef.readByte(pc));
+    pc += 1;
+
+    return 8;
+  };
+
+  /**
+   * Unconditional private call =  to the absolut=>e fixed address
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RSTAi30Hi = (): byte => {
+    RST(0x30);
+
+    return 16;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private LDHLiSPIncri = (): byte => {
+    let incr = Primitive.toWord(Primitive.toSigned(memoryRef.readByte(pc)));
+    checkHalfCarry(Primitive.upper(incr), Primitive.upper(sp));
+    checkFullCarry16(incr, sp);
+    pc += 1;
+    incr = Primitive.addWord(incr, sp);
+    r.hl = incr;
+    setZFlag(0);
+    setNFlag(0);
+
+    return 12;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDSPiHLi = (): byte => {
+    sp = r.hl;
+
+    return 8;
+  };
+
+  /**
+   * Load data into the register.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private LDAia16m = (): byte => {
+    r.af = Primitive.setUpper(
+      r.af,
+      Primitive.toByte(memoryRef.readByte(memoryRef.readWord(pc)))
+    );
+    pc += 2;
+
+    return 16;
+  };
+
+  /**
+   * Enables interrupt handling.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private EI = (): byte => {
+    this.setInterruptsGlobal(true);
+
+    return 4;
+  };
+
+  /**
+   * Invalid opcode.
+   * Affected flags:
+   */
+  private IllegalFC = (): byte => {
+    // throw new Error('Tried to call illegal opcode.');
+
+    return 4;
+  };
+
+  /**
+   * Invalid opcode.
+   * Affected flags:
+   */
+  private IllegalFD = (): byte => {
+    // throw new Error('Tried to call illegal opcode.');
+
+    return 4;
+  };
+
+  /**
+   * Compare A with regiseter.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private CPd8i = (): byte => {
+    CP(memoryRef.readByte(pc));
+    pc += 1;
+
+    return 8;
+  };
+
+  /**
+   * Unconditional private call =  to the absolut=>e fixed address
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RSTAi38Hi = (): byte => {
+    RST(0x38);
+
+    return 16;
+  };
+
+  /**
+   * Rotate n left. Old bit 7 to Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RLCBi = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, RLCn(Primitive.upper(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Rotate n left. Old bit 7 to Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RLCCi = (): byte => {
+    r.bc = Primitive.setLower(r.bc, RLCn(Primitive.lower(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Rotate n left. Old bit 7 to Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RLCDi = (): byte => {
+    r.de = Primitive.setUpper(r.de, RLCn(Primitive.upper(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Rotate n left. Old bit 7 to Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RLCEi = (): byte => {
+    r.de = Primitive.setLower(r.de, RLCn(Primitive.lower(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Rotate n left. Old bit 7 to Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RLCHi = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, RLCn(Primitive.upper(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Rotate n left. Old bit 7 to Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RLCLi = (): byte => {
+    r.hl = Primitive.setLower(r.hl, RLCn(Primitive.lower(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Rotate n left. Old bit 7 to Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RLCHLm = (): byte => {
+    memoryRef.writeByte(r.hl, RLCn(memoryRef.readByte(r.hl)));
+
+    return 16;
+  };
+
+  /**
+   * Rotate n left. Old bit 7 to Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RLCAi = (): byte => {
+    r.af = Primitive.setUpper(r.af, RLCn(Primitive.upper(r.af)));
+
+    return 8;
+  };
+
+  /**
+   * Rotate n right. Old bit 0 to Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RRCBi = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, RRCn(Primitive.upper(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Rotate n right. Old bit 0 to Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RRCCi = (): byte => {
+    r.bc = Primitive.setLower(r.bc, RRCn(Primitive.lower(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Rotate n right. Old bit 0 to Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RRCDi = (): byte => {
+    r.de = Primitive.setUpper(r.de, RRCn(Primitive.upper(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Rotate n right. Old bit 0 to Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RRCEi = (): byte => {
+    r.de = Primitive.setLower(r.de, RRCn(Primitive.lower(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Rotate n right. Old bit 0 to Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RRCHi = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, RRCn(Primitive.upper(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Rotate n right. Old bit 0 to Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RRCLi = (): byte => {
+    r.hl = Primitive.setLower(r.hl, RRCn(Primitive.lower(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Rotate n right. Old bit 0 to Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RRCHLm = (): byte => {
+    memoryRef.writeByte(r.hl, RRCn(memoryRef.readByte(r.hl)));
+
+    return 16;
+  };
+
+  /**
+   * Rotate n right. Old bit 0 to Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RRCAi = (): byte => {
+    r.af = Primitive.setUpper(r.af, RRCn(Primitive.upper(r.af)));
+
+    return 8;
+  };
+
+  /**
+   * Rotate n left through Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RLBi = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, RLn(Primitive.upper(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Rotate n left through Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RLCi = (): byte => {
+    r.bc = Primitive.setLower(r.bc, RLn(Primitive.lower(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Rotate n left through Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RLDi = (): byte => {
+    r.de = Primitive.setUpper(r.de, RLn(Primitive.upper(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Rotate n left through Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RLEi = (): byte => {
+    r.de = Primitive.setLower(r.de, RLn(Primitive.lower(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Rotate n left through Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RLHi = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, RLn(Primitive.upper(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Rotate n left through Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RLLi = (): byte => {
+    r.hl = Primitive.setLower(r.hl, RLn(Primitive.lower(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Rotate n left through Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RLHLm = (): byte => {
+    memoryRef.writeByte(r.hl, RLn(memoryRef.readByte(r.hl)));
+
+    return 16;
+  };
+
+  /**
+   * Rotate n left through Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RLAi = (): byte => {
+    r.af = Primitive.setUpper(r.af, RLn(Primitive.upper(r.af)));
+
+    return 8;
+  };
+
+  /**
+   * Rotate n right through Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RRBi = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, RLn(Primitive.upper(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Rotate n right through Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RRCi = (): byte => {
+    r.bc = Primitive.setLower(r.bc, RRn(Primitive.lower(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Rotate n right through Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RRDi = (): byte => {
+    r.de = Primitive.setUpper(r.de, RRn(Primitive.upper(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Rotate n right through Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RREi = (): byte => {
+    r.de = Primitive.setLower(r.de, RRn(Primitive.lower(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Rotate n right through Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RRHi = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, RRn(Primitive.upper(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Rotate n right through Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RRLi = (): byte => {
+    r.hl = Primitive.setLower(r.hl, RRn(Primitive.lower(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Rotate n right through Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RRHLm = (): byte => {
+    memoryRef.writeByte(r.hl, RRn(memoryRef.readByte(r.hl)));
+
+    return 16;
+  };
+
+  /**
+   * Rotate n right through Carry flag.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private RRAi = (): byte => {
+    r.af = Primitive.setUpper(r.af, RRn(Primitive.upper(r.af)));
+
+    return 8;
+  };
+
+  /**
+   * Shift n left into Carry. LSB of n set to 0.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SLABi = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, SLAn(Primitive.upper(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Shift n left into Carry. LSB of n set to 0.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SLACi = (): byte => {
+    r.bc = Primitive.setLower(r.bc, SLAn(Primitive.lower(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Shift n left into Carry. LSB of n set to 0.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SLADi = (): byte => {
+    r.de = Primitive.setUpper(r.de, SLAn(Primitive.upper(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Shift n left into Carry. LSB of n set to 0.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SLAEi = (): byte => {
+    r.de = Primitive.setLower(r.de, SLAn(Primitive.lower(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Shift n left into Carry. LSB of n set to 0.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SLAHi = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, SLAn(Primitive.upper(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Shift n left into Carry. LSB of n set to 0.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SLALi = (): byte => {
+    r.hl = Primitive.setLower(r.hl, SLAn(Primitive.lower(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Shift n left into Carry. LSB of n set to 0.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SLAHLm = (): byte => {
+    memoryRef.writeByte(r.hl, SLAn(memoryRef.readByte(r.hl)));
+
+    return 16;
+  };
+
+  /**
+   * Shift n left into Carry. LSB of n set to 0.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SLAAi = (): byte => {
+    r.af = Primitive.setUpper(r.af, SLAn(Primitive.upper(r.af)));
+
+    return 8;
+  };
+
+  /**
+   * Shift n right into Carry. MSB doesn't change.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SRABi = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, SRAn(Primitive.upper(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Shift n right into Carry. MSB doesn't change.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SRACi = (): byte => {
+    r.bc = Primitive.setLower(r.bc, SRAn(Primitive.lower(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Shift n right into Carry. MSB doesn't change.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SRADi = (): byte => {
+    r.de = Primitive.setUpper(r.de, SRAn(Primitive.upper(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Shift n right into Carry. MSB doesn't change.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SRAEi = (): byte => {
+    r.de = Primitive.setLower(r.de, SRAn(Primitive.lower(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Shift n right into Carry. MSB doesn't change.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SRAHi = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, SRAn(Primitive.upper(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Shift n right into Carry. MSB doesn't change.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SRALi = (): byte => {
+    r.hl = Primitive.setLower(r.hl, SRAn(Primitive.lower(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Shift n right into Carry. MSB doesn't change.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SRAHLm = (): byte => {
+    memoryRef.writeByte(r.hl, SRAn(memoryRef.readByte(r.hl)));
+
+    return 16;
+  };
+
+  /**
+   * Shift n right into Carry. MSB doesn't change.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SRAAi = (): byte => {
+    r.af = Primitive.setUpper(r.af, SRAn(Primitive.upper(r.af)));
+
+    return 8;
+  };
+
+  /**
+   * Swap Primitive.upper and Primitive.lower nibbles.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SWAPBi = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, SWAP(Primitive.upper(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Swap Primitive.upper and Primitive.lower nibbles.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SWAPCi = (): byte => {
+    r.bc = Primitive.setLower(r.bc, SWAP(Primitive.lower(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Swap Primitive.upper and Primitive.lower nibbles.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SWAPDi = (): byte => {
+    r.de = Primitive.setUpper(r.de, SWAP(Primitive.upper(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Swap Primitive.upper and Primitive.lower nibbles.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SWAPEi = (): byte => {
+    r.de = Primitive.setLower(r.de, SWAP(Primitive.lower(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Swap Primitive.upper and Primitive.lower nibbles.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SWAPHi = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, SWAP(Primitive.upper(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Swap Primitive.upper and Primitive.lower nibbles.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SWAPLi = (): byte => {
+    r.hl = Primitive.setLower(r.hl, SWAP(Primitive.lower(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Swap Primitive.upper and Primitive.lower nibbles.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SWAPHLm = (): byte => {
+    memoryRef.writeByte(r.hl, SWAP(memoryRef.readByte(r.hl)));
+
+    return 16;
+  };
+
+  /**
+   * Swap Primitive.upper and Primitive.lower nibbles.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SWAPAi = (): byte => {
+    r.af = Primitive.setUpper(r.af, SWAP(Primitive.upper(r.af)));
+
+    return 8;
+  };
+
+  /**
+   * Shift n right into Carry. MSB set to 0.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SRLBi = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, SRLn(Primitive.upper(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Shift n right into Carry. MSB set to 0.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SRLCi = (): byte => {
+    r.bc = Primitive.setLower(r.bc, SRLn(Primitive.lower(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Shift n right into Carry. MSB set to 0.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SRLDi = (): byte => {
+    r.de = Primitive.setUpper(r.de, SRLn(Primitive.upper(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Shift n right into Carry. MSB set to 0.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SRLEi = (): byte => {
+    r.de = Primitive.setLower(r.de, SRLn(Primitive.lower(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Shift n right into Carry. MSB set to 0.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SRLHi = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, SRLn(Primitive.upper(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Shift n right into Carry. MSB set to 0.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SRLLi = (): byte => {
+    r.hl = Primitive.setLower(r.hl, SRLn(Primitive.lower(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Shift n right into Carry. MSB set to 0.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SRLHLm = (): byte => {
+    memoryRef.writeByte(r.hl, SRLn(memoryRef.readByte(r.hl)));
+
+    return 16;
+  };
+
+  /**
+   * Shift n right into Carry. MSB set to 0.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H, C
+   */
+  private SRLAi = (): byte => {
+    r.af = Primitive.setUpper(r.af, SRLn(Primitive.upper(r.af)));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT0iBi = (): byte => {
+    BIT(0, Primitive.upper(r.bc));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT0iCi = (): byte => {
+    BIT(0, Primitive.lower(r.bc));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT0iDi = (): byte => {
+    BIT(0, Primitive.upper(r.de));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT0iEi = (): byte => {
+    BIT(0, Primitive.lower(r.de));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT0iHi = (): byte => {
+    BIT(0, Primitive.upper(r.hl));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT0iLi = (): byte => {
+    BIT(0, Primitive.lower(r.hl));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT0iHLm = (): byte => {
+    BIT(0, memoryRef.readByte(r.hl));
+
+    return 12;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT0iAi = (): byte => {
+    BIT(0, Primitive.upper(r.af));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT1iBi = (): byte => {
+    BIT(1, Primitive.upper(r.bc));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT1iCi = (): byte => {
+    BIT(1, Primitive.lower(r.bc));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT1iDi = (): byte => {
+    BIT(1, Primitive.upper(r.de));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT1iEi = (): byte => {
+    BIT(1, Primitive.lower(r.de));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT1iHi = (): byte => {
+    BIT(1, Primitive.upper(r.hl));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT1iLi = (): byte => {
+    BIT(1, Primitive.lower(r.hl));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT1iHLm = (): byte => {
+    BIT(1, memoryRef.readByte(r.hl));
+
+    return 12;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT1iAi = (): byte => {
+    BIT(1, Primitive.upper(r.af));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT2iBi = (): byte => {
+    BIT(2, Primitive.upper(r.bc));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT2iCi = (): byte => {
+    BIT(2, Primitive.lower(r.bc));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT2iDi = (): byte => {
+    BIT(2, Primitive.upper(r.de));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT2iEi = (): byte => {
+    BIT(2, Primitive.lower(r.de));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT2iHi = (): byte => {
+    BIT(2, Primitive.upper(r.hl));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT2iLi = (): byte => {
+    BIT(2, Primitive.lower(r.hl));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT2iHLm = (): byte => {
+    BIT(2, memoryRef.readByte(r.hl));
+
+    return 12;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT2iAi = (): byte => {
+    BIT(2, Primitive.upper(r.af));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT3iBi = (): byte => {
+    BIT(3, Primitive.upper(r.bc));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT3iCi = (): byte => {
+    BIT(3, Primitive.lower(r.bc));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT3iDi = (): byte => {
+    BIT(3, Primitive.upper(r.de));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT3iEi = (): byte => {
+    BIT(3, Primitive.lower(r.de));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT3iHi = (): byte => {
+    BIT(3, Primitive.upper(r.hl));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT3iLi = (): byte => {
+    BIT(3, Primitive.lower(r.hl));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT3iHLm = (): byte => {
+    BIT(3, memoryRef.readByte(r.hl));
+
+    return 12;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT3iAi = (): byte => {
+    BIT(3, Primitive.upper(r.af));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT4iBi = (): byte => {
+    BIT(4, Primitive.upper(r.bc));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT4iCi = (): byte => {
+    BIT(4, Primitive.lower(r.bc));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT4iDi = (): byte => {
+    BIT(4, Primitive.upper(r.de));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT4iEi = (): byte => {
+    BIT(4, Primitive.lower(r.de));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT4iHi = (): byte => {
+    BIT(4, Primitive.upper(r.hl));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT4iLi = (): byte => {
+    BIT(4, Primitive.lower(r.hl));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT4iHLm = (): byte => {
+    BIT(4, memoryRef.readByte(r.hl));
+
+    return 12;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT4iAi = (): byte => {
+    BIT(4, Primitive.upper(r.af));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT5iBi = (): byte => {
+    BIT(5, Primitive.upper(r.bc));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT5iCi = (): byte => {
+    BIT(5, Primitive.lower(r.bc));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT5iDi = (): byte => {
+    BIT(5, Primitive.upper(r.de));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT5iEi = (): byte => {
+    BIT(5, Primitive.lower(r.de));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT5iHi = (): byte => {
+    BIT(5, Primitive.upper(r.hl));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT5iLi = (): byte => {
+    BIT(5, Primitive.lower(r.hl));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT5iHLm = (): byte => {
+    BIT(5, memoryRef.readByte(r.hl));
+
+    return 12;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT5iAi = (): byte => {
+    BIT(5, Primitive.upper(r.af));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT6iBi = (): byte => {
+    BIT(6, Primitive.upper(r.bc));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT6iCi = (): byte => {
+    BIT(6, Primitive.lower(r.bc));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT6iDi = (): byte => {
+    BIT(6, Primitive.upper(r.de));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT6iEi = (): byte => {
+    BIT(6, Primitive.lower(r.de));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT6iHi = (): byte => {
+    BIT(6, Primitive.upper(r.hl));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT6iLi = (): byte => {
+    BIT(6, Primitive.lower(r.hl));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT6iHLm = (): byte => {
+    BIT(6, memoryRef.readByte(r.hl));
+
+    return 12;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT6iAi = (): byte => {
+    BIT(6, Primitive.upper(r.af));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT7iBi = (): byte => {
+    BIT(7, Primitive.upper(r.bc));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT7iCi = (): byte => {
+    BIT(7, Primitive.lower(r.bc));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT7iDi = (): byte => {
+    BIT(7, Primitive.upper(r.de));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT7iEi = (): byte => {
+    BIT(7, Primitive.lower(r.de));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT7iHi = (): byte => {
+    BIT(7, Primitive.upper(r.hl));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT7iLi = (): byte => {
+    BIT(7, Primitive.lower(r.hl));
+
+    return 8;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT7iHLm = (): byte => {
+    BIT(7, memoryRef.readByte(r.hl));
+
+    return 12;
+  };
+
+  /**
+   * Test bit in register
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags: Z, N, H
+   */
+  private BIT7iAi = (): byte => {
+    BIT(7, Primitive.upper(r.af));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES0B = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, RES0(Primitive.upper(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES0C = (): byte => {
+    r.bc = Primitive.setLower(r.bc, RES0(Primitive.lower(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES0D = (): byte => {
+    r.de = Primitive.setUpper(r.de, RES0(Primitive.upper(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES0E = (): byte => {
+    r.de = Primitive.setLower(r.de, RES0(Primitive.lower(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES0H = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, RES0(Primitive.upper(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES0L = (): byte => {
+    r.hl = Primitive.setLower(r.hl, RES0(Primitive.lower(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES0HL = (): byte => {
+    memoryRef.writeByte(r.hl, RES0(memoryRef.readByte(r.hl)));
+
+    return 16;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES0A = (): byte => {
+    r.af = Primitive.setUpper(r.af, RES0(Primitive.upper(r.af)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES1B = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, RES1(Primitive.upper(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES1C = (): byte => {
+    r.bc = Primitive.setLower(r.bc, RES1(Primitive.lower(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES1D = (): byte => {
+    r.de = Primitive.setUpper(r.de, RES1(Primitive.upper(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES1E = (): byte => {
+    r.de = Primitive.setLower(r.de, RES1(Primitive.lower(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES1H = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, RES1(Primitive.upper(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES1L = (): byte => {
+    r.hl = Primitive.setLower(r.hl, RES1(Primitive.lower(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES1HL = (): byte => {
+    memoryRef.writeByte(r.hl, RES1(memoryRef.readByte(r.hl)));
+
+    return 16;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES1A = (): byte => {
+    r.af = Primitive.setUpper(r.af, RES1(Primitive.upper(r.af)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES2B = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, RES2(Primitive.upper(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES2C = (): byte => {
+    r.bc = Primitive.setLower(r.bc, RES2(Primitive.lower(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES2D = (): byte => {
+    r.de = Primitive.setUpper(r.de, RES2(Primitive.upper(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES2E = (): byte => {
+    r.de = Primitive.setLower(r.de, RES2(Primitive.lower(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES2H = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, RES2(Primitive.upper(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES2L = (): byte => {
+    r.hl = Primitive.setLower(r.hl, RES2(Primitive.lower(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES2HL = (): byte => {
+    memoryRef.writeByte(r.hl, RES2(memoryRef.readByte(r.hl)));
+
+    return 16;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES2A = (): byte => {
+    r.af = Primitive.setUpper(r.af, RES2(Primitive.upper(r.af)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES3B = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, RES3(Primitive.upper(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES3C = (): byte => {
+    r.bc = Primitive.setLower(r.bc, RES3(Primitive.lower(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES3D = (): byte => {
+    r.de = Primitive.setUpper(r.de, RES3(Primitive.upper(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES3E = (): byte => {
+    r.de = Primitive.setLower(r.de, RES3(Primitive.lower(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES3H = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, RES3(Primitive.upper(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES3L = (): byte => {
+    r.hl = Primitive.setLower(r.hl, RES3(Primitive.lower(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES3HL = (): byte => {
+    memoryRef.writeByte(r.hl, RES3(memoryRef.readByte(r.hl)));
+
+    return 16;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES3A = (): byte => {
+    r.af = Primitive.setUpper(r.af, RES3(Primitive.upper(r.af)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES4B = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, RES4(Primitive.upper(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES4C = (): byte => {
+    r.bc = Primitive.setLower(r.bc, RES4(Primitive.lower(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES4D = (): byte => {
+    r.de = Primitive.setUpper(r.de, RES4(Primitive.upper(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES4E = (): byte => {
+    r.de = Primitive.setLower(r.de, RES4(Primitive.lower(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES4H = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, RES4(Primitive.upper(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES4L = (): byte => {
+    r.hl = Primitive.setLower(r.hl, RES4(Primitive.lower(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES4HL = (): byte => {
+    memoryRef.writeByte(r.hl, RES4(memoryRef.readByte(r.hl)));
+
+    return 16;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES4A = (): byte => {
+    r.af = Primitive.setUpper(r.af, RES4(Primitive.upper(r.af)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES5B = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, RES5(Primitive.upper(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES5C = (): byte => {
+    r.bc = Primitive.setLower(r.bc, RES5(Primitive.lower(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES5D = (): byte => {
+    r.de = Primitive.setUpper(r.de, RES5(Primitive.upper(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES5E = (): byte => {
+    r.de = Primitive.setLower(r.de, RES5(Primitive.lower(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES5H = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, RES5(Primitive.upper(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES5L = (): byte => {
+    r.hl = Primitive.setLower(r.hl, RES5(Primitive.lower(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES5HL = (): byte => {
+    memoryRef.writeByte(r.hl, RES5(memoryRef.readByte(r.hl)));
+
+    return 16;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES5A = (): byte => {
+    r.af = Primitive.setUpper(r.af, RES5(Primitive.upper(r.af)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES6B = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, RES6(Primitive.upper(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES6C = (): byte => {
+    r.bc = Primitive.setLower(r.bc, RES6(Primitive.lower(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES6D = (): byte => {
+    r.de = Primitive.setUpper(r.de, RES6(Primitive.upper(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES6E = (): byte => {
+    r.de = Primitive.setLower(r.de, RES6(Primitive.lower(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES6H = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, RES6(Primitive.upper(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES6L = (): byte => {
+    r.hl = Primitive.setLower(r.hl, RES6(Primitive.lower(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES6HL = (): byte => {
+    memoryRef.writeByte(r.hl, RES6(memoryRef.readByte(r.hl)));
+
+    return 16;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES6A = (): byte => {
+    r.af = Primitive.setUpper(r.af, RES6(Primitive.upper(r.af)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES7B = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, RES7(Primitive.upper(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES7C = (): byte => {
+    r.bc = Primitive.setLower(r.bc, RES7(Primitive.lower(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES7D = (): byte => {
+    r.de = Primitive.setUpper(r.de, RES7(Primitive.upper(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES7E = (): byte => {
+    r.de = Primitive.setLower(r.de, RES7(Primitive.lower(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES7H = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, RES7(Primitive.upper(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES7L = (): byte => {
+    r.hl = Primitive.setLower(r.hl, RES7(Primitive.lower(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES7HL = (): byte => {
+    memoryRef.writeByte(r.hl, RES7(memoryRef.readByte(r.hl)));
+
+    return 16;
+  };
+
+  /**
+   * Reset bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private RES7A = (): byte => {
+    r.af = Primitive.setUpper(r.af, RES7(Primitive.upper(r.af)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET0B = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, SET(0, Primitive.upper(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET0C = (): byte => {
+    r.bc = Primitive.setLower(r.bc, SET(0, Primitive.lower(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET0D = (): byte => {
+    r.de = Primitive.setUpper(r.de, SET(0, Primitive.upper(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET0E = (): byte => {
+    r.de = Primitive.setLower(r.de, SET(0, Primitive.lower(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET0H = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, SET(0, Primitive.upper(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET0L = (): byte => {
+    r.hl = Primitive.setLower(r.hl, SET(0, Primitive.lower(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET0HL = (): byte => {
+    memoryRef.writeByte(r.hl, SET(0, memoryRef.readByte(r.hl)));
+
+    return 16;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET0A = (): byte => {
+    r.af = Primitive.setUpper(r.af, SET(0, Primitive.lower(r.af)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET1B = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, SET(1, Primitive.upper(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET1C = (): byte => {
+    r.bc = Primitive.setLower(r.bc, SET(1, Primitive.lower(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET1D = (): byte => {
+    r.de = Primitive.setUpper(r.de, SET(1, Primitive.upper(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET1E = (): byte => {
+    r.de = Primitive.setLower(r.de, SET(1, Primitive.lower(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET1H = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, SET(1, Primitive.upper(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET1L = (): byte => {
+    r.hl = Primitive.setLower(r.hl, SET(1, Primitive.lower(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET1HL = (): byte => {
+    memoryRef.writeByte(r.hl, SET(1, memoryRef.readByte(r.hl)));
+
+    return 16;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET1A = (): byte => {
+    r.af = Primitive.setUpper(r.af, SET(1, Primitive.upper(r.af)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET2B = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, SET(2, Primitive.upper(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET2C = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, SET(2, Primitive.lower(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET2D = (): byte => {
+    r.de = Primitive.setUpper(r.de, SET(2, Primitive.upper(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET2E = (): byte => {
+    r.de = Primitive.setLower(r.de, SET(2, Primitive.lower(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET2H = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, SET(2, Primitive.upper(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET2L = (): byte => {
+    r.hl = Primitive.setLower(r.hl, SET(2, Primitive.lower(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET2HL = (): byte => {
+    memoryRef.writeByte(r.hl, SET(2, memoryRef.readByte(r.hl)));
+
+    return 16;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET2A = (): byte => {
+    r.af = Primitive.setUpper(r.af, SET(2, Primitive.upper(r.af)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET3B = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, SET(3, Primitive.upper(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET3C = (): byte => {
+    r.bc = Primitive.setLower(r.bc, SET(3, Primitive.lower(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET3D = (): byte => {
+    r.de = Primitive.setUpper(r.de, SET(3, Primitive.upper(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET3E = (): byte => {
+    r.de = Primitive.setLower(r.de, SET(3, Primitive.lower(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET3H = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, SET(3, Primitive.upper(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET3L = (): byte => {
+    r.hl = Primitive.setLower(r.hl, SET(3, Primitive.lower(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET3HL = (): byte => {
+    memoryRef.writeByte(r.hl, SET(3, memoryRef.readByte(r.hl)));
+
+    return 16;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET3A = (): byte => {
+    r.af = Primitive.setUpper(r.af, SET(3, Primitive.upper(r.af)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET4B = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, SET(4, Primitive.upper(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET4C = (): byte => {
+    r.bc = Primitive.setLower(r.bc, SET(4, Primitive.lower(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET4D = (): byte => {
+    r.de = Primitive.setUpper(r.de, SET(4, Primitive.upper(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET4E = (): byte => {
+    r.de = Primitive.setLower(r.de, SET(4, Primitive.lower(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET4H = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, SET(4, Primitive.upper(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET4L = (): byte => {
+    r.hl = Primitive.setLower(r.hl, SET(4, Primitive.lower(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET4HL = (): byte => {
+    memoryRef.writeByte(r.hl, SET(4, memoryRef.readByte(r.hl)));
+
+    return 16;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET4A = (): byte => {
+    r.af = Primitive.setUpper(r.af, SET(4, Primitive.upper(r.af)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET5B = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, SET(5, Primitive.upper(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET5C = (): byte => {
+    r.bc = Primitive.setLower(r.bc, SET(5, Primitive.lower(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET5D = (): byte => {
+    r.de = Primitive.setUpper(r.de, SET(5, Primitive.upper(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET5E = (): byte => {
+    r.de = Primitive.setLower(r.de, SET(5, Primitive.lower(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET5H = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, SET(5, Primitive.upper(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET5L = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, SET(5, Primitive.lower(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET5HL = (): byte => {
+    memoryRef.writeByte(r.hl, SET(5, memoryRef.readByte(r.hl)));
+
+    return 16;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET5A = (): byte => {
+    r.af = Primitive.setUpper(r.af, SET(5, Primitive.upper(r.af)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET6B = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, SET(6, Primitive.upper(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET6C = (): byte => {
+    r.bc = Primitive.setLower(r.bc, SET(6, Primitive.lower(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET6D = (): byte => {
+    r.de = Primitive.setUpper(r.de, SET(6, Primitive.upper(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET6E = (): byte => {
+    r.de = Primitive.setLower(r.de, SET(6, Primitive.lower(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET6H = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, SET(6, Primitive.upper(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET6L = (): byte => {
+    r.hl = Primitive.setLower(r.hl, SET(6, Primitive.lower(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET6HL = (): byte => {
+    memoryRef.writeByte(r.hl, SET(6, memoryRef.readByte(r.hl)));
+
+    return 16;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET6A = (): byte => {
+    r.af = Primitive.setUpper(r.af, SET(6, Primitive.upper(r.af)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET7B = (): byte => {
+    r.bc = Primitive.setUpper(r.bc, SET(7, Primitive.upper(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET7C = (): byte => {
+    r.bc = Primitive.setLower(r.bc, SET(7, Primitive.lower(r.bc)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET7D = (): byte => {
+    r.de = Primitive.setUpper(r.de, SET(7, Primitive.upper(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET7E = (): byte => {
+    r.de = Primitive.setLower(r.de, SET(7, Primitive.lower(r.de)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET7H = (): byte => {
+    r.hl = Primitive.setUpper(r.hl, SET(7, Primitive.upper(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET7L = (): byte => {
+    r.hl = Primitive.setLower(r.hl, SET(7, Primitive.lower(r.hl)));
+
+    return 8;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET7HL = (): byte => {
+    memoryRef.writeByte(r.hl, SET(7, memoryRef.readByte(r.hl)));
+
+    return 16;
+  };
+
+  /**
+   * Set bit b in register r.
+   * @param - None
+   * @returns {byte} - The number of system clock ticks required.
+   * Affected flags:
+   */
+  private SET7A = (): byte => {
+    r.af = Primitive.setUpper(r.af, SET(7, Primitive.upper(r.af)));
+
+    return 8;
+  };
+
+  private opcodes: OpcodeList = {
+    0x00: this.NOP,
+    0x01: this.LDBCid16i,
+    0x02: this.LDBCmAi,
+    0x03: this.INCBCi,
+    0x04: this.INCBi,
+    0x05: this.DECBi,
+    0x06: this.LDBid8i,
+    0x07: this.RLCA,
+    0x08: this.LDa16mSPi,
+    0x09: this.ADDHLiBCi,
+    0x0a: this.LDAiBCm,
+    0x0b: this.DECBCi,
+    0x0c: this.INCCi,
+    0x0d: this.DECCi,
+    0x0e: this.LDCid8i,
+    0x0f: this.RRCA,
+    0x10: this.STOP,
+    0x11: this.LDDEid16i,
+    0x12: this.LDDEmAi,
+    0x13: this.INCDEi,
+    0x14: this.INCDi,
+    0x15: this.DECDi,
+    0x16: this.LDDid8i,
+    0x17: this.RLA,
+    0x18: this.JRr8,
+    0x19: this.ADDHLiDEi,
+    0x1a: this.LDAiDEm,
+    0x1b: this.DECDEi,
+    0x1c: this.INCEi,
+    0x1d: this.DECEi,
+    0x1e: this.LDEid8i,
+    0x1f: this.RRA,
+    0x20: this.JRCNZr8,
+    0x21: this.LDHLid16i,
+    0x22: this.LDHLIncrmAi,
+    0x23: this.INCHLi,
+    0x24: this.INCHi,
+    0x25: this.DECHi,
+    0x26: this.LDHid8i,
+    0x27: this.DAAA,
+    0x28: this.JRCZr8,
+    0x29: this.ADDHLiHLi,
+    0x2a: this.LDAiHLIncrm,
+    0x2b: this.DECHLi,
+    0x2c: this.INCLi,
+    0x2d: this.DECLi,
+    0x2e: this.LDLid8i,
+    0x2f: this.CPLA,
+    0x30: this.JRCNCr8,
+    0x31: this.LDSPid16i,
+    0x32: this.LDHLDecrmAi,
+    0x33: this.INCSPi,
+    0x34: this.INCHLm,
+    0x35: this.DECHLm,
+    0x36: this.LDHLmd8i,
+    0x37: this.SCF,
+    0x38: this.JRCCr8,
+    0x39: this.ADDHLiSPi,
+    0x3a: this.LDAiHLDecrm,
+    0x3b: this.DECSPi,
+    0x3c: this.INCAi,
+    0x3d: this.DECAi,
+    0x3e: this.LDAid8i,
+    0x3f: this.CCF,
+    0x40: this.LDBiBi,
+    0x41: this.LDBiCi,
+    0x42: this.LDBiDi,
+    0x43: this.LDBiEi,
+    0x44: this.LDBiHi,
+    0x45: this.LDBiLi,
+    0x46: this.LDBiHLm,
+    0x47: this.LDBiAi,
+    0x48: this.LDCiBi,
+    0x49: this.LDCiCi,
+    0x4a: this.LDCiDi,
+    0x4b: this.LDCiEi,
+    0x4c: this.LDCiHi,
+    0x4d: this.LDCiLi,
+    0x4e: this.LDCiHLm,
+    0x4f: this.LDCiAi,
+    0x50: this.LDDiBi,
+    0x51: this.LDDiCi,
+    0x52: this.LDDiDi,
+    0x53: this.LDDiEi,
+    0x54: this.LDDiHi,
+    0x55: this.LDDiLi,
+    0x56: this.LDDiHLm,
+    0x57: this.LDDiAi,
+    0x58: this.LDEiBi,
+    0x59: this.LDEiCi,
+    0x5a: this.LDEiDi,
+    0x5b: this.LDEiEi,
+    0x5c: this.LDEiHi,
+    0x5d: this.LDEiLi,
+    0x5e: this.LDEiHLm,
+    0x5f: this.LDEiAi,
+    0x60: this.LDHiBi,
+    0x61: this.LDHiCi,
+    0x62: this.LDHiDi,
+    0x63: this.LDHiEi,
+    0x64: this.LDHiHi,
+    0x65: this.LDHiLi,
+    0x66: this.LDHiHLm,
+    0x67: this.LDHiAi,
+    0x68: this.LDLiBi,
+    0x69: this.LDLiCi,
+    0x6a: this.LDLiDi,
+    0x6b: this.LDLiEi,
+    0x6c: this.LDLiHi,
+    0x6d: this.LDLiLi,
+    0x6e: this.LDLiHLm,
+    0x6f: this.LDLiAi,
+    0x70: this.LDHLmBi,
+    0x71: this.LDHLmCi,
+    0x72: this.LDHLmDi,
+    0x73: this.LDHLmEi,
+    0x74: this.LDHLmHi,
+    0x75: this.LDHLmLi,
+    0x76: this.HALT,
+    0x77: this.LDHLmAi,
+    0x78: this.LDAiBi,
+    0x79: this.LDAiCi,
+    0x7a: this.LDAiDi,
+    0x7b: this.LDAiEi,
+    0x7c: this.LDAiHi,
+    0x7d: this.LDAiLi,
+    0x7e: this.LDAiHLm,
+    0x7f: this.LDAiAi,
+    0x80: this.ADDAiBi,
+    0x81: this.ADDAiCi,
+    0x82: this.ADDAiDi,
+    0x83: this.ADDAiEi,
+    0x84: this.ADDAiHi,
+    0x85: this.ADDAiLi,
+    0x86: this.ADDAiHLm,
+    0x87: this.ADDAiAi,
+    0x88: this.ADCAiBi,
+    0x89: this.ADCAiCi,
+    0x8a: this.ADCAiDi,
+    0x8b: this.ADCAiEi,
+    0x8c: this.ADCAiHi,
+    0x8d: this.ADCAiLi,
+    0x8e: this.ADCAiHLm,
+    0x8f: this.ADCAiAi,
+    0x90: this.SUBAiBi,
+    0x91: this.SUBAiCi,
+    0x92: this.SUBAiDi,
+    0x93: this.SUBAiEi,
+    0x94: this.SUBAiHi,
+    0x95: this.SUBAiLi,
+    0x96: this.SUBAiHLm,
+    0x97: this.SUBAiAi,
+    0x98: this.SBCAiBi,
+    0x99: this.SBCAiCi,
+    0x9a: this.SBCAiDi,
+    0x9b: this.SBCAiEi,
+    0x9c: this.SBCAiHi,
+    0x9d: this.SBCAiLi,
+    0x9e: this.SBCAiHLm,
+    0x9f: this.SBCAiAi,
+    0xa0: this.ANDBi,
+    0xa1: this.ANDCi,
+    0xa2: this.ANDDi,
+    0xa3: this.ANDEi,
+    0xa4: this.ANDHi,
+    0xa5: this.ANDLi,
+    0xa6: this.ANDHLm,
+    0xa7: this.ANDAi,
+    0xa8: this.XORBi,
+    0xa9: this.XORCi,
+    0xaa: this.XORDi,
+    0xab: this.XOREi,
+    0xac: this.XORHi,
+    0xad: this.XORLi,
+    0xae: this.XORHLm,
+    0xaf: this.XORAi,
+    0xb0: this.ORBi,
+    0xb1: this.ORCi,
+    0xb2: this.ORDi,
+    0xb3: this.OREi,
+    0xb4: this.ORHi,
+    0xb5: this.ORLi,
+    0xb6: this.ORHLm,
+    0xb7: this.ORAi,
+    0xb8: this.CPBi,
+    0xb9: this.CPCi,
+    0xba: this.CPDi,
+    0xbb: this.CPEi,
+    0xbc: this.CPHi,
+    0xbd: this.CPLi,
+    0xbe: this.CPHLm,
+    0xbf: this.CPAi,
+    0xc0: this.RETCNZ,
+    0xc1: this.POPIntoBCi,
+    0xc2: this.JPCNZa16,
+    0xc3: this.JPa16,
+    0xc4: this.CALLCNZa16,
+    0xc5: this.PUSHRegisterBCi,
+    0xc6: this.ADDAid8i,
+    0xc7: this.RSTAi00Hi,
+    0xc8: this.RETCZ,
+    0xc9: this.RET,
+    0xca: this.JPCZa16,
+    0xcb: this.PREFIX,
+    0xcc: this.CALLCZa16,
+    0xcd: this.CALL,
+    0xce: this.ADCAid8i,
+    0xcf: this.RSTAi08Hi,
+    0xd0: this.RETCNC,
+    0xd1: this.POPIntoDEi,
+    0xd2: this.JPCNCa16,
+    0xd3: this.IllegalD3,
+    0xd4: this.CALLCNCa16,
+    0xd5: this.PUSHRegisterDEi,
+    0xd6: this.SUBAid8i,
+    0xd7: this.RSTAi10Hi,
+    0xd8: this.RETCC,
+    0xd9: this.RETI,
+    0xda: this.JPCCa16,
+    0xdb: this.IllegalDB,
+    0xdc: this.CALLCCa16,
+    0xdd: this.IllegalDD,
+    0xde: this.SBCAid8i,
+    0xdf: this.RSTAi18Hi,
+    0xe0: this.LDHa8mAi,
+    0xe1: this.POPIntoHLi,
+    0xe2: this.LDCmAi,
+    0xe3: this.IllegalE3,
+    0xe4: this.IllegalE4,
+    0xe5: this.PUSHRegisterHLi,
+    0xe6: this.ANDd8i,
+    0xe7: this.RSTAi20Hi,
+    0xe8: this.ADDSPir8i,
+    0xe9: this.JPHL,
+    0xea: this.LDa16mAi,
+    0xeb: this.IllegalEB,
+    0xec: this.IllegalEC,
+    0xed: this.IllegalED,
+    0xee: this.XORd8i,
+    0xef: this.RSTAi28Hi,
+    0xf0: this.LDHAia8m,
+    0xf1: this.POPIntoAFi,
+    0xf2: this.LDAiCm,
+    0xf3: this.DI,
+    0xf4: this.IllegalF4,
+    0xf5: this.PUSHRegisterAFi,
+    0xf6: this.ORd8i,
+    0xf7: this.RSTAi30Hi,
+    0xf8: this.LDHLiSPIncri,
+    0xf9: this.LDSPiHLi,
+    0xfa: this.LDAia16m,
+    0xfb: this.EI,
+    0xfc: this.IllegalFC,
+    0xfd: this.IllegalFD,
+    0xfe: this.CPd8i,
+    0xff: this.RSTAi38Hi,
+  };
+
+  private cbOpcodes: OpcodeList = {
+    0x00: this.RLCBi,
+    0x01: this.RLCCi,
+    0x02: this.RLCDi,
+    0x03: this.RLCEi,
+    0x04: this.RLCHi,
+    0x05: this.RLCLi,
+    0x06: this.RLCHLm,
+    0x07: this.RLCAi,
+    0x08: this.RRCBi,
+    0x09: this.RRCCi,
+    0x0a: this.RRCDi,
+    0x0b: this.RRCEi,
+    0x0c: this.RRCHi,
+    0x0d: this.RRCLi,
+    0x0e: this.RRCHLm,
+    0x0f: this.RRCAi,
+    0x10: this.RLBi,
+    0x11: this.RLCi,
+    0x12: this.RLDi,
+    0x13: this.RLEi,
+    0x14: this.RLHi,
+    0x15: this.RLLi,
+    0x16: this.RLHLm,
+    0x17: this.RLAi,
+    0x18: this.RRBi,
+    0x19: this.RRCi,
+    0x1a: this.RRDi,
+    0x1b: this.RREi,
+    0x1c: this.RRHi,
+    0x1d: this.RRLi,
+    0x1e: this.RRHLm,
+    0x1f: this.RRAi,
+    0x20: this.SLABi,
+    0x21: this.SLACi,
+    0x22: this.SLADi,
+    0x23: this.SLAEi,
+    0x24: this.SLAHi,
+    0x25: this.SLALi,
+    0x26: this.SLAHLm,
+    0x27: this.SLAAi,
+    0x28: this.SRABi,
+    0x29: this.SRACi,
+    0x2a: this.SRADi,
+    0x2b: this.SRAEi,
+    0x2c: this.SRAHi,
+    0x2d: this.SRALi,
+    0x2e: this.SRAHLm,
+    0x2f: this.SRAAi,
+    0x30: this.SWAPBi,
+    0x31: this.SWAPCi,
+    0x32: this.SWAPDi,
+    0x33: this.SWAPEi,
+    0x34: this.SWAPHi,
+    0x35: this.SWAPLi,
+    0x36: this.SWAPHLm,
+    0x37: this.SWAPAi,
+    0x38: this.SRLBi,
+    0x39: this.SRLCi,
+    0x3a: this.SRLDi,
+    0x3b: this.SRLEi,
+    0x3c: this.SRLHi,
+    0x3d: this.SRLLi,
+    0x3e: this.SRLHLm,
+    0x3f: this.SRLAi,
+    0x40: this.BIT0iBi,
+    0x41: this.BIT0iCi,
+    0x42: this.BIT0iDi,
+    0x43: this.BIT0iEi,
+    0x44: this.BIT0iHi,
+    0x45: this.BIT0iLi,
+    0x46: this.BIT0iHLm,
+    0x47: this.BIT0iAi,
+    0x48: this.BIT1iBi,
+    0x49: this.BIT1iCi,
+    0x4a: this.BIT1iDi,
+    0x4b: this.BIT1iEi,
+    0x4c: this.BIT1iHi,
+    0x4d: this.BIT1iLi,
+    0x4e: this.BIT1iHLm,
+    0x4f: this.BIT1iAi,
+    0x50: this.BIT2iBi,
+    0x51: this.BIT2iCi,
+    0x52: this.BIT2iDi,
+    0x53: this.BIT2iEi,
+    0x54: this.BIT2iHi,
+    0x55: this.BIT2iLi,
+    0x56: this.BIT2iHLm,
+    0x57: this.BIT2iAi,
+    0x58: this.BIT3iBi,
+    0x59: this.BIT3iCi,
+    0x5a: this.BIT3iDi,
+    0x5b: this.BIT3iEi,
+    0x5c: this.BIT3iHi,
+    0x5d: this.BIT3iLi,
+    0x5e: this.BIT3iHLm,
+    0x5f: this.BIT3iAi,
+    0x60: this.BIT4iBi,
+    0x61: this.BIT4iCi,
+    0x62: this.BIT4iDi,
+    0x63: this.BIT4iEi,
+    0x64: this.BIT4iHi,
+    0x65: this.BIT4iLi,
+    0x66: this.BIT4iHLm,
+    0x67: this.BIT4iAi,
+    0x68: this.BIT5iBi,
+    0x69: this.BIT5iCi,
+    0x6a: this.BIT5iDi,
+    0x6b: this.BIT5iEi,
+    0x6c: this.BIT5iHi,
+    0x6d: this.BIT5iLi,
+    0x6e: this.BIT5iHLm,
+    0x6f: this.BIT5iAi,
+    0x70: this.BIT6iBi,
+    0x71: this.BIT6iCi,
+    0x72: this.BIT6iDi,
+    0x73: this.BIT6iEi,
+    0x74: this.BIT6iHi,
+    0x75: this.BIT6iLi,
+    0x76: this.BIT6iHLm,
+    0x77: this.BIT6iAi,
+    0x78: this.BIT7iBi,
+    0x79: this.BIT7iCi,
+    0x7a: this.BIT7iDi,
+    0x7b: this.BIT7iEi,
+    0x7c: this.BIT7iHi,
+    0x7d: this.BIT7iLi,
+    0x7e: this.BIT7iHLm,
+    0x7f: this.BIT7iAi,
+    0x80: this.RES0B,
+    0x81: this.RES0C,
+    0x82: this.RES0D,
+    0x83: this.RES0E,
+    0x84: this.RES0H,
+    0x85: this.RES0L,
+    0x86: this.RES0HL,
+    0x87: this.RES0A,
+    0x88: this.RES1B,
+    0x89: this.RES1C,
+    0x8a: this.RES1D,
+    0x8b: this.RES1E,
+    0x8c: this.RES1H,
+    0x8d: this.RES1L,
+    0x8e: this.RES1HL,
+    0x8f: this.RES1A,
+    0x90: this.RES2B,
+    0x91: this.RES2C,
+    0x92: this.RES2D,
+    0x93: this.RES2E,
+    0x94: this.RES2H,
+    0x95: this.RES2L,
+    0x96: this.RES2HL,
+    0x97: this.RES2A,
+    0x98: this.RES3B,
+    0x99: this.RES3C,
+    0x9a: this.RES3D,
+    0x9b: this.RES3E,
+    0x9c: this.RES3H,
+    0x9d: this.RES3L,
+    0x9e: this.RES3HL,
+    0x9f: this.RES3A,
+    0xa0: this.RES4B,
+    0xa1: this.RES4C,
+    0xa2: this.RES4D,
+    0xa3: this.RES4E,
+    0xa4: this.RES4H,
+    0xa5: this.RES4L,
+    0xa6: this.RES4HL,
+    0xa7: this.RES4A,
+    0xa8: this.RES5B,
+    0xa9: this.RES5C,
+    0xaa: this.RES5D,
+    0xab: this.RES5E,
+    0xac: this.RES5H,
+    0xad: this.RES5L,
+    0xae: this.RES5HL,
+    0xaf: this.RES5A,
+    0xb0: this.RES6B,
+    0xb1: this.RES6C,
+    0xb2: this.RES6D,
+    0xb3: this.RES6E,
+    0xb4: this.RES6H,
+    0xb5: this.RES6L,
+    0xb6: this.RES6HL,
+    0xb7: this.RES6A,
+    0xb8: this.RES7B,
+    0xb9: this.RES7C,
+    0xba: this.RES7D,
+    0xbb: this.RES7E,
+    0xbc: this.RES7H,
+    0xbd: this.RES7L,
+    0xbe: this.RES7HL,
+    0xbf: this.RES7A,
+    0xc0: this.SET0B,
+    0xc1: this.SET0C,
+    0xc2: this.SET0D,
+    0xc3: this.SET0E,
+    0xc4: this.SET0H,
+    0xc5: this.SET0L,
+    0xc6: this.SET0HL,
+    0xc7: this.SET0A,
+    0xc8: this.SET1B,
+    0xc9: this.SET1C,
+    0xca: this.SET1D,
+    0xcb: this.SET1E,
+    0xcc: this.SET1H,
+    0xcd: this.SET1L,
+    0xce: this.SET1HL,
+    0xcf: this.SET1A,
+    0xd0: this.SET2B,
+    0xd1: this.SET2C,
+    0xd2: this.SET2D,
+    0xd3: this.SET2E,
+    0xd4: this.SET2H,
+    0xd5: this.SET2L,
+    0xd6: this.SET2HL,
+    0xd7: this.SET2A,
+    0xd8: this.SET3B,
+    0xd9: this.SET3C,
+    0xda: this.SET3D,
+    0xdb: this.SET3E,
+    0xdc: this.SET3H,
+    0xdd: this.SET3L,
+    0xde: this.SET3HL,
+    0xdf: this.SET3A,
+    0xe0: this.SET4B,
+    0xe1: this.SET4C,
+    0xe2: this.SET4D,
+    0xe3: this.SET4E,
+    0xe4: this.SET4H,
+    0xe5: this.SET4L,
+    0xe6: this.SET4HL,
+    0xe7: this.SET4A,
+    0xe8: this.SET5B,
+    0xe9: this.SET5C,
+    0xea: this.SET5D,
+    0xeb: this.SET5E,
+    0xec: this.SET5H,
+    0xed: this.SET5L,
+    0xee: this.SET5HL,
+    0xef: this.SET5A,
+    0xf0: this.SET6B,
+    0xf1: this.SET6C,
+    0xf2: this.SET6D,
+    0xf3: this.SET6E,
+    0xf4: this.SET6H,
+    0xf5: this.SET6L,
+    0xf6: this.SET6HL,
+    0xf7: this.SET6A,
+    0xf8: this.SET7B,
+    0xf9: this.SET7C,
+    0xfa: this.SET7D,
+    0xfb: this.SET7E,
+    0xfc: this.SET7H,
+    0xfd: this.SET7L,
+    0xfe: this.SET7HL,
+    0xff: this.SET7A,
+  };
+}
+
+function RLCn(reg: byte): byte {
+  setCYFlag(reg >> 7);
+  const shifted: number = reg << 1;
+  const result: byte = Primitive.toByte(shifted | (shifted >> 8));
+  checkZFlag(result);
+  setNFlag(0);
+  setHFlag(0);
+  return result;
+}
+
+function RLn(reg: byte): byte {
+  const oldCY = getCYFlag();
+  setCYFlag(reg >> 7);
+  const shifted = reg << 1;
+  const result = Primitive.toByte(shifted | oldCY);
+  checkZFlag(result);
+  setHFlag(0);
+  setNFlag(0);
+  return result;
+}
+
+function ADD(operand: byte): void {
+  checkFullCarry8(Primitive.upper(r.af), operand);
+  checkHalfCarry(Primitive.upper(r.af), operand);
+  r.af = Primitive.addUpper(r.af, operand);
+  checkZFlag(Primitive.upper(r.af));
+  setNFlag(0);
+}
+
+function ADC(operand: byte): void {
+  operand = Primitive.addByte(operand, <byte>getCYFlag());
+  checkFullCarry8(Primitive.upper(r.af), operand);
+  checkHalfCarry(Primitive.upper(r.af), operand);
+  r.af = Primitive.addUpper(r.af, operand);
+  checkZFlag(Primitive.upper(r.af));
+  setNFlag(0);
+}
+
+function SUB(operand: byte): void {
+  checkFullCarry8(Primitive.upper(r.af), operand, true);
+  checkHalfCarry(Primitive.upper(r.af), operand, true);
+  r.af = Primitive.toWord(Primitive.addUpper(r.af, -operand));
+  checkZFlag(Primitive.upper(r.af));
+  setNFlag(1);
+}
+
+function SBC(operand: byte): void {
+  const carry = getCYFlag() ? -1 : 0;
+  operand = Primitive.addByte(operand, carry);
+  checkFullCarry8(Primitive.upper(r.af), operand, true);
+  checkHalfCarry(Primitive.upper(r.af), operand, true);
+  r.af = Primitive.toWord(Primitive.addUpper(r.af, -operand));
+  checkZFlag(Primitive.upper(r.af));
+  setNFlag(1);
+}
+
+function OR(operand: byte): void {
+  const result = Primitive.upper(r.af) | operand;
+  r.af = Primitive.setUpper(r.af, Primitive.toByte(result));
+  checkZFlag(Primitive.upper(r.af));
+  setNFlag(0);
+  setHFlag(0);
+  setCYFlag(0);
+}
+
+function AND(operand: byte): void {
+  const result = Primitive.upper(r.af) & operand;
+  r.af = Primitive.setUpper(r.af, Primitive.toByte(result));
+  checkZFlag(Primitive.upper(r.af));
+  setNFlag(0);
+  setHFlag(1);
+  setCYFlag(0);
+}
+
+function XOR(operand: byte): void {
+  const result = Primitive.upper(r.af) ^ operand;
+  r.af = Primitive.setUpper(r.af, Primitive.toByte(result));
+  checkZFlag(Primitive.upper(r.af));
+  setNFlag(0);
+  setHFlag(0);
+  setCYFlag(0);
+}
+
+function CP(operand: byte): void {
+  checkFullCarry8(Primitive.upper(r.af), operand, true);
+  checkHalfCarry(Primitive.upper(r.af), operand, true);
+  const result: byte = Primitive.addByte(Primitive.upper(r.af), -operand);
+  setNFlag(1);
+  checkZFlag(result);
+}
+
+function CALLH(flag: boolean): boolean {
+  if (flag) {
+    sp = Primitive.addWord(sp, -2);
+    memoryRef.writeWord(sp, Primitive.toWord(pc + 2));
+    pc = memoryRef.readWord(pc);
+    return true;
+  }
+  return false;
+}
+
+function PUSH(register: word): void {
+  sp = Primitive.addWord(sp, -1);
+  memoryRef.writeByte(sp, Primitive.upper(register));
+  sp = Primitive.addWord(sp, -1);
+  memoryRef.writeByte(sp, Primitive.lower(register));
+}
+
+function POP(): word {
+  const value: word = memoryRef.readWord(sp);
+  sp = Primitive.addWord(sp, 2);
+  return value;
+}
+
+function Jpcc(flag: boolean): boolean {
+  if (flag) {
+    pc = memoryRef.readWord(pc);
+    return true;
+  }
+  return false;
+}
+
+function RETH(flag: boolean): boolean {
+  if (flag) {
+    pc = memoryRef.readWord(sp);
+    sp = Primitive.addWord(sp, 2);
+    return true;
+  }
+  return false;
+}
+
+function RST(address: word): void {
+  sp = Primitive.addWord(sp, -2);
+  memoryRef.writeWord(sp, pc);
+  pc = address;
+}
+
+function RRCn(reg: byte): byte {
+  const bitZero = reg & 1;
+  setCYFlag(bitZero);
+  const shifted: byte = reg >> 1;
+  const result: byte = Primitive.toByte(shifted | (bitZero << 7));
+  checkZFlag(result);
+  setNFlag(0);
+  setHFlag(0);
+  return result;
+}
+
+function RRn(reg: byte): byte {
+  const oldCY = getCYFlag();
+  setCYFlag(reg & 1);
+  const shifted = reg >> 1;
+  const result: byte = Primitive.toByte(shifted | (oldCY << 7));
+  checkZFlag(result);
+  setHFlag(0);
+  setNFlag(0);
+  return result;
+}
+
+function SLAn(reg: byte): byte {
+  setCYFlag(reg << 7);
+  const result = Primitive.toByte(reg << 1);
+  checkZFlag(result);
+  setHFlag(0);
+  setNFlag(0);
+  return result;
+}
+
+function SRAn(reg: byte): byte {
+  setCYFlag(reg & 1);
+  // shift to right, but keep the most sig bit
+  const msb: byte = reg >> 7;
+  const result: byte = (reg >> 1) | msb;
+  checkZFlag(result);
+  setHFlag(0);
+  setNFlag(0);
+  return result;
+}
+
+function SRLn(reg: byte): byte {
+  setCYFlag(reg & 1);
+  const result: byte = reg >> 1;
+  checkZFlag(result);
+  setHFlag(0);
+  setNFlag(0);
+  return result;
+}
+
+function BIT(bit: number, reg: byte): void {
+  checkZFlag((reg >> bit) & 1);
+  setNFlag(0);
+  setHFlag(1);
+}
+
+function RES0(reg: byte): byte {
+  return reg & 0xfe;
+}
+
+function RES1(reg: byte): byte {
+  return reg & 0xfd;
+}
+
+function RES2(reg: byte): byte {
+  return reg & 0xfb;
+}
+
+function RES3(reg: byte): byte {
+  return reg & 0xf7;
+}
+
+function RES4(reg: byte): byte {
+  return reg & 0xef;
+}
+
+function RES5(reg: byte): byte {
+  return reg & 0xdf;
+}
+
+function RES6(reg: byte): byte {
+  return reg & 0xbf;
+}
+
+function RES7(reg: byte): byte {
+  return reg & 0x7f;
+}
+
+function SET(bit: number, reg: byte): byte {
+  return reg | (1 << bit);
+}
+
+function SWAP(reg: byte): byte {
+  const upper = reg >> 4;
+  const lower = reg & 0xf;
+  const result = (lower << 4) | upper;
+  checkZFlag(result);
+  return result;
 }
 
 export default CPU;
