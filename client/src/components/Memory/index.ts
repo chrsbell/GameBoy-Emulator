@@ -1,5 +1,5 @@
 import CPU from 'CPU/index';
-import {DEBUG, error, Primitive} from 'helpers/index';
+import {DEBUG, Primitive} from 'helpers/index';
 import PPU from 'PPU/index';
 import Cartridge from './Cartridge';
 import MBC0 from './Cartridge/MBC0';
@@ -56,12 +56,12 @@ class Memory {
       // WRAM / write shadow RAM
       if (address <= 0xddff) this.ram[address + 0x1000] = data;
     } else if (address <= 0xfdff) {
-      error(`Can't write to prohibited address ${Primitive.toHex(address)}.`);
+      // error(`Can't write to prohibited address ${Primitive.toHex(address)}.`);
     } else if (address <= 0xfe9f) {
       // OAM
       this.ram[address] = data;
     } else if (address <= 0xfeff) {
-      error(`Can't write to prohibited address ${Primitive.toHex(address)}.`);
+      // error(`Can't write to prohibited address ${Primitive.toHex(address)}.`);
     } else if (address <= 0xff7f) {
       // I/O
       this.ppuBridge.writeIORam(address, data);
@@ -100,17 +100,20 @@ class Memory {
       // Sprite attribute table (OAM)
       return this.ram[address];
     } else if (address <= 0xfeff) {
-      throw new Error('Use of this area is prohibited.');
+      // throw new Error('Use of this area is prohibited.');
     } else if (address <= 0xffff) {
       // I/O + HRAM + IE Register
       return this.ram[address];
     }
-    throw new Error(
-      `Tried to read out of bounds address: ${Primitive.toHex(address)}.`
-    );
+    return 0;
+    // throw new Error(
+    //   `Tried to read out of bounds address: ${Primitive.toHex(address)}.`
+    // );
   };
   public readWord = (address: word): word => {
-    return this.readByte(address) | (this.readByte(address + 1) << 8);
+    return (
+      this.readByte(address) | (this.readByte((address + 1) & 0xffff) << 8)
+    );
   };
 
   /**
@@ -136,6 +139,7 @@ class Memory {
       this.bios = bios;
       this.inBios = true;
       cpu.execute = cpu.executeBios;
+      // cpu.initPowerSequence();
       DEBUG && console.log('Loaded bios.');
     } else {
       this.inBios = false;

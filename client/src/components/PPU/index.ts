@@ -96,9 +96,10 @@ class PPU {
   constructor(ppuBridge: PPUBridge, interruptService: InterruptService) {
     interruptServiceRef = interruptService;
     ppuBridgeRef = ppuBridge;
-    lcdc = new PPUControl();
+    this.reset();
   }
   public reset = (): void => {
+    lcdc = new PPUControl();
     lcdc.update(0);
     this.pixelMap = new Array(CanvasRenderer.screenHeight)
       .fill(0)

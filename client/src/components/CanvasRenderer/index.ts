@@ -53,8 +53,16 @@ class CanvasRenderer {
         CanvasRenderer.screenHeight * this.scaleFactor
       );
       this.initialized = true;
-      this.timeout = window.requestAnimationFrame(this.drawOnScreen);
     }
+  };
+
+  public render = (): void => {
+    this.timeout = window.requestAnimationFrame(this.drawOnScreen);
+  };
+
+  public clear = (): void => {
+    this.clearScreen();
+    if (this.timeout !== null) window.cancelAnimationFrame(this.timeout);
   };
 
   public setPPU = (ppu: PPU): void => {
@@ -76,6 +84,20 @@ class CanvasRenderer {
         this.image.data[offset + 3] = color[3];
       }
     }
+  };
+
+  private clearScreen = (): void => {
+    this.image = this.offscreenContext.createImageData(
+      CanvasRenderer.screenWidth * this.scaleFactor,
+      CanvasRenderer.screenHeight * this.scaleFactor
+    );
+    this.offscreenContext.putImageData(this.image, 0, 0);
+    this.context.drawImage(this.canvasOffscreen, 0, 0);
+    // this.image.data = new Array(screenHeight * this.scaleFactor)
+    //   .fill(0)
+    //   .map(y =>
+    //     new Array(CanvasRenderer.screenWidth * this.scaleFactor * 4).fill(0)
+    //   );
   };
 
   public buildImage = (): void => {

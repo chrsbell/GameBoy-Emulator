@@ -19,7 +19,6 @@ class PPUBridge {
     this.interruptService = new InterruptService(memoryRef);
     this.ppu = new PPU(this, this.interruptService);
     ppuRef = this.ppu;
-    ppuRef.reset();
   }
   /**
    * Used internally by the PPU/lCD to update the current scanline.

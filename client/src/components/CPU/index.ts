@@ -9,12 +9,10 @@ export interface Registers {
   hl: word;
 }
 
-const r: Registers = {
-  af: 0,
-  bc: 0,
-  de: 0,
-  hl: 0,
-};
+let af: word = 0;
+let bc: word = 0;
+let de: word = 0;
+let hl: word = 0;
 let pc: word = 0;
 let sp: word = 0;
 
@@ -23,47 +21,40 @@ let memoryRef!: Memory;
 
 const setCYFlag = (value: boolean | byte): void => {
   if (value) {
-    r.af |= 1 << 4;
+    af |= 1 << 4;
   } else {
-    r.af &= ~(1 << 4);
+    af &= ~(1 << 4);
   }
 };
 
 const setHFlag = (value: boolean | byte): void => {
   if (value) {
-    r.af |= 1 << 5;
+    af |= 1 << 5;
   } else {
-    r.af &= ~(1 << 5);
+    af &= ~(1 << 5);
   }
 };
 
 const setNFlag = (value: boolean | byte): void => {
   if (value) {
-    r.af |= 1 << 6;
+    af |= 1 << 6;
   } else {
-    r.af &= ~(1 << 6);
+    af &= ~(1 << 6);
   }
 };
 
 const setZFlag = (value: boolean | byte): void => {
   if (value) {
-    r.af |= 1 << 7;
+    af |= 1 << 7;
   } else {
-    r.af &= ~(1 << 7);
+    af &= ~(1 << 7);
   }
 };
 
-const getCYFlag = (): bit => (r.af >> 4) & 1;
-const getHFlag = (): bit => (r.af >> 5) & 1;
-const getNFlag = (): bit => (r.af >> 6) & 1;
-const getZFlag = (): bit => (r.af >> 7) & 1;
-
-/**
- * Sets the Z flag if the register is 0, otherwise resets it.
- */
-const checkZFlag = (reg: byte): void => {
-  setZFlag(!reg);
-};
+const getCYFlag = (): bit => (af >> 4) & 1;
+const getHFlag = (): bit => (af >> 5) & 1;
+const getNFlag = (): bit => (af >> 6) & 1;
+const getZFlag = (): bit => (af >> 7) & 1;
 
 /**
  * Sets the half carry flag if a carry will be generated from bits 3 to 4 of the sum.
@@ -117,7 +108,10 @@ class CPU {
   }
 
   public getPC = (): word => pc;
-  public getR = (): Registers => r;
+  public getAF = (): word => af;
+  public getBC = (): word => bc;
+  public getDE = (): word => de;
+  public getHL = (): word => hl;
   public getSP = (): word => sp;
   public getIE = (): boolean => allInterruptsEnabled;
 
@@ -126,10 +120,10 @@ class CPU {
     sp = 0;
     this.halted = false;
     allInterruptsEnabled = true;
-    r.af = 0;
-    r.bc = 0;
-    r.de = 0;
-    r.hl = 0;
+    af = 0;
+    bc = 0;
+    de = 0;
+    hl = 0;
     this.lastExecuted = [];
   };
 
@@ -141,10 +135,10 @@ class CPU {
    */
   public initPowerSequence = (): void => {
     pc = 0x100;
-    r.af = 0x01b0;
-    r.bc = 0x0013;
-    r.de = 0x00d8;
-    r.hl = 0x014d;
+    af = 0x01b0;
+    bc = 0x0013;
+    de = 0x00d8;
+    hl = 0x014d;
     sp = 0xfffe;
     memoryRef.writeByte(0xff05, 0x00);
     memoryRef.writeByte(0xff06, 0x00);
@@ -183,9 +177,11 @@ class CPU {
    * @returns {number} the number of CPU cycles required.
    */
   public executeInstruction = (): number => {
+    const opcode: byte = memoryRef.readByte(pc);
     pc += 1;
     pc &= 0xffff;
-    return this.opcodes[memoryRef.readByte(pc)]();
+    this.addCalledInstruction(opcode);
+    return this.opcodes[opcode]();
   };
   public execute: () => number = this.executeInstruction;
   public executeBios = (): number => {
@@ -251,14 +247,6 @@ class CPU {
         break;
     }
   }
-  /**
-   * Logs the internal state of the this.
-   */
-  public log = (): void => {
-    console.log(`JS GB Registers: ${JSON.stringify(r)}`);
-    console.log(`JS GB PC: ${pc}`);
-    console.log(`JS GB SP: ${sp}`);
-  };
 
   /**
    * No operation.
@@ -277,7 +265,7 @@ class CPU {
    * Affected flags:
    */
   private LDBCid16i = (): byte => {
-    r.bc = memoryRef.readWord(pc);
+    bc = memoryRef.readWord(pc);
     pc += 2;
 
     return 12;
@@ -290,7 +278,7 @@ class CPU {
    * Affected flags:
    */
   private LDBCmAi = (): byte => {
-    memoryRef.writeByte(r.bc, Primitive.upper(r.af));
+    memoryRef.writeByte(bc, Primitive.upper(af));
 
     return 8;
   };
@@ -302,7 +290,7 @@ class CPU {
    * Affected flags:
    */
   private INCBCi = (): byte => {
-    r.bc = Primitive.addWord(r.bc, 1);
+    bc = Primitive.addWord(bc, 1);
 
     return 8;
   };
@@ -317,12 +305,12 @@ class CPU {
     // convert operand to unsigned
     let operand: byte = 1;
     // check for half carry on affected byte only
-    checkHalfCarry(Primitive.upper(r.bc), operand);
+    checkHalfCarry(Primitive.upper(bc), operand);
     // perform addition
-    operand = Primitive.addByte(operand, Primitive.upper(r.bc));
-    r.bc = Primitive.setUpper(r.bc, operand);
+    operand = Primitive.addByte(operand, Primitive.upper(bc));
+    bc = Primitive.setUpper(bc, operand);
 
-    checkZFlag(Primitive.upper(r.bc));
+    setZFlag(!Primitive.upper(bc));
     setNFlag(0);
 
     return 4;
@@ -335,9 +323,9 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private DECBi = (): byte => {
-    checkHalfCarry(Primitive.upper(r.bc), 1, true);
-    r.bc = Primitive.addUpper(r.bc, Primitive.toByte(-1));
-    checkZFlag(Primitive.upper(r.bc));
+    checkHalfCarry(Primitive.upper(bc), 1, true);
+    bc = Primitive.addUpper(bc, Primitive.toByte(-1));
+    setZFlag(!Primitive.upper(bc));
     setNFlag(1);
 
     return 4;
@@ -351,7 +339,7 @@ class CPU {
    */
   private LDBid8i = (): byte => {
     // load into B from pc (immediate)
-    r.bc = Primitive.setUpper(r.bc, Primitive.toByte(memoryRef.readByte(pc)));
+    bc = Primitive.setUpper(bc, Primitive.toByte(memoryRef.readByte(pc)));
     pc += 1;
 
     return 8;
@@ -365,10 +353,10 @@ class CPU {
    */
   private RLCA = (): byte => {
     // check carry flag
-    setCYFlag(Primitive.upper(r.af) >> 7);
+    setCYFlag(Primitive.upper(af) >> 7);
     // left shift
-    const shifted: byte = Primitive.upper(r.af) << 1;
-    r.af = Primitive.setUpper(r.af, Primitive.toByte(shifted | (shifted >> 8)));
+    const shifted: byte = Primitive.upper(af) << 1;
+    af = Primitive.setUpper(af, Primitive.toByte(shifted | (shifted >> 8)));
     // flag resets
     setNFlag(0);
     setHFlag(0);
@@ -396,9 +384,10 @@ class CPU {
    * Affected flags: N, H, C
    */
   private ADDHLiBCi = (): byte => {
-    checkFullCarry16(r.hl, r.bc);
-    checkHalfCarry(Primitive.upper(r.hl), Primitive.upper(r.bc));
-    r.hl = Primitive.addWord(r.hl, r.bc);
+    checkFullCarry16(hl, bc);
+    setHFlag((((hl & 0xfff) + (bc & 0xfff)) & 0x1000) === 0x1000);
+    hl += bc;
+    hl &= 0xffff;
     setNFlag(0);
 
     return 8;
@@ -411,7 +400,7 @@ class CPU {
    * Affected flags:
    */
   private LDAiBCm = (): byte => {
-    r.af = Primitive.setUpper(r.af, Primitive.toByte(memoryRef.readByte(r.bc)));
+    af = Primitive.setUpper(af, Primitive.toByte(memoryRef.readByte(bc)));
 
     return 8;
   };
@@ -423,7 +412,7 @@ class CPU {
    * Affected flags:
    */
   private DECBCi = (): byte => {
-    r.bc = Primitive.addWord(r.bc, -1);
+    bc = Primitive.addWord(bc, -1);
 
     return 8;
   };
@@ -438,12 +427,12 @@ class CPU {
     // convert operand to unsigned
     let operand: byte = 1;
     // check for half carry on affected byte only
-    checkHalfCarry(Primitive.lower(r.bc), operand);
+    checkHalfCarry(Primitive.lower(bc), operand);
     // perform addition
-    operand = Primitive.addByte(operand, Primitive.lower(r.bc));
-    r.bc = Primitive.setLower(r.bc, operand);
+    operand = Primitive.addByte(operand, Primitive.lower(bc));
+    bc = Primitive.setLower(bc, operand);
 
-    checkZFlag(Primitive.lower(r.bc));
+    setZFlag(!Primitive.lower(bc));
     setNFlag(0);
 
     return 4;
@@ -457,9 +446,9 @@ class CPU {
    */
   private DECCi = (): byte => {
     // convert operand to unsigned
-    checkHalfCarry(Primitive.lower(r.bc), 1, true);
-    r.bc = Primitive.addLower(r.bc, Primitive.toByte(-1));
-    checkZFlag(Primitive.lower(r.bc));
+    checkHalfCarry(Primitive.lower(bc), 1, true);
+    bc = Primitive.addLower(bc, Primitive.toByte(-1));
+    setZFlag(!Primitive.lower(bc));
     setNFlag(1);
 
     return 4;
@@ -473,7 +462,7 @@ class CPU {
    */
   private LDCid8i = (): byte => {
     // load into C from pc (immediate)
-    r.bc = Primitive.setLower(r.bc, Primitive.toByte(memoryRef.readByte(pc)));
+    bc = Primitive.setLower(bc, Primitive.toByte(memoryRef.readByte(pc)));
     pc += 1;
 
     return 8;
@@ -487,11 +476,11 @@ class CPU {
    */
   private RRCA = (): byte => {
     // check carry flag
-    const bitZero = Primitive.upper(r.af) & 1;
+    const bitZero = Primitive.upper(af) & 1;
     setCYFlag(bitZero);
     // right shift
-    const shifted: byte = Primitive.upper(r.af) >> 1;
-    r.af = Primitive.setUpper(r.af, Primitive.toByte(shifted | (bitZero << 7)));
+    const shifted: byte = Primitive.upper(af) >> 1;
+    af = Primitive.setUpper(af, Primitive.toByte(shifted | (bitZero << 7)));
     // flag resets
     setNFlag(0);
     setHFlag(0);
@@ -521,7 +510,7 @@ class CPU {
    * Affected flags:
    */
   private LDDEid16i = (): byte => {
-    r.de = memoryRef.readWord(pc);
+    de = memoryRef.readWord(pc);
     pc += 2;
 
     return 12;
@@ -534,7 +523,7 @@ class CPU {
    * Affected flags:
    */
   private LDDEmAi = (): byte => {
-    memoryRef.writeByte(r.de, Primitive.upper(r.af));
+    memoryRef.writeByte(de, Primitive.upper(af));
 
     return 8;
   };
@@ -546,7 +535,7 @@ class CPU {
    * Affected flags:
    */
   private INCDEi = (): byte => {
-    r.de = Primitive.addWord(r.de, 1);
+    de = Primitive.addWord(de, 1);
 
     return 8;
   };
@@ -561,12 +550,12 @@ class CPU {
     // convert operand to unsigned
     let operand: byte = 1;
     // check for half carry on affected byte only
-    checkHalfCarry(Primitive.upper(r.de), operand);
+    checkHalfCarry(Primitive.upper(de), operand);
     // perform addition
-    operand = Primitive.addByte(operand, Primitive.upper(r.de));
-    r.de = Primitive.setUpper(r.de, operand);
+    operand = Primitive.addByte(operand, Primitive.upper(de));
+    de = Primitive.setUpper(de, operand);
 
-    checkZFlag(Primitive.upper(r.de));
+    setZFlag(!Primitive.upper(de));
     setNFlag(0);
 
     return 4;
@@ -580,9 +569,9 @@ class CPU {
    */
   private DECDi = (): byte => {
     // check for half carry on affected byte only
-    checkHalfCarry(Primitive.upper(r.de), 1, true);
-    r.de = Primitive.addUpper(r.de, Primitive.toByte(-1));
-    checkZFlag(Primitive.upper(r.de));
+    checkHalfCarry(Primitive.upper(de), 1, true);
+    de = Primitive.addUpper(de, Primitive.toByte(-1));
+    setZFlag(!Primitive.upper(de));
     setNFlag(1);
 
     return 4;
@@ -595,7 +584,7 @@ class CPU {
    * Affected flags:
    */
   private LDDid8i = (): byte => {
-    r.de = Primitive.setUpper(r.de, Primitive.toByte(memoryRef.readByte(pc)));
+    de = Primitive.setUpper(de, Primitive.toByte(memoryRef.readByte(pc)));
     pc += 1;
 
     return 8;
@@ -612,11 +601,11 @@ class CPU {
     // get the old carry value
     const oldCY = getCYFlag();
     // set the carry flag to the 7th bit of A
-    setCYFlag(Primitive.upper(r.af) >> 7);
+    setCYFlag(Primitive.upper(af) >> 7);
     // rotate left
-    const shifted = Primitive.upper(r.af) << 1;
+    const shifted = Primitive.upper(af) << 1;
     // combine old flag and shifted, set to A
-    r.af = Primitive.setUpper(r.af, Primitive.toByte(shifted | oldCY));
+    af = Primitive.setUpper(af, Primitive.toByte(shifted | oldCY));
     setHFlag(0);
     setNFlag(0);
     setZFlag(0);
@@ -631,8 +620,8 @@ class CPU {
    * Affected flags:
    */
   private JRr8 = (): byte => {
-    pc = Primitive.addWord(pc, Primitive.toSigned(memoryRef.readByte(pc)));
-    pc += 1;
+    pc += Primitive.toSigned(memoryRef.readByte(pc)) + 1;
+    pc &= 0xffff;
 
     return 12;
   };
@@ -644,9 +633,10 @@ class CPU {
    * Affected flags: N, H, C
    */
   private ADDHLiDEi = (): byte => {
-    checkFullCarry16(r.hl, r.de);
-    checkHalfCarry(Primitive.upper(r.hl), Primitive.upper(r.de));
-    r.hl = Primitive.addWord(r.hl, r.de);
+    checkFullCarry16(hl, de);
+    setHFlag((((hl & 0xfff) + (de & 0xfff)) & 0x1000) === 0x1000);
+    hl += de;
+    hl &= 0xffff;
     setNFlag(0);
 
     return 8;
@@ -659,7 +649,7 @@ class CPU {
    * Affected flags:
    */
   private LDAiDEm = (): byte => {
-    r.af = Primitive.setUpper(r.af, Primitive.toByte(memoryRef.readByte(r.de)));
+    af = Primitive.setUpper(af, Primitive.toByte(memoryRef.readByte(de)));
 
     return 8;
   };
@@ -671,7 +661,7 @@ class CPU {
    * Affected flags:
    */
   private DECDEi = (): byte => {
-    r.de = Primitive.addWord(r.de, -1);
+    de = Primitive.addWord(de, -1);
 
     return 8;
   };
@@ -686,12 +676,12 @@ class CPU {
     // convert operand to unsigned
     let operand: byte = 1;
     // check for half carry on affected byte only
-    checkHalfCarry(Primitive.lower(r.de), operand);
+    checkHalfCarry(Primitive.lower(de), operand);
     // perform addition
-    operand = Primitive.addByte(operand, Primitive.lower(r.de));
-    r.de = Primitive.setLower(r.de, operand);
+    operand = Primitive.addByte(operand, Primitive.lower(de));
+    de = Primitive.setLower(de, operand);
 
-    checkZFlag(Primitive.lower(r.de));
+    setZFlag(!Primitive.lower(de));
     setNFlag(0);
 
     return 4;
@@ -705,9 +695,9 @@ class CPU {
    */
   private DECEi = (): byte => {
     // check for half carry on affected byte only
-    checkHalfCarry(Primitive.lower(r.de), 1, true);
-    r.de = Primitive.addLower(r.de, Primitive.toByte(-1));
-    checkZFlag(Primitive.lower(r.de));
+    checkHalfCarry(Primitive.lower(de), 1, true);
+    de = Primitive.addLower(de, Primitive.toByte(-1));
+    setZFlag(!Primitive.lower(de));
     setNFlag(1);
 
     return 4;
@@ -720,7 +710,7 @@ class CPU {
    * Affected flags:
    */
   private LDEid8i = (): byte => {
-    r.de = Primitive.setLower(r.de, Primitive.toByte(memoryRef.readByte(pc)));
+    de = Primitive.setLower(de, Primitive.toByte(memoryRef.readByte(pc)));
     pc += 1;
 
     return 8;
@@ -737,11 +727,11 @@ class CPU {
     // get the old carry value
     const oldCY = getCYFlag();
     // set the carry flag to the 0th bit of A
-    setCYFlag(Primitive.upper(r.af) & 1);
+    setCYFlag(Primitive.upper(af) & 1);
     // rotate right
-    const shifted = Primitive.upper(r.af) >> 1;
+    const shifted = Primitive.upper(af) >> 1;
     // combine old flag and shifted, set to A
-    r.af = Primitive.setUpper(r.af, Primitive.toByte(shifted | (oldCY << 7)));
+    af = Primitive.setUpper(af, Primitive.toByte(shifted | (oldCY << 7)));
     setHFlag(0);
     setNFlag(0);
     setZFlag(0);
@@ -756,14 +746,13 @@ class CPU {
    * Affected flags:
    */
   private JRCNZr8 = (): byte => {
-    const incr = Primitive.toSigned(memoryRef.readByte(pc));
-    pc += 1;
-
     if (!getZFlag()) {
-      // increment pc if zero flag was reset
-      pc = Primitive.addWord(pc, incr);
+      pc += Primitive.toSigned(memoryRef.readByte(pc)) + 1;
+      pc &= 0xffff;
       return 12;
     }
+    pc += 1;
+    pc &= 0xffff;
     return 8;
   };
 
@@ -774,7 +763,7 @@ class CPU {
    * Affected flags:
    */
   private LDHLid16i = (): byte => {
-    r.hl = memoryRef.readWord(pc);
+    hl = memoryRef.readWord(pc);
     pc += 2;
 
     return 12;
@@ -787,8 +776,8 @@ class CPU {
    * Affected flags:
    */
   private LDHLIncrmAi = (): byte => {
-    memoryRef.writeByte(r.hl, Primitive.upper(r.af));
-    r.hl = Primitive.addWord(r.hl, 1);
+    memoryRef.writeByte(hl, Primitive.upper(af));
+    hl = Primitive.addWord(hl, 1);
 
     return 8;
   };
@@ -800,7 +789,7 @@ class CPU {
    * Affected flags:
    */
   private INCHLi = (): byte => {
-    r.hl = Primitive.addWord(r.hl, 1);
+    hl = Primitive.addWord(hl, 1);
 
     return 8;
   };
@@ -815,12 +804,12 @@ class CPU {
     // convert operand to unsigned
     let operand: byte = 1;
     // check for half carry on affected byte only
-    checkHalfCarry(Primitive.upper(r.hl), operand);
+    checkHalfCarry(Primitive.upper(hl), operand);
     // perform addition
-    operand = Primitive.addByte(operand, Primitive.upper(r.hl));
-    r.hl = Primitive.setUpper(r.hl, operand);
+    operand = Primitive.addByte(operand, Primitive.upper(hl));
+    hl = Primitive.setUpper(hl, operand);
 
-    checkZFlag(operand);
+    setZFlag(!operand);
     setNFlag(0);
 
     return 4;
@@ -833,9 +822,9 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private DECHi = (): byte => {
-    checkHalfCarry(Primitive.upper(r.hl), 1, true);
-    r.hl = Primitive.addUpper(r.hl, Primitive.toByte(-1));
-    checkZFlag(Primitive.upper(r.hl));
+    checkHalfCarry(Primitive.upper(hl), 1, true);
+    hl = Primitive.addUpper(hl, Primitive.toByte(-1));
+    setZFlag(!Primitive.upper(hl));
     setNFlag(1);
 
     return 4;
@@ -848,7 +837,7 @@ class CPU {
    * Affected flags:
    */
   private LDHid8i = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, Primitive.toByte(memoryRef.readByte(pc)));
+    hl = Primitive.setUpper(hl, Primitive.toByte(memoryRef.readByte(pc)));
     pc += 1;
 
     return 8;
@@ -864,24 +853,24 @@ class CPU {
     // note: assumes a is a uint8_t and wraps from 0xff to 0
     if (!getNFlag()) {
       // after an addition, adjust if (half-)carry occurred or if result is out of bounds
-      if (getCYFlag() || Primitive.upper(r.af) > 0x99) {
-        r.af = Primitive.addUpper(r.af, 0x60);
+      if (getCYFlag() || Primitive.upper(af) > 0x99) {
+        af = Primitive.addUpper(af, 0x60);
         setCYFlag(1);
       }
-      if (getHFlag() || (Primitive.upper(r.af) & 0x0f) > 0x09) {
-        r.af = Primitive.addUpper(r.af, 0x6);
+      if (getHFlag() || (Primitive.upper(af) & 0x0f) > 0x09) {
+        af = Primitive.addUpper(af, 0x6);
       }
     } else {
       // after a subtraction, only adjust if (half-)carry occurred
       if (getCYFlag()) {
-        r.af = Primitive.addUpper(r.af, -0x60);
+        af = Primitive.addUpper(af, -0x60);
       }
       if (getHFlag()) {
-        r.af = Primitive.addUpper(r.af, -0x6);
+        af = Primitive.addUpper(af, -0x6);
       }
     }
     // these flags are always updated
-    checkZFlag(Primitive.upper(r.af));
+    setZFlag(!Primitive.upper(af));
     setHFlag(0); // h flag is always cleared
 
     return 4;
@@ -894,12 +883,13 @@ class CPU {
    * Affected flags:
    */
   private JRCZr8 = (): byte => {
-    const incr = Primitive.toSigned(memoryRef.readByte(pc));
-    pc += 1;
     if (getZFlag()) {
-      pc = Primitive.addWord(pc, incr);
+      pc += Primitive.toSigned(memoryRef.readByte(pc)) + 1;
+      pc &= 0xffff;
       return 12;
     }
+    pc += 1;
+    pc &= 0xffff;
     return 8;
   };
 
@@ -910,9 +900,9 @@ class CPU {
    * Affected flags: N, H, C
    */
   private ADDHLiHLi = (): byte => {
-    checkFullCarry16(r.hl, r.hl);
-    checkHalfCarry(Primitive.upper(r.hl), Primitive.upper(r.hl));
-    r.hl = Primitive.addWord(r.hl, r.hl);
+    checkFullCarry16(hl, hl);
+    checkHalfCarry(Primitive.upper(hl), Primitive.upper(hl));
+    hl = Primitive.addWord(hl, hl);
     setNFlag(0);
 
     return 8;
@@ -925,8 +915,8 @@ class CPU {
    * Affected flags:
    */
   private LDAiHLIncrm = (): byte => {
-    r.af = Primitive.setUpper(r.af, Primitive.toByte(memoryRef.readByte(r.hl)));
-    r.hl = Primitive.addWord(r.hl, 1);
+    af = Primitive.setUpper(af, Primitive.toByte(memoryRef.readByte(hl)));
+    hl = Primitive.addWord(hl, 1);
 
     return 8;
   };
@@ -938,7 +928,7 @@ class CPU {
    * Affected flags:
    */
   private DECHLi = (): byte => {
-    r.hl = Primitive.addWord(r.hl, -1);
+    hl = Primitive.addWord(hl, -1);
 
     return 8;
   };
@@ -950,9 +940,9 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private INCLi = (): byte => {
-    checkHalfCarry(Primitive.lower(r.hl), 1);
-    r.hl = Primitive.addLower(r.hl, 1);
-    checkZFlag(Primitive.lower(r.hl));
+    checkHalfCarry(Primitive.lower(hl), 1);
+    hl = Primitive.addLower(hl, 1);
+    setZFlag(!Primitive.lower(hl));
     setNFlag(0);
 
     return 4;
@@ -965,9 +955,9 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private DECLi = (): byte => {
-    checkHalfCarry(Primitive.lower(r.hl), 1, true);
-    r.hl = Primitive.addLower(r.hl, Primitive.toByte(-1));
-    checkZFlag(Primitive.lower(r.hl));
+    checkHalfCarry(Primitive.lower(hl), 1, true);
+    hl = Primitive.addLower(hl, Primitive.toByte(-1));
+    setZFlag(!Primitive.lower(hl));
     setNFlag(1);
 
     return 4;
@@ -980,7 +970,7 @@ class CPU {
    * Affected flags:
    */
   private LDLid8i = (): byte => {
-    r.hl = Primitive.setLower(r.hl, Primitive.toByte(memoryRef.readByte(pc)));
+    hl = Primitive.setLower(hl, Primitive.toByte(memoryRef.readByte(pc)));
     pc += 1;
 
     return 8;
@@ -993,7 +983,7 @@ class CPU {
    * Affected flags: N, H
    */
   private CPLA = (): byte => {
-    r.af = Primitive.setUpper(r.af, Primitive.toByte(~Primitive.upper(r.af)));
+    af = Primitive.setUpper(af, Primitive.toByte(~Primitive.upper(af)));
     setNFlag(1);
     setHFlag(1);
 
@@ -1007,12 +997,13 @@ class CPU {
    * Affected flags:
    */
   private JRCNCr8 = (): byte => {
-    const incr = Primitive.toSigned(memoryRef.readByte(pc));
-    pc += 1;
     if (!getCYFlag()) {
-      pc = Primitive.addWord(pc, incr);
+      pc += Primitive.toSigned(memoryRef.readByte(pc)) + 1;
+      pc &= 0xffff;
       return 12;
     }
+    pc += 1;
+    pc &= 0xffff;
     return 8;
   };
 
@@ -1025,6 +1016,7 @@ class CPU {
   private LDSPid16i = (): byte => {
     sp = memoryRef.readWord(pc);
     pc += 2;
+    pc &= 0xffff;
 
     return 12;
   };
@@ -1036,8 +1028,8 @@ class CPU {
    * Affected flags:
    */
   private LDHLDecrmAi = (): byte => {
-    memoryRef.writeByte(r.hl, Primitive.upper(r.af));
-    r.hl = Primitive.addWord(r.hl, -1);
+    memoryRef.writeByte(hl, Primitive.upper(af));
+    hl = Primitive.addWord(hl, -1);
 
     return 8;
   };
@@ -1063,13 +1055,13 @@ class CPU {
   private INCHLm = (): byte => {
     // convert operand to unsigned
     let operand: byte = 1;
-    const newVal: byte = Primitive.toByte(memoryRef.readByte(r.hl));
+    const newVal: byte = Primitive.toByte(memoryRef.readByte(hl));
     // check for half carry on affected byte only
     checkHalfCarry(newVal, operand);
     operand = Primitive.addByte(operand, newVal);
-    memoryRef.writeByte(r.hl, operand);
+    memoryRef.writeByte(hl, operand);
 
-    checkZFlag(operand);
+    setZFlag(!operand);
     setNFlag(0);
 
     return 12;
@@ -1083,12 +1075,12 @@ class CPU {
    */
   private DECHLm = (): byte => {
     // convert operand to unsigned
-    let newVal: byte = Primitive.toByte(memoryRef.readByte(r.hl));
+    let newVal: byte = Primitive.toByte(memoryRef.readByte(hl));
     // check for half carry on affected byte only
     checkHalfCarry(newVal, 1, true);
     newVal = Primitive.addByte(newVal, Primitive.toByte(-1));
-    memoryRef.writeByte(r.hl, newVal);
-    checkZFlag(newVal);
+    memoryRef.writeByte(hl, newVal);
+    setZFlag(!newVal);
     setNFlag(1);
 
     return 12;
@@ -1101,7 +1093,7 @@ class CPU {
    * Affected flags:
    */
   private LDHLmd8i = (): byte => {
-    memoryRef.writeByte(r.hl, Primitive.toByte(memoryRef.readByte(pc)));
+    memoryRef.writeByte(hl, Primitive.toByte(memoryRef.readByte(pc)));
     pc += 1;
 
     return 12;
@@ -1128,12 +1120,13 @@ class CPU {
    * Affected flags:
    */
   private JRCCr8 = (): byte => {
-    const incr = Primitive.toSigned(memoryRef.readByte(pc));
-    pc += 1;
     if (getCYFlag()) {
-      pc = Primitive.addWord(pc, incr);
+      pc += Primitive.toSigned(memoryRef.readByte(pc)) + 1;
+      pc &= 0xffff;
       return 12;
     }
+    pc += 1;
+    pc &= 0xffff;
     return 8;
   };
 
@@ -1144,9 +1137,11 @@ class CPU {
    * Affected flags: N, H, C
    */
   private ADDHLiSPi = (): byte => {
-    checkFullCarry16(r.hl, sp);
-    checkHalfCarry(Primitive.upper(r.hl), Primitive.upper(sp));
-    r.hl = Primitive.addWord(r.hl, sp);
+    checkFullCarry16(hl, sp);
+    // half carry for this is weird, check if carry from bit 11 to 12
+    setHFlag((((hl & 0xfff) + (sp & 0xfff)) & 0x1000) === 0x1000);
+    hl += sp;
+    hl &= 0xffff;
     setNFlag(0);
 
     return 8;
@@ -1159,8 +1154,8 @@ class CPU {
    * Affected flags:
    */
   private LDAiHLDecrm = (): byte => {
-    r.af = Primitive.setUpper(r.af, Primitive.toByte(memoryRef.readByte(r.hl)));
-    r.hl = Primitive.addWord(r.hl, -1);
+    af = Primitive.setUpper(af, Primitive.toByte(memoryRef.readByte(hl)));
+    hl = Primitive.addWord(hl, -1);
 
     return 8;
   };
@@ -1185,10 +1180,10 @@ class CPU {
    */
   private INCAi = (): byte => {
     let operand: byte = 1;
-    checkHalfCarry(Primitive.upper(r.af), operand);
-    operand = Primitive.addByte(operand, Primitive.upper(r.af));
-    r.af = Primitive.setUpper(r.af, operand);
-    checkZFlag(operand);
+    checkHalfCarry(Primitive.upper(af), operand);
+    operand = Primitive.addByte(operand, Primitive.upper(af));
+    af = Primitive.setUpper(af, operand);
+    setZFlag(!operand);
     setNFlag(0);
 
     return 4;
@@ -1201,9 +1196,9 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private DECAi = (): byte => {
-    checkHalfCarry(Primitive.upper(r.af), 1, true);
-    r.af = Primitive.addUpper(r.af, Primitive.toByte(-1));
-    checkZFlag(Primitive.upper(r.af));
+    checkHalfCarry(Primitive.upper(af), 1, true);
+    af = Primitive.addUpper(af, Primitive.toByte(-1));
+    setZFlag(!Primitive.upper(af));
     setNFlag(1);
 
     return 4;
@@ -1216,7 +1211,7 @@ class CPU {
    * Affected flags:
    */
   private LDAid8i = (): byte => {
-    r.af = Primitive.setUpper(r.af, Primitive.toByte(memoryRef.readByte(pc)));
+    af = Primitive.setUpper(af, Primitive.toByte(memoryRef.readByte(pc)));
     pc += 1;
 
     return 8;
@@ -1249,7 +1244,7 @@ class CPU {
    * Affected flags:
    */
   private LDBiBi = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, Primitive.upper(r.bc));
+    bc = Primitive.setUpper(bc, Primitive.upper(bc));
 
     return 4;
   };
@@ -1261,7 +1256,7 @@ class CPU {
    * Affected flags:
    */
   private LDBiCi = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, Primitive.lower(r.bc));
+    bc = Primitive.setUpper(bc, Primitive.lower(bc));
 
     return 4;
   };
@@ -1273,7 +1268,7 @@ class CPU {
    * Affected flags:
    */
   private LDBiDi = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, Primitive.upper(r.de));
+    bc = Primitive.setUpper(bc, Primitive.upper(de));
 
     return 4;
   };
@@ -1285,7 +1280,7 @@ class CPU {
    * Affected flags:
    */
   private LDBiEi = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, Primitive.lower(r.de));
+    bc = Primitive.setUpper(bc, Primitive.lower(de));
 
     return 4;
   };
@@ -1297,7 +1292,7 @@ class CPU {
    * Affected flags:
    */
   private LDBiHi = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, Primitive.upper(r.hl));
+    bc = Primitive.setUpper(bc, Primitive.upper(hl));
 
     return 4;
   };
@@ -1309,7 +1304,7 @@ class CPU {
    * Affected flags:
    */
   private LDBiLi = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, Primitive.lower(r.hl));
+    bc = Primitive.setUpper(bc, Primitive.lower(hl));
 
     return 4;
   };
@@ -1321,7 +1316,7 @@ class CPU {
    * Affected flags:
    */
   private LDBiHLm = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, Primitive.toByte(memoryRef.readByte(r.hl)));
+    bc = Primitive.setUpper(bc, Primitive.toByte(memoryRef.readByte(hl)));
 
     return 8;
   };
@@ -1333,7 +1328,7 @@ class CPU {
    * Affected flags:
    */
   private LDBiAi = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, Primitive.upper(r.af));
+    bc = Primitive.setUpper(bc, Primitive.upper(af));
 
     return 4;
   };
@@ -1345,7 +1340,7 @@ class CPU {
    * Affected flags:
    */
   private LDCiBi = (): byte => {
-    r.bc = Primitive.setLower(r.bc, Primitive.upper(r.bc));
+    bc = Primitive.setLower(bc, Primitive.upper(bc));
 
     return 4;
   };
@@ -1357,7 +1352,7 @@ class CPU {
    * Affected flags:
    */
   private LDCiCi = (): byte => {
-    r.bc = Primitive.setLower(r.bc, Primitive.lower(r.bc));
+    bc = Primitive.setLower(bc, Primitive.lower(bc));
 
     return 4;
   };
@@ -1369,7 +1364,7 @@ class CPU {
    * Affected flags:
    */
   private LDCiDi = (): byte => {
-    r.bc = Primitive.setLower(r.bc, Primitive.upper(r.de));
+    bc = Primitive.setLower(bc, Primitive.upper(de));
 
     return 4;
   };
@@ -1381,7 +1376,7 @@ class CPU {
    * Affected flags:
    */
   private LDCiEi = (): byte => {
-    r.bc = Primitive.setLower(r.bc, Primitive.lower(r.de));
+    bc = Primitive.setLower(bc, Primitive.lower(de));
 
     return 4;
   };
@@ -1393,7 +1388,7 @@ class CPU {
    * Affected flags:
    */
   private LDCiHi = (): byte => {
-    r.bc = Primitive.setLower(r.bc, Primitive.upper(r.hl));
+    bc = Primitive.setLower(bc, Primitive.upper(hl));
 
     return 4;
   };
@@ -1405,7 +1400,7 @@ class CPU {
    * Affected flags:
    */
   private LDCiLi = (): byte => {
-    r.bc = Primitive.setLower(r.bc, Primitive.lower(r.hl));
+    bc = Primitive.setLower(bc, Primitive.lower(hl));
 
     return 4;
   };
@@ -1417,7 +1412,7 @@ class CPU {
    * Affected flags:
    */
   private LDCiHLm = (): byte => {
-    r.bc = Primitive.setLower(r.bc, Primitive.toByte(memoryRef.readByte(r.hl)));
+    bc = Primitive.setLower(bc, Primitive.toByte(memoryRef.readByte(hl)));
 
     return 8;
   };
@@ -1429,7 +1424,7 @@ class CPU {
    * Affected flags:
    */
   private LDCiAi = (): byte => {
-    r.bc = Primitive.setLower(r.bc, Primitive.upper(r.af));
+    bc = Primitive.setLower(bc, Primitive.upper(af));
 
     return 4;
   };
@@ -1441,7 +1436,7 @@ class CPU {
    * Affected flags:
    */
   private LDDiBi = (): byte => {
-    r.de = Primitive.setUpper(r.de, Primitive.upper(r.bc));
+    de = Primitive.setUpper(de, Primitive.upper(bc));
 
     return 4;
   };
@@ -1453,7 +1448,7 @@ class CPU {
    * Affected flags:
    */
   private LDDiCi = (): byte => {
-    r.de = Primitive.setUpper(r.de, Primitive.lower(r.bc));
+    de = Primitive.setUpper(de, Primitive.lower(bc));
 
     return 4;
   };
@@ -1465,7 +1460,7 @@ class CPU {
    * Affected flags:
    */
   private LDDiDi = (): byte => {
-    r.de = Primitive.setUpper(r.de, Primitive.upper(r.de));
+    de = Primitive.setUpper(de, Primitive.upper(de));
 
     return 4;
   };
@@ -1477,7 +1472,7 @@ class CPU {
    * Affected flags:
    */
   private LDDiEi = (): byte => {
-    r.de = Primitive.setUpper(r.de, Primitive.lower(r.de));
+    de = Primitive.setUpper(de, Primitive.lower(de));
 
     return 4;
   };
@@ -1489,7 +1484,7 @@ class CPU {
    * Affected flags:
    */
   private LDDiHi = (): byte => {
-    r.de = Primitive.setUpper(r.de, Primitive.upper(r.hl));
+    de = Primitive.setUpper(de, Primitive.upper(hl));
 
     return 4;
   };
@@ -1501,7 +1496,7 @@ class CPU {
    * Affected flags:
    */
   private LDDiLi = (): byte => {
-    r.de = Primitive.setUpper(r.de, Primitive.lower(r.hl));
+    de = Primitive.setUpper(de, Primitive.lower(hl));
 
     return 4;
   };
@@ -1513,7 +1508,7 @@ class CPU {
    * Affected flags:
    */
   private LDDiHLm = (): byte => {
-    r.de = Primitive.setUpper(r.de, Primitive.toByte(memoryRef.readByte(r.hl)));
+    de = Primitive.setUpper(de, Primitive.toByte(memoryRef.readByte(hl)));
 
     return 8;
   };
@@ -1525,7 +1520,7 @@ class CPU {
    * Affected flags:
    */
   private LDDiAi = (): byte => {
-    r.de = Primitive.setUpper(r.de, Primitive.upper(r.af));
+    de = Primitive.setUpper(de, Primitive.upper(af));
 
     return 4;
   };
@@ -1537,7 +1532,7 @@ class CPU {
    * Affected flags:
    */
   private LDEiBi = (): byte => {
-    r.de = Primitive.setLower(r.de, Primitive.upper(r.bc));
+    de = Primitive.setLower(de, Primitive.upper(bc));
 
     return 4;
   };
@@ -1549,7 +1544,7 @@ class CPU {
    * Affected flags:
    */
   private LDEiCi = (): byte => {
-    r.de = Primitive.setLower(r.de, Primitive.upper(r.bc));
+    de = (bc & 0xff) | (de & 0xff00);
 
     return 4;
   };
@@ -1561,7 +1556,8 @@ class CPU {
    * Affected flags:
    */
   private LDEiDi = (): byte => {
-    r.de = Primitive.setLower(r.de, Primitive.upper(r.de));
+    const d = de & 0xff00;
+    de = (d >> 8) | d;
 
     return 4;
   };
@@ -1573,8 +1569,6 @@ class CPU {
    * Affected flags:
    */
   private LDEiEi = (): byte => {
-    r.de = Primitive.setLower(r.de, Primitive.lower(r.de));
-
     return 4;
   };
 
@@ -1585,7 +1579,7 @@ class CPU {
    * Affected flags:
    */
   private LDEiHi = (): byte => {
-    r.de = Primitive.setLower(r.de, Primitive.upper(r.hl));
+    de = Primitive.setLower(de, Primitive.upper(hl));
 
     return 4;
   };
@@ -1597,7 +1591,7 @@ class CPU {
    * Affected flags:
    */
   private LDEiLi = (): byte => {
-    r.de = Primitive.setLower(r.de, Primitive.lower(r.hl));
+    de = Primitive.setLower(de, Primitive.lower(hl));
 
     return 4;
   };
@@ -1609,7 +1603,7 @@ class CPU {
    * Affected flags:
    */
   private LDEiHLm = (): byte => {
-    r.de = Primitive.setLower(r.de, Primitive.toByte(memoryRef.readByte(r.hl)));
+    de = Primitive.setLower(de, Primitive.toByte(memoryRef.readByte(hl)));
 
     return 8;
   };
@@ -1621,7 +1615,7 @@ class CPU {
    * Affected flags:
    */
   private LDEiAi = (): byte => {
-    r.de = Primitive.setLower(r.de, Primitive.upper(r.af));
+    de = Primitive.setLower(de, Primitive.upper(af));
 
     return 4;
   };
@@ -1633,7 +1627,7 @@ class CPU {
    * Affected flags:
    */
   private LDHiBi = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, Primitive.upper(r.bc));
+    hl = Primitive.setUpper(hl, Primitive.upper(bc));
 
     return 4;
   };
@@ -1645,7 +1639,7 @@ class CPU {
    * Affected flags:
    */
   private LDHiCi = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, Primitive.lower(r.bc));
+    hl = Primitive.setUpper(hl, Primitive.lower(bc));
 
     return 4;
   };
@@ -1657,7 +1651,7 @@ class CPU {
    * Affected flags:
    */
   private LDHiDi = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, Primitive.upper(r.de));
+    hl = Primitive.setUpper(hl, Primitive.upper(de));
 
     return 4;
   };
@@ -1669,7 +1663,7 @@ class CPU {
    * Affected flags:
    */
   private LDHiEi = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, Primitive.lower(r.de));
+    hl = Primitive.setUpper(hl, Primitive.lower(de));
 
     return 4;
   };
@@ -1681,7 +1675,7 @@ class CPU {
    * Affected flags:
    */
   private LDHiHi = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, Primitive.upper(r.hl));
+    hl = Primitive.setUpper(hl, Primitive.upper(hl));
 
     return 4;
   };
@@ -1693,7 +1687,7 @@ class CPU {
    * Affected flags:
    */
   private LDHiLi = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, Primitive.lower(r.hl));
+    hl = Primitive.setUpper(hl, Primitive.lower(hl));
 
     return 4;
   };
@@ -1705,7 +1699,7 @@ class CPU {
    * Affected flags:
    */
   private LDHiHLm = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, Primitive.toByte(memoryRef.readByte(r.hl)));
+    hl = Primitive.setUpper(hl, Primitive.toByte(memoryRef.readByte(hl)));
 
     return 8;
   };
@@ -1717,7 +1711,7 @@ class CPU {
    * Affected flags:
    */
   private LDHiAi = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, Primitive.upper(r.af));
+    hl = Primitive.setUpper(hl, Primitive.upper(af));
 
     return 4;
   };
@@ -1729,7 +1723,7 @@ class CPU {
    * Affected flags:
    */
   private LDLiBi = (): byte => {
-    r.hl = Primitive.setLower(r.hl, Primitive.upper(r.bc));
+    hl = Primitive.setLower(hl, Primitive.upper(bc));
 
     return 4;
   };
@@ -1741,7 +1735,7 @@ class CPU {
    * Affected flags:
    */
   private LDLiCi = (): byte => {
-    r.hl = Primitive.setLower(r.hl, Primitive.lower(r.bc));
+    hl = Primitive.setLower(hl, Primitive.lower(bc));
 
     return 4;
   };
@@ -1753,7 +1747,7 @@ class CPU {
    * Affected flags:
    */
   private LDLiDi = (): byte => {
-    r.hl = Primitive.setLower(r.hl, Primitive.upper(r.de));
+    hl = Primitive.setLower(hl, Primitive.upper(de));
 
     return 4;
   };
@@ -1765,7 +1759,7 @@ class CPU {
    * Affected flags:
    */
   private LDLiEi = (): byte => {
-    r.hl = Primitive.setLower(r.hl, Primitive.lower(r.de));
+    hl = Primitive.setLower(hl, Primitive.lower(de));
 
     return 4;
   };
@@ -1777,7 +1771,7 @@ class CPU {
    * Affected flags:
    */
   private LDLiHi = (): byte => {
-    r.hl = Primitive.setLower(r.hl, Primitive.upper(r.hl));
+    hl = Primitive.setLower(hl, Primitive.upper(hl));
 
     return 4;
   };
@@ -1789,7 +1783,7 @@ class CPU {
    * Affected flags:
    */
   private LDLiLi = (): byte => {
-    r.hl = Primitive.setLower(r.hl, Primitive.lower(r.hl));
+    hl = Primitive.setLower(hl, Primitive.lower(hl));
 
     return 4;
   };
@@ -1801,7 +1795,7 @@ class CPU {
    * Affected flags:
    */
   private LDLiHLm = (): byte => {
-    r.hl = Primitive.setLower(r.hl, Primitive.toByte(memoryRef.readByte(r.hl)));
+    hl = Primitive.setLower(hl, Primitive.toByte(memoryRef.readByte(hl)));
 
     return 8;
   };
@@ -1813,7 +1807,7 @@ class CPU {
    * Affected flags:
    */
   private LDLiAi = (): byte => {
-    r.hl = Primitive.setLower(r.hl, Primitive.upper(r.af));
+    hl = Primitive.setLower(hl, Primitive.upper(af));
 
     return 4;
   };
@@ -1825,7 +1819,7 @@ class CPU {
    * Affected flags:
    */
   private LDHLmBi = (): byte => {
-    memoryRef.writeByte(r.hl, Primitive.upper(r.bc));
+    memoryRef.writeByte(hl, Primitive.upper(bc));
 
     return 8;
   };
@@ -1837,7 +1831,7 @@ class CPU {
    * Affected flags:
    */
   private LDHLmCi = (): byte => {
-    memoryRef.writeByte(r.hl, Primitive.lower(r.bc));
+    memoryRef.writeByte(hl, Primitive.lower(bc));
 
     return 8;
   };
@@ -1849,7 +1843,7 @@ class CPU {
    * Affected flags:
    */
   private LDHLmDi = (): byte => {
-    memoryRef.writeByte(r.hl, Primitive.upper(r.de));
+    memoryRef.writeByte(hl, Primitive.upper(de));
 
     return 8;
   };
@@ -1861,7 +1855,7 @@ class CPU {
    * Affected flags:
    */
   private LDHLmEi = (): byte => {
-    memoryRef.writeByte(r.hl, Primitive.lower(r.de));
+    memoryRef.writeByte(hl, Primitive.lower(de));
 
     return 8;
   };
@@ -1873,7 +1867,7 @@ class CPU {
    * Affected flags:
    */
   private LDHLmHi = (): byte => {
-    memoryRef.writeByte(r.hl, Primitive.upper(r.hl));
+    memoryRef.writeByte(hl, Primitive.upper(hl));
 
     return 8;
   };
@@ -1885,7 +1879,7 @@ class CPU {
    * Affected flags:
    */
   private LDHLmLi = (): byte => {
-    memoryRef.writeByte(r.hl, Primitive.lower(r.hl));
+    memoryRef.writeByte(hl, Primitive.lower(hl));
 
     return 8;
   };
@@ -1909,7 +1903,7 @@ class CPU {
    * Affected flags:
    */
   private LDHLmAi = (): byte => {
-    memoryRef.writeByte(r.hl, Primitive.upper(r.af));
+    memoryRef.writeByte(hl, Primitive.upper(af));
 
     return 8;
   };
@@ -1921,7 +1915,7 @@ class CPU {
    * Affected flags:
    */
   private LDAiBi = (): byte => {
-    r.af = Primitive.setUpper(r.af, Primitive.upper(r.bc));
+    af = Primitive.setUpper(af, Primitive.upper(bc));
 
     return 4;
   };
@@ -1933,7 +1927,7 @@ class CPU {
    * Affected flags:
    */
   private LDAiCi = (): byte => {
-    r.af = Primitive.setUpper(r.af, Primitive.lower(r.bc));
+    af = Primitive.setUpper(af, Primitive.lower(bc));
 
     return 4;
   };
@@ -1945,7 +1939,7 @@ class CPU {
    * Affected flags:
    */
   private LDAiDi = (): byte => {
-    r.af = Primitive.setUpper(r.af, Primitive.upper(r.de));
+    af = Primitive.setUpper(af, Primitive.upper(de));
 
     return 4;
   };
@@ -1957,7 +1951,7 @@ class CPU {
    * Affected flags:
    */
   private LDAiEi = (): byte => {
-    r.af = Primitive.setUpper(r.af, Primitive.lower(r.de));
+    af = Primitive.setUpper(af, Primitive.lower(de));
 
     return 4;
   };
@@ -1969,7 +1963,7 @@ class CPU {
    * Affected flags:
    */
   private LDAiHi = (): byte => {
-    r.af = Primitive.setUpper(r.af, Primitive.upper(r.hl));
+    af = Primitive.setUpper(af, Primitive.upper(hl));
 
     return 4;
   };
@@ -1981,7 +1975,7 @@ class CPU {
    * Affected flags:
    */
   private LDAiLi = (): byte => {
-    r.af = Primitive.setUpper(r.af, Primitive.lower(r.hl));
+    af = Primitive.setUpper(af, Primitive.lower(hl));
 
     return 4;
   };
@@ -1993,7 +1987,7 @@ class CPU {
    * Affected flags:
    */
   private LDAiHLm = (): byte => {
-    r.af = Primitive.setUpper(r.af, Primitive.toByte(memoryRef.readByte(r.hl)));
+    af = Primitive.setUpper(af, Primitive.toByte(memoryRef.readByte(hl)));
 
     return 8;
   };
@@ -2005,7 +1999,7 @@ class CPU {
    * Affected flags:
    */
   private LDAiAi = (): byte => {
-    r.af = Primitive.setUpper(r.af, Primitive.upper(r.af));
+    af = Primitive.setUpper(af, Primitive.upper(af));
 
     return 4;
   };
@@ -2017,7 +2011,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ADDAiBi = (): byte => {
-    ADD(Primitive.upper(r.bc));
+    ADD(Primitive.upper(bc));
 
     return 4;
   };
@@ -2029,7 +2023,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ADDAiCi = (): byte => {
-    ADD(Primitive.lower(r.bc));
+    ADD(Primitive.lower(bc));
 
     return 4;
   };
@@ -2041,7 +2035,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ADDAiDi = (): byte => {
-    ADD(Primitive.upper(r.de));
+    ADD(Primitive.upper(de));
 
     return 4;
   };
@@ -2053,7 +2047,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ADDAiEi = (): byte => {
-    ADD(Primitive.lower(r.de));
+    ADD(Primitive.lower(de));
 
     return 4;
   };
@@ -2065,7 +2059,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ADDAiHi = (): byte => {
-    ADD(Primitive.upper(r.hl));
+    ADD(Primitive.upper(hl));
 
     return 4;
   };
@@ -2077,7 +2071,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ADDAiLi = (): byte => {
-    ADD(Primitive.lower(r.hl));
+    ADD(Primitive.lower(hl));
 
     return 4;
   };
@@ -2089,7 +2083,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ADDAiHLm = (): byte => {
-    ADD(Primitive.toByte(memoryRef.readByte(r.hl)));
+    ADD(Primitive.toByte(memoryRef.readByte(hl)));
 
     return 8;
   };
@@ -2101,7 +2095,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ADDAiAi = (): byte => {
-    ADD(Primitive.upper(r.af));
+    ADD(Primitive.upper(af));
 
     return 4;
   };
@@ -2113,7 +2107,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ADCAiBi = (): byte => {
-    ADC(r.bc >> 8);
+    ADC(bc >> 8);
 
     return 4;
   };
@@ -2125,7 +2119,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ADCAiCi = (): byte => {
-    ADC(Primitive.lower(r.bc));
+    ADC(Primitive.lower(bc));
 
     return 4;
   };
@@ -2137,7 +2131,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ADCAiDi = (): byte => {
-    ADC(Primitive.upper(r.de));
+    ADC(Primitive.upper(de));
 
     return 4;
   };
@@ -2149,7 +2143,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ADCAiEi = (): byte => {
-    ADC(Primitive.lower(r.de));
+    ADC(Primitive.lower(de));
 
     return 4;
   };
@@ -2161,7 +2155,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ADCAiHi = (): byte => {
-    ADC(Primitive.upper(r.hl));
+    ADC(Primitive.upper(hl));
 
     return 4;
   };
@@ -2173,7 +2167,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ADCAiLi = (): byte => {
-    ADC(Primitive.lower(r.hl));
+    ADC(Primitive.lower(hl));
 
     return 4;
   };
@@ -2185,7 +2179,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ADCAiHLm = (): byte => {
-    ADC(Primitive.toByte(memoryRef.readByte(r.hl)));
+    ADC(Primitive.toByte(memoryRef.readByte(hl)));
 
     return 8;
   };
@@ -2197,7 +2191,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ADCAiAi = (): byte => {
-    ADC(Primitive.upper(r.af));
+    ADC(Primitive.upper(af));
 
     return 4;
   };
@@ -2209,7 +2203,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SUBAiBi = (): byte => {
-    SUB(Primitive.upper(r.bc));
+    SUB(Primitive.upper(bc));
 
     return 4;
   };
@@ -2221,7 +2215,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SUBAiCi = (): byte => {
-    SUB(Primitive.lower(r.bc));
+    SUB(Primitive.lower(bc));
 
     return 4;
   };
@@ -2233,7 +2227,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SUBAiDi = (): byte => {
-    SUB(Primitive.upper(r.de));
+    SUB(Primitive.upper(de));
 
     return 4;
   };
@@ -2245,7 +2239,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SUBAiEi = (): byte => {
-    SUB(Primitive.lower(r.de));
+    SUB(Primitive.lower(de));
 
     return 4;
   };
@@ -2257,7 +2251,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SUBAiHi = (): byte => {
-    SUB(Primitive.upper(r.hl));
+    SUB(Primitive.upper(hl));
 
     return 4;
   };
@@ -2269,7 +2263,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SUBAiLi = (): byte => {
-    SUB(Primitive.lower(r.hl));
+    SUB(Primitive.lower(hl));
 
     return 4;
   };
@@ -2281,7 +2275,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SUBAiHLm = (): byte => {
-    SUB(Primitive.toByte(memoryRef.readByte(r.hl)));
+    SUB(Primitive.toByte(memoryRef.readByte(hl)));
 
     return 8;
   };
@@ -2293,7 +2287,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SUBAiAi = (): byte => {
-    SUB(Primitive.upper(r.af));
+    SUB(Primitive.upper(af));
 
     return 4;
   };
@@ -2305,7 +2299,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SBCAiBi = (): byte => {
-    SBC(Primitive.upper(r.bc));
+    SBC(Primitive.upper(bc));
 
     return 4;
   };
@@ -2317,7 +2311,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SBCAiCi = (): byte => {
-    SBC(Primitive.lower(r.bc));
+    SBC(Primitive.lower(bc));
 
     return 4;
   };
@@ -2329,7 +2323,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SBCAiDi = (): byte => {
-    SBC(Primitive.upper(r.de));
+    SBC(Primitive.upper(de));
 
     return 4;
   };
@@ -2341,7 +2335,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SBCAiEi = (): byte => {
-    SBC(Primitive.lower(r.de));
+    SBC(Primitive.lower(de));
 
     return 4;
   };
@@ -2353,7 +2347,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SBCAiHi = (): byte => {
-    SBC(Primitive.upper(r.hl));
+    SBC(Primitive.upper(hl));
 
     return 4;
   };
@@ -2365,7 +2359,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SBCAiLi = (): byte => {
-    SBC(Primitive.lower(r.hl));
+    SBC(Primitive.lower(hl));
 
     return 4;
   };
@@ -2377,7 +2371,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SBCAiHLm = (): byte => {
-    SBC(Primitive.toByte(memoryRef.readByte(r.hl)));
+    SBC(Primitive.toByte(memoryRef.readByte(hl)));
 
     return 8;
   };
@@ -2389,7 +2383,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SBCAiAi = (): byte => {
-    SBC(Primitive.upper(r.af));
+    SBC(Primitive.upper(af));
 
     return 4;
   };
@@ -2401,7 +2395,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ANDBi = (): byte => {
-    AND(Primitive.upper(r.bc));
+    AND(Primitive.upper(bc));
 
     return 4;
   };
@@ -2413,7 +2407,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ANDCi = (): byte => {
-    AND(Primitive.lower(r.bc));
+    AND(Primitive.lower(bc));
 
     return 4;
   };
@@ -2425,7 +2419,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ANDDi = (): byte => {
-    AND(Primitive.upper(r.de));
+    AND(Primitive.upper(de));
 
     return 4;
   };
@@ -2437,7 +2431,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ANDEi = (): byte => {
-    AND(Primitive.lower(r.de));
+    AND(Primitive.lower(de));
 
     return 4;
   };
@@ -2449,7 +2443,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ANDHi = (): byte => {
-    AND(Primitive.upper(r.hl));
+    AND(Primitive.upper(hl));
 
     return 4;
   };
@@ -2461,7 +2455,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ANDLi = (): byte => {
-    AND(Primitive.lower(r.hl));
+    AND(Primitive.lower(hl));
 
     return 4;
   };
@@ -2473,7 +2467,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ANDHLm = (): byte => {
-    AND(memoryRef.readByte(r.hl));
+    AND(memoryRef.readByte(hl));
 
     return 8;
   };
@@ -2485,7 +2479,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ANDAi = (): byte => {
-    AND(Primitive.upper(r.af));
+    AND(Primitive.upper(af));
 
     return 4;
   };
@@ -2497,7 +2491,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private XORBi = (): byte => {
-    XOR(Primitive.upper(r.bc));
+    XOR(Primitive.upper(bc));
 
     return 4;
   };
@@ -2509,7 +2503,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private XORCi = (): byte => {
-    XOR(Primitive.lower(r.bc));
+    XOR(Primitive.lower(bc));
 
     return 4;
   };
@@ -2521,7 +2515,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private XORDi = (): byte => {
-    XOR(Primitive.upper(r.de));
+    XOR(Primitive.upper(de));
 
     return 4;
   };
@@ -2533,7 +2527,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private XOREi = (): byte => {
-    XOR(Primitive.lower(r.de));
+    XOR(Primitive.lower(de));
 
     return 4;
   };
@@ -2545,7 +2539,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private XORHi = (): byte => {
-    XOR(Primitive.upper(r.hl));
+    XOR(Primitive.upper(hl));
 
     return 4;
   };
@@ -2557,7 +2551,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private XORLi = (): byte => {
-    XOR(Primitive.lower(r.hl));
+    XOR(Primitive.lower(hl));
 
     return 4;
   };
@@ -2569,7 +2563,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private XORHLm = (): byte => {
-    XOR(memoryRef.readByte(r.hl));
+    XOR(memoryRef.readByte(hl));
 
     return 8;
   };
@@ -2581,7 +2575,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private XORAi = (): byte => {
-    XOR(Primitive.upper(r.af));
+    XOR(af >> 8);
 
     return 4;
   };
@@ -2593,7 +2587,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ORBi = (): byte => {
-    OR(Primitive.upper(r.bc));
+    OR(Primitive.upper(bc));
 
     return 4;
   };
@@ -2605,7 +2599,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ORCi = (): byte => {
-    OR(Primitive.lower(r.bc));
+    OR(Primitive.lower(bc));
 
     return 4;
   };
@@ -2617,7 +2611,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ORDi = (): byte => {
-    OR(Primitive.upper(r.de));
+    OR(Primitive.upper(de));
 
     return 4;
   };
@@ -2629,7 +2623,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private OREi = (): byte => {
-    OR(Primitive.lower(r.de));
+    OR(Primitive.lower(de));
 
     return 4;
   };
@@ -2641,7 +2635,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ORHi = (): byte => {
-    OR(Primitive.upper(r.hl));
+    OR(Primitive.upper(hl));
 
     return 4;
   };
@@ -2653,7 +2647,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ORLi = (): byte => {
-    OR(Primitive.lower(r.hl));
+    OR(Primitive.lower(hl));
 
     return 4;
   };
@@ -2665,7 +2659,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ORHLm = (): byte => {
-    OR(memoryRef.readByte(r.hl));
+    OR(memoryRef.readByte(hl));
 
     return 8;
   };
@@ -2677,7 +2671,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ORAi = (): byte => {
-    OR(Primitive.upper(r.af));
+    OR(Primitive.upper(af));
 
     return 4;
   };
@@ -2689,7 +2683,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private CPBi = (): byte => {
-    CP(Primitive.upper(r.bc));
+    CP(Primitive.upper(bc));
 
     return 4;
   };
@@ -2701,7 +2695,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private CPCi = (): byte => {
-    CP(Primitive.lower(r.bc));
+    CP(Primitive.lower(bc));
 
     return 4;
   };
@@ -2713,7 +2707,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private CPDi = (): byte => {
-    CP(Primitive.upper(r.de));
+    CP(Primitive.upper(de));
 
     return 4;
   };
@@ -2725,7 +2719,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private CPEi = (): byte => {
-    CP(Primitive.lower(r.de));
+    CP(Primitive.lower(de));
 
     return 4;
   };
@@ -2737,7 +2731,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private CPHi = (): byte => {
-    CP(Primitive.upper(r.hl));
+    CP(Primitive.upper(hl));
 
     return 4;
   };
@@ -2749,7 +2743,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private CPLi = (): byte => {
-    CP(Primitive.lower(r.hl));
+    CP(Primitive.lower(hl));
 
     return 4;
   };
@@ -2761,7 +2755,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private CPHLm = (): byte => {
-    CP(Primitive.toByte(memoryRef.readByte(r.hl)));
+    CP(Primitive.toByte(memoryRef.readByte(hl)));
 
     return 8;
   };
@@ -2773,7 +2767,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private CPAi = (): byte => {
-    CP(Primitive.upper(r.af));
+    CP(Primitive.upper(af));
 
     return 4;
   };
@@ -2799,7 +2793,7 @@ class CPU {
    * Affected flags:
    */
   private POPIntoBCi = (): byte => {
-    r.bc = POP();
+    bc = POP();
 
     return 12;
   };
@@ -2815,6 +2809,7 @@ class CPU {
       return 16;
     }
     pc += 2;
+    pc &= 0xffff;
     return 12;
   };
 
@@ -2841,6 +2836,7 @@ class CPU {
       return 24;
     }
     pc += 2;
+    pc &= 0xffff;
     return 12;
   };
 
@@ -2851,7 +2847,7 @@ class CPU {
    * Affected flags:
    */
   private PUSHRegisterBCi = (): byte => {
-    PUSH(r.bc);
+    PUSH(bc);
 
     return 16;
   };
@@ -2864,10 +2860,10 @@ class CPU {
    */
   private ADDAid8i = (): byte => {
     const value = Primitive.toByte(memoryRef.readByte(pc));
-    checkFullCarry8(Primitive.upper(r.af), value);
-    checkHalfCarry(Primitive.upper(r.af), value);
-    r.af = Primitive.addUpper(r.af, value);
-    checkZFlag(Primitive.upper(r.af));
+    checkFullCarry8(Primitive.upper(af), value);
+    checkHalfCarry(Primitive.upper(af), value);
+    af = Primitive.addUpper(af, value);
+    setZFlag(!Primitive.upper(af));
     pc += 1;
     setNFlag(0);
 
@@ -2921,10 +2917,11 @@ class CPU {
    * Affected flags:
    */
   private JPCZa16 = (): byte => {
-    if (Jpcc(getZFlag() === 0)) {
+    if (Jpcc(getZFlag())) {
       return 16;
     }
     pc += 2;
+    pc &= 0xffff;
     return 12;
   };
 
@@ -2949,10 +2946,11 @@ class CPU {
    * Affected flags:
    */
   private CALLCZa16 = (): byte => {
-    if (CALLH(getZFlag() === 1)) {
+    if (CALLH(getZFlag())) {
       return 24;
     }
     pc += 2;
+    pc &= 0xffff;
     return 12;
   };
 
@@ -3013,7 +3011,7 @@ class CPU {
    * Affected flags:
    */
   private POPIntoDEi = (): byte => {
-    r.de = POP();
+    de = POP();
 
     return 12;
   };
@@ -3025,10 +3023,11 @@ class CPU {
    * Affected flags:
    */
   private JPCNCa16 = (): byte => {
-    if (Jpcc(getZFlag() === 0)) {
+    if (Jpcc(!getCYFlag())) {
       return 16;
     }
     pc += 2;
+    pc &= 0xffff;
     return 12;
   };
 
@@ -3053,6 +3052,7 @@ class CPU {
       return 24;
     }
     pc += 2;
+    pc &= 0xffff;
     return 12;
   };
 
@@ -3063,7 +3063,7 @@ class CPU {
    * Affected flags:
    */
   private PUSHRegisterDEi = (): byte => {
-    PUSH(r.de);
+    PUSH(de);
 
     return 16;
   };
@@ -3100,7 +3100,7 @@ class CPU {
    * Affected flags:
    */
   private RETCC = (): byte => {
-    if (RETH(getCYFlag() === 1)) {
+    if (RETH(getCYFlag())) {
       return 20;
     }
     return 8;
@@ -3114,7 +3114,7 @@ class CPU {
    */
   private RETI = (): byte => {
     RETH(true);
-    this.setInterruptsGlobal(true);
+    allInterruptsEnabled = true;
 
     return 16;
   };
@@ -3126,10 +3126,11 @@ class CPU {
    * Affected flags:
    */
   private JPCCa16 = (): byte => {
-    if (Jpcc(getCYFlag() === 0)) {
+    if (Jpcc(getCYFlag())) {
       return 16;
     }
     pc += 2;
+    pc &= 0xffff;
     return 12;
   };
 
@@ -3150,10 +3151,11 @@ class CPU {
    * Affected flags:
    */
   private CALLCCa16 = (): byte => {
-    if (CALLH(getCYFlag() === 1)) {
+    if (CALLH(getCYFlag())) {
       return 24;
     }
     pc += 2;
+    pc &= 0xffff;
     return 12;
   };
 
@@ -3199,7 +3201,7 @@ class CPU {
    * Affected flags:
    */
   private LDHa8mAi = (): byte => {
-    memoryRef.writeByte(0xff00 + memoryRef.readByte(pc), Primitive.upper(r.af));
+    memoryRef.writeByte(0xff00 + memoryRef.readByte(pc), Primitive.upper(af));
     pc += 1;
 
     return 12;
@@ -3212,7 +3214,7 @@ class CPU {
    * Affected flags:
    */
   private POPIntoHLi = (): byte => {
-    r.hl = POP();
+    hl = POP();
 
     return 12;
   };
@@ -3224,7 +3226,7 @@ class CPU {
    * Affected flags:
    */
   private LDCmAi = (): byte => {
-    memoryRef.writeByte(0xff00 + Primitive.lower(r.bc), Primitive.upper(r.af));
+    memoryRef.writeByte(0xff00 + Primitive.lower(bc), Primitive.upper(af));
 
     return 8;
   };
@@ -3256,7 +3258,7 @@ class CPU {
    * Affected flags:
    */
   private PUSHRegisterHLi = (): byte => {
-    PUSH(r.hl);
+    PUSH(hl);
 
     return 16;
   };
@@ -3293,13 +3295,16 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private ADDSPir8i = (): byte => {
-    const operand = Primitive.toWord(
-      Primitive.toSigned(memoryRef.readByte(pc))
-    );
-    checkFullCarry16(sp, operand);
-    checkHalfCarry(Primitive.upper(sp), Primitive.upper(operand));
-    sp = Primitive.addWord(sp, operand);
+    const operand = Primitive.toSigned(memoryRef.readByte(pc));
+    const sum = (sp + operand) & 0xffff;
+    // don't ask me to explain why half-carry needs to be checked like this 😳
+    // taken from https://github.com/taisel/GameBoy-Online
+    const flag = sp ^ operand ^ sum;
+    setCYFlag(flag & 0x100);
+    setHFlag((flag & 0x10) === 0x10);
+    sp = sum;
     pc += 1;
+    pc &= 0xffff;
     setZFlag(0);
     setNFlag(0);
 
@@ -3313,7 +3318,7 @@ class CPU {
    * Affected flags:
    */
   private JPHL = (): byte => {
-    pc = r.hl;
+    pc = hl;
 
     return 4;
   };
@@ -3325,7 +3330,7 @@ class CPU {
    * Affected flags:
    */
   private LDa16mAi = (): byte => {
-    memoryRef.writeByte(memoryRef.readWord(pc), Primitive.upper(r.af));
+    memoryRef.writeByte(memoryRef.readWord(pc), Primitive.upper(af));
     pc += 2;
 
     return 16;
@@ -3399,7 +3404,7 @@ class CPU {
     //     0xff00 + memoryRef.readByte(pc)
     //   ).toString(16)}`
     // );
-    r.af = Primitive.setUpper(r.af, data);
+    af = Primitive.setUpper(af, data);
     pc += 1;
     // if (pc === 565) debugger;
 
@@ -3413,7 +3418,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private POPIntoAFi = (): byte => {
-    r.af = POP();
+    af = POP();
 
     return 12;
   };
@@ -3425,8 +3430,8 @@ class CPU {
    * Affected flags:
    */
   private LDAiCm = (): byte => {
-    const data = memoryRef.readByte(0xff00 + Primitive.lower(r.bc));
-    r.af = Primitive.setUpper(r.af, data);
+    const data = memoryRef.readByte(0xff00 + Primitive.lower(bc));
+    af = Primitive.setUpper(af, data);
 
     return 8;
   };
@@ -3460,7 +3465,7 @@ class CPU {
    * Affected flags:
    */
   private PUSHRegisterAFi = (): byte => {
-    PUSH(r.af);
+    PUSH(af);
 
     return 16;
   };
@@ -3497,12 +3502,13 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private LDHLiSPIncri = (): byte => {
-    let incr = Primitive.toWord(Primitive.toSigned(memoryRef.readByte(pc)));
-    checkHalfCarry(Primitive.upper(incr), Primitive.upper(sp));
-    checkFullCarry16(incr, sp);
+    const operand = Primitive.toSigned(memoryRef.readByte(pc)) & 0xffff;
+    hl = (sp + operand) & 0xffff;
+    const flag = operand ^ sp ^ hl;
+    setHFlag(flag & 0x10);
+    setCYFlag(flag & 0x100);
     pc += 1;
-    incr = Primitive.addWord(incr, sp);
-    r.hl = incr;
+    pc &= 0xffff;
     setZFlag(0);
     setNFlag(0);
 
@@ -3516,7 +3522,7 @@ class CPU {
    * Affected flags:
    */
   private LDSPiHLi = (): byte => {
-    sp = r.hl;
+    sp = hl;
 
     return 8;
   };
@@ -3528,8 +3534,8 @@ class CPU {
    * Affected flags:
    */
   private LDAia16m = (): byte => {
-    r.af = Primitive.setUpper(
-      r.af,
+    af = Primitive.setUpper(
+      af,
       Primitive.toByte(memoryRef.readByte(memoryRef.readWord(pc)))
     );
     pc += 2;
@@ -3601,7 +3607,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RLCBi = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, RLCn(Primitive.upper(r.bc)));
+    bc = (bc & 0xff) | (RLCn(bc >> 8) << 8);
 
     return 8;
   };
@@ -3613,7 +3619,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RLCCi = (): byte => {
-    r.bc = Primitive.setLower(r.bc, RLCn(Primitive.lower(r.bc)));
+    bc = (bc & 0xff00) | RLCn(bc & 0xff);
 
     return 8;
   };
@@ -3625,7 +3631,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RLCDi = (): byte => {
-    r.de = Primitive.setUpper(r.de, RLCn(Primitive.upper(r.de)));
+    de = (de & 0xff) | (RLCn(de >> 8) << 8);
 
     return 8;
   };
@@ -3637,7 +3643,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RLCEi = (): byte => {
-    r.de = Primitive.setLower(r.de, RLCn(Primitive.lower(r.de)));
+    de = (de & 0xff00) | RLCn(de & 0xff);
 
     return 8;
   };
@@ -3649,7 +3655,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RLCHi = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, RLCn(Primitive.upper(r.hl)));
+    hl = (hl & 0xff) | (RLCn(hl >> 8) << 8);
 
     return 8;
   };
@@ -3661,7 +3667,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RLCLi = (): byte => {
-    r.hl = Primitive.setLower(r.hl, RLCn(Primitive.lower(r.hl)));
+    hl = (hl & 0xff00) | RLCn(hl & 0xff);
 
     return 8;
   };
@@ -3673,7 +3679,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RLCHLm = (): byte => {
-    memoryRef.writeByte(r.hl, RLCn(memoryRef.readByte(r.hl)));
+    memoryRef.writeByte(hl, RLCn(memoryRef.readByte(hl)));
 
     return 16;
   };
@@ -3685,7 +3691,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RLCAi = (): byte => {
-    r.af = Primitive.setUpper(r.af, RLCn(Primitive.upper(r.af)));
+    af = (af & 0xff) | (RLCn(af >> 8) << 8);
 
     return 8;
   };
@@ -3697,8 +3703,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RRCBi = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, RRCn(Primitive.upper(r.bc)));
-
+    bc = (bc & 0xff) | (RRCn(bc >> 8) << 8);
     return 8;
   };
 
@@ -3709,7 +3714,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RRCCi = (): byte => {
-    r.bc = Primitive.setLower(r.bc, RRCn(Primitive.lower(r.bc)));
+    bc = (bc & 0xff00) | RRCn(bc & 0xff);
 
     return 8;
   };
@@ -3721,7 +3726,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RRCDi = (): byte => {
-    r.de = Primitive.setUpper(r.de, RRCn(Primitive.upper(r.de)));
+    de = (de & 0xff) | (RRCn(de >> 8) << 8);
 
     return 8;
   };
@@ -3733,7 +3738,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RRCEi = (): byte => {
-    r.de = Primitive.setLower(r.de, RRCn(Primitive.lower(r.de)));
+    de = (de & 0xff00) | RRCn(de & 0xff);
 
     return 8;
   };
@@ -3745,7 +3750,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RRCHi = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, RRCn(Primitive.upper(r.hl)));
+    hl = Primitive.setUpper(hl, RRCn(Primitive.upper(hl)));
 
     return 8;
   };
@@ -3757,7 +3762,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RRCLi = (): byte => {
-    r.hl = Primitive.setLower(r.hl, RRCn(Primitive.lower(r.hl)));
+    hl = (hl & 0xff00) | RRCn(hl & 0xff);
 
     return 8;
   };
@@ -3769,7 +3774,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RRCHLm = (): byte => {
-    memoryRef.writeByte(r.hl, RRCn(memoryRef.readByte(r.hl)));
+    memoryRef.writeByte(hl, RRCn(memoryRef.readByte(hl)));
 
     return 16;
   };
@@ -3781,7 +3786,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RRCAi = (): byte => {
-    r.af = Primitive.setUpper(r.af, RRCn(Primitive.upper(r.af)));
+    af = (af & 0xff) | (RRCn(af >> 8) << 8);
 
     return 8;
   };
@@ -3793,7 +3798,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RLBi = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, RLn(Primitive.upper(r.bc)));
+    bc = (bc & 0xff) | (RLn(bc >> 8) << 8);
 
     return 8;
   };
@@ -3805,7 +3810,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RLCi = (): byte => {
-    r.bc = Primitive.setLower(r.bc, RLn(Primitive.lower(r.bc)));
+    bc = (bc & 0xff00) | RLn(bc & 0xff);
 
     return 8;
   };
@@ -3817,7 +3822,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RLDi = (): byte => {
-    r.de = Primitive.setUpper(r.de, RLn(Primitive.upper(r.de)));
+    de = (de & 0xff) | (RLn(de >> 8) << 8);
 
     return 8;
   };
@@ -3829,7 +3834,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RLEi = (): byte => {
-    r.de = Primitive.setLower(r.de, RLn(Primitive.lower(r.de)));
+    de = (de & 0xff00) | RLn(de & 0xff);
 
     return 8;
   };
@@ -3841,7 +3846,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RLHi = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, RLn(Primitive.upper(r.hl)));
+    hl = (hl & 0xff) | (RLn(hl >> 8) << 8);
 
     return 8;
   };
@@ -3853,7 +3858,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RLLi = (): byte => {
-    r.hl = Primitive.setLower(r.hl, RLn(Primitive.lower(r.hl)));
+    hl = (hl & 0xff00) | RLn(hl & 0xff);
 
     return 8;
   };
@@ -3865,7 +3870,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RLHLm = (): byte => {
-    memoryRef.writeByte(r.hl, RLn(memoryRef.readByte(r.hl)));
+    memoryRef.writeByte(hl, RLn(memoryRef.readByte(hl)));
 
     return 16;
   };
@@ -3877,7 +3882,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RLAi = (): byte => {
-    r.af = Primitive.setUpper(r.af, RLn(Primitive.upper(r.af)));
+    af = (af & 0xff) | (RLn(af >> 8) << 8);
 
     return 8;
   };
@@ -3889,7 +3894,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RRBi = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, RLn(Primitive.upper(r.bc)));
+    bc = (bc & 0xff) | (RRn(bc >> 8) << 8);
 
     return 8;
   };
@@ -3901,7 +3906,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RRCi = (): byte => {
-    r.bc = Primitive.setLower(r.bc, RRn(Primitive.lower(r.bc)));
+    bc = (bc & 0xff00) | RRn(bc & 0xff);
 
     return 8;
   };
@@ -3913,7 +3918,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RRDi = (): byte => {
-    r.de = Primitive.setUpper(r.de, RRn(Primitive.upper(r.de)));
+    de = (de & 0xff) | (RRn(de >> 8) << 8);
 
     return 8;
   };
@@ -3925,7 +3930,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RREi = (): byte => {
-    r.de = Primitive.setLower(r.de, RRn(Primitive.lower(r.de)));
+    de = (de & 0xff00) | RRn(de & 0xff);
 
     return 8;
   };
@@ -3937,7 +3942,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RRHi = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, RRn(Primitive.upper(r.hl)));
+    hl = (hl & 0xff) | (RRn(hl >> 8) << 8);
 
     return 8;
   };
@@ -3949,7 +3954,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RRLi = (): byte => {
-    r.hl = Primitive.setLower(r.hl, RRn(Primitive.lower(r.hl)));
+    hl = (hl & 0xff00) | RRn(hl & 0xff);
 
     return 8;
   };
@@ -3961,7 +3966,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RRHLm = (): byte => {
-    memoryRef.writeByte(r.hl, RRn(memoryRef.readByte(r.hl)));
+    memoryRef.writeByte(hl, RRn(memoryRef.readByte(hl)));
 
     return 16;
   };
@@ -3973,7 +3978,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private RRAi = (): byte => {
-    r.af = Primitive.setUpper(r.af, RRn(Primitive.upper(r.af)));
+    af = (af & 0xff) | (RRn(af >> 8) << 8);
 
     return 8;
   };
@@ -3985,7 +3990,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SLABi = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, SLAn(Primitive.upper(r.bc)));
+    bc = (bc & 0xff) | (SLAn(bc >> 8) << 8);
 
     return 8;
   };
@@ -3997,7 +4002,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SLACi = (): byte => {
-    r.bc = Primitive.setLower(r.bc, SLAn(Primitive.lower(r.bc)));
+    bc = (bc & 0xff00) | SLAn(bc & 0xff);
 
     return 8;
   };
@@ -4009,7 +4014,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SLADi = (): byte => {
-    r.de = Primitive.setUpper(r.de, SLAn(Primitive.upper(r.de)));
+    de = (de & 0xff) | (SLAn(de >> 8) << 8);
 
     return 8;
   };
@@ -4021,8 +4026,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SLAEi = (): byte => {
-    r.de = Primitive.setLower(r.de, SLAn(Primitive.lower(r.de)));
-
+    de = (de & 0xff00) | SLAn(de & 0xff);
     return 8;
   };
 
@@ -4033,7 +4037,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SLAHi = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, SLAn(Primitive.upper(r.hl)));
+    hl = (hl & 0xff) | (SLAn(hl >> 8) << 8);
 
     return 8;
   };
@@ -4045,7 +4049,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SLALi = (): byte => {
-    r.hl = Primitive.setLower(r.hl, SLAn(Primitive.lower(r.hl)));
+    hl = (hl & 0xff00) | SLAn(hl & 0xff);
 
     return 8;
   };
@@ -4057,7 +4061,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SLAHLm = (): byte => {
-    memoryRef.writeByte(r.hl, SLAn(memoryRef.readByte(r.hl)));
+    memoryRef.writeByte(hl, SLAn(memoryRef.readByte(hl)));
 
     return 16;
   };
@@ -4069,7 +4073,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SLAAi = (): byte => {
-    r.af = Primitive.setUpper(r.af, SLAn(Primitive.upper(r.af)));
+    af = (af & 0xff) | (SLAn(af >> 8) << 8);
 
     return 8;
   };
@@ -4081,7 +4085,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SRABi = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, SRAn(Primitive.upper(r.bc)));
+    bc = (bc & 0xff) | (SRAn(bc >> 8) << 8);
 
     return 8;
   };
@@ -4093,7 +4097,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SRACi = (): byte => {
-    r.bc = Primitive.setLower(r.bc, SRAn(Primitive.lower(r.bc)));
+    bc = (bc & 0xff00) | SRAn(bc & 0xff);
 
     return 8;
   };
@@ -4105,7 +4109,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SRADi = (): byte => {
-    r.de = Primitive.setUpper(r.de, SRAn(Primitive.upper(r.de)));
+    de = (de & 0xff) | (SRAn(de >> 8) << 8);
 
     return 8;
   };
@@ -4117,7 +4121,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SRAEi = (): byte => {
-    r.de = Primitive.setLower(r.de, SRAn(Primitive.lower(r.de)));
+    de = (de & 0xff00) | SRAn(de & 0xff);
 
     return 8;
   };
@@ -4129,7 +4133,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SRAHi = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, SRAn(Primitive.upper(r.hl)));
+    hl = (hl & 0xff) | (SRAn(hl >> 8) << 8);
 
     return 8;
   };
@@ -4141,7 +4145,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SRALi = (): byte => {
-    r.hl = Primitive.setLower(r.hl, SRAn(Primitive.lower(r.hl)));
+    hl = (hl & 0xff00) | SRAn(hl & 0xff);
 
     return 8;
   };
@@ -4153,7 +4157,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SRAHLm = (): byte => {
-    memoryRef.writeByte(r.hl, SRAn(memoryRef.readByte(r.hl)));
+    memoryRef.writeByte(hl, SRAn(memoryRef.readByte(hl)));
 
     return 16;
   };
@@ -4165,8 +4169,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SRAAi = (): byte => {
-    r.af = Primitive.setUpper(r.af, SRAn(Primitive.upper(r.af)));
-
+    af = (af & 0xff) | (SRAn(af >> 8) << 8);
     return 8;
   };
 
@@ -4177,7 +4180,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SWAPBi = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, SWAP(Primitive.upper(r.bc)));
+    bc = (bc & 0xff) | (SWAP(bc >> 8) << 8);
 
     return 8;
   };
@@ -4189,7 +4192,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SWAPCi = (): byte => {
-    r.bc = Primitive.setLower(r.bc, SWAP(Primitive.lower(r.bc)));
+    bc = (bc & 0xff00) | SWAP(bc & 0xff);
 
     return 8;
   };
@@ -4201,7 +4204,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SWAPDi = (): byte => {
-    r.de = Primitive.setUpper(r.de, SWAP(Primitive.upper(r.de)));
+    de = (de & 0xff) | (SWAP(de >> 8) << 8);
 
     return 8;
   };
@@ -4213,7 +4216,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SWAPEi = (): byte => {
-    r.de = Primitive.setLower(r.de, SWAP(Primitive.lower(r.de)));
+    de = (de & 0xff00) | SWAP(de & 0xff);
 
     return 8;
   };
@@ -4225,7 +4228,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SWAPHi = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, SWAP(Primitive.upper(r.hl)));
+    hl = (hl & 0xff) | (SWAP(hl >> 8) << 8);
 
     return 8;
   };
@@ -4237,7 +4240,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SWAPLi = (): byte => {
-    r.hl = Primitive.setLower(r.hl, SWAP(Primitive.lower(r.hl)));
+    hl = (hl & 0xff00) | SWAP(hl & 0xff);
 
     return 8;
   };
@@ -4249,7 +4252,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SWAPHLm = (): byte => {
-    memoryRef.writeByte(r.hl, SWAP(memoryRef.readByte(r.hl)));
+    memoryRef.writeByte(hl, SWAP(memoryRef.readByte(hl)));
 
     return 16;
   };
@@ -4261,7 +4264,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SWAPAi = (): byte => {
-    r.af = Primitive.setUpper(r.af, SWAP(Primitive.upper(r.af)));
+    af = (af & 0xff) | (SWAP(af >> 8) << 8);
 
     return 8;
   };
@@ -4273,7 +4276,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SRLBi = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, SRLn(Primitive.upper(r.bc)));
+    bc = (bc & 0xff) | (SRLn(bc >> 8) << 8);
 
     return 8;
   };
@@ -4285,7 +4288,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SRLCi = (): byte => {
-    r.bc = Primitive.setLower(r.bc, SRLn(Primitive.lower(r.bc)));
+    bc = (bc & 0xff00) | SRLn(bc & 0xff);
 
     return 8;
   };
@@ -4297,7 +4300,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SRLDi = (): byte => {
-    r.de = Primitive.setUpper(r.de, SRLn(Primitive.upper(r.de)));
+    de = (de & 0xff) | (SRLn(de >> 8) << 8);
 
     return 8;
   };
@@ -4309,7 +4312,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SRLEi = (): byte => {
-    r.de = Primitive.setLower(r.de, SRLn(Primitive.lower(r.de)));
+    de = (de & 0xff00) | SRLn(de & 0xff);
 
     return 8;
   };
@@ -4321,7 +4324,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SRLHi = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, SRLn(Primitive.upper(r.hl)));
+    hl = (hl & 0xff) | (SRLn(hl >> 8) << 8);
 
     return 8;
   };
@@ -4333,7 +4336,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SRLLi = (): byte => {
-    r.hl = Primitive.setLower(r.hl, SRLn(Primitive.lower(r.hl)));
+    hl = (hl & 0xff00) | SRLn(hl & 0xff);
 
     return 8;
   };
@@ -4345,7 +4348,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SRLHLm = (): byte => {
-    memoryRef.writeByte(r.hl, SRLn(memoryRef.readByte(r.hl)));
+    memoryRef.writeByte(hl, SRLn(memoryRef.readByte(hl)));
 
     return 16;
   };
@@ -4357,7 +4360,7 @@ class CPU {
    * Affected flags: Z, N, H, C
    */
   private SRLAi = (): byte => {
-    r.af = Primitive.setUpper(r.af, SRLn(Primitive.upper(r.af)));
+    af = (af & 0xff) | (SRLn(af >> 8) << 8);
 
     return 8;
   };
@@ -4369,7 +4372,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT0iBi = (): byte => {
-    BIT(0, Primitive.upper(r.bc));
+    BIT(0, Primitive.upper(bc));
 
     return 8;
   };
@@ -4381,7 +4384,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT0iCi = (): byte => {
-    BIT(0, Primitive.lower(r.bc));
+    BIT(0, Primitive.lower(bc));
 
     return 8;
   };
@@ -4393,7 +4396,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT0iDi = (): byte => {
-    BIT(0, Primitive.upper(r.de));
+    BIT(0, Primitive.upper(de));
 
     return 8;
   };
@@ -4405,7 +4408,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT0iEi = (): byte => {
-    BIT(0, Primitive.lower(r.de));
+    BIT(0, Primitive.lower(de));
 
     return 8;
   };
@@ -4417,7 +4420,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT0iHi = (): byte => {
-    BIT(0, Primitive.upper(r.hl));
+    BIT(0, Primitive.upper(hl));
 
     return 8;
   };
@@ -4429,7 +4432,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT0iLi = (): byte => {
-    BIT(0, Primitive.lower(r.hl));
+    BIT(0, Primitive.lower(hl));
 
     return 8;
   };
@@ -4441,7 +4444,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT0iHLm = (): byte => {
-    BIT(0, memoryRef.readByte(r.hl));
+    BIT(0, memoryRef.readByte(hl));
 
     return 12;
   };
@@ -4453,7 +4456,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT0iAi = (): byte => {
-    BIT(0, Primitive.upper(r.af));
+    BIT(0, Primitive.upper(af));
 
     return 8;
   };
@@ -4465,7 +4468,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT1iBi = (): byte => {
-    BIT(1, Primitive.upper(r.bc));
+    BIT(1, Primitive.upper(bc));
 
     return 8;
   };
@@ -4477,7 +4480,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT1iCi = (): byte => {
-    BIT(1, Primitive.lower(r.bc));
+    BIT(1, Primitive.lower(bc));
 
     return 8;
   };
@@ -4489,7 +4492,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT1iDi = (): byte => {
-    BIT(1, Primitive.upper(r.de));
+    BIT(1, Primitive.upper(de));
 
     return 8;
   };
@@ -4501,7 +4504,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT1iEi = (): byte => {
-    BIT(1, Primitive.lower(r.de));
+    BIT(1, Primitive.lower(de));
 
     return 8;
   };
@@ -4513,7 +4516,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT1iHi = (): byte => {
-    BIT(1, Primitive.upper(r.hl));
+    BIT(1, Primitive.upper(hl));
 
     return 8;
   };
@@ -4525,7 +4528,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT1iLi = (): byte => {
-    BIT(1, Primitive.lower(r.hl));
+    BIT(1, Primitive.lower(hl));
 
     return 8;
   };
@@ -4537,7 +4540,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT1iHLm = (): byte => {
-    BIT(1, memoryRef.readByte(r.hl));
+    BIT(1, memoryRef.readByte(hl));
 
     return 12;
   };
@@ -4549,7 +4552,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT1iAi = (): byte => {
-    BIT(1, Primitive.upper(r.af));
+    BIT(1, Primitive.upper(af));
 
     return 8;
   };
@@ -4561,7 +4564,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT2iBi = (): byte => {
-    BIT(2, Primitive.upper(r.bc));
+    BIT(2, Primitive.upper(bc));
 
     return 8;
   };
@@ -4573,7 +4576,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT2iCi = (): byte => {
-    BIT(2, Primitive.lower(r.bc));
+    BIT(2, Primitive.lower(bc));
 
     return 8;
   };
@@ -4585,7 +4588,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT2iDi = (): byte => {
-    BIT(2, Primitive.upper(r.de));
+    BIT(2, Primitive.upper(de));
 
     return 8;
   };
@@ -4597,7 +4600,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT2iEi = (): byte => {
-    BIT(2, Primitive.lower(r.de));
+    BIT(2, Primitive.lower(de));
 
     return 8;
   };
@@ -4609,7 +4612,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT2iHi = (): byte => {
-    BIT(2, Primitive.upper(r.hl));
+    BIT(2, Primitive.upper(hl));
 
     return 8;
   };
@@ -4621,7 +4624,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT2iLi = (): byte => {
-    BIT(2, Primitive.lower(r.hl));
+    BIT(2, Primitive.lower(hl));
 
     return 8;
   };
@@ -4633,7 +4636,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT2iHLm = (): byte => {
-    BIT(2, memoryRef.readByte(r.hl));
+    BIT(2, memoryRef.readByte(hl));
 
     return 12;
   };
@@ -4645,7 +4648,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT2iAi = (): byte => {
-    BIT(2, Primitive.upper(r.af));
+    BIT(2, Primitive.upper(af));
 
     return 8;
   };
@@ -4657,7 +4660,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT3iBi = (): byte => {
-    BIT(3, Primitive.upper(r.bc));
+    BIT(3, Primitive.upper(bc));
 
     return 8;
   };
@@ -4669,7 +4672,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT3iCi = (): byte => {
-    BIT(3, Primitive.lower(r.bc));
+    BIT(3, Primitive.lower(bc));
 
     return 8;
   };
@@ -4681,7 +4684,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT3iDi = (): byte => {
-    BIT(3, Primitive.upper(r.de));
+    BIT(3, Primitive.upper(de));
 
     return 8;
   };
@@ -4693,7 +4696,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT3iEi = (): byte => {
-    BIT(3, Primitive.lower(r.de));
+    BIT(3, Primitive.lower(de));
 
     return 8;
   };
@@ -4705,7 +4708,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT3iHi = (): byte => {
-    BIT(3, Primitive.upper(r.hl));
+    BIT(3, Primitive.upper(hl));
 
     return 8;
   };
@@ -4717,7 +4720,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT3iLi = (): byte => {
-    BIT(3, Primitive.lower(r.hl));
+    BIT(3, Primitive.lower(hl));
 
     return 8;
   };
@@ -4729,7 +4732,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT3iHLm = (): byte => {
-    BIT(3, memoryRef.readByte(r.hl));
+    BIT(3, memoryRef.readByte(hl));
 
     return 12;
   };
@@ -4741,7 +4744,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT3iAi = (): byte => {
-    BIT(3, Primitive.upper(r.af));
+    BIT(3, Primitive.upper(af));
 
     return 8;
   };
@@ -4753,7 +4756,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT4iBi = (): byte => {
-    BIT(4, Primitive.upper(r.bc));
+    BIT(4, Primitive.upper(bc));
 
     return 8;
   };
@@ -4765,7 +4768,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT4iCi = (): byte => {
-    BIT(4, Primitive.lower(r.bc));
+    BIT(4, Primitive.lower(bc));
 
     return 8;
   };
@@ -4777,7 +4780,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT4iDi = (): byte => {
-    BIT(4, Primitive.upper(r.de));
+    BIT(4, Primitive.upper(de));
 
     return 8;
   };
@@ -4789,7 +4792,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT4iEi = (): byte => {
-    BIT(4, Primitive.lower(r.de));
+    BIT(4, Primitive.lower(de));
 
     return 8;
   };
@@ -4801,7 +4804,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT4iHi = (): byte => {
-    BIT(4, Primitive.upper(r.hl));
+    BIT(4, Primitive.upper(hl));
 
     return 8;
   };
@@ -4813,7 +4816,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT4iLi = (): byte => {
-    BIT(4, Primitive.lower(r.hl));
+    BIT(4, Primitive.lower(hl));
 
     return 8;
   };
@@ -4825,7 +4828,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT4iHLm = (): byte => {
-    BIT(4, memoryRef.readByte(r.hl));
+    BIT(4, memoryRef.readByte(hl));
 
     return 12;
   };
@@ -4837,7 +4840,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT4iAi = (): byte => {
-    BIT(4, Primitive.upper(r.af));
+    BIT(4, Primitive.upper(af));
 
     return 8;
   };
@@ -4849,7 +4852,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT5iBi = (): byte => {
-    BIT(5, Primitive.upper(r.bc));
+    BIT(5, Primitive.upper(bc));
 
     return 8;
   };
@@ -4861,7 +4864,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT5iCi = (): byte => {
-    BIT(5, Primitive.lower(r.bc));
+    BIT(5, Primitive.lower(bc));
 
     return 8;
   };
@@ -4873,7 +4876,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT5iDi = (): byte => {
-    BIT(5, Primitive.upper(r.de));
+    BIT(5, Primitive.upper(de));
 
     return 8;
   };
@@ -4885,7 +4888,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT5iEi = (): byte => {
-    BIT(5, Primitive.lower(r.de));
+    BIT(5, Primitive.lower(de));
 
     return 8;
   };
@@ -4897,7 +4900,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT5iHi = (): byte => {
-    BIT(5, Primitive.upper(r.hl));
+    BIT(5, Primitive.upper(hl));
 
     return 8;
   };
@@ -4909,7 +4912,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT5iLi = (): byte => {
-    BIT(5, Primitive.lower(r.hl));
+    BIT(5, Primitive.lower(hl));
 
     return 8;
   };
@@ -4921,7 +4924,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT5iHLm = (): byte => {
-    BIT(5, memoryRef.readByte(r.hl));
+    BIT(5, memoryRef.readByte(hl));
 
     return 12;
   };
@@ -4933,7 +4936,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT5iAi = (): byte => {
-    BIT(5, Primitive.upper(r.af));
+    BIT(5, Primitive.upper(af));
 
     return 8;
   };
@@ -4945,7 +4948,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT6iBi = (): byte => {
-    BIT(6, Primitive.upper(r.bc));
+    BIT(6, Primitive.upper(bc));
 
     return 8;
   };
@@ -4957,7 +4960,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT6iCi = (): byte => {
-    BIT(6, Primitive.lower(r.bc));
+    BIT(6, Primitive.lower(bc));
 
     return 8;
   };
@@ -4969,7 +4972,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT6iDi = (): byte => {
-    BIT(6, Primitive.upper(r.de));
+    BIT(6, Primitive.upper(de));
 
     return 8;
   };
@@ -4981,7 +4984,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT6iEi = (): byte => {
-    BIT(6, Primitive.lower(r.de));
+    BIT(6, Primitive.lower(de));
 
     return 8;
   };
@@ -4993,7 +4996,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT6iHi = (): byte => {
-    BIT(6, Primitive.upper(r.hl));
+    BIT(6, Primitive.upper(hl));
 
     return 8;
   };
@@ -5005,7 +5008,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT6iLi = (): byte => {
-    BIT(6, Primitive.lower(r.hl));
+    BIT(6, Primitive.lower(hl));
 
     return 8;
   };
@@ -5017,7 +5020,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT6iHLm = (): byte => {
-    BIT(6, memoryRef.readByte(r.hl));
+    BIT(6, memoryRef.readByte(hl));
 
     return 12;
   };
@@ -5029,7 +5032,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT6iAi = (): byte => {
-    BIT(6, Primitive.upper(r.af));
+    BIT(6, Primitive.upper(af));
 
     return 8;
   };
@@ -5041,7 +5044,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT7iBi = (): byte => {
-    BIT(7, Primitive.upper(r.bc));
+    BIT(7, Primitive.upper(bc));
 
     return 8;
   };
@@ -5053,7 +5056,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT7iCi = (): byte => {
-    BIT(7, Primitive.lower(r.bc));
+    BIT(7, Primitive.lower(bc));
 
     return 8;
   };
@@ -5065,7 +5068,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT7iDi = (): byte => {
-    BIT(7, Primitive.upper(r.de));
+    BIT(7, Primitive.upper(de));
 
     return 8;
   };
@@ -5077,7 +5080,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT7iEi = (): byte => {
-    BIT(7, Primitive.lower(r.de));
+    BIT(7, Primitive.lower(de));
 
     return 8;
   };
@@ -5089,7 +5092,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT7iHi = (): byte => {
-    BIT(7, Primitive.upper(r.hl));
+    BIT(7, Primitive.upper(hl));
 
     return 8;
   };
@@ -5101,7 +5104,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT7iLi = (): byte => {
-    BIT(7, Primitive.lower(r.hl));
+    BIT(7, Primitive.lower(hl));
 
     return 8;
   };
@@ -5113,7 +5116,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT7iHLm = (): byte => {
-    BIT(7, memoryRef.readByte(r.hl));
+    BIT(7, memoryRef.readByte(hl));
 
     return 12;
   };
@@ -5125,7 +5128,7 @@ class CPU {
    * Affected flags: Z, N, H
    */
   private BIT7iAi = (): byte => {
-    BIT(7, Primitive.upper(r.af));
+    BIT(7, Primitive.upper(af));
 
     return 8;
   };
@@ -5137,7 +5140,7 @@ class CPU {
    * Affected flags:
    */
   private RES0B = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, RES0(Primitive.upper(r.bc)));
+    bc = Primitive.setUpper(bc, RES0(Primitive.upper(bc)));
 
     return 8;
   };
@@ -5149,7 +5152,7 @@ class CPU {
    * Affected flags:
    */
   private RES0C = (): byte => {
-    r.bc = Primitive.setLower(r.bc, RES0(Primitive.lower(r.bc)));
+    bc = Primitive.setLower(bc, RES0(Primitive.lower(bc)));
 
     return 8;
   };
@@ -5161,7 +5164,7 @@ class CPU {
    * Affected flags:
    */
   private RES0D = (): byte => {
-    r.de = Primitive.setUpper(r.de, RES0(Primitive.upper(r.de)));
+    de = Primitive.setUpper(de, RES0(Primitive.upper(de)));
 
     return 8;
   };
@@ -5173,7 +5176,7 @@ class CPU {
    * Affected flags:
    */
   private RES0E = (): byte => {
-    r.de = Primitive.setLower(r.de, RES0(Primitive.lower(r.de)));
+    de = Primitive.setLower(de, RES0(Primitive.lower(de)));
 
     return 8;
   };
@@ -5185,7 +5188,7 @@ class CPU {
    * Affected flags:
    */
   private RES0H = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, RES0(Primitive.upper(r.hl)));
+    hl = Primitive.setUpper(hl, RES0(Primitive.upper(hl)));
 
     return 8;
   };
@@ -5197,7 +5200,7 @@ class CPU {
    * Affected flags:
    */
   private RES0L = (): byte => {
-    r.hl = Primitive.setLower(r.hl, RES0(Primitive.lower(r.hl)));
+    hl = Primitive.setLower(hl, RES0(Primitive.lower(hl)));
 
     return 8;
   };
@@ -5209,7 +5212,7 @@ class CPU {
    * Affected flags:
    */
   private RES0HL = (): byte => {
-    memoryRef.writeByte(r.hl, RES0(memoryRef.readByte(r.hl)));
+    memoryRef.writeByte(hl, RES0(memoryRef.readByte(hl)));
 
     return 16;
   };
@@ -5221,7 +5224,7 @@ class CPU {
    * Affected flags:
    */
   private RES0A = (): byte => {
-    r.af = Primitive.setUpper(r.af, RES0(Primitive.upper(r.af)));
+    af = Primitive.setUpper(af, RES0(Primitive.upper(af)));
 
     return 8;
   };
@@ -5233,7 +5236,7 @@ class CPU {
    * Affected flags:
    */
   private RES1B = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, RES1(Primitive.upper(r.bc)));
+    bc = Primitive.setUpper(bc, RES1(Primitive.upper(bc)));
 
     return 8;
   };
@@ -5245,7 +5248,7 @@ class CPU {
    * Affected flags:
    */
   private RES1C = (): byte => {
-    r.bc = Primitive.setLower(r.bc, RES1(Primitive.lower(r.bc)));
+    bc = Primitive.setLower(bc, RES1(Primitive.lower(bc)));
 
     return 8;
   };
@@ -5257,7 +5260,7 @@ class CPU {
    * Affected flags:
    */
   private RES1D = (): byte => {
-    r.de = Primitive.setUpper(r.de, RES1(Primitive.upper(r.de)));
+    de = Primitive.setUpper(de, RES1(Primitive.upper(de)));
 
     return 8;
   };
@@ -5269,7 +5272,7 @@ class CPU {
    * Affected flags:
    */
   private RES1E = (): byte => {
-    r.de = Primitive.setLower(r.de, RES1(Primitive.lower(r.de)));
+    de = Primitive.setLower(de, RES1(Primitive.lower(de)));
 
     return 8;
   };
@@ -5281,7 +5284,7 @@ class CPU {
    * Affected flags:
    */
   private RES1H = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, RES1(Primitive.upper(r.hl)));
+    hl = Primitive.setUpper(hl, RES1(Primitive.upper(hl)));
 
     return 8;
   };
@@ -5293,7 +5296,7 @@ class CPU {
    * Affected flags:
    */
   private RES1L = (): byte => {
-    r.hl = Primitive.setLower(r.hl, RES1(Primitive.lower(r.hl)));
+    hl = Primitive.setLower(hl, RES1(Primitive.lower(hl)));
 
     return 8;
   };
@@ -5305,7 +5308,7 @@ class CPU {
    * Affected flags:
    */
   private RES1HL = (): byte => {
-    memoryRef.writeByte(r.hl, RES1(memoryRef.readByte(r.hl)));
+    memoryRef.writeByte(hl, RES1(memoryRef.readByte(hl)));
 
     return 16;
   };
@@ -5317,7 +5320,7 @@ class CPU {
    * Affected flags:
    */
   private RES1A = (): byte => {
-    r.af = Primitive.setUpper(r.af, RES1(Primitive.upper(r.af)));
+    af = Primitive.setUpper(af, RES1(Primitive.upper(af)));
 
     return 8;
   };
@@ -5329,7 +5332,7 @@ class CPU {
    * Affected flags:
    */
   private RES2B = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, RES2(Primitive.upper(r.bc)));
+    bc = Primitive.setUpper(bc, RES2(Primitive.upper(bc)));
 
     return 8;
   };
@@ -5341,7 +5344,7 @@ class CPU {
    * Affected flags:
    */
   private RES2C = (): byte => {
-    r.bc = Primitive.setLower(r.bc, RES2(Primitive.lower(r.bc)));
+    bc = Primitive.setLower(bc, RES2(Primitive.lower(bc)));
 
     return 8;
   };
@@ -5353,7 +5356,7 @@ class CPU {
    * Affected flags:
    */
   private RES2D = (): byte => {
-    r.de = Primitive.setUpper(r.de, RES2(Primitive.upper(r.de)));
+    de = Primitive.setUpper(de, RES2(Primitive.upper(de)));
 
     return 8;
   };
@@ -5365,7 +5368,7 @@ class CPU {
    * Affected flags:
    */
   private RES2E = (): byte => {
-    r.de = Primitive.setLower(r.de, RES2(Primitive.lower(r.de)));
+    de = Primitive.setLower(de, RES2(Primitive.lower(de)));
 
     return 8;
   };
@@ -5377,7 +5380,7 @@ class CPU {
    * Affected flags:
    */
   private RES2H = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, RES2(Primitive.upper(r.hl)));
+    hl = Primitive.setUpper(hl, RES2(Primitive.upper(hl)));
 
     return 8;
   };
@@ -5389,7 +5392,7 @@ class CPU {
    * Affected flags:
    */
   private RES2L = (): byte => {
-    r.hl = Primitive.setLower(r.hl, RES2(Primitive.lower(r.hl)));
+    hl = Primitive.setLower(hl, RES2(Primitive.lower(hl)));
 
     return 8;
   };
@@ -5401,7 +5404,7 @@ class CPU {
    * Affected flags:
    */
   private RES2HL = (): byte => {
-    memoryRef.writeByte(r.hl, RES2(memoryRef.readByte(r.hl)));
+    memoryRef.writeByte(hl, RES2(memoryRef.readByte(hl)));
 
     return 16;
   };
@@ -5413,7 +5416,7 @@ class CPU {
    * Affected flags:
    */
   private RES2A = (): byte => {
-    r.af = Primitive.setUpper(r.af, RES2(Primitive.upper(r.af)));
+    af = Primitive.setUpper(af, RES2(Primitive.upper(af)));
 
     return 8;
   };
@@ -5425,7 +5428,7 @@ class CPU {
    * Affected flags:
    */
   private RES3B = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, RES3(Primitive.upper(r.bc)));
+    bc = Primitive.setUpper(bc, RES3(Primitive.upper(bc)));
 
     return 8;
   };
@@ -5437,7 +5440,7 @@ class CPU {
    * Affected flags:
    */
   private RES3C = (): byte => {
-    r.bc = Primitive.setLower(r.bc, RES3(Primitive.lower(r.bc)));
+    bc = Primitive.setLower(bc, RES3(Primitive.lower(bc)));
 
     return 8;
   };
@@ -5449,7 +5452,7 @@ class CPU {
    * Affected flags:
    */
   private RES3D = (): byte => {
-    r.de = Primitive.setUpper(r.de, RES3(Primitive.upper(r.de)));
+    de = Primitive.setUpper(de, RES3(Primitive.upper(de)));
 
     return 8;
   };
@@ -5461,7 +5464,7 @@ class CPU {
    * Affected flags:
    */
   private RES3E = (): byte => {
-    r.de = Primitive.setLower(r.de, RES3(Primitive.lower(r.de)));
+    de = Primitive.setLower(de, RES3(Primitive.lower(de)));
 
     return 8;
   };
@@ -5473,7 +5476,7 @@ class CPU {
    * Affected flags:
    */
   private RES3H = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, RES3(Primitive.upper(r.hl)));
+    hl = Primitive.setUpper(hl, RES3(Primitive.upper(hl)));
 
     return 8;
   };
@@ -5485,7 +5488,7 @@ class CPU {
    * Affected flags:
    */
   private RES3L = (): byte => {
-    r.hl = Primitive.setLower(r.hl, RES3(Primitive.lower(r.hl)));
+    hl = Primitive.setLower(hl, RES3(Primitive.lower(hl)));
 
     return 8;
   };
@@ -5497,7 +5500,7 @@ class CPU {
    * Affected flags:
    */
   private RES3HL = (): byte => {
-    memoryRef.writeByte(r.hl, RES3(memoryRef.readByte(r.hl)));
+    memoryRef.writeByte(hl, RES3(memoryRef.readByte(hl)));
 
     return 16;
   };
@@ -5509,7 +5512,7 @@ class CPU {
    * Affected flags:
    */
   private RES3A = (): byte => {
-    r.af = Primitive.setUpper(r.af, RES3(Primitive.upper(r.af)));
+    af = Primitive.setUpper(af, RES3(Primitive.upper(af)));
 
     return 8;
   };
@@ -5521,7 +5524,7 @@ class CPU {
    * Affected flags:
    */
   private RES4B = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, RES4(Primitive.upper(r.bc)));
+    bc = Primitive.setUpper(bc, RES4(Primitive.upper(bc)));
 
     return 8;
   };
@@ -5533,7 +5536,7 @@ class CPU {
    * Affected flags:
    */
   private RES4C = (): byte => {
-    r.bc = Primitive.setLower(r.bc, RES4(Primitive.lower(r.bc)));
+    bc = Primitive.setLower(bc, RES4(Primitive.lower(bc)));
 
     return 8;
   };
@@ -5545,7 +5548,7 @@ class CPU {
    * Affected flags:
    */
   private RES4D = (): byte => {
-    r.de = Primitive.setUpper(r.de, RES4(Primitive.upper(r.de)));
+    de = Primitive.setUpper(de, RES4(Primitive.upper(de)));
 
     return 8;
   };
@@ -5557,7 +5560,7 @@ class CPU {
    * Affected flags:
    */
   private RES4E = (): byte => {
-    r.de = Primitive.setLower(r.de, RES4(Primitive.lower(r.de)));
+    de = Primitive.setLower(de, RES4(Primitive.lower(de)));
 
     return 8;
   };
@@ -5569,7 +5572,7 @@ class CPU {
    * Affected flags:
    */
   private RES4H = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, RES4(Primitive.upper(r.hl)));
+    hl = Primitive.setUpper(hl, RES4(Primitive.upper(hl)));
 
     return 8;
   };
@@ -5581,7 +5584,7 @@ class CPU {
    * Affected flags:
    */
   private RES4L = (): byte => {
-    r.hl = Primitive.setLower(r.hl, RES4(Primitive.lower(r.hl)));
+    hl = Primitive.setLower(hl, RES4(Primitive.lower(hl)));
 
     return 8;
   };
@@ -5593,7 +5596,7 @@ class CPU {
    * Affected flags:
    */
   private RES4HL = (): byte => {
-    memoryRef.writeByte(r.hl, RES4(memoryRef.readByte(r.hl)));
+    memoryRef.writeByte(hl, RES4(memoryRef.readByte(hl)));
 
     return 16;
   };
@@ -5605,7 +5608,7 @@ class CPU {
    * Affected flags:
    */
   private RES4A = (): byte => {
-    r.af = Primitive.setUpper(r.af, RES4(Primitive.upper(r.af)));
+    af = Primitive.setUpper(af, RES4(Primitive.upper(af)));
 
     return 8;
   };
@@ -5617,7 +5620,7 @@ class CPU {
    * Affected flags:
    */
   private RES5B = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, RES5(Primitive.upper(r.bc)));
+    bc = Primitive.setUpper(bc, RES5(Primitive.upper(bc)));
 
     return 8;
   };
@@ -5629,7 +5632,7 @@ class CPU {
    * Affected flags:
    */
   private RES5C = (): byte => {
-    r.bc = Primitive.setLower(r.bc, RES5(Primitive.lower(r.bc)));
+    bc = Primitive.setLower(bc, RES5(Primitive.lower(bc)));
 
     return 8;
   };
@@ -5641,7 +5644,7 @@ class CPU {
    * Affected flags:
    */
   private RES5D = (): byte => {
-    r.de = Primitive.setUpper(r.de, RES5(Primitive.upper(r.de)));
+    de = Primitive.setUpper(de, RES5(Primitive.upper(de)));
 
     return 8;
   };
@@ -5653,7 +5656,7 @@ class CPU {
    * Affected flags:
    */
   private RES5E = (): byte => {
-    r.de = Primitive.setLower(r.de, RES5(Primitive.lower(r.de)));
+    de = Primitive.setLower(de, RES5(Primitive.lower(de)));
 
     return 8;
   };
@@ -5665,7 +5668,7 @@ class CPU {
    * Affected flags:
    */
   private RES5H = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, RES5(Primitive.upper(r.hl)));
+    hl = Primitive.setUpper(hl, RES5(Primitive.upper(hl)));
 
     return 8;
   };
@@ -5677,7 +5680,7 @@ class CPU {
    * Affected flags:
    */
   private RES5L = (): byte => {
-    r.hl = Primitive.setLower(r.hl, RES5(Primitive.lower(r.hl)));
+    hl = Primitive.setLower(hl, RES5(Primitive.lower(hl)));
 
     return 8;
   };
@@ -5689,7 +5692,7 @@ class CPU {
    * Affected flags:
    */
   private RES5HL = (): byte => {
-    memoryRef.writeByte(r.hl, RES5(memoryRef.readByte(r.hl)));
+    memoryRef.writeByte(hl, RES5(memoryRef.readByte(hl)));
 
     return 16;
   };
@@ -5701,7 +5704,7 @@ class CPU {
    * Affected flags:
    */
   private RES5A = (): byte => {
-    r.af = Primitive.setUpper(r.af, RES5(Primitive.upper(r.af)));
+    af = Primitive.setUpper(af, RES5(Primitive.upper(af)));
 
     return 8;
   };
@@ -5713,7 +5716,7 @@ class CPU {
    * Affected flags:
    */
   private RES6B = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, RES6(Primitive.upper(r.bc)));
+    bc = Primitive.setUpper(bc, RES6(Primitive.upper(bc)));
 
     return 8;
   };
@@ -5725,7 +5728,7 @@ class CPU {
    * Affected flags:
    */
   private RES6C = (): byte => {
-    r.bc = Primitive.setLower(r.bc, RES6(Primitive.lower(r.bc)));
+    bc = Primitive.setLower(bc, RES6(Primitive.lower(bc)));
 
     return 8;
   };
@@ -5737,7 +5740,7 @@ class CPU {
    * Affected flags:
    */
   private RES6D = (): byte => {
-    r.de = Primitive.setUpper(r.de, RES6(Primitive.upper(r.de)));
+    de = Primitive.setUpper(de, RES6(Primitive.upper(de)));
 
     return 8;
   };
@@ -5749,7 +5752,7 @@ class CPU {
    * Affected flags:
    */
   private RES6E = (): byte => {
-    r.de = Primitive.setLower(r.de, RES6(Primitive.lower(r.de)));
+    de = Primitive.setLower(de, RES6(Primitive.lower(de)));
 
     return 8;
   };
@@ -5761,7 +5764,7 @@ class CPU {
    * Affected flags:
    */
   private RES6H = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, RES6(Primitive.upper(r.hl)));
+    hl = Primitive.setUpper(hl, RES6(Primitive.upper(hl)));
 
     return 8;
   };
@@ -5773,7 +5776,7 @@ class CPU {
    * Affected flags:
    */
   private RES6L = (): byte => {
-    r.hl = Primitive.setLower(r.hl, RES6(Primitive.lower(r.hl)));
+    hl = Primitive.setLower(hl, RES6(Primitive.lower(hl)));
 
     return 8;
   };
@@ -5785,7 +5788,7 @@ class CPU {
    * Affected flags:
    */
   private RES6HL = (): byte => {
-    memoryRef.writeByte(r.hl, RES6(memoryRef.readByte(r.hl)));
+    memoryRef.writeByte(hl, RES6(memoryRef.readByte(hl)));
 
     return 16;
   };
@@ -5797,7 +5800,7 @@ class CPU {
    * Affected flags:
    */
   private RES6A = (): byte => {
-    r.af = Primitive.setUpper(r.af, RES6(Primitive.upper(r.af)));
+    af = Primitive.setUpper(af, RES6(Primitive.upper(af)));
 
     return 8;
   };
@@ -5809,7 +5812,7 @@ class CPU {
    * Affected flags:
    */
   private RES7B = (): byte => {
-    r.bc = Primitive.setUpper(r.bc, RES7(Primitive.upper(r.bc)));
+    bc = Primitive.setUpper(bc, RES7(Primitive.upper(bc)));
 
     return 8;
   };
@@ -5821,7 +5824,7 @@ class CPU {
    * Affected flags:
    */
   private RES7C = (): byte => {
-    r.bc = Primitive.setLower(r.bc, RES7(Primitive.lower(r.bc)));
+    bc = Primitive.setLower(bc, RES7(Primitive.lower(bc)));
 
     return 8;
   };
@@ -5833,7 +5836,7 @@ class CPU {
    * Affected flags:
    */
   private RES7D = (): byte => {
-    r.de = Primitive.setUpper(r.de, RES7(Primitive.upper(r.de)));
+    de = Primitive.setUpper(de, RES7(Primitive.upper(de)));
 
     return 8;
   };
@@ -5845,7 +5848,7 @@ class CPU {
    * Affected flags:
    */
   private RES7E = (): byte => {
-    r.de = Primitive.setLower(r.de, RES7(Primitive.lower(r.de)));
+    de = Primitive.setLower(de, RES7(Primitive.lower(de)));
 
     return 8;
   };
@@ -5857,7 +5860,7 @@ class CPU {
    * Affected flags:
    */
   private RES7H = (): byte => {
-    r.hl = Primitive.setUpper(r.hl, RES7(Primitive.upper(r.hl)));
+    hl = Primitive.setUpper(hl, RES7(Primitive.upper(hl)));
 
     return 8;
   };
@@ -5869,7 +5872,7 @@ class CPU {
    * Affected flags:
    */
   private RES7L = (): byte => {
-    r.hl = Primitive.setLower(r.hl, RES7(Primitive.lower(r.hl)));
+    hl = Primitive.setLower(hl, RES7(Primitive.lower(hl)));
 
     return 8;
   };
@@ -5881,7 +5884,7 @@ class CPU {
    * Affected flags:
    */
   private RES7HL = (): byte => {
-    memoryRef.writeByte(r.hl, RES7(memoryRef.readByte(r.hl)));
+    memoryRef.writeByte(hl, RES7(memoryRef.readByte(hl)));
 
     return 16;
   };
@@ -5893,7 +5896,7 @@ class CPU {
    * Affected flags:
    */
   private RES7A = (): byte => {
-    r.af = Primitive.setUpper(r.af, RES7(Primitive.upper(r.af)));
+    af = Primitive.setUpper(af, RES7(Primitive.upper(af)));
 
     return 8;
   };
@@ -5905,7 +5908,7 @@ class CPU {
    * Affected flags:
    */
   private SET0B = (): byte => {
-    r.bc |= 0b100000000;
+    bc |= 0b100000000;
 
     return 8;
   };
@@ -5917,7 +5920,7 @@ class CPU {
    * Affected flags:
    */
   private SET0C = (): byte => {
-    r.bc |= 0b1;
+    bc |= 0b1;
     return 8;
   };
 
@@ -5928,7 +5931,7 @@ class CPU {
    * Affected flags:
    */
   private SET0D = (): byte => {
-    r.de |= 0b100000000;
+    de |= 0b100000000;
 
     return 8;
   };
@@ -5940,7 +5943,7 @@ class CPU {
    * Affected flags:
    */
   private SET0E = (): byte => {
-    r.de |= 0b1;
+    de |= 0b1;
     return 8;
   };
 
@@ -5951,7 +5954,7 @@ class CPU {
    * Affected flags:
    */
   private SET0H = (): byte => {
-    r.hl |= 0b100000000;
+    hl |= 0b100000000;
 
     return 8;
   };
@@ -5963,7 +5966,7 @@ class CPU {
    * Affected flags:
    */
   private SET0L = (): byte => {
-    r.hl |= 0b1;
+    hl |= 0b1;
 
     return 8;
   };
@@ -5975,7 +5978,7 @@ class CPU {
    * Affected flags:
    */
   private SET0HL = (): byte => {
-    memoryRef.writeByte(r.hl, memoryRef.readByte(r.hl) | 0b1);
+    memoryRef.writeByte(hl, memoryRef.readByte(hl) | 0b1);
 
     return 16;
   };
@@ -5987,7 +5990,7 @@ class CPU {
    * Affected flags:
    */
   private SET0A = (): byte => {
-    r.af |= 0b100000000;
+    af |= 0b100000000;
 
     return 8;
   };
@@ -5999,7 +6002,7 @@ class CPU {
    * Affected flags:
    */
   private SET1B = (): byte => {
-    r.bc |= 0b1000000000;
+    bc |= 0b1000000000;
 
     return 8;
   };
@@ -6011,7 +6014,7 @@ class CPU {
    * Affected flags:
    */
   private SET1C = (): byte => {
-    r.bc |= 0b10;
+    bc |= 0b10;
 
     return 8;
   };
@@ -6023,7 +6026,7 @@ class CPU {
    * Affected flags:
    */
   private SET1D = (): byte => {
-    r.de |= 0b1000000000;
+    de |= 0b1000000000;
 
     return 8;
   };
@@ -6035,7 +6038,7 @@ class CPU {
    * Affected flags:
    */
   private SET1E = (): byte => {
-    r.de |= 0b10;
+    de |= 0b10;
 
     return 8;
   };
@@ -6047,7 +6050,7 @@ class CPU {
    * Affected flags:
    */
   private SET1H = (): byte => {
-    r.hl |= 0b1000000000;
+    hl |= 0b1000000000;
 
     return 8;
   };
@@ -6059,7 +6062,7 @@ class CPU {
    * Affected flags:
    */
   private SET1L = (): byte => {
-    r.hl |= 0b10;
+    hl |= 0b10;
 
     return 8;
   };
@@ -6071,7 +6074,7 @@ class CPU {
    * Affected flags:
    */
   private SET1HL = (): byte => {
-    memoryRef.writeByte(r.hl, memoryRef.readByte(r.hl) | 0b10);
+    memoryRef.writeByte(hl, memoryRef.readByte(hl) | 0b10);
 
     return 16;
   };
@@ -6083,7 +6086,7 @@ class CPU {
    * Affected flags:
    */
   private SET1A = (): byte => {
-    r.af |= 0b1000000000;
+    af |= 0b1000000000;
 
     return 8;
   };
@@ -6095,7 +6098,7 @@ class CPU {
    * Affected flags:
    */
   private SET2B = (): byte => {
-    r.bc |= 0b10000000000;
+    bc |= 0b10000000000;
 
     return 8;
   };
@@ -6107,7 +6110,7 @@ class CPU {
    * Affected flags:
    */
   private SET2C = (): byte => {
-    r.bc |= 0b100;
+    bc |= 0b100;
 
     return 8;
   };
@@ -6119,7 +6122,7 @@ class CPU {
    * Affected flags:
    */
   private SET2D = (): byte => {
-    r.de |= 0b10000000000;
+    de |= 0b10000000000;
 
     return 8;
   };
@@ -6131,7 +6134,7 @@ class CPU {
    * Affected flags:
    */
   private SET2E = (): byte => {
-    r.de |= 0b100;
+    de |= 0b100;
     return 8;
   };
 
@@ -6142,7 +6145,7 @@ class CPU {
    * Affected flags:
    */
   private SET2H = (): byte => {
-    r.hl |= 0b10000000000;
+    hl |= 0b10000000000;
 
     return 8;
   };
@@ -6154,7 +6157,7 @@ class CPU {
    * Affected flags:
    */
   private SET2L = (): byte => {
-    r.hl |= 0b100;
+    hl |= 0b100;
 
     return 8;
   };
@@ -6166,7 +6169,7 @@ class CPU {
    * Affected flags:
    */
   private SET2HL = (): byte => {
-    memoryRef.writeByte(r.hl, memoryRef.readByte(r.hl) | 0b100);
+    memoryRef.writeByte(hl, memoryRef.readByte(hl) | 0b100);
 
     return 16;
   };
@@ -6178,7 +6181,7 @@ class CPU {
    * Affected flags:
    */
   private SET2A = (): byte => {
-    r.af |= 0b10000000000;
+    af |= 0b10000000000;
 
     return 8;
   };
@@ -6190,7 +6193,7 @@ class CPU {
    * Affected flags:
    */
   private SET3B = (): byte => {
-    r.bc |= 0b100000000000;
+    bc |= 0b100000000000;
 
     return 8;
   };
@@ -6202,7 +6205,7 @@ class CPU {
    * Affected flags:
    */
   private SET3C = (): byte => {
-    r.bc |= 0b1000;
+    bc |= 0b1000;
 
     return 8;
   };
@@ -6214,7 +6217,7 @@ class CPU {
    * Affected flags:
    */
   private SET3D = (): byte => {
-    r.de |= 0b100000000000;
+    de |= 0b100000000000;
 
     return 8;
   };
@@ -6226,7 +6229,7 @@ class CPU {
    * Affected flags:
    */
   private SET3E = (): byte => {
-    r.de |= 0b1000;
+    de |= 0b1000;
 
     return 8;
   };
@@ -6238,7 +6241,7 @@ class CPU {
    * Affected flags:
    */
   private SET3H = (): byte => {
-    r.hl |= 0b100000000000;
+    hl |= 0b100000000000;
 
     return 8;
   };
@@ -6250,7 +6253,7 @@ class CPU {
    * Affected flags:
    */
   private SET3L = (): byte => {
-    r.hl |= 0b1000;
+    hl |= 0b1000;
 
     return 8;
   };
@@ -6262,7 +6265,7 @@ class CPU {
    * Affected flags:
    */
   private SET3HL = (): byte => {
-    memoryRef.writeByte(r.hl, memoryRef.readByte(r.hl) | 0b1000);
+    memoryRef.writeByte(hl, memoryRef.readByte(hl) | 0b1000);
 
     return 16;
   };
@@ -6274,7 +6277,7 @@ class CPU {
    * Affected flags:
    */
   private SET3A = (): byte => {
-    r.af |= 0b100000000000;
+    af |= 0b100000000000;
 
     return 8;
   };
@@ -6286,7 +6289,7 @@ class CPU {
    * Affected flags:
    */
   private SET4B = (): byte => {
-    r.bc |= 0b1000000000000;
+    bc |= 0b1000000000000;
 
     return 8;
   };
@@ -6298,7 +6301,7 @@ class CPU {
    * Affected flags:
    */
   private SET4C = (): byte => {
-    r.bc |= 0b10000;
+    bc |= 0b10000;
 
     return 8;
   };
@@ -6310,7 +6313,7 @@ class CPU {
    * Affected flags:
    */
   private SET4D = (): byte => {
-    r.de |= 0b1000000000000;
+    de |= 0b1000000000000;
 
     return 8;
   };
@@ -6322,7 +6325,7 @@ class CPU {
    * Affected flags:
    */
   private SET4E = (): byte => {
-    r.de |= 0b10000;
+    de |= 0b10000;
 
     return 8;
   };
@@ -6334,7 +6337,7 @@ class CPU {
    * Affected flags:
    */
   private SET4H = (): byte => {
-    r.hl |= 0b1000000000000;
+    hl |= 0b1000000000000;
 
     return 8;
   };
@@ -6346,7 +6349,7 @@ class CPU {
    * Affected flags:
    */
   private SET4L = (): byte => {
-    r.hl |= 0b10000;
+    hl |= 0b10000;
 
     return 8;
   };
@@ -6358,7 +6361,7 @@ class CPU {
    * Affected flags:
    */
   private SET4HL = (): byte => {
-    memoryRef.writeByte(r.hl, memoryRef.readByte(r.hl) | 0b10000);
+    memoryRef.writeByte(hl, memoryRef.readByte(hl) | 0b10000);
 
     return 16;
   };
@@ -6370,7 +6373,7 @@ class CPU {
    * Affected flags:
    */
   private SET4A = (): byte => {
-    r.af |= 0b1000000000000;
+    af |= 0b1000000000000;
 
     return 8;
   };
@@ -6382,7 +6385,7 @@ class CPU {
    * Affected flags:
    */
   private SET5B = (): byte => {
-    r.bc |= 0b10000000000000;
+    bc |= 0b10000000000000;
 
     return 8;
   };
@@ -6394,7 +6397,7 @@ class CPU {
    * Affected flags:
    */
   private SET5C = (): byte => {
-    r.bc |= 0b100000;
+    bc |= 0b100000;
 
     return 8;
   };
@@ -6406,7 +6409,7 @@ class CPU {
    * Affected flags:
    */
   private SET5D = (): byte => {
-    r.de |= 0b10000000000000;
+    de |= 0b10000000000000;
 
     return 8;
   };
@@ -6418,7 +6421,7 @@ class CPU {
    * Affected flags:
    */
   private SET5E = (): byte => {
-    r.de |= 0b100000;
+    de |= 0b100000;
 
     return 8;
   };
@@ -6430,7 +6433,7 @@ class CPU {
    * Affected flags:
    */
   private SET5H = (): byte => {
-    r.hl |= 0b10000000000000;
+    hl |= 0b10000000000000;
 
     return 8;
   };
@@ -6442,7 +6445,7 @@ class CPU {
    * Affected flags:
    */
   private SET5L = (): byte => {
-    r.hl |= 0b100000;
+    hl |= 0b100000;
 
     return 8;
   };
@@ -6454,7 +6457,7 @@ class CPU {
    * Affected flags:
    */
   private SET5HL = (): byte => {
-    memoryRef.writeByte(r.hl, memoryRef.readByte(r.hl) | 0b100000);
+    memoryRef.writeByte(hl, memoryRef.readByte(hl) | 0b100000);
 
     return 16;
   };
@@ -6466,7 +6469,7 @@ class CPU {
    * Affected flags:
    */
   private SET5A = (): byte => {
-    r.af |= 0b10000000000000;
+    af |= 0b10000000000000;
 
     return 8;
   };
@@ -6478,7 +6481,7 @@ class CPU {
    * Affected flags:
    */
   private SET6B = (): byte => {
-    r.bc |= 0b100000000000000;
+    bc |= 0b100000000000000;
 
     return 8;
   };
@@ -6490,7 +6493,7 @@ class CPU {
    * Affected flags:
    */
   private SET6C = (): byte => {
-    r.bc |= 0b1000000;
+    bc |= 0b1000000;
 
     return 8;
   };
@@ -6502,7 +6505,7 @@ class CPU {
    * Affected flags:
    */
   private SET6D = (): byte => {
-    r.de |= 0b100000000000000;
+    de |= 0b100000000000000;
 
     return 8;
   };
@@ -6514,7 +6517,7 @@ class CPU {
    * Affected flags:
    */
   private SET6E = (): byte => {
-    r.de |= 0b1000000;
+    de |= 0b1000000;
 
     return 8;
   };
@@ -6526,7 +6529,7 @@ class CPU {
    * Affected flags:
    */
   private SET6H = (): byte => {
-    r.hl |= 0b100000000000000;
+    hl |= 0b100000000000000;
 
     return 8;
   };
@@ -6538,7 +6541,7 @@ class CPU {
    * Affected flags:
    */
   private SET6L = (): byte => {
-    r.hl |= 0b1000000;
+    hl |= 0b1000000;
 
     return 8;
   };
@@ -6550,7 +6553,7 @@ class CPU {
    * Affected flags:
    */
   private SET6HL = (): byte => {
-    memoryRef.writeByte(r.hl, memoryRef.readByte(r.hl) | 0b1000000);
+    memoryRef.writeByte(hl, memoryRef.readByte(hl) | 0b1000000);
 
     return 16;
   };
@@ -6562,7 +6565,7 @@ class CPU {
    * Affected flags:
    */
   private SET6A = (): byte => {
-    r.af |= 0b100000000000000;
+    af |= 0b100000000000000;
 
     return 8;
   };
@@ -6574,7 +6577,7 @@ class CPU {
    * Affected flags:
    */
   private SET7B = (): byte => {
-    r.bc |= 0b1000000000000000;
+    bc |= 0b1000000000000000;
 
     return 8;
   };
@@ -6586,7 +6589,7 @@ class CPU {
    * Affected flags:
    */
   private SET7C = (): byte => {
-    r.bc |= 0b10000000;
+    bc |= 0b10000000;
 
     return 8;
   };
@@ -6598,7 +6601,7 @@ class CPU {
    * Affected flags:
    */
   private SET7D = (): byte => {
-    r.de |= 0b1000000000000000;
+    de |= 0b1000000000000000;
 
     return 8;
   };
@@ -6610,7 +6613,7 @@ class CPU {
    * Affected flags:
    */
   private SET7E = (): byte => {
-    r.de |= 0b10000000;
+    de |= 0b10000000;
 
     return 8;
   };
@@ -6622,7 +6625,7 @@ class CPU {
    * Affected flags:
    */
   private SET7H = (): byte => {
-    r.hl |= 0b1000000000000000;
+    hl |= 0b1000000000000000;
 
     return 8;
   };
@@ -6634,7 +6637,7 @@ class CPU {
    * Affected flags:
    */
   private SET7L = (): byte => {
-    r.hl |= 0b10000000;
+    hl |= 0b10000000;
 
     return 8;
   };
@@ -6646,7 +6649,7 @@ class CPU {
    * Affected flags:
    */
   private SET7HL = (): byte => {
-    memoryRef.writeByte(r.hl, memoryRef.readByte(r.hl) | 0b10000000);
+    memoryRef.writeByte(hl, memoryRef.readByte(hl) | 0b10000000);
 
     return 16;
   };
@@ -6658,7 +6661,7 @@ class CPU {
    * Affected flags:
    */
   private SET7A = (): byte => {
-    r.af |= 0b1000000000000000;
+    af |= 0b1000000000000000;
 
     return 8;
   };
@@ -7184,105 +7187,104 @@ class CPU {
 
 function RLCn(reg: byte): byte {
   setCYFlag(reg >> 7);
-  const shifted: number = reg << 1;
-  const result: byte = Primitive.toByte(shifted | (shifted >> 8));
-  checkZFlag(result);
+  const result: byte = ((reg << 1) & 0xff) | getCYFlag();
+  setZFlag(!result);
   setNFlag(0);
   setHFlag(0);
   return result;
 }
 
 function RLn(reg: byte): byte {
-  const oldCY = getCYFlag();
-  setCYFlag(reg >> 7);
-  const shifted = reg << 1;
-  const result = Primitive.toByte(shifted | oldCY);
-  checkZFlag(result);
+  const cy = reg >> 7;
+  const result = ((reg << 1) & 0xff) | getCYFlag();
+  setCYFlag(cy);
+  setZFlag(!result);
   setHFlag(0);
   setNFlag(0);
   return result;
 }
 
 function ADD(operand: byte): void {
-  let a = r.af >> 8;
+  let a = af >> 8;
   checkFullCarry8(a, operand);
   checkHalfCarry(a, operand);
-  a = (a + operand) & 255;
-  r.af = (a << 8) | (r.af & 255);
-  checkZFlag(a);
+  a = (a + operand) & 0xff;
+  af = (a << 8) | (af & 0xff);
+  setZFlag(!a);
   setNFlag(0);
 }
 
 function ADC(operand: byte): void {
-  let a = r.af >> 8;
+  let a = af >> 8;
   const cy = getCYFlag();
   setHFlag(((operand & 0xf) + (a & 0xf) + cy) & 0x10);
   operand += cy;
   checkFullCarry8(operand, a);
-  a = (a + operand) & 255;
-  r.af = (a << 8) | (r.af & 255);
-  checkZFlag(a);
+  a = (a + operand) & 0xff;
+  af = (a << 8) | (af & 0xff);
+  setZFlag(!a);
   setNFlag(0);
 }
 
 function SUB(operand: byte): void {
-  checkFullCarry8(Primitive.upper(r.af), operand, true);
-  checkHalfCarry(Primitive.upper(r.af), operand, true);
-  r.af = Primitive.toWord(Primitive.addUpper(r.af, -operand));
-  checkZFlag(Primitive.upper(r.af));
+  checkFullCarry8(Primitive.upper(af), operand, true);
+  checkHalfCarry(Primitive.upper(af), operand, true);
+  af = Primitive.toWord(Primitive.addUpper(af, -operand));
+  setZFlag(!Primitive.upper(af));
   setNFlag(1);
 }
 
 function SBC(operand: byte): void {
-  let a = r.af >> 8;
+  let a = af >> 8;
   const cy = getCYFlag();
   setHFlag((a & 0xf) - (operand & 0xf) - cy < 0);
   setCYFlag(a - operand - cy < 0);
-  a = (a - operand - cy) & 255;
-  r.af = (a << 8) | (r.af & 255);
-  checkZFlag(a);
+  a = (a - operand - cy) & 0xff;
+  af = (a << 8) | (af & 0xff);
+  setZFlag(!a);
   setNFlag(1);
 }
 
 function OR(operand: byte): void {
-  const result = Primitive.upper(r.af) | operand;
-  r.af = Primitive.setUpper(r.af, Primitive.toByte(result));
-  checkZFlag(Primitive.upper(r.af));
+  const result = Primitive.upper(af) | operand;
+  af = Primitive.setUpper(af, Primitive.toByte(result));
+  setZFlag(!Primitive.upper(af));
   setNFlag(0);
   setHFlag(0);
   setCYFlag(0);
 }
 
 function AND(operand: byte): void {
-  const result = Primitive.upper(r.af) & operand;
-  r.af = Primitive.setUpper(r.af, Primitive.toByte(result));
-  checkZFlag(Primitive.upper(r.af));
+  const result = Primitive.upper(af) & operand;
+  af = Primitive.setUpper(af, Primitive.toByte(result));
+  setZFlag(!Primitive.upper(af));
   setNFlag(0);
   setHFlag(1);
   setCYFlag(0);
 }
 
 function XOR(operand: byte): void {
-  const result = Primitive.upper(r.af) ^ operand;
-  r.af = Primitive.setUpper(r.af, Primitive.toByte(result));
-  checkZFlag(Primitive.upper(r.af));
+  const result = (af >> 8) ^ operand;
+  af = (af & 0xff) | ((result & 0xff) << 8);
+  setZFlag(!(af >> 8));
   setNFlag(0);
   setHFlag(0);
   setCYFlag(0);
 }
 
 function CP(operand: byte): void {
-  checkFullCarry8(Primitive.upper(r.af), operand, true);
-  checkHalfCarry(Primitive.upper(r.af), operand, true);
-  const result: byte = Primitive.addByte(Primitive.upper(r.af), -operand);
+  checkFullCarry8(Primitive.upper(af), operand, true);
+  checkHalfCarry(Primitive.upper(af), operand, true);
+  const result: byte = Primitive.addByte(Primitive.upper(af), -operand);
   setNFlag(1);
-  checkZFlag(result);
+  setZFlag(!result);
 }
 
-function CALLH(flag: boolean): boolean {
+function CALLH(flag: boolean | bit): boolean {
   if (flag) {
-    sp = Primitive.addWord(sp, -2);
-    memoryRef.writeWord(sp, Primitive.toWord(pc + 2));
+    sp -= 2;
+    sp &= 0xffff;
+    memoryRef.writeWord(sp, (pc + 2) & 0xffff);
     pc = memoryRef.readWord(pc);
     return true;
   }
@@ -7302,7 +7304,7 @@ function POP(): word {
   return value;
 }
 
-function Jpcc(flag: boolean): boolean {
+function Jpcc(flag: boolean | bit): boolean {
   if (flag) {
     pc = memoryRef.readWord(pc);
     return true;
@@ -7310,47 +7312,46 @@ function Jpcc(flag: boolean): boolean {
   return false;
 }
 
-function RETH(flag: boolean): boolean {
+function RETH(flag: boolean | bit): boolean {
   if (flag) {
     pc = memoryRef.readWord(sp);
-    sp = Primitive.addWord(sp, 2);
+    sp += 2;
+    sp &= 0xffff;
     return true;
   }
   return false;
 }
 
 function RST(address: word): void {
-  sp = Primitive.addWord(sp, -2);
+  sp -= 2;
+  sp &= 0xffff;
   memoryRef.writeWord(sp, pc);
   pc = address;
 }
 
 function RRCn(reg: byte): byte {
-  const bitZero = reg & 1;
-  setCYFlag(bitZero);
-  const shifted: byte = reg >> 1;
-  const result: byte = Primitive.toByte(shifted | (bitZero << 7));
-  checkZFlag(result);
+  setCYFlag(reg & 1);
+  const result: byte = (reg >> 1) | (getCYFlag() << 7);
+  setZFlag(!result);
   setNFlag(0);
   setHFlag(0);
   return result;
 }
 
 function RRn(reg: byte): byte {
-  const oldCY = getCYFlag();
-  setCYFlag(reg & 1);
-  const shifted = reg >> 1;
-  const result: byte = Primitive.toByte(shifted | (oldCY << 7));
-  checkZFlag(result);
+  const cy = reg & 1;
+  const result: byte = Primitive.toByte((reg >> 1) | (getCYFlag() << 7));
+  setCYFlag(cy);
+  setZFlag(!result);
   setHFlag(0);
   setNFlag(0);
   return result;
 }
 
 function SLAn(reg: byte): byte {
-  setCYFlag(reg << 7);
-  const result = Primitive.toByte(reg << 1);
-  checkZFlag(result);
+  setCYFlag(reg >> 7);
+  const result = (reg << 1) & 0xff;
+  setZFlag(!result);
   setHFlag(0);
   setNFlag(0);
   return result;
@@ -7359,9 +7360,8 @@ function SLAn(reg: byte): byte {
 function SRAn(reg: byte): byte {
   setCYFlag(reg & 1);
   // shift to right, but keep the most sig bit
-  const msb: byte = reg >> 7;
-  const result: byte = (reg >> 1) | msb;
-  checkZFlag(result);
+  const result: byte = (reg >> 1) | (reg & 0x80);
+  setZFlag(!result);
   setHFlag(0);
   setNFlag(0);
   return result;
@@ -7370,14 +7370,14 @@ function SRAn(reg: byte): byte {
 function SRLn(reg: byte): byte {
   setCYFlag(reg & 1);
   const result: byte = reg >> 1;
-  checkZFlag(result);
+  setZFlag(!result);
   setHFlag(0);
   setNFlag(0);
   return result;
 }
 
 function BIT(bit: number, reg: byte): void {
-  checkZFlag((reg >> bit) & 1);
+  setZFlag(!((reg >> bit) & 1));
   setNFlag(0);
   setHFlag(1);
 }
@@ -7419,18 +7419,19 @@ function SET(bit: number, reg: byte): byte {
 }
 
 function SWAP(reg: byte): byte {
-  const upper = reg >> 4;
-  const lower = reg & 0xf;
-  const result = (lower << 4) | upper;
-  checkZFlag(result);
+  const result = ((reg & 0xf) << 4) | (reg >> 4);
+  setZFlag(!result);
+  setCYFlag(0);
+  setHFlag(0);
+  setNFlag(0);
   return result;
 }
 
-class Flag implements Flag {
+class Flag {
   private _z: bit = 0; // set if last op producted 0
   private _n: bit = 0; // set if last op was subtraction
   private _h: bit = 0; // set if result's Primitive.lower half of last op overflowed past 15
-  private _cy: bit = 0; // set if last op produced a result over 255 or under 0
+  private _cy: bit = 0; // set if last op produced a result over 0xff or under 0
   private cpu: CPU = <CPU>{};
   constructor(cpu: CPU, value: byte = 0) {
     this.cpu = cpu;
@@ -7439,17 +7440,6 @@ class Flag implements Flag {
     this.h = (value >> 5) & 1;
     this.cy = (value >> 4) & 1;
   }
-
-  /**
-   * Sets the Z flag if the register is 0, otherwise resets it.
-   */
-  public checkZFlag = (reg: byte): void => {
-    if (!reg) {
-      this.z = 1;
-    } else {
-      this.z = 0;
-    }
-  };
 
   private error(): void {
     throw new Error('Tried to set flag outside range.');
@@ -7462,7 +7452,7 @@ class Flag implements Flag {
   set z(value: bit) {
     if (value === 0 || value === 1) {
       this._z = value;
-      r.af = Primitive.setLower(r.af, Primitive.lower(r.af) | (value << 7));
+      af = Primitive.setLower(af, Primitive.lower(af) | (value << 7));
     } else {
       this.error();
     }
@@ -7475,7 +7465,7 @@ class Flag implements Flag {
   set n(value: bit) {
     if (value === 0 || value === 1) {
       this._n = value;
-      r.af = Primitive.setLower(r.af, Primitive.lower(r.af) | (value << 6));
+      af = Primitive.setLower(af, Primitive.lower(af) | (value << 6));
     } else {
       this.error();
     }
@@ -7488,7 +7478,7 @@ class Flag implements Flag {
   set h(value: bit) {
     if (value === 0 || value === 1) {
       this._h = value;
-      r.af = Primitive.setLower(r.af, Primitive.lower(r.af) | (value << 5));
+      af = Primitive.setLower(af, Primitive.lower(af) | (value << 5));
     } else {
       this.error();
     }
@@ -7501,7 +7491,7 @@ class Flag implements Flag {
   set cy(value: bit) {
     if (value === 0 || value === 1) {
       this._cy = value;
-      r.af = Primitive.setLower(r.af, Primitive.lower(r.af) | (value << 4));
+      af = Primitive.setLower(af, Primitive.lower(af) | (value << 4));
     } else {
       this.error();
     }

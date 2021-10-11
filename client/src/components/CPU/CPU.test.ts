@@ -1,5 +1,5 @@
 import {green, red} from 'chalk';
-import CPU, {Flag, Registers} from 'CPU/index';
+import CPU, {Flag} from 'CPU/index';
 import * as fs from 'fs';
 import {Primitive} from 'helpers/index';
 import PPUBridge from 'Memory/PPUBridge';
@@ -26,15 +26,7 @@ const GENERATED_FOLDER = path.join(
   'test',
   'generated'
 );
-const ROM_FOLDER = path.join(
-  __dirname,
-  '..',
-  '..',
-  '..',
-  '..',
-  'public',
-  'roms'
-);
+const ROM_FOLDER = path.join(__dirname, '..', '..', '..', '..', 'roms');
 
 interface CPUInfo {
   sp: word;
@@ -100,13 +92,13 @@ expect.extend({
             .join(' ')}\n\nExpected CPU State: ${logObject(
             expectedState
           )}\n\nActual CPU State: ${logObject({
-            a: cpu.getR().af >> 8,
-            f: cpu.getR().af & 255,
-            b: cpu.getR().bc >> 8,
-            c: cpu.getR().bc & 255,
-            d: cpu.getR().de >> 8,
-            e: cpu.getR().de & 255,
-            hl: cpu.getR().hl >> 8,
+            a: cpu.getAF() >> 8,
+            f: cpu.getAF() & 255,
+            b: cpu.getBC() >> 8,
+            c: cpu.getBC() & 255,
+            d: cpu.getDE() >> 8,
+            e: cpu.getDE() & 255,
+            hl: cpu.getHL() >> 8,
             sp: cpu.getSP(),
             pc: cpu.getPC(),
             interruptsEnabled: cpu.getIE(),
@@ -196,64 +188,29 @@ describe('CPU', () => {
     const saveState: Buffer = setupTestROM(biosFile, testROM, expectedState);
     // skip initial state
     [expected, fileIndex] = readSaveState(saveState, fileIndex);
-    debugger;
     for (let i = 0; i < saveState.length; i++) {
       // Act
-      debugger;
       cpu.executeInstruction();
-      // PPU.buildGraphics(cycles);
-      // cpu.checkInterrupts();
+      if (!memory.inBios) break;
       [expected, fileIndex] = readSaveState(saveState, fileIndex);
-      // if (cpu.lastExecuted[0] === '0xf0') {
-      //   cpu.pc = expected.pc;
-      //   cpu.sp = expected.sp;
-      //   r.af = (expected.a << 8) | expected.f;
-      //   r.bc = (expected.b << 8) | expected.c;
-      //   r.de = (expected.d << 8) | expected.e;
-      //   r.hl = expected.hl;
-      // }
 
       // Assert
-      const r: Registers = cpu.getR();
+      const a = cpu.getAF() >> 8;
+      const f = cpu.getAF() & 255;
+      const b = cpu.getBC() >> 8;
+      const c = cpu.getBC() & 255;
+      const d = cpu.getDE() >> 8;
+      const e = cpu.getDE() & 255;
+      const hl = cpu.getHL() >> 8;
       expect(cpu.getPC()).toMatchRegister(cpu, expected.pc, 'PC', expected);
       expect(cpu.getSP()).toMatchRegister(cpu, expected.sp, 'SP', expected);
-      expect(r.hl).toMatchRegister(cpu, expected.hl, 'HL', expected);
-      expect(Primitive.upper(r.af)).toMatchRegister(
-        cpu,
-        expected.a,
-        'A',
-        expected
-      );
-      expect(Primitive.upper(r.bc)).toMatchRegister(
-        cpu,
-        expected.b,
-        'B',
-        expected
-      );
-      expect(Primitive.lower(r.bc)).toMatchRegister(
-        cpu,
-        expected.c,
-        'C',
-        expected
-      );
-      expect(Primitive.upper(r.de)).toMatchRegister(
-        cpu,
-        expected.d,
-        'D',
-        expected
-      );
-      expect(Primitive.lower(r.de)).toMatchRegister(
-        cpu,
-        expected.e,
-        'E',
-        expected
-      );
-      expect(Primitive.lower(r.af)).toMatchRegister(
-        cpu,
-        expected.f,
-        'F',
-        expected
-      );
+      expect(hl).toMatchRegister(cpu, expected.hl, 'HL', expected);
+      expect(a).toMatchRegister(cpu, expected.a, 'A', expected);
+      expect(b).toMatchRegister(cpu, expected.b, 'B', expected);
+      expect(c).toMatchRegister(cpu, expected.c, 'C', expected);
+      expect(d).toMatchRegister(cpu, expected.d, 'D', expected);
+      expect(e).toMatchRegister(cpu, expected.e, 'E', expected);
+      expect(f).toMatchRegister(cpu, expected.f, 'F', expected);
     }
   };
 
@@ -266,7 +223,7 @@ describe('CPU', () => {
     expect(cycles).toEqual(4);
   });
 
-  it('exectues a ROM file', () => {
+  xit('exectues a ROM file', () => {
     checkRegisters(null, path.join(TEST_ROM_FOLDER, 'tetris.gb'), 'tetris.gb');
   });
 
@@ -334,7 +291,7 @@ describe('CPU', () => {
     );
   });
 
-  xit('executes the bios', () => {
+  it('executes the bios', () => {
     checkRegisters(
       path.join(ROM_FOLDER, 'bios.bin'),
       path.join(ROM_FOLDER, 'tetris.gb'),

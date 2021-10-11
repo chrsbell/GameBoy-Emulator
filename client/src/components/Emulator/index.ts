@@ -40,11 +40,12 @@ class Emulator {
     this.memory.reset();
     this.cpu.reset();
     this.ppu.reset();
+    window.clearInterval(this.timeout);
+    this.canvasRenderer.clear();
   };
   public load = (bios: ByteArray, rom: Uint8Array): boolean => {
     this.memory.load(this.cpu, bios, rom);
-    if (this.timeout !== null) window.cancelAnimationFrame(this.timeout);
-    this.update();
+    this.canvasRenderer.render();
     this.timeout = window.setInterval(this.update, 1);
     return true;
   };
@@ -55,8 +56,13 @@ class Emulator {
         this.stopped = true;
         console.log('stopped emulator');
       }
+      if (this.input.pressed(Key.Escape)) {
+        console.log('emulator reset');
+        this.reset();
+        return;
+      }
       const {cpu, ppu, canvasRenderer, memory} = this;
-      const {execute, checkInterrupts} = cpu;
+      const {checkInterrupts} = cpu;
       const {buildGraphics} = ppu;
       let cycles = 0;
       const cyclesPerUpdate = this.cpu.clock;
@@ -64,7 +70,7 @@ class Emulator {
       // elapse time according to number of cpu cycles used
       while (cycles < cyclesPerUpdate) {
         if (!cpu.halted) {
-          elapsed = execute();
+          elapsed = cpu.execute();
           cycles += elapsed;
         }
         buildGraphics(elapsed);
