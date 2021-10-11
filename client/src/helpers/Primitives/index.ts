@@ -5,19 +5,6 @@ const pad = (str: string, width: number, replacement = '0'): string => {
   return Array(width - str.length).join(replacement) + str;
 };
 
-interface Flavoring<FlavorT> {
-  _type?: FlavorT;
-}
-
-type Primitive<T, FlavorT> = T & Flavoring<FlavorT>;
-
-export type bit = Primitive<number, 'bit'>;
-export type byte = Primitive<number, 'byte'>;
-export type word = Primitive<number, 'word'>;
-export interface OpcodeList {
-  [key: string]: Function;
-}
-
 /**
  * Casts a number to a byte.
  * @returns {byte}
@@ -66,20 +53,21 @@ const setLower = (value: word, operand: byte): word =>
  * Adds the operand to the word.
  * @returns {word}
  */
-const addWord = (opOne: word, opTwo: word): word => toWord(opOne + opTwo);
+const addWord = (opOne: word, opTwo: word | byte): word =>
+  toWord(opOne + opTwo);
 
 /**
  * Adds the operand to the upper byte.
  * @returns {word}
  */
 const addUpper = (value: word, operand: byte): word =>
-  lower(value) | (addByte(upper(value), operand) << 8);
+  (value & 255) | (addByte(upper(value), operand) << 8);
 
 /**
  * Adds the operand to the lower byte.
  */
 const addLower = (value: word, operand: byte): word =>
-  (upper(value) << 8) | addByte(lower(value), operand);
+  (upper(value) << 8) | ((value + operand) & 255);
 
 /**
  * Formats the byte/word as a hex value
@@ -89,7 +77,7 @@ const toHex = (value: byte | word): string => `0x${pad(value.toString(16), 2)}`;
 /**
  * Converts the unsigned byte to its signed format using two's complement
  */
-const toSigned = (value: byte) => {
+const toSigned = (value: byte): byte => {
   if (value < 0) throw new Error(`Can't pass signed value into toSigned.`);
   if (value >= 128 || value <= -128) {
     return -((~value + 1) & 255);
@@ -97,28 +85,19 @@ const toSigned = (value: byte) => {
   return value;
 };
 
-const getBit = (value: byte, bit: number) => {
-  if (bit > 7) {
-    throw new Error('Tried to get bit outside of range.');
-  }
+const getBit = (value: byte, bit: number): bit => {
   return (value >> bit) & 1;
 };
 
-const setBit = (value: byte, bit: number) => {
-  if (bit > 7) {
-    throw new Error('Tried to set bit outside of range.');
-  }
+const setBit = (value: byte | word, bit: number): byte | word => {
   return value | (1 << bit);
 };
 
-const clearBit = (value: byte, bit: number) => {
-  if (bit > 7) {
-    throw new Error('Tried to clear bit outside of range.');
-  }
+const clearBit = (value: byte | word, bit: number): byte | word => {
   return value & ~(1 << bit);
 };
 
-export {
+const Primitive = {
   toByte,
   addByte,
   toWord,
@@ -135,3 +114,5 @@ export {
   setBit,
   clearBit,
 };
+
+export default Primitive;

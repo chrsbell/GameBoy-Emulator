@@ -1,383 +1,296 @@
-import benchmark, {benchmarksEnabled} from '../../helpers/Performance';
-import {
-  byte,
-  clearBit,
-  getBit,
-  setBit,
-  toSigned,
-  word,
-  upper,
-  lower,
-} from '../../helpers/Primitives';
-import type {ColorScheme, RGB} from '../CanvasRenderer';
-import CanvasRenderer from '../CanvasRenderer';
-import Interrupt, {enableInterrupt} from '../Interrupts';
-import Memory from '../Memory';
-import PPUControl from './Control';
+import CanvasRenderer from 'CanvasRenderer/index';
+import {Primitive} from 'helpers/index';
+import InterruptService from 'Interrupts/index';
+import PPUBridge from 'Memory/PPUBridge';
+import PPUControl from './LCDC';
 
 type StatBitsType = {
   modeLower: number;
   modeUpper: number;
   lycLc: number;
-  interrupt: {
-    [key: number]: number;
-  };
+  interrupt: NumNumIdx;
   lycLcInterrupt: number;
 };
 
+let ppuBridgeRef!: PPUBridge;
+let interruptServiceRef!: InterruptService;
+// clock used to determine the draw mode, elapsed according to cpu t-states
+let clock = 0;
+// the scanline currently being rendererd (0-153)
+let scanline = 0;
+let mode = 2;
+// stat register
+let stat = 0;
+let paletteMapRef!: number[];
+let tileDataRef!: word[][][];
+let tileMapRef!: byte[][];
+let pixelMapRef!: byte[][];
+let lcdc!: PPUControl;
 class PPU {
-  private memory: Memory = <Memory>{};
-  private _lcdc: PPUControl = <PPUControl>{};
-  public get lcdc(): PPUControl {
-    return this._lcdc;
-  }
-  private scanlineClockMod = 5;
-  private ppuModes = {
+  private static ppuModes: StrNumIdx = {
     hBlank: 0,
     vBlank: 1,
     readOAM: 2,
     readVRAM: 3,
   };
-  private statBits = {
+  private static statBits: StatBitsType = {
     modeLower: 0,
     modeUpper: 1,
     lycLc: 2,
     interrupt: {
-      [this.ppuModes.hBlank]: 3,
-      [this.ppuModes.vBlank]: 4,
-      [this.ppuModes.readOAM]: 5,
-      [this.ppuModes.readVRAM]: -1, // no interrupt bit
+      [PPU.ppuModes.hBlank]: 3,
+      [PPU.ppuModes.vBlank]: 4,
+      [PPU.ppuModes.readOAM]: 5,
+      [PPU.ppuModes.readVRAM]: -1, // no interrupt bit
     },
     lycLcInterrupt: 6,
   };
-  private pixelMap!: Array<Array<byte>>;
-  private colorScheme!: Array<RGB>;
-  // stat register
-  private _stat = 0;
-  public get stat(): byte {
-    return this.memory.readByte(this.memory.addresses.ppu.stat);
-  }
-  public set stat(value) {
-    this._stat = value;
-    this._mode = value & 0b11;
-    this.memory.writeByte(this.memory.addresses.ppu.stat, value);
-  }
-  private _mode = 2;
-  public set mode(value) {
-    let register: byte = this.stat;
-    register = clearBit(register, this.statBits.modeLower);
-    register = clearBit(register, this.statBits.modeUpper);
-    register |= value;
-    this.stat = register;
-  }
-  public get mode(): byte {
-    // if (this._mode !== (this.memory.readByte(this.memory.addresses.ppu.stat) & 0b11))
-    // throw new Error('Mismatch in stat value from class and this.memory.');
-    return this.memory.readByte(this.memory.addresses.ppu.stat) & 0b11;
-  }
-  // clock used to determine the draw mode, elapsed according to cpu t-states
-  private _clock = 0;
-  public get clock() {
-    return this._clock;
-  }
-  public set clock(value) {
-    this._clock = value;
-  }
-  // the scanline currently being rendererd (0-153)
-  private _scanline = 0;
-  public get scanline(): byte {
-    return this.memory.readByte(this.memory.addresses.ppu.scanline);
-  }
-  public set scanline(value) {
-    this.memory.updateScanline(value);
-    this._scanline = value;
-  }
-  private _scanlineCompare = 0;
-  public get scanlineCompare(): byte {
-    return this.memory.readByte(this.memory.addresses.ppu.scanlineCompare);
-  }
-  public set scanlineCompare(value) {
-    this.memory.writeByte(this.memory.addresses.ppu.scanlineCompare, value);
-    this._scanlineCompare = value;
-  }
-  private _scrollX = 0;
-  public get scrollX(): byte {
-    return this.memory.readByte(this.memory.addresses.ppu.scrollX);
-  }
-  public set scrollX(value) {
-    this._scrollX = value;
-    this.memory.writeByte(this.memory.addresses.ppu.scrollX, value);
-  }
-  private _scrollY = 0;
-  public get scrollY(): byte {
-    return this.memory.readByte(this.memory.addresses.ppu.scrollY);
-  }
-  public set scrollY(value) {
-    this._scrollY = value;
-    this.memory.writeByte(this.memory.addresses.ppu.scrollY, value);
-  }
-  private _windowX = 0;
-  public get windowX(): byte {
-    return this.memory.readByte(this.memory.addresses.ppu.windowX);
-  }
-  public set windowX(value) {
-    this._windowX = value;
-    this.memory.writeByte(this.memory.addresses.ppu.windowX, value);
-  }
-  private _windowY = 0;
-  public get windowY(): byte {
-    return this.memory.readByte(this.memory.addresses.ppu.windowY);
-  }
-  public set windowY(value) {
-    this._windowY = value;
-    this.memory.writeByte(this.memory.addresses.ppu.windowY, value);
-  }
+  // internal representation of canvas, copied over during update
+  public pixelMap!: byte[][];
+  public getLCDC = (): PPUControl => lcdc;
+  public setStat = (value: number): void => {
+    stat = value;
+    mode = value & 0b11;
+    ppuBridgeRef.writeIORamOnly(0xff41, stat);
+  };
 
-  private _palette = 0;
-  private paletteMap: Array<number> = new Array(4);
-  public get palette(): byte {
-    return this.memory.readByte(this.memory.addresses.ppu.paletteData);
-  }
-  public set palette(value) {
-    this._palette = value;
-    this.memory.writeByte(this.memory.addresses.ppu.paletteData, value);
-  }
-  public constructor(memory: Memory) {
-    this.memory = memory;
-    this._lcdc = new PPUControl();
-    this.pixelMap = new Array(CanvasRenderer.screenHeight);
-    for (let y = 0; y < CanvasRenderer.screenHeight; y++) {
-      this.pixelMap[y] = new Array(CanvasRenderer.screenWidth);
+  public setMode = (value: number): void => {
+    // lcd mode switch interrupt condition
+    // only certain modes trigger an interrupt
+    const interruptBit = PPU.statBits.interrupt[mode];
+    if (interruptBit >= 0) {
+      const interruptModeBit = (stat >> interruptBit) & 1; //Primitive.getBit(reg, interruptBit);
+      if (interruptModeBit && value !== mode) {
+        interruptServiceRef.enable(InterruptService.flags.lcdStat);
+      }
     }
+    mode = value;
+    stat = ((stat >> 2) << 2) | value;
+    ppuBridgeRef.writeIORamOnly(0xff41, stat);
+  };
+  public updateScanline = (value: byte): void => {
+    scanline = value;
+    ppuBridgeRef.updateScanline(value);
+    // scanline compare interrupt condition
+    let reg: byte = stat;
+    if (scanline === this.scanlineCompare) {
+      reg |= 1 << 2;
+      if ((reg >> 6) & 1) {
+        interruptServiceRef.enable(1);
+      }
+    } else {
+      reg &= ~(1 << 2);
+    }
+    this.setStat(reg);
+  };
+  public scanlineCompare: byte = 0;
+  public scrollX: byte = 0;
+  public scrollY: byte = 0;
+  public windowX: byte = 0;
+  public windowY: byte = 0;
+  public palette: byte = 0;
+  // the current palette mapping
+  public paletteMap!: number[];
+  public tileData!: word[][][];
+  public tileMap!: byte[][];
+  constructor(ppuBridge: PPUBridge, interruptService: InterruptService) {
+    interruptServiceRef = interruptService;
+    ppuBridgeRef = ppuBridge;
     this.reset();
-    if (benchmarksEnabled) {
-      this.buildGraphics = benchmark(this.buildGraphics.bind(this), this);
-      this.drawScanline = benchmark(this.drawScanline.bind(this), this);
-      this.renderTiles = benchmark(this.renderTiles.bind(this), this);
-      this.readOAM = benchmark(this.readOAM.bind(this), this);
-      this.readVRAM = benchmark(this.readVRAM.bind(this), this);
-      this.vBlank = benchmark(this.vBlank.bind(this), this);
-      this.hBlank = benchmark(this.hBlank.bind(this), this);
-      this.lcdInterrupt = benchmark(this.lcdInterrupt.bind(this), this);
-    }
   }
-  /**
-   * Sets the color scheme mapping for palettes.
-   */
-  public setColorScheme(scheme: ColorScheme): void {
-    this.colorScheme[0] = scheme.white;
-    this.colorScheme[1] = scheme.lightGray;
-    this.colorScheme[2] = scheme.darkGray;
-    this.colorScheme[3] = scheme.black;
-  }
-  /**
-   * Resets the PPU.
-   */
-  public reset(): void {
-    this.lcdc.update(0);
-    this._stat = 0;
-    this._mode = 0;
-    this._clock = 0;
-    this._scanline = 0;
-    this._scanlineCompare = 0;
-    this._scrollX = 0;
-    this._scrollY = 0;
-    this._windowX = 0;
-    this._windowY = 0;
-    this._palette = 0;
-    this.colorScheme = new Array(4);
-  }
-  /**
-   * Returns whether lcd is enabled.
-   */
-  public lcdEnabled(): boolean {
-    return this._lcdc.LCDPPU === 1;
-  }
-  /**
-   * Vertical blanking period.
-   */
-  private vBlank(): void {
-    if (this.clock >= 456) {
-      this.scanline = this.scanline + 1;
-      this.clock = 0;
-      if (this.scanline > 153) {
-        this.mode = this.ppuModes.readOAM;
-        this.scanline = 0;
+  public reset = (): void => {
+    lcdc = new PPUControl();
+    lcdc.update(0);
+    this.pixelMap = new Array(CanvasRenderer.screenHeight)
+      .fill(0)
+      .map(y => new Array(CanvasRenderer.screenWidth).fill(0));
+    pixelMapRef = this.pixelMap;
+    this.tileData = new Array(384)
+      .fill(0)
+      .map(y => new Array(8).fill(0).map(x => new Array(8).fill(0)));
+    tileDataRef = this.tileData;
+    this.tileMap = new Array(2).fill(0).map(m => new Array(1024).fill(0));
+    tileMapRef = this.tileMap;
+    this.paletteMap = [0, 0, 0, 0];
+    paletteMapRef = this.paletteMap;
+    this.setStat(0);
+    this.setMode(2);
+    clock = 0;
+    scanline = 0;
+    this.scanlineCompare = 0;
+    this.scrollX = 0;
+    this.scrollY = 0;
+    this.windowX = 0;
+    this.windowY = 0;
+    this.palette = 0;
+  };
+  private vBlank = (): void => {
+    if (clock >= 456) {
+      this.updateScanline(scanline + 1);
+      clock = 0;
+      if (scanline > 153) {
+        this.setMode(PPU.ppuModes.readOAM);
+        this.updateScanline(0);
       }
     }
-  }
-  /**
-   * Horizontal blanking period.
-   */
-  private hBlank(): void {
-    if (this.clock >= 204) {
-      this.scanline = this.scanline + 1;
-      if (this.scanline === CanvasRenderer.screenHeight) {
-        this.mode = this.ppuModes.vBlank;
-        enableInterrupt(this.memory, Interrupt.vBlank);
+  };
+  private hBlank = (): void => {
+    if (clock >= 204) {
+      this.drawScanline();
+      this.updateScanline(scanline + 1);
+      if (scanline === CanvasRenderer.screenHeight) {
+        this.setMode(PPU.ppuModes.vBlank);
+        interruptServiceRef.enable(InterruptService.flags.vBlank);
       } else {
-        this.mode = this.ppuModes.readOAM;
+        this.setMode(PPU.ppuModes.readOAM);
       }
     }
-  }
-  private readOAM(): void {
-    if (this.clock >= 80) {
-      this.mode = this.ppuModes.readVRAM;
+  };
+  private readOAM = (): void => {
+    if (clock >= 80) {
+      this.setMode(PPU.ppuModes.readVRAM);
     }
-  }
-  private readVRAM(): void {
-    if (this.clock >= 172) {
-      this.mode = this.ppuModes.hBlank;
+  };
+  private readVRAM = (): void => {
+    if (clock >= 172) {
+      this.setMode(PPU.ppuModes.hBlank);
     }
-    // sanctioned screen tearing to improve performance
-    if (this.clock % this.scanlineClockMod === 0) this.drawScanline();
-    this.scanlineClockMod += 1;
-    if (this.scanlineClockMod === 40) {
-      this.scanlineClockMod = 8;
-    }
-  }
-  private lcdInterrupt(switchedMode: boolean): void {
-    const interruptBit = this.statBits.interrupt[this.mode];
+  };
+  private lcdInterrupt = (switchedMode: boolean): void => {
+    const interruptBit = PPU.statBits.interrupt[mode];
     // only certain modes trigger an interrupt
     if (interruptBit >= 0) {
-      const interruptModeBit = getBit(this.stat, interruptBit);
+      const interruptModeBit = Primitive.getBit(stat, interruptBit);
       if (interruptModeBit && switchedMode) {
-        enableInterrupt(this.memory, Interrupt.lcdStat);
+        interruptServiceRef.enable(InterruptService.flags.lcdStat);
       }
     }
-  }
+  };
   /**
-   * Sends scanlines to the renderer.
+   * Updates internal representation of graphics
    */
-  public buildGraphics(cycles: number): void {
-    this.paletteMap[0] =
-      (getBit(this.palette, 1) << 1) | getBit(this.palette, 0);
-    this.paletteMap[1] =
-      (getBit(this.palette, 3) << 1) | getBit(this.palette, 2);
-    this.paletteMap[2] =
-      (getBit(this.palette, 5) << 1) | getBit(this.palette, 4);
-    this.paletteMap[3] =
-      (getBit(this.palette, 7) << 1) | getBit(this.palette, 6);
-    // possible the lcdc register was set by the game
-    this.lcdc.update(this.memory.readByte(this.memory.addresses.ppu.lcdc));
-    if (this.lcdEnabled()) {
-      this.clock += cycles;
-      const oldMode = this.mode;
-      switch (this.mode) {
-        case this.ppuModes.hBlank:
-          this.hBlank();
+  public buildGraphics = (cycles: number): void => {
+    if (lcdc.enable) {
+      clock += cycles;
+      const oldMode = mode;
+      switch (oldMode) {
+        case 0:
+          if (clock >= 204) {
+            if (lcdc.bgWindowEnable) {
+              this.renderTiles();
+            }
+            if (lcdc.objEnable) {
+              this.renderSprites();
+            }
+            this.updateScanline(scanline + 1);
+            if (scanline === 144) {
+              this.setMode(1);
+              interruptServiceRef.enable(1);
+            } else {
+              this.setMode(2);
+            }
+          }
           break;
-        case this.ppuModes.vBlank:
-          this.vBlank();
+        case 1:
+          if (clock >= 456) {
+            this.updateScanline(scanline + 1);
+            clock = 0;
+            if (scanline > 153) {
+              this.setMode(2);
+              this.updateScanline(0);
+            }
+          }
           break;
-        case this.ppuModes.readOAM:
-          this.readOAM();
+        case 2:
+          if (clock >= 80) {
+            this.setMode(PPU.ppuModes.readVRAM);
+          }
           break;
-        case this.ppuModes.readVRAM:
-          this.readVRAM();
+        case 3:
+          if (clock >= 172) {
+            this.setMode(PPU.ppuModes.hBlank);
+          }
           break;
       }
-      this.lcdInterrupt(oldMode !== this.mode);
+      this.lcdInterrupt(oldMode !== mode);
       this.compareLcLyc();
     } else {
-      this.resetVBlank();
+      // reset v blank
+      clock = 0;
+      scanline = 0;
+      this.setMode(PPU.ppuModes.vBlank);
     }
-  }
-  /**
-   * Compares the scanline/scanline compare registers and toggles appropriate bits.
-   */
-  public compareLcLyc(): void {
-    const register: byte = this.stat;
-    if (this.scanline === this.scanlineCompare) {
-      this.stat = setBit(register, this.statBits.lycLc);
-      if (getBit(this.stat, this.statBits.lycLcInterrupt)) {
-        enableInterrupt(this.memory, Interrupt.lcdStat);
+  };
+  public compareLcLyc = (): void => {
+    const register: byte = stat;
+    if (scanline === this.scanlineCompare) {
+      this.setStat(Primitive.setBit(register, PPU.statBits.lycLc));
+      if (Primitive.getBit(stat, PPU.statBits.lycLcInterrupt)) {
+        interruptServiceRef.enable(InterruptService.flags.lcdStat);
       }
     } else {
-      this.stat = clearBit(register, this.statBits.lycLc);
+      this.setStat(Primitive.clearBit(register, PPU.statBits.lycLc));
     }
+    ppuBridgeRef.writeIORam(0xff41, stat);
+  };
+  private windowVisible(): boolean {
+    return (
+      lcdc.windowEnable &&
+      this.windowY <= CanvasRenderer.screenHeight &&
+      this.windowX <= CanvasRenderer.screenWidth
+    );
   }
-  /**
-   * Resets the PPU/LCD to the beginning of the VBlank period.
-   */
-  public resetVBlank(): void {
-    this.clock = 0;
-    this.scanline = 0;
-    this.mode = this.ppuModes.vBlank;
-  }
-  private scanlineInWindow(): boolean {
-    return this.lcdc.windowEnable && this.scanline >= this.windowY;
-  }
-  private bgMemoryMapOffset(): word {
-    const testBit = !this.scanlineInWindow()
-      ? this.lcdc.bgTileMapArea
-      : this.lcdc.tileMapArea;
+  private tileMapMemoryIndex(): word {
+    const testBit = !this.windowVisible()
+      ? lcdc.bgTileMapArea
+      : lcdc.windowTileMapArea;
     return testBit ? 0x9c00 : 0x9800;
   }
-  private tileDataMapOffset(): word {
-    return this.lcdc.bgWindowTileData ? 0x8000 : 0x8800;
-  }
-  /**
-   * Renders tiles.
-   */
-  public renderTiles(): void {
-    const windowXOffset = this.windowX - 7;
-    const tileDataAddress = this.tileDataMapOffset();
-    const isSigned = tileDataAddress === 0x8800;
-    const bgDataAddress = this.bgMemoryMapOffset();
-    let yPos;
-    const scanlineInWindow =
-      this.lcdc.windowEnable && this.scanline >= this.windowY;
-    if (!scanlineInWindow) {
-      yPos = this.scrollY + this.scanline;
-    } else {
-      yPos = this.scanline - this.windowY;
-    }
-    const line = (yPos % 8) * 2;
-    const tileRow = Math.floor(yPos / 8) * 32;
-    const tileAddress = bgDataAddress + tileRow;
-    for (let x = 0; x < CanvasRenderer.screenWidth; x++) {
-      let xPos;
-      if (scanlineInWindow && x >= windowXOffset) {
-        xPos = x - windowXOffset;
-      } else {
-        xPos = x + this.scrollX;
+  public renderTiles = (): void => {
+    const {scrollY, scrollX} = this;
+    const currentLine = pixelMapRef[scanline];
+    // there are 2 tile maps which map indices to tiles. Each map stores 32x32 tiles. Each tile index is a byte. Each tile is 8x8 pixels, which using 2bpp means 16 bytes per tile.
+    const currentMap = tileMapRef[!lcdc.bgTileMapArea ? 0 : 1];
+    // Background:
+    // scy and scx specify top left origin of visible 160x144 pixel area within 256x256 tile map. If the visible area exceeds bounds of tile map, wraps around
+    // Window:
+    // const windowXOffset = this.windowX - 7;
+    // const bgDataAddressIndex = this.bgMemoryMapIndex();
+    let tileCol = (scrollX >> 3) & 31;
+    const tileYOffset = scanline + scrollY;
+    const tileRow = (tileYOffset & 255) >> 3;
+    let tileIndex = currentMap[tileCol + (tileRow << 5)];
+    const isSigned = lcdc.bgWindowTileData === 0;
+    // start from block 2 if using signed data
+    if (isSigned && tileIndex <= 127) tileIndex += 256;
+    let tileX = scrollX & 7;
+    let tileY = tileDataRef[tileIndex][tileYOffset & 7];
+    // When using tile lookup method 1, 8000 is the base pointer. Block 0 (8000-87ff) maps to indices 0-127 and Block 1 (8800-8fff) maps to indices 128-255
+    // Using method 2, 9000 is the base pointer and the indices are signed. Indices 128-255 (or -127-0) map to block 1 and indices 0-127 map to block 2 (9000-97ff)
+    for (let x = 0; x < 160; x++) {
+      for (tileX; tileX < 7; tileX++) {
+        currentLine[x] = paletteMapRef[tileY[tileX]];
+        x += 1;
       }
-      const tileCol = Math.floor(xPos / 8);
-      const tileAddressX = tileAddress + tileCol;
-      const tileId = isSigned
-        ? toSigned(this.memory.readByte(tileAddressX))
-        : this.memory.readByte(tileAddressX);
-      const tileLocation =
-        tileDataAddress + (isSigned ? (tileId + 128) * 16 : tileId * 16);
-      const tile = this.memory.readWord(tileLocation + line);
-      const colorBit = -((xPos % 8) - 7);
-      const colorIndex =
-        (getBit(upper(tile), colorBit) << 1) | getBit(lower(tile), colorBit);
-
-      this.pixelMap[this.scanline][xPos] = this.paletteMap[colorIndex];
-      CanvasRenderer.setPixel(
-        xPos,
-        this.scanline,
-        this.colorScheme[this.pixelMap[this.scanline][xPos]]
-      );
+      currentLine[x] = paletteMapRef[tileY[tileX]];
+      tileX = 0;
+      tileCol += 1;
+      // wrap around screen if reached last tile
+      if (tileCol === 32) tileCol = 0;
+      tileIndex = currentMap[tileCol + (tileRow << 5)];
+      if (isSigned && tileIndex <= 127) tileIndex += 256;
+      tileY = tileDataRef[tileIndex][(scanline + scrollY) & 7];
     }
-  }
-  /**
-   * Renders sprites.
-   */
-  public renderSprites(): void {}
-  /**
-   * Draws a scanline.
-   */
-  public drawScanline(): void {
-    if (this.lcdc.bgWindowEnable) {
+  };
+  public renderSprites = (): void => {};
+  public drawScanline = (): void => {
+    if (lcdc.bgWindowEnable) {
       this.renderTiles();
     }
-    if (this.lcdc.objEnable) {
+    if (lcdc.objEnable) {
       this.renderSprites();
     }
-  }
+  };
 }
 
 export default PPU;

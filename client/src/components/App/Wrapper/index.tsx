@@ -1,16 +1,15 @@
+import {DEBUG} from 'helpers/index';
 import * as React from 'react';
 import {useEffect, useRef, useState} from 'react';
-import {DEBUG} from '../../helpers/Debug';
-import type {AppContext} from './AppTypes';
-import './styles.scss';
+import styles from './sass/index.module.scss';
 
-const Wrapper: React.FC<AppContext> = ({appDispatch}) => {
+const Wrapper = ({appDispatch}: AppContext): JSX.Element => {
   const canvasRef: React.MutableRefObject<HTMLCanvasElement> = useRef(null!);
   const hiddenBIOSRef: React.MutableRefObject<HTMLInputElement> = useRef(null!);
   const hiddenROMRef: React.MutableRefObject<HTMLInputElement> = useRef(null!);
   const [ROMFile, setROMFile] = useState<Blob>(null!);
   const [BIOSFile, setBIOSFile] = useState<Blob>(null!);
-  const onSubmit = () => {
+  const onSubmit = (): void => {
     if (BIOSFile) {
       BIOSFile.arrayBuffer().then(buffer => {
         appDispatch({
@@ -36,18 +35,18 @@ const Wrapper: React.FC<AppContext> = ({appDispatch}) => {
 
   return (
     <>
-      <section className="container">
-        <div className="flex-column">
+      <section className={styles['container']}>
+        <div className={styles['flex-column']}>
           <nav>
             <button
-              onClick={() => {
+              onClick={(): void => {
                 hiddenROMRef.current.click();
               }}
             >
               Upload ROM
             </button>
             <button
-              onClick={() => {
+              onClick={(): void => {
                 hiddenBIOSRef.current.click();
               }}
             >
@@ -57,21 +56,33 @@ const Wrapper: React.FC<AppContext> = ({appDispatch}) => {
               type="file"
               name="rom"
               ref={hiddenROMRef}
-              onChange={e => setROMFile(e.target.files![0])}
+              onChange={(e): void => setROMFile(e.target.files![0])}
             />
             <input
               type="file"
               name="bios"
               ref={hiddenBIOSRef}
-              onChange={e => setBIOSFile(e.target.files![0])}
+              onChange={(e): void => setBIOSFile(e.target.files![0])}
             />
             <button type="button" onClick={onSubmit}>
               Upload
             </button>
           </nav>
-          <div id="canvas" />
-          {/* Use a LCD size similar to GameBoy's */}
-          <canvas width="787" height="720" ref={canvasRef} />
+          <div className={styles['shell']}>
+            <div className={styles['shell-half']}>
+              <div className={styles['power']} />
+              <div className={styles['display']}>
+                <canvas
+                  width={styles['canvasWidth']}
+                  height={styles['canvasHeight']}
+                  ref={canvasRef}
+                />
+              </div>
+            </div>
+            <div className={styles['shell-half']}>
+              <div className={styles.controls} />
+            </div>
+          </div>
         </div>
       </section>
     </>

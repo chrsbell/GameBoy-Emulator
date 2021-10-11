@@ -10,7 +10,7 @@ describe('LCDControl', () => {
     expect(control.bgTileMapArea).toBe(1);
     expect(control.bgWindowEnable).toBe(0);
     expect(control.windowEnable).toBe(1);
-    expect(control.tileMapArea).toBe(0);
-    expect(control.LCDPPU).toBe(1);
+    expect(control.bgTileMapArea).toBe(0);
+    expect(control.enable).toBe(1);
   });
 });

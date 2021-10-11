@@ -1,81 +1,90 @@
-import {forEach, map} from 'lodash';
-import benchmark, {
-  benchmarksEnabled,
-  getBenchmarks,
-} from '../../helpers/Performance';
-import CanvasRenderer from '../CanvasRenderer';
-import CPU from '../CPU';
-import Memory from '../Memory';
-import PPU from '../PPU';
-import chalk from 'chalk';
+import CanvasRenderer from 'CanvasRenderer/index';
+import CPU from 'CPU/index';
+import benchmark from 'helpers/Performance';
+import Input, {Key} from 'Input/index';
+import InterruptService from 'Interrupts/index';
+import Memory from 'Memory/index';
+import PPUBridge from 'Memory/PPUBridge';
+import PPU from 'PPU/index';
 
 class Emulator {
-  private timerID!: ReturnType<typeof setTimeout>;
+  private timeout!: number;
   private numExecuted = 0;
-  private memory: Memory = <Memory>{};
-  private cpu: CPU = <CPU>{};
-  private ppu: PPU = <PPU>{};
-  public constructor() {
-    this.memory = new Memory();
-    this.cpu = new CPU();
-    this.ppu = new PPU(this.memory);
-    this.ppu.setColorScheme(CanvasRenderer.colorScheme);
-    if (benchmarksEnabled) {
-      this.update = benchmark(this.update.bind(this), this);
-    }
+  private memory!: Memory;
+  private canvasRenderer!: CanvasRenderer;
+  private cpu!: CPU;
+  private ppuBridge!: PPUBridge;
+  private ppu!: PPU;
+  private input!: Input;
+  private interruptService!: InterruptService;
+  private stopped = false;
+  constructor(canvasRenderer: CanvasRenderer) {
+    this.canvasRenderer = canvasRenderer;
+    this.ppuBridge = new PPUBridge();
+    this.interruptService = this.ppuBridge.interruptService;
+    this.memory = this.ppuBridge.memory;
+    this.cpu = new CPU(this.memory);
+    this.ppu = this.ppuBridge.ppu;
+    this.input = new Input();
+    this.canvasRenderer.setPPU(this.ppuBridge.ppu);
+    benchmark(this.ppuBridge);
+    benchmark(this.memory);
+    benchmark(this.cpu);
+    benchmark(this.ppu);
+    benchmark(this.input);
+    benchmark(this.canvasRenderer);
+    benchmark(this.interruptService);
+    benchmark(this);
   }
-  public reset() {
+  public reset = (): void => {
     this.memory.reset();
     this.cpu.reset();
     this.ppu.reset();
-  }
-  /**
-   * Loads a bios and ROM file into the Memory module and stops the currently updating function.
-   * @returns {boolean}
-   */
-  public load(bios: Uint8Array | null, rom: Uint8Array): boolean {
+    window.clearInterval(this.timeout);
+    this.canvasRenderer.clear();
+  };
+  public load = (bios: ByteArray, rom: Uint8Array): boolean => {
     this.memory.load(this.cpu, bios, rom);
-    clearTimeout(this.timerID);
-    this.timerID = setInterval(this.update, 0);
+    this.canvasRenderer.render();
+    this.timeout = window.setInterval(this.update, 1);
     return true;
-  }
-  /**
-   * Executes the next set of opcodes and calls renderer update method.
-   * Calls itself at regular intervals according to the renderer's FPS, updating
-   * the ID of setTimeout each time.
-   */
-  public update() {
-    const cyclesPerUpdate = this.cpu.clock / CanvasRenderer.fps;
-    let cycles = 0;
-    let elapsed;
-    this.logBenchmarks();
-    // elapse time according to number of cpu cycles used
-    while (cycles < cyclesPerUpdate) {
-      elapsed = this.cpu.executeInstruction(this.memory);
-      this.numExecuted += elapsed;
-      cycles += elapsed;
-      this.ppu.buildGraphics(elapsed);
-      this.cpu.checkInterrupts(this.memory);
+  };
+  public update = (): void => {
+    if (!this.stopped) {
+      if (this.input.pressed(Key.Space)) {
+        this.input.debounce(Key.Space);
+        this.stopped = true;
+        console.log('stopped emulator');
+      }
+      if (this.input.pressed(Key.Escape)) {
+        console.log('emulator reset');
+        this.reset();
+        return;
+      }
+      const {cpu, ppu, canvasRenderer, memory} = this;
+      const {checkInterrupts} = cpu;
+      const {buildGraphics} = ppu;
+      let cycles = 0;
+      const cyclesPerUpdate = this.cpu.clock;
+      let elapsed = 0;
+      // elapse time according to number of cpu cycles used
+      while (cycles < cyclesPerUpdate) {
+        if (!cpu.halted) {
+          elapsed = cpu.execute();
+          cycles += elapsed;
+        }
+        buildGraphics(elapsed);
+        checkInterrupts(memory);
+      }
+      canvasRenderer.buildImage();
+    } else {
+      if (this.input.pressed(Key.Space)) {
+        this.input.debounce(Key.Space);
+        console.log('unpaused emulator');
+        this.stopped = false;
+      }
     }
-    console.log(`Test status: ${this.memory.readByte(0xa000)}`);
-    CanvasRenderer.draw();
-  }
-  /**
-   * Utility function to benchmark the emulator.
-   */
-  private logBenchmarks(): void {
-    if (this.numExecuted > this.cpu.clock) {
-      const times = getBenchmarks();
-      forEach(times, (functions: any, group: any) => {
-        console.log(
-          `%cPerformance of ${group}:`,
-          'color:#8217ab; font-weight: bold'
-        );
-        console.table(functions);
-      });
-      this.numExecuted = 0;
-    }
-  }
+  };
 }
 
 export default Emulator;

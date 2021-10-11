@@ -1,9 +1,8 @@
+import Wrapper from 'App/Wrapper';
+import CanvasRenderer from 'CanvasRenderer/index';
+import Emulator from 'Emulator/index';
 import * as React from 'react';
 import {useEffect, useReducer, useRef} from 'react';
-import CanvasRenderer from '../CanvasRenderer';
-import Emulator from '../Emulator';
-import type {Action, AppContext, AppState} from './AppTypes';
-import Wrapper from './Wrapper';
 
 const initialState: AppState = {
   canvas: null!,
@@ -11,7 +10,7 @@ const initialState: AppState = {
   parsedBIOS: new Uint8Array(),
 };
 
-const reducer = (state: AppState, action: Action) => {
+const reducer = (state: AppState, action: Action): AppState => {
   switch (action.type) {
     case 'canvas':
       return {
@@ -35,20 +34,21 @@ const reducer = (state: AppState, action: Action) => {
   }
 };
 
-const App: React.FC = () => {
+const App = (): JSX.Element => {
   const [appState, appDispatch] = useReducer(reducer, initialState);
-  const emulator = useRef(new Emulator());
+  const emulator: React.MutableRefObject<Emulator> = useRef(null!);
 
   useEffect(() => {
-    const {parsedROM, parsedBIOS} = appState;
-    if (parsedROM.length) {
-      emulator.current.load(parsedBIOS, parsedROM);
+    if (appState.parsedROM.length) {
+      emulator.current.load(appState.parsedBIOS, appState.parsedROM);
     }
-  }, [appState]);
+  }, [appState.parsedROM, appState.parsedBIOS]);
 
   useEffect(() => {
-    if (appState.canvas && !CanvasRenderer.initialized) {
-      CanvasRenderer.initialize(appState.canvas, Math.round(787 / 160));
+    if (appState.canvas && !emulator.current) {
+      const canvasRenderer = new CanvasRenderer();
+      canvasRenderer.initialize(appState.canvas);
+      emulator.current = new Emulator(canvasRenderer);
     }
   }, [appState.canvas]);
 

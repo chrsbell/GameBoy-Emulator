@@ -1,32 +1,30 @@
-import {byte, setBit, word} from '../../helpers/Primitives';
-import Memory from '../Memory';
+import {Primitive} from 'helpers/index';
+import Memory from 'Memory/index';
 
-interface GBInterrupt {
-  vBlank: number;
-  lcdStat: number;
-  timer: number;
-  serial: number;
-  joypad: number;
-  ie: word;
-  if: word;
+let interruptsEnabled = 0;
+let interruptsFlag = 0;
+
+class InterruptService {
+  public static flags: StrNumIdx = {
+    vBlank: 0,
+    lcdStat: 1,
+    timer: 2,
+    serial: 3,
+    joypad: 4,
+  };
+  constructor(private memory: Memory) {}
+  public getIE = (): byte => interruptsEnabled;
+  public getIF = (): byte => interruptsFlag;
+  /**
+   * Enables the interrupt corresponding to the index.
+   */
+  public enable = (index: number): void => {
+    const register: byte = this.memory.readByte(0xff0f);
+    this.memory.writeByte(
+      Memory.addresses.interrupt.if,
+      <byte>Primitive.setBit(register, index)
+    );
+  };
 }
 
-const Interrupt: GBInterrupt = {
-  vBlank: 0,
-  lcdStat: 1,
-  timer: 2,
-  serial: 3,
-  joypad: 4,
-  ie: 0xffff,
-  if: 0xff0f,
-};
-
-/**
- * Enables the interrupt corresponding to the index.
- */
-export const enableInterrupt = (memory: Memory, index: number): void => {
-  const register: byte = memory.readByte(0xff0f);
-  memory.writeByte(0xff0f, setBit(register, index));
-};
-
-export default Interrupt;
+export default InterruptService;

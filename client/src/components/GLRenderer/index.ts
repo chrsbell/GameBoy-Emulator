@@ -1,8 +1,3 @@
-import benchmark, {benchmarksEnabled} from '../../helpers/Performance';
-
-// could render data as an image texture
-type RGB = Array<number>;
-
 export const Colors = {
   white: [0.62745, 0.81176, 0.03922] as RGB,
   lightGray: [0.54902, 0.54902, 0.04314] as RGB,
@@ -24,21 +19,19 @@ class GLRenderer {
   public screenWidth = 160;
   public screenHeight = 144;
 
-  public constructor() {
-    if (benchmarksEnabled) this.draw = benchmark(this.draw.bind(this));
-  }
+  constructor() {}
 
   /**
    * @returns whether the renderer is initialized.
    */
-  public isInitialized() {
+  public isInitialized = (): boolean => {
     return this.initialized;
-  }
+  };
 
   /**
    * Initializes the renderer.
    */
-  public initialize(canvas: HTMLCanvasElement) {
+  public initialize = (canvas: HTMLCanvasElement): void => {
     if (canvas && !this.initialized) {
       this.gl = canvas.getContext('webgl2')!;
       const gl: WebGL2RenderingContext = this.gl;
@@ -148,16 +141,16 @@ class GLRenderer {
       console.log('Initialized GL Renderer.');
       this.initialized = true;
     }
-  }
+  };
 
   /**
    * Compiles the shader program.
    */
-  private createShader(
+  private createShader = (
     gl: WebGL2RenderingContext,
     type: number,
     source: string
-  ): WebGLShader {
+  ): WebGLShader => {
     const shader = gl.createShader(type)!;
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
@@ -169,16 +162,16 @@ class GLRenderer {
     console.log(gl.getShaderInfoLog(shader));
     gl.deleteShader(shader);
     return -1;
-  }
+  };
 
   /**
    * Attaches the shaders and links the program.
    */
-  private createProgram(
+  private createProgram = (
     gl: WebGL2RenderingContext,
     vertexShader: WebGLShader,
     fragmentShader: WebGLShader
-  ): WebGLProgram {
+  ): WebGLProgram => {
     const program: WebGLProgram = gl.createProgram()!;
     gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);
@@ -191,12 +184,12 @@ class GLRenderer {
     console.log(gl.getProgramInfoLog(program));
     gl.deleteProgram(program);
     return -1;
-  }
+  };
 
   /**
    * Set a pixel of the virtual screen
    */
-  public setPixel(x: number, y: number, shade: RGB): void {
+  public setPixel = (x: number, y: number, shade: RGB): void => {
     if (x >= 0 && x < this.screenWidth) {
       if (y >= 0 && y < this.screenHeight) {
         const {gl} = this;
@@ -210,17 +203,17 @@ class GLRenderer {
         gl.bufferSubData(gl.ARRAY_BUFFER, start, new Float32Array(data));
       }
     }
-  }
+  };
 
   /**
    * The main render loop.
    */
-  public draw(): void {
+  public draw = (): void => {
     const {gl} = this;
     gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLES, 0, 6 * this.screenWidth * this.screenHeight);
-  }
+  };
 }
 
 export default new GLRenderer();
