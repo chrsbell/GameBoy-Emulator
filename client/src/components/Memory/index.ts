@@ -38,7 +38,7 @@ class Memory {
   reset(): void {
     this.bios = [];
     this.inBios = false;
-    this.ram = new Uint8Array(0xffff);
+    this.ram = new Uint8Array(0x10000);
     this.cart?.reset();
   }
   public writeByte = (address: word, data: byte): void => {
@@ -71,8 +71,8 @@ class Memory {
     }
   };
   public writeWord = (address: word, data: word): void => {
-    this.writeByte(address, Primitive.lower(data));
-    this.writeByte(address + 1, Primitive.upper(data));
+    this.writeByte(address & 0xffff, data & 0xff);
+    this.writeByte((address + 1) & 0xffff, data >> 8);
   };
   public readByte = (address: word): byte => {
     if (this.inBios) {
@@ -106,9 +106,6 @@ class Memory {
       return this.ram[address];
     }
     return 0;
-    // throw new Error(
-    //   `Tried to read out of bounds address: ${Primitive.toHex(address)}.`
-    // );
   };
   public readWord = (address: word): word => {
     return (

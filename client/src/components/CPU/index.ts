@@ -127,9 +127,6 @@ class CPU {
     this.lastExecuted = [];
   };
 
-  setInterruptsGlobal(enabled: boolean): void {
-    allInterruptsEnabled = enabled;
-  }
   /**
    * Completes the GB power sequence
    */
@@ -203,51 +200,46 @@ class CPU {
     }
   };
   /**
-   * Checks if an interrupt needs to be handled.
+   * Checks for and handles interrupts.
    */
-  public checkInterrupts = (memoryRef: Memory): void => {
+  public checkInterrupts = (memoryRef: Memory): number => {
     if (allInterruptsEnabled) {
-      const register: byte = memoryRef.readByte(0xff0f);
-      if (register) {
-        const individualEnabled = memoryRef.readByte(0xffff);
-        // 5 interrupts
+      // IME, IE and IF need to be set to handle corresponding interrupts
+      const interruptFlag = memoryRef.readByte(0xff0f);
+      if (interruptFlag) {
+        const interruptEnable = memoryRef.readByte(0xffff);
         for (let i = 0; i < 5; i++) {
-          if ((register >> i) & 1 && (individualEnabled >> i) & 1) {
-            this.handleInterrupts(memoryRef, i);
+          if ((interruptEnable >> i) & 1 && (interruptFlag >> i) & 1) {
+            // clear IME and IF bit
+            allInterruptsEnabled = false;
+            memoryRef.writeByte(0xff0f, interruptFlag & ~(1 << i));
+            PUSH(pc);
+            DEBUG && console.log('Handled an interrupt.');
+            switch (i) {
+              case InterruptService.flags.vBlank:
+                pc = 0x40;
+                break;
+              case InterruptService.flags.lcdStat:
+                pc = 0x48;
+                break;
+              case InterruptService.flags.timer:
+                pc = 0x50;
+                break;
+              case InterruptService.flags.serial:
+                pc = 0x58;
+                break;
+              case InterruptService.flags.joypad:
+                pc = 0x40;
+                break;
+            }
+            // time needed to transfer to ISR
+            return 8;
           }
         }
       }
     }
+    return 0;
   };
-  private handleInterrupts(memoryRef: Memory, interrupt: number): void {
-    this.setInterruptsGlobal(false);
-    const register: byte = memoryRef.readByte(Memory.addresses.interrupt.if);
-    memoryRef.writeByte(
-      InterruptService.flags.if,
-      <byte>Primitive.clearBit(register, interrupt)
-    );
-
-    PUSH(pc);
-    DEBUG && console.log('Handled an interrupt.');
-    switch (interrupt) {
-      case InterruptService.flags.vBlank:
-        pc = 0x40;
-        break;
-      case InterruptService.flags.lcdStat:
-        pc = 0x48;
-        break;
-      case InterruptService.flags.timer:
-        pc = 0x50;
-        break;
-      case InterruptService.flags.serial:
-        pc = 0x58;
-        break;
-      case InterruptService.flags.joypad:
-        pc = 0x40;
-        break;
-    }
-  }
-
   /**
    * No operation.
    * @param - None
@@ -1557,7 +1549,7 @@ class CPU {
    */
   private LDEiDi = (): byte => {
     const d = de & 0xff00;
-    de = (d >> 8) | d;
+    de = (de >> 8) | d;
 
     return 4;
   };
@@ -3399,14 +3391,8 @@ class CPU {
    */
   private LDHAia8m = (): byte => {
     const data = memoryRef.readByte(0xff00 + memoryRef.readByte(pc));
-    // console.log(
-    //   `Tried to read address ${Number(
-    //     0xff00 + memoryRef.readByte(pc)
-    //   ).toString(16)}`
-    // );
     af = Primitive.setUpper(af, data);
     pc += 1;
-    // if (pc === 565) debugger;
 
     return 12;
   };
@@ -3443,7 +3429,7 @@ class CPU {
    * Affected flags:
    */
   private DI = (): byte => {
-    this.setInterruptsGlobal(false);
+    allInterruptsEnabled = false;
 
     return 4;
   };
@@ -3550,7 +3536,7 @@ class CPU {
    * Affected flags:
    */
   private EI = (): byte => {
-    this.setInterruptsGlobal(true);
+    allInterruptsEnabled = true;
 
     return 4;
   };
@@ -4027,6 +4013,7 @@ class CPU {
    */
   private SLAEi = (): byte => {
     de = (de & 0xff00) | SLAn(de & 0xff);
+
     return 8;
   };
 
@@ -7292,10 +7279,12 @@ function CALLH(flag: boolean | bit): boolean {
 }
 
 function PUSH(register: word): void {
-  sp = Primitive.addWord(sp, -1);
-  memoryRef.writeByte(sp, Primitive.upper(register));
-  sp = Primitive.addWord(sp, -1);
-  memoryRef.writeByte(sp, Primitive.lower(register));
+  sp -= 1;
+  sp &= 0xffff;
+  memoryRef.writeByte(sp, register >> 8);
+  sp -= 1;
+  sp &= 0xffff;
+  memoryRef.writeByte(sp, register & 0xff);
 }
 
 function POP(): word {

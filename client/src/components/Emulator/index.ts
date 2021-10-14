@@ -74,7 +74,7 @@ class Emulator {
           cycles += elapsed;
         }
         buildGraphics(elapsed);
-        checkInterrupts(memory);
+        cycles += checkInterrupts(memory);
       }
       canvasRenderer.buildImage();
     } else {

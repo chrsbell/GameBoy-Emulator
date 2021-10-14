@@ -8,7 +8,7 @@ type StatBitsType = {
   modeLower: number;
   modeUpper: number;
   lycLc: number;
-  interrupt: NumNumIdx;
+  interrupt: StrNumIdx;
   lycLcInterrupt: number;
 };
 
@@ -38,10 +38,9 @@ class PPU {
     modeUpper: 1,
     lycLc: 2,
     interrupt: {
-      [PPU.ppuModes.hBlank]: 3,
-      [PPU.ppuModes.vBlank]: 4,
-      [PPU.ppuModes.readOAM]: 5,
-      [PPU.ppuModes.readVRAM]: -1, // no interrupt bit
+      hBlank: 3,
+      vBlank: 4,
+      readOAM: 5,
     },
     lycLcInterrupt: 6,
   };
@@ -54,16 +53,8 @@ class PPU {
     ppuBridgeRef.writeIORamOnly(0xff41, stat);
   };
 
-  public setMode = (value: number): void => {
-    // lcd mode switch interrupt condition
-    // only certain modes trigger an interrupt
-    const interruptBit = PPU.statBits.interrupt[mode];
-    if (interruptBit >= 0) {
-      const interruptModeBit = (stat >> interruptBit) & 1; //Primitive.getBit(reg, interruptBit);
-      if (interruptModeBit && value !== mode) {
-        interruptServiceRef.enable(InterruptService.flags.lcdStat);
-      }
-    }
+  public setMode = (value: number, interruptBit?: number): void => {
+    if (interruptBit) this.lcdInterrupt(interruptBit);
     mode = value;
     stat = ((stat >> 2) << 2) | value;
     ppuBridgeRef.writeIORamOnly(0xff41, stat);
@@ -129,7 +120,7 @@ class PPU {
       this.updateScanline(scanline + 1);
       clock = 0;
       if (scanline > 153) {
-        this.setMode(PPU.ppuModes.readOAM);
+        this.setMode(PPU.ppuModes.readOAM, PPU.statBits.interrupt.readOAM);
         this.updateScanline(0);
       }
     }
@@ -139,10 +130,10 @@ class PPU {
       this.drawScanline();
       this.updateScanline(scanline + 1);
       if (scanline === CanvasRenderer.screenHeight) {
-        this.setMode(PPU.ppuModes.vBlank);
+        this.setMode(PPU.ppuModes.vBlank, PPU.statBits.interrupt.vBlank);
         interruptServiceRef.enable(InterruptService.flags.vBlank);
       } else {
-        this.setMode(PPU.ppuModes.readOAM);
+        this.setMode(PPU.ppuModes.readOAM, PPU.statBits.interrupt.readOAM);
       }
     }
   };
@@ -153,17 +144,24 @@ class PPU {
   };
   private readVRAM = (): void => {
     if (clock >= 172) {
-      this.setMode(PPU.ppuModes.hBlank);
+      this.setMode(PPU.ppuModes.hBlank, PPU.statBits.interrupt.hBlank);
     }
   };
-  private lcdInterrupt = (switchedMode: boolean): void => {
-    const interruptBit = PPU.statBits.interrupt[mode];
-    // only certain modes trigger an interrupt
-    if (interruptBit >= 0) {
-      const interruptModeBit = Primitive.getBit(stat, interruptBit);
-      if (interruptModeBit && switchedMode) {
-        interruptServiceRef.enable(InterruptService.flags.lcdStat);
-      }
+  private lcdInterrupt = (interruptBit: bit): void => {
+    // trigger stat interrupt if new mode and transitioning from low to high (STAT blocking)
+    const interruptFlagReset = !(
+      (ppuBridgeRef.memory.readByte(0xff0f) >> InterruptService.flags.lcdStat) &
+      1
+    );
+    // mode switch interrupt source
+    if ((stat >> interruptBit) & 1 && interruptFlagReset) {
+      debugger;
+      interruptServiceRef.enable(InterruptService.flags.lcdStat);
+    }
+    // scanline compare interrupt source
+    if ((stat >> PPU.statBits.lycLcInterrupt) & 1 && interruptFlagReset) {
+      debugger;
+      interruptServiceRef.enable(InterruptService.flags.lcdStat);
     }
   };
   /**
@@ -184,10 +182,10 @@ class PPU {
             }
             this.updateScanline(scanline + 1);
             if (scanline === 144) {
-              this.setMode(1);
-              interruptServiceRef.enable(1);
+              this.setMode(1, PPU.statBits.interrupt.vBlank);
+              interruptServiceRef.enable(InterruptService.flags.vBlank);
             } else {
-              this.setMode(2);
+              this.setMode(2, PPU.statBits.interrupt.readOAM);
             }
           }
           break;
@@ -196,7 +194,7 @@ class PPU {
             this.updateScanline(scanline + 1);
             clock = 0;
             if (scanline > 153) {
-              this.setMode(2);
+              this.setMode(2, PPU.statBits.interrupt.readOAM);
               this.updateScanline(0);
             }
           }
@@ -208,11 +206,10 @@ class PPU {
           break;
         case 3:
           if (clock >= 172) {
-            this.setMode(PPU.ppuModes.hBlank);
+            this.setMode(PPU.ppuModes.hBlank, PPU.statBits.interrupt.hBlank);
           }
           break;
       }
-      this.lcdInterrupt(oldMode !== mode);
       this.compareLcLyc();
     } else {
       // reset v blank
@@ -225,9 +222,6 @@ class PPU {
     const register: byte = stat;
     if (scanline === this.scanlineCompare) {
       this.setStat(Primitive.setBit(register, PPU.statBits.lycLc));
-      if (Primitive.getBit(stat, PPU.statBits.lycLcInterrupt)) {
-        interruptServiceRef.enable(InterruptService.flags.lcdStat);
-      }
     } else {
       this.setStat(Primitive.clearBit(register, PPU.statBits.lycLc));
     }
