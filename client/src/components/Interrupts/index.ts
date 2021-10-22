@@ -1,4 +1,3 @@
-import {Primitive} from 'helpers/index';
 import Memory from 'Memory/index';
 
 let interruptsEnabled = 0;
@@ -18,12 +17,9 @@ class InterruptService {
   /**
    * Enables the interrupt corresponding to the index.
    */
-  public enable = (index: number): void => {
+  public enable = (bit: number): void => {
     const register: byte = this.memory.readByte(0xff0f);
-    this.memory.writeByte(
-      Memory.addresses.interrupt.if,
-      <byte>Primitive.setBit(register, index)
-    );
+    this.memory.writeByte(0xff0f, register | (1 << bit));
   };
 }
 

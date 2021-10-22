@@ -20,5 +20,5 @@ module.exports = {
     'helpers/index': ['<rootDir>/client/src/helpers/index'],
     'CPU/index': ['<rootDir>/client/src/components/CPU/index'],
   },
-  modulePathIgnorePatterns: ['<rootDir>/node_modules'],
+  modulePathIgnorePatterns: ['<rootDir>/node_modules', '<rootDir>/build'],
 };

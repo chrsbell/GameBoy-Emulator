@@ -1,6 +1,15 @@
 import CanvasRenderer from 'CanvasRenderer/index';
-import CPU from 'CPU/index';
-import benchmark from 'helpers/Performance';
+import CPU, {
+  getDivider,
+  getInputClock,
+  getTimerCounter,
+  getTimerEnable,
+  getTimerModulo,
+  setDivider,
+  setTimerCounter,
+} from 'CPU/index';
+import GLRenderer from 'GLRenderer/index';
+import {benchmark} from 'helpers/index';
 import Input, {Key} from 'Input/index';
 import InterruptService from 'Interrupts/index';
 import Memory from 'Memory/index';
@@ -8,31 +17,31 @@ import PPUBridge from 'Memory/PPUBridge';
 import PPU from 'PPU/index';
 
 class Emulator {
-  private timeout!: number;
+  public timeout!: number;
   private numExecuted = 0;
-  private memory!: Memory;
-  private canvasRenderer!: CanvasRenderer;
-  private cpu!: CPU;
+  public memory!: Memory;
+  private renderer!: CanvasRenderer | GLRenderer;
+  public cpu!: CPU;
   private ppuBridge!: PPUBridge;
-  private ppu!: PPU;
+  public ppu!: PPU;
   private input!: Input;
   private interruptService!: InterruptService;
   private stopped = false;
-  constructor(canvasRenderer: CanvasRenderer) {
-    this.canvasRenderer = canvasRenderer;
+  constructor(renderer: CanvasRenderer | GLRenderer) {
+    this.renderer = renderer;
     this.ppuBridge = new PPUBridge();
     this.interruptService = this.ppuBridge.interruptService;
     this.memory = this.ppuBridge.memory;
     this.cpu = new CPU(this.memory);
     this.ppu = this.ppuBridge.ppu;
     this.input = new Input();
-    this.canvasRenderer.setPPU(this.ppuBridge.ppu);
+    this.renderer.setPPU(this.ppuBridge.ppu);
     benchmark(this.ppuBridge);
     benchmark(this.memory);
     benchmark(this.cpu);
     benchmark(this.ppu);
     benchmark(this.input);
-    benchmark(this.canvasRenderer);
+    benchmark(this.renderer);
     benchmark(this.interruptService);
     benchmark(this);
   }
@@ -41,15 +50,17 @@ class Emulator {
     this.cpu.reset();
     this.ppu.reset();
     window.clearInterval(this.timeout);
-    this.canvasRenderer.clear();
+    this.renderer.clear();
   };
-  public load = (bios: ByteArray, rom: Uint8Array): boolean => {
+  public load = (bios: ByteArray | null, rom: Uint8Array): boolean => {
     this.memory.load(this.cpu, bios, rom);
-    this.canvasRenderer.render();
+    this.renderer.render();
     this.timeout = window.setInterval(this.update, 1);
     return true;
   };
-  public update = (): void => {
+  public update = (
+    callback: (elapsed: number) => void = (): void => {}
+  ): void => {
     if (!this.stopped) {
       if (this.input.pressed(Key.Space)) {
         this.input.debounce(Key.Space);
@@ -61,22 +72,51 @@ class Emulator {
         this.reset();
         return;
       }
-      const {cpu, ppu, canvasRenderer, memory} = this;
-      const {checkInterrupts} = cpu;
+      const {cpu, ppu, renderer} = this;
       const {buildGraphics} = ppu;
       let cycles = 0;
+      let dividerOverflow = 0;
+      let timer = 0;
       const cyclesPerUpdate = this.cpu.clock;
       let elapsed = 0;
+      // move this out of here
+      const timerOverflow: NumNumIdx = {
+        0: 4096,
+        1: 262144,
+        2: 65536,
+        3: 16384,
+      };
+      let oldTimerModulo;
       // elapse time according to number of cpu cycles used
       while (cycles < cyclesPerUpdate) {
-        if (!cpu.halted) {
-          elapsed = cpu.execute();
-          cycles += elapsed;
+        while (dividerOverflow < 0xff) {
+          oldTimerModulo = getTimerModulo();
+          if (!cpu.halted) {
+            elapsed = cpu.execute();
+            cycles += elapsed;
+          }
+          buildGraphics(elapsed);
+          dividerOverflow += elapsed;
+          if (getTimerEnable()) {
+            timer += elapsed;
+            if (timer >= timerOverflow[getInputClock()]) {
+              timer -= timerOverflow[getInputClock()];
+              const newTimerCounter = getTimerCounter() + 1;
+              if (newTimerCounter > 0xff) {
+                // debugger;
+                this.interruptService.enable(InterruptService.flags.timer);
+                setTimerCounter(oldTimerModulo);
+              } else {
+                setTimerCounter(newTimerCounter);
+              }
+            }
+          }
+          callback(elapsed);
         }
-        buildGraphics(elapsed);
-        cycles += checkInterrupts(memory);
+        setDivider((getDivider() + 1) & 0xff);
+        dividerOverflow -= 0xff;
       }
-      canvasRenderer.buildImage();
+      renderer.buildImage();
     } else {
       if (this.input.pressed(Key.Space)) {
         this.input.debounce(Key.Space);

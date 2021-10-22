@@ -1,10 +1,13 @@
+// @ts-nocheck
+import CanvasRenderer from 'CanvasRenderer/index';
 import {green, red} from 'chalk';
 import CPU, {Flag} from 'CPU/index';
+import Emulator from 'Emulator/index';
 import * as fs from 'fs';
 import {Primitive} from 'helpers/index';
-import PPUBridge from 'Memory/PPUBridge';
 import * as path from 'path';
 import * as util from 'util';
+jest.mock('CanvasRenderer/index');
 
 const TEST_ROM_FOLDER = path.join(
   __dirname,
@@ -27,7 +30,6 @@ const GENERATED_FOLDER = path.join(
   'generated'
 );
 const ROM_FOLDER = path.join(__dirname, '..', '..', '..', '..', 'roms');
-
 interface CPUInfo {
   sp: word;
   pc: word;
@@ -38,7 +40,7 @@ interface CPUInfo {
   d: byte;
   e: byte;
   hl: word;
-  interrupt_master_enable: boolean;
+  ie: boolean;
   halted: boolean;
   stopped: boolean;
 }
@@ -78,14 +80,16 @@ expect.extend({
     } else {
       let logged: string | byte | word = received;
       if (register === 'F') {
-        logged = logObject(new Flag(cpu, <byte>received));
+        logged = logObject(Flag.formatFlag(<byte>received));
       }
       return {
         message: (): string =>
           `Expected register ${green(register)} value ${red(
             logged
           )} to equal ${green(
-            expected
+            register === 'F'
+              ? logObject(Flag.formatFlag(<byte>expected))
+              : expected
           )} after instructions: \n\n${cpu.lastExecuted
             .map(instr => red(Primitive.toHex(instr)))
             .reverse()
@@ -136,21 +140,24 @@ const readSaveState = (
   pc |= saveState[fileIndex++] << 8;
   cpuState.pc = pc;
 
-  cpuState.interrupt_master_enable = Boolean(saveState[fileIndex++]);
+  cpuState.ie = Boolean(saveState[fileIndex++]);
   cpuState.halted = Boolean(saveState[fileIndex++]);
   cpuState.stopped = Boolean(saveState[fileIndex++]);
   return [cpuState, fileIndex];
 };
 
 describe('CPU', () => {
-  const ppuBridge = new PPUBridge();
-  const cpu = new CPU(ppuBridge.memory);
-  const memory = ppuBridge.memory;
-  const ppu = ppuBridge.ppu;
+  const canvas = new CanvasRenderer();
+  // canvas.initialize(createCanvas(787, 720));
+  const emulator = new Emulator(canvas);
   beforeEach(() => {
-    memory.reset();
-    cpu.reset();
-    ppu.reset();
+    emulator.reset();
+    jest.spyOn(emulator.ppu, 'renderTiles').mockImplementation(jest.fn());
+  });
+
+  afterEach(() => {
+    CanvasRenderer.mockClear();
+    jest.restoreAllMocks();
   });
 
   /**
@@ -165,13 +172,13 @@ describe('CPU', () => {
     const ROMFile: Buffer = fs.readFileSync(testROM);
     if (biosFile) {
       const BIOSFile: Buffer = fs.readFileSync(biosFile);
-      memory.load(cpu, BIOSFile, new Uint8Array([...ROMFile]));
+      emulator.load(BIOSFile, new Uint8Array([...ROMFile]));
     } else {
-      memory.load(cpu, [], new Uint8Array([...ROMFile]));
+      emulator.load([], new Uint8Array([...ROMFile]));
     }
-    return fs.readFileSync(
-      path.join(GENERATED_FOLDER, `${expectedState}.state`)
-    );
+    // will be manually stepping through emulator
+    window.clearInterval(emulator.timeout);
+    return fs.readFileSync(path.join(GENERATED_FOLDER, `${expectedState}`));
   };
 
   /**
@@ -188,50 +195,62 @@ describe('CPU', () => {
     const saveState: Buffer = setupTestROM(biosFile, testROM, expectedState);
     // skip initial state
     [expected, fileIndex] = readSaveState(saveState, fileIndex);
+    emulator.ppu;
     for (let i = 0; i < saveState.length; i++) {
       // Act
-      cpu.executeInstruction();
-      if (!memory.inBios) break;
-      [expected, fileIndex] = readSaveState(saveState, fileIndex);
+      emulator.update(() => {
+        [expected, fileIndex] = readSaveState(saveState, fileIndex);
 
-      // Assert
-      const a = cpu.getAF() >> 8;
-      const f = cpu.getAF() & 255;
-      const b = cpu.getBC() >> 8;
-      const c = cpu.getBC() & 255;
-      const d = cpu.getDE() >> 8;
-      const e = cpu.getDE() & 255;
-      const hl = cpu.getHL() >> 8;
-      expect(cpu.getPC()).toMatchRegister(cpu, expected.pc, 'PC', expected);
-      expect(cpu.getSP()).toMatchRegister(cpu, expected.sp, 'SP', expected);
-      expect(hl).toMatchRegister(cpu, expected.hl, 'HL', expected);
-      expect(a).toMatchRegister(cpu, expected.a, 'A', expected);
-      expect(b).toMatchRegister(cpu, expected.b, 'B', expected);
-      expect(c).toMatchRegister(cpu, expected.c, 'C', expected);
-      expect(d).toMatchRegister(cpu, expected.d, 'D', expected);
-      expect(e).toMatchRegister(cpu, expected.e, 'E', expected);
-      expect(f).toMatchRegister(cpu, expected.f, 'F', expected);
+        // Assert
+        const a = emulator.cpu.getAF() >> 8;
+        const f = emulator.cpu.getAF() & 255;
+        const b = emulator.cpu.getBC() >> 8;
+        const c = emulator.cpu.getBC() & 255;
+        const d = emulator.cpu.getDE() >> 8;
+        const e = emulator.cpu.getDE() & 255;
+        const hl = emulator.cpu.getHL();
+        expect(emulator.cpu.getPC()).toMatchRegister(
+          emulator.cpu.getPC(),
+          expected.pc,
+          'PC',
+          expected
+        );
+        expect(emulator.cpu.getSP()).toMatchRegister(
+          emulator.cpu.getSP(),
+          expected.sp,
+          'SP',
+          expected
+        );
+        expect(hl).toMatchRegister(emulator.cpu, expected.hl, 'HL', expected);
+        expect(a).toMatchRegister(emulator.cpu, expected.a, 'A', expected);
+        expect(b).toMatchRegister(emulator.cpu, expected.b, 'B', expected);
+        expect(c).toMatchRegister(emulator.cpu, expected.c, 'C', expected);
+        expect(d).toMatchRegister(emulator.cpu, expected.d, 'D', expected);
+        expect(e).toMatchRegister(emulator.cpu, expected.e, 'E', expected);
+        expect(f).toMatchRegister(emulator.cpu, expected.f, 'F', expected);
+      });
     }
   };
 
   xit('executes an instruction', () => {
-    memory.load(cpu, [], new Uint8Array([...Array(8192 * 2).fill(0)]));
-    const memReadSpy = jest.spyOn(memory, 'readByte');
-    // to do: NOP instruction spy
-    const cycles = cpu.executeInstruction();
-    expect(memReadSpy).toHaveBeenCalledTimes(1);
-    expect(cycles).toEqual(4);
+    emulator.load([], new Uint8Array([...Array(8192 * 2).fill(0)]));
+    const memReadSpy = jest.spyOn(emulator.memory, 'readByte');
+    // should have called NOP instruction
+    emulator.update((elapsed: number) => {
+      expect(memReadSpy).toHaveBeenCalledTimes(3);
+      expect(elapsed).toEqual(4);
+    });
   });
 
   xit('exectues a ROM file', () => {
     checkRegisters(null, path.join(TEST_ROM_FOLDER, 'tetris.gb'), 'tetris.gb');
   });
 
-  xit('executes SP and HL instructions', () => {
+  it('executes SP and HL instructions', () => {
     checkRegisters(
       null,
       path.join(TEST_ROM_FOLDER, '03-op sp,hl.gb'),
-      '03-op sp,hl.gb'
+      '03-op sp,hl.gb.state'
     );
   });
 
@@ -263,7 +282,7 @@ describe('CPU', () => {
     checkRegisters(
       null,
       path.join(TEST_ROM_FOLDER, '08-misc instrs.gb'),
-      '08-misc instrs.gb'
+      '08-misc instrs.gb.state'
     );
   });
 
@@ -291,7 +310,7 @@ describe('CPU', () => {
     );
   });
 
-  it('executes the bios', () => {
+  xit('executes the bios', () => {
     checkRegisters(
       path.join(ROM_FOLDER, 'bios.bin'),
       path.join(ROM_FOLDER, 'tetris.gb'),

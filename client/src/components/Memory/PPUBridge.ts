@@ -1,5 +1,5 @@
 import InterruptService from 'Interrupts/index';
-import {DEBUG, Primitive} from '../../helpers/index';
+import {DEBUG} from '../../helpers/index';
 import Memory from '../Memory/index';
 import PPU from '../PPU/index';
 
@@ -7,7 +7,7 @@ let ppuRef!: PPU;
 let memoryRef!: Memory;
 
 /**
- * Using this to abstract the circular reference from ppu<->memory
+ * Get rid of this?
  */
 class PPUBridge {
   public ppu!: PPU;
@@ -26,9 +26,6 @@ class PPUBridge {
   public updateScanline = (scanline: byte): void => {
     memoryRef.ram[0xff44] = scanline;
   };
-  public writeIORamOnly = (address: word, data: byte): void => {
-    memoryRef.ram[address] = data;
-  };
   public updateTiles = (address: word, data: byte): void => {
     // each tile (384 tiles) takes up 16 bytes in vram (range 0x8000 to 0x97ff). each tile is 8x8 pixels. A horizontal row of 8 pixels can be represented using 2 bytes, where the first byte contains the least sig bit of the color ID for each pixel. The second byte contains the most sig bit of the color ID.
 
@@ -42,15 +39,15 @@ class PPUBridge {
       if (address % 2 === 1) address -= 1;
       const lowByte = memoryRef.readByte(address);
       const highByte = memoryRef.readByte(address + 1);
-      const tileIndex = Math.floor((address - 0x8000) / 16);
+      const tileIndex = (address & 0x1fff) >> 4;
       const y = (address >> 1) & 7;
 
       let lowBit: bit;
       let highBit: bit;
 
       for (let x = 7; x >= 0; x--) {
-        lowBit = Primitive.getBit(lowByte, x);
-        highBit = Primitive.getBit(highByte, x);
+        lowBit = (lowByte >> x) & 1;
+        highBit = (highByte >> x) & 1;
         const tileData = (lowBit ? 1 : 0) | (highBit ? 2 : 0);
         ppuRef.tileData[tileIndex][y][7 - x] = tileData;
       }
@@ -61,17 +58,16 @@ class PPUBridge {
     }
   };
 
-  public writeIORam = (address: word, data: byte): void => {
+  public writeGraphicsData = (address: word, data: byte): void => {
     if (address === Memory.addresses.ppu.stat) {
       ppuRef.setStat(data);
-      return;
-    }
-    if (address === Memory.addresses.ppu.lcdc) ppuRef.getLCDC().update(data);
+    } else if (address === Memory.addresses.ppu.lcdc)
+      ppuRef.getLCDC().update(data);
     else if (address === Memory.addresses.ppu.scrollY) ppuRef.scrollY = data;
     else if (address === Memory.addresses.ppu.scrollX) ppuRef.scrollX = data;
     // reset scanline if trying to write to associated register
     else if (address === Memory.addresses.ppu.scanline) {
-      ppuRef.updateScanline(0);
+      ppuRef.resetScanline();
     } else if (address === Memory.addresses.ppu.scanlineCompare)
       ppuRef.scanlineCompare = data;
     else if (address === Memory.addresses.ppu.dma) {
@@ -79,17 +75,12 @@ class PPUBridge {
       memoryRef.dmaTransfer(data);
     } else if (address === Memory.addresses.ppu.paletteData) {
       ppuRef.palette = data;
-      ppuRef.paletteMap[0] =
-        (Primitive.getBit(data, 1) << 1) | Primitive.getBit(data, 0);
-      ppuRef.paletteMap[1] =
-        (Primitive.getBit(data, 3) << 1) | Primitive.getBit(data, 2);
-      ppuRef.paletteMap[2] =
-        (Primitive.getBit(data, 5) << 1) | Primitive.getBit(data, 4);
-      ppuRef.paletteMap[3] =
-        (Primitive.getBit(data, 7) << 1) | Primitive.getBit(data, 6);
+      ppuRef.paletteMap[0] = (((data >> 1) & 1) << 1) | (data & 1);
+      ppuRef.paletteMap[1] = (((data >> 3) & 1) << 1) | ((data >> 2) & 1);
+      ppuRef.paletteMap[2] = (((data >> 5) & 1) << 1) | ((data >> 4) & 1);
+      ppuRef.paletteMap[3] = (((data >> 7) & 1) << 1) | ((data >> 6) & 1);
     } else if (address === Memory.addresses.ppu.windowX) ppuRef.windowX = data;
     else if (address === Memory.addresses.ppu.windowY) ppuRef.windowY = data;
-    this.writeIORamOnly(address, data);
   };
 }
 

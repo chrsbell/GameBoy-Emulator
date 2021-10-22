@@ -17,15 +17,10 @@ declare type Action =
   | {type: 'parsedROM'; parsedROM: Uint8Array}
   | {type: 'parsedBIOS'; parsedBIOS: Uint8Array};
 
-declare interface AppContext {
-  appState: AppState;
-  appDispatch: React.Dispatch<Action>;
-}
-
 declare interface AppState {
-  canvas: HTMLCanvasElement;
-  parsedROM: Uint8Array;
-  parsedBIOS: Uint8Array;
+  canvas: HTMLCanvasElement | null;
+  parsedROM: Uint8Array | null;
+  parsedBIOS: Uint8Array | null;
 }
 
 declare type RGB = Array<number>;

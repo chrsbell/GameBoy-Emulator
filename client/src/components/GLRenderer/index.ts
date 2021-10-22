@@ -1,12 +1,24 @@
-export const Colors = {
-  white: [0.62745, 0.81176, 0.03922] as RGB,
-  lightGray: [0.54902, 0.54902, 0.04314] as RGB,
-  darkGray: [0.18039, 0.45098, 0.12157] as RGB,
-  black: [0.00784, 0.24706, 0.00392] as RGB,
+import PPU from 'PPU/index';
+
+const colorSchemes = {
+  default: {
+    0: [255, 255, 255, 255],
+    1: [170, 170, 170, 255],
+    2: [85, 85, 85, 255],
+    3: [0, 0, 0, 255],
+  },
+  classic: {
+    0: [155, 188, 15, 255],
+    2: [139, 172, 15, 255],
+    3: [48, 98, 48, 255],
+    4: [16, 56, 16, 255],
+  },
 };
 
+// use an image texture instead of this
+
 class GLRenderer {
-  public fps = 60;
+  private timeout!: number;
   private gl!: WebGL2RenderingContext;
   private vertexShader!: WebGLShader;
   private fragmentShader!: WebGLShader;
@@ -16,17 +28,12 @@ class GLRenderer {
   private shadeAttributeLocation!: GLint;
   private shadeBuffer!: WebGLBuffer;
   private initialized = false;
-  public screenWidth = 160;
-  public screenHeight = 144;
+  public static screenWidth = 160;
+  public static screenHeight = 144;
+  public ppu!: PPU;
+  public colorScheme: ColorScheme = colorSchemes.default;
 
   constructor() {}
-
-  /**
-   * @returns whether the renderer is initialized.
-   */
-  public isInitialized = (): boolean => {
-    return this.initialized;
-  };
 
   /**
    * Initializes the renderer.
@@ -81,25 +88,25 @@ class GLRenderer {
 
         const pixelBuffer = [];
         const shadeBuffer = [];
-        const xIncr = 2.0 / this.screenWidth;
-        const yIncr = 2.0 / this.screenHeight;
-        for (let x = 0; x < this.screenWidth; x++) {
-          for (let y = 0; y < this.screenHeight; y++) {
+        const xIncr = 2.0 / GLRenderer.screenWidth;
+        const yIncr = 2.0 / GLRenderer.screenHeight;
+        for (let x = 0; x < GLRenderer.screenWidth; x++) {
+          for (let y = 0; y < GLRenderer.screenHeight; y++) {
             const topLeft = {x: -1.0 + x * xIncr, y: -1.0 + y * yIncr};
             // triangle #1
             pixelBuffer.push(topLeft.x, topLeft.y);
             pixelBuffer.push(topLeft.x + xIncr, topLeft.y);
             pixelBuffer.push(topLeft.x + xIncr, topLeft.y + yIncr);
-            shadeBuffer.push(...Colors.black);
-            shadeBuffer.push(...Colors.black);
-            shadeBuffer.push(...Colors.black);
+            shadeBuffer.push(...this.colorScheme[0]);
+            shadeBuffer.push(...this.colorScheme[0]);
+            shadeBuffer.push(...this.colorScheme[0]);
             // triangle #2
             pixelBuffer.push(topLeft.x, topLeft.y);
             pixelBuffer.push(topLeft.x, topLeft.y + yIncr);
             pixelBuffer.push(topLeft.x + xIncr, topLeft.y + yIncr);
-            shadeBuffer.push(...Colors.black);
-            shadeBuffer.push(...Colors.black);
-            shadeBuffer.push(...Colors.black);
+            shadeBuffer.push(...this.colorScheme[0]);
+            shadeBuffer.push(...this.colorScheme[0]);
+            shadeBuffer.push(...this.colorScheme[0]);
           }
         }
         const size = 2;
@@ -186,15 +193,12 @@ class GLRenderer {
     return -1;
   };
 
-  /**
-   * Set a pixel of the virtual screen
-   */
   public setPixel = (x: number, y: number, shade: RGB): void => {
-    if (x >= 0 && x < this.screenWidth) {
-      if (y >= 0 && y < this.screenHeight) {
+    if (x >= 0 && x < GLRenderer.screenWidth) {
+      if (y >= 0 && y < GLRenderer.screenHeight) {
         const {gl} = this;
         // sizeof(float) * num vertices per pixel * number of data points
-        const start: number = y * 72 + x * 72 * this.screenHeight;
+        const start: number = y * 72 + x * 72 * GLRenderer.screenHeight;
         const data: Array<number> = [];
         for (let i = 0; i < 6; i++) {
           data.push(...shade);
@@ -205,15 +209,39 @@ class GLRenderer {
     }
   };
 
-  /**
-   * The main render loop.
-   */
+  public clear = (): void => {};
+
+  public setPPU = (ppu: PPU): void => {
+    this.ppu = ppu;
+  };
+
+  public render = (): void => {
+    this.timeout = window.requestAnimationFrame(this.draw);
+  };
+
+  public buildImage = (): void => {
+    for (let y = 0; y < GLRenderer.screenHeight; y++) {
+      for (let x = 0; x < GLRenderer.screenWidth; x++) {
+        this.setPixel(x, y, this.colorScheme[this.ppu.pixelMap[y][x]]);
+      }
+    }
+    // this.context.drawImage(this.canvasOffscreen, 0, 0);
+
+    // setTimeout(this.draw, 100);
+    // this.context.drawImage(this.image.getImage, 0, 0);
+    // this.timeout = window.requestAnimationFrame(this.draw);
+  };
+
   public draw = (): void => {
     const {gl} = this;
     gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLES, 0, 6 * this.screenWidth * this.screenHeight);
+    gl.drawArrays(
+      gl.TRIANGLES,
+      0,
+      6 * GLRenderer.screenWidth * GLRenderer.screenHeight
+    );
   };
 }
 
-export default new GLRenderer();
+export default GLRenderer;

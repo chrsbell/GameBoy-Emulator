@@ -31,7 +31,7 @@ def main():
         os.makedirs(out_dir)
     # Dir pointing to cpu instruction test gameboy roms
     cpu_test_dir = os.path.join(dirname, "gb-test-roms", "cpu_instrs", "individual")
-    runCPUTest(cpu_test_dir, "tetris.gb")
+    # runCPUTest(cpu_test_dir, "tetris.gb")
     # runCPUTest(cpu_test_dir, "01-special.gb")
     # # runCPUTest(cpu_test_dir, "02-interrupts.gb")
     # runCPUTest(cpu_test_dir, "03-op sp,hl.gb")
@@ -40,7 +40,7 @@ def main():
     # runCPUTest(cpu_test_dir, "06-ld r,r.gb")
     # # runCPUTest(cpu_test_dir, "07-jr,jp,call,ret,rst.gb")
     # runCPUTest(cpu_test_dir, "08-misc instrs.gb")
-    # runCPUTest(cpu_test_dir, "09-op r,r.gb")
+    runCPUTest(cpu_test_dir, "09-op r,r.gb")
     # runCPUTest(cpu_test_dir, "10-bit ops.gb")
     # runCPUTest(cpu_test_dir, "bios.gb")
 

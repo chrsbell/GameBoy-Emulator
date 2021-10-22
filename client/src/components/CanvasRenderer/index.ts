@@ -1,10 +1,4 @@
-import {sample} from 'lodash';
 import PPU from 'PPU/index';
-
-const testAnimation = {
-  x: 0,
-  y: 0,
-};
 
 const colorSchemes = {
   default: {
@@ -34,7 +28,6 @@ class CanvasRenderer {
   private scaleFactor = 1;
   public static screenWidth = 160;
   public static screenHeight = 144;
-  public fps = 60;
 
   constructor() {}
 
@@ -118,23 +111,6 @@ class CanvasRenderer {
     this.context.drawImage(this.canvasOffscreen, 0, 0);
     this.timeout = window.requestAnimationFrame(this.drawOnScreen);
     // setTimeout(this.drawOnScreen, 100);
-  };
-
-  public testAnimation = (): void => {
-    testAnimation.x += 1;
-    if (testAnimation.x === CanvasRenderer.screenWidth) {
-      testAnimation.y += 1;
-      testAnimation.x = 0;
-    }
-    if (testAnimation.y === CanvasRenderer.screenHeight) {
-      testAnimation.x = 0;
-      testAnimation.y = 0;
-    }
-    this.setPixel(
-      testAnimation.x,
-      testAnimation.y,
-      <RGB>sample(this.colorScheme)
-    );
   };
 }
 

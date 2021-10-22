@@ -1,20 +1,19 @@
-import CanvasRenderer from 'CanvasRenderer/index';
-import CPU from 'CPU/index';
-import Emulator from 'Emulator/index';
-import Input from 'Input/index';
-import InterruptService from 'Interrupts/index';
-import Memory from 'Memory/index';
-import PPUBridge from 'Memory/PPUBridge';
-import PPU from 'PPU/index';
-
 const BENCHMARKS_ENABLED = false;
 
-let times = {};
+let times: {
+  [className: string]: {
+    [funcName: string]: {
+      elapsedMilliseconds: number;
+      numberOfCalls: number;
+      averageCallTime: number;
+    };
+  };
+} = {};
 
 /**
  * Utility function to *roughly* benchmark/debug the emulator.
  */
-const logBenchmarks = () => {
+const logBenchmarks = (): void => {
   Object.entries(times).forEach(([group, functions]) => {
     console.log(
       `%cPerformance of ${group}:`,
@@ -26,9 +25,11 @@ const logBenchmarks = () => {
   times = {};
 };
 
-const benchmark = context => {
+const benchmark = (context: any): void => {
   if (BENCHMARKS_ENABLED) {
-    const methods = {};
+    const methods: {
+      [index: string]: any;
+    } = {};
     Object.entries(context).forEach(([k, v]) => {
       methods[k] = v;
     });
@@ -40,12 +41,11 @@ const benchmark = context => {
   }
 };
 
-const benchmarkFunction = (context, funcName) => {
+const benchmarkFunction = (context: any, funcName: string): any => {
   const func = context[funcName];
   if (BENCHMARKS_ENABLED) {
     const className = context ? context.constructor.name : 'Helpers';
-    return (...args) => {
-      // benchmark random calls
+    return (...args: any): any => {
       const t1 = performance.now();
       const value = func(...args);
       const t2 = performance.now();
@@ -64,8 +64,6 @@ const benchmarkFunction = (context, funcName) => {
           elapsedMilliseconds / numberOfCalls;
       }
       return value;
-
-      // return func(...args);
     };
   }
   return func;

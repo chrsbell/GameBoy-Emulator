@@ -1,4 +1,10 @@
-import CPU from 'CPU/index';
+import CPU, {
+  setDivider,
+  setInputClock,
+  setTimerCounter,
+  setTimerEnable,
+  setTimerModulo,
+} from 'CPU/index';
 import {DEBUG, Primitive} from 'helpers/index';
 import PPU from 'PPU/index';
 import Cartridge from './Cartridge';
@@ -63,10 +69,27 @@ class Memory {
     } else if (address <= 0xfeff) {
       // error(`Can't write to prohibited address ${Primitive.toHex(address)}.`);
     } else if (address <= 0xff7f) {
-      // I/O
-      this.ppuBridge.writeIORam(address, data);
-    } else if (address <= 0xffff) {
-      // HRAM + IE Register
+      // Timer stuff
+      if (address === 0xff04) {
+        setDivider(0);
+        this.ram[0xff04];
+      } else if (address === 0xff05) {
+        setTimerCounter(data);
+        this.ram[0xff05] = data;
+      } else if (address === 0xff06) {
+        setTimerModulo(data);
+        this.ram[0xff06] = data;
+      } else if (address === 0xff07) {
+        setInputClock(data & 0b11);
+        setTimerEnable((data >> 2) & 1);
+        this.ram[address] = data;
+      } else {
+        // I/O + IE Register
+        this.ppuBridge.writeGraphicsData(address, data);
+        this.ram[address] = data;
+      }
+    } else {
+      // HRAM
       this.ram[address] = data;
     }
   };
@@ -126,7 +149,7 @@ class Memory {
   /**
    * Loads parsed files into BIOS/ROM
    */
-  public load = (cpu: CPU, bios: ByteArray, rom: ByteArray): void => {
+  public load = (cpu: CPU, bios: ByteArray | null, rom: ByteArray): void => {
     const mbcType = rom[0x147];
     const romSizeCode = rom[0x148];
     const ramSizeCode = rom[0x149];
@@ -136,10 +159,10 @@ class Memory {
       this.bios = bios;
       this.inBios = true;
       cpu.execute = cpu.executeBios;
-      // cpu.initPowerSequence();
       DEBUG && console.log('Loaded bios.');
     } else {
       this.inBios = false;
+      cpu.initPowerSequence();
     }
   };
   /**

@@ -1,13 +1,13 @@
 import Wrapper from 'App/Wrapper';
-import CanvasRenderer from 'CanvasRenderer/index';
 import Emulator from 'Emulator/index';
+import GLRenderer from 'GLRenderer/index';
 import * as React from 'react';
 import {useEffect, useReducer, useRef} from 'react';
 
 const initialState: AppState = {
-  canvas: null!,
-  parsedROM: new Uint8Array(),
-  parsedBIOS: new Uint8Array(),
+  canvas: null,
+  parsedROM: null,
+  parsedBIOS: null,
 };
 
 const reducer = (state: AppState, action: Action): AppState => {
@@ -36,28 +36,28 @@ const reducer = (state: AppState, action: Action): AppState => {
 
 const App = (): JSX.Element => {
   const [appState, appDispatch] = useReducer(reducer, initialState);
-  const emulator: React.MutableRefObject<Emulator> = useRef(null!);
+  const emulator: React.MutableRefObject<Emulator | null> = useRef(null);
 
   useEffect(() => {
-    if (appState.parsedROM.length) {
-      emulator.current.load(appState.parsedBIOS, appState.parsedROM);
+    if (appState?.parsedROM?.length) {
+      emulator.current?.load(
+        appState?.parsedBIOS as Uint8Array,
+        appState?.parsedROM as Uint8Array
+      );
     }
   }, [appState.parsedROM, appState.parsedBIOS]);
 
   useEffect(() => {
     if (appState.canvas && !emulator.current) {
-      const canvasRenderer = new CanvasRenderer();
-      canvasRenderer.initialize(appState.canvas);
-      emulator.current = new Emulator(canvasRenderer);
+      // const canvasRenderer = new CanvasRenderer();
+      // canvasRenderer.initialize(appState.canvas);
+      const glRenderer = new GLRenderer();
+      glRenderer.initialize(appState.canvas);
+      emulator.current = new Emulator(glRenderer);
     }
   }, [appState.canvas]);
 
-  const reducerProps: AppContext = {
-    appState,
-    appDispatch,
-  };
-
-  return <Wrapper {...reducerProps} />;
+  return <Wrapper {...{appDispatch}} />;
 };
 
 export default App;

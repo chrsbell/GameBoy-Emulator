@@ -48,7 +48,7 @@ class MBC1 extends Cartridge {
       this.ramEnabled = (data & 0b1111) === 0xa;
     } else if (address <= 0x3fff) {
       // ROM bank change, map new rom bank to bit mask defining number of banks
-      this.currROMBank = data & 0b11111;
+      // this.currROMBank = data & 0b11111;
       // data & (ROMSizeCodeMap[ROMSizeCode].numBanks - 1);
       if (!this.currROMBank) this.currROMBank = 1;
     } else if (address <= 0x5fff) {
@@ -58,8 +58,8 @@ class MBC1 extends Cartridge {
         this.currRAMBank = this.romRAMMixed;
       } else {
         // select bits 5-6 of ROM bank
-        this.currROMBank &= 0b11111;
-        this.currROMBank |= data << 5;
+        // this.currROMBank &= 0b11111;
+        // this.currROMBank |= data << 5;
       }
     } else if (address <= 0x7fff) {
       // banking mode select
