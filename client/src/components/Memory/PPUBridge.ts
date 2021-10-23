@@ -49,6 +49,7 @@ class PPUBridge {
         lowBit = (lowByte >> x) & 1;
         highBit = (highByte >> x) & 1;
         const tileData = (lowBit ? 1 : 0) | (highBit ? 2 : 0);
+        // just store each scanline as 8 pixels w/ 2bpp
         ppuRef.tileData[tileIndex][y][7 - x] = tileData;
       }
     } else if (address <= 0x9bff) {

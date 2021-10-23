@@ -259,29 +259,33 @@ class PPU {
     // const windowXOffset = this.windowX - 7;
     // const bgDataAddressIndex = this.bgMemoryMapIndex();
     let tileCol = (scrollX >> 3) & 31;
-    const tileYOffset = scanline + scrollY;
-    const tileRow = (tileYOffset & 255) >> 3;
-    let tileIndex = currentMap[tileCol + (tileRow << 5)];
+    const tileY = scanline + scrollY;
+    const tileRowOffset = ((tileY & 255) >> 3) << 5;
+    let tileIndex = currentMap[tileCol + tileRowOffset];
     const isSigned = lcdc.bgWindowTileData === 0;
     // start from block 2 if using signed data
     if (isSigned && tileIndex <= 127) tileIndex += 256;
     let tileX = scrollX & 7;
-    let tileY = tileDataRef[tileIndex][tileYOffset & 7];
+    let tileDataRow = tileDataRef[tileIndex][tileY & 7];
     // When using tile lookup method 1, 8000 is the base pointer. Block 0 (8000-87ff) maps to indices 0-127 and Block 1 (8800-8fff) maps to indices 128-255
     // Using method 2, 9000 is the base pointer and the indices are signed. Indices 128-255 (or -127-0) map to block 1 and indices 0-127 map to block 2 (9000-97ff)
+    // could chunk tile data based on when they are going to wrap and concat the chunks in renderer
+    // determine min tile col and max tile col with min tileY and max tileY
+    // send each tile col to gl
+    // let firstChunk = 7-tileX;
     for (let x = 0; x < 160; x++) {
       for (tileX; tileX < 7; tileX++) {
-        currentLine[x] = paletteMapRef[tileY[tileX]];
+        currentLine[x] = paletteMapRef[tileDataRow[tileX]];
         x += 1;
       }
-      currentLine[x] = paletteMapRef[tileY[tileX]];
+      currentLine[x] = paletteMapRef[tileDataRow[tileX]];
       tileX = 0;
       tileCol += 1;
       // wrap around screen if reached last tile
       if (tileCol === 32) tileCol = 0;
-      tileIndex = currentMap[tileCol + (tileRow << 5)];
+      tileIndex = currentMap[tileCol + tileRowOffset];
       if (isSigned && tileIndex <= 127) tileIndex += 256;
-      tileY = tileDataRef[tileIndex][(scanline + scrollY) & 7];
+      tileDataRow = tileDataRef[tileIndex][(scanline + scrollY) & 7];
     }
   };
   public renderSprites = (): void => {};

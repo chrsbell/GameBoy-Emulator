@@ -13,11 +13,13 @@ declare interface OpcodeList {
 }
 
 declare type Action =
+  | {type: 'rendererType'; rendererType: string}
   | {type: 'canvas'; canvas: HTMLCanvasElement}
   | {type: 'parsedROM'; parsedROM: Uint8Array}
   | {type: 'parsedBIOS'; parsedBIOS: Uint8Array};
 
 declare interface AppState {
+  rendererType: string;
   canvas: HTMLCanvasElement | null;
   parsedROM: Uint8Array | null;
   parsedBIOS: Uint8Array | null;
