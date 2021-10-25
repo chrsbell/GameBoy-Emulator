@@ -1,4 +1,3 @@
-import CanvasRenderer from 'CanvasRenderer/index';
 import CPU, {
   getDivider,
   getInputClock,
@@ -20,14 +19,14 @@ class Emulator {
   public timeout!: number;
   private numExecuted = 0;
   public memory!: Memory;
-  private renderer!: CanvasRenderer | GLRenderer;
+  private renderer!: GLRenderer;
   public cpu!: CPU;
   private ppuBridge!: PPUBridge;
   public ppu!: PPU;
   private input!: Input;
   private interruptService!: InterruptService;
   private stopped = false;
-  constructor(renderer: CanvasRenderer | GLRenderer) {
+  constructor(renderer: GLRenderer) {
     this.renderer = renderer;
     this.ppuBridge = new PPUBridge();
     this.interruptService = this.ppuBridge.interruptService;
@@ -54,7 +53,7 @@ class Emulator {
   };
   public load = (bios: ByteArray | null, rom: Uint8Array): boolean => {
     this.memory.load(this.cpu, bios, rom);
-    this.renderer.render();
+    this.renderer.start();
     this.timeout = window.setInterval(this.update, 1);
     return true;
   };
@@ -72,7 +71,7 @@ class Emulator {
         this.reset();
         return;
       }
-      const {cpu, ppu, renderer} = this;
+      const {cpu, ppu} = this;
       const {buildGraphics} = ppu;
       let cycles = 0;
       let dividerOverflow = 0;
@@ -87,7 +86,7 @@ class Emulator {
         3: 16384,
       };
       let oldTimerModulo;
-      // elapse time according to number of cpu cycles used
+
       while (cycles < cyclesPerUpdate) {
         while (dividerOverflow < 0xff) {
           oldTimerModulo = getTimerModulo();
@@ -103,7 +102,6 @@ class Emulator {
               timer -= timerOverflow[getInputClock()];
               const newTimerCounter = getTimerCounter() + 1;
               if (newTimerCounter > 0xff) {
-                // debugger;
                 this.interruptService.enable(InterruptService.flags.timer);
                 setTimerCounter(oldTimerModulo);
               } else {
@@ -116,7 +114,6 @@ class Emulator {
         setDivider((getDivider() + 1) & 0xff);
         dividerOverflow -= 0xff;
       }
-      renderer.buildImage();
     } else {
       if (this.input.pressed(Key.Space)) {
         this.input.debounce(Key.Space);

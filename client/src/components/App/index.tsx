@@ -1,12 +1,10 @@
 import Wrapper from 'App/Wrapper';
-import CanvasRenderer from 'CanvasRenderer/index';
 import Emulator from 'Emulator/index';
 import GLRenderer from 'GLRenderer/index';
 import * as React from 'react';
 import {useEffect, useReducer, useRef} from 'react';
 
 const initialState: AppState = {
-  rendererType: 'canvas',
   canvas: null,
   parsedROM: null,
   parsedBIOS: null,
@@ -14,11 +12,6 @@ const initialState: AppState = {
 
 const reducer = (state: AppState, action: Action): AppState => {
   switch (action.type) {
-    case 'rendererType':
-      return {
-        ...state,
-        rendererType: action.rendererType,
-      };
     case 'canvas':
       return {
         ...state,
@@ -56,16 +49,11 @@ const App = (): JSX.Element => {
 
   useEffect(() => {
     if (appState.canvas && !emulator.current) {
-      let renderer: CanvasRenderer | GLRenderer;
-      if (appState.rendererType === 'gl') {
-        renderer = new GLRenderer();
-      } else {
-        renderer = new CanvasRenderer();
-      }
+      const renderer: GLRenderer = new GLRenderer();
       renderer.initialize(appState.canvas);
       emulator.current = new Emulator(renderer);
     }
-  }, [appState.canvas, appState.rendererType]);
+  }, [appState.canvas]);
 
   return <Wrapper {...{appDispatch}} />;
 };

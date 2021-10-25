@@ -62,7 +62,7 @@ class CanvasRenderer {
     this.ppu = ppu;
   };
 
-  public setPixel = (x: number, y: number, color: RGB): void => {
+  public setPixel = (x: number, y: number, color: RGBA): void => {
     x *= this.scaleFactor;
     y *= this.scaleFactor;
     for (let startX = x; startX < x + this.scaleFactor; startX++) {

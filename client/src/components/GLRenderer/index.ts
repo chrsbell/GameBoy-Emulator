@@ -15,8 +15,7 @@ const colorSchemes = {
   },
 };
 
-// use an image texture instead of this
-
+let y = 0;
 class GLRenderer {
   private timeout!: number;
   private gl!: WebGL2RenderingContext;
@@ -25,8 +24,11 @@ class GLRenderer {
   private program!: WebGLProgram;
   private positionAttributeLocation!: GLint;
   private positionBuffer!: WebGLBuffer;
-  private shadeAttributeLocation!: GLint;
-  private shadeBuffer!: WebGLBuffer;
+  private textureCoordBuffer!: WebGLBuffer;
+  private textureCoordAttributeLocation!: GLint;
+  private samplerUniformLocation!: GLint;
+  // private pixelBuffer!: WebGLBuffer;
+  private screenTexture!: WebGLTexture;
   private initialized = false;
   public static screenWidth = 160;
   public static screenHeight = 144;
@@ -35,9 +37,6 @@ class GLRenderer {
 
   constructor() {}
 
-  /**
-   * Initializes the renderer.
-   */
   public initialize = (canvas: HTMLCanvasElement): void => {
     if (canvas && !this.initialized) {
       this.gl = canvas.getContext('webgl2')!;
@@ -72,87 +71,112 @@ class GLRenderer {
 
         this.positionAttributeLocation = gl.getAttribLocation(
           this.program,
-          'a_position'
+          'aPosition'
         );
         gl.enableVertexAttribArray(this.positionAttributeLocation);
 
-        this.shadeAttributeLocation = gl.getAttribLocation(
+        this.textureCoordAttributeLocation = gl.getAttribLocation(
           this.program,
-          'a_shade'
+          'aTextureCoord'
         );
-        gl.enableVertexAttribArray(this.shadeAttributeLocation);
+        gl.enableVertexAttribArray(this.textureCoordAttributeLocation);
 
-        // bind buffers and describe/send their data
         this.positionBuffer = gl.createBuffer()!;
-        this.shadeBuffer = gl.createBuffer()!;
-
-        const pixelBuffer = [];
-        const shadeBuffer = [];
-        const xIncr = 2.0 / GLRenderer.screenWidth;
-        const yIncr = 2.0 / GLRenderer.screenHeight;
-        for (let x = 0; x < GLRenderer.screenWidth; x++) {
-          for (let y = 0; y < GLRenderer.screenHeight; y++) {
-            const topLeft = {x: -1.0 + x * xIncr, y: -1.0 + y * yIncr};
-            // triangle #1
-            pixelBuffer.push(topLeft.x, topLeft.y);
-            pixelBuffer.push(topLeft.x + xIncr, topLeft.y);
-            pixelBuffer.push(topLeft.x + xIncr, topLeft.y + yIncr);
-            shadeBuffer.push(...this.colorScheme[0]);
-            shadeBuffer.push(...this.colorScheme[0]);
-            shadeBuffer.push(...this.colorScheme[0]);
-            // triangle #2
-            pixelBuffer.push(topLeft.x, topLeft.y);
-            pixelBuffer.push(topLeft.x, topLeft.y + yIncr);
-            pixelBuffer.push(topLeft.x + xIncr, topLeft.y + yIncr);
-            shadeBuffer.push(...this.colorScheme[0]);
-            shadeBuffer.push(...this.colorScheme[0]);
-            shadeBuffer.push(...this.colorScheme[0]);
-          }
-        }
-        const size = 2;
-        const type = gl.FLOAT;
-        const normalize = false;
-        const stride = 0;
-        const offset = 0;
+        // this.pixelBuffer = gl.createBuffer()!;
+        this.textureCoordBuffer = gl.createBuffer()!;
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
         gl.vertexAttribPointer(
           this.positionAttributeLocation,
-          size,
-          type,
-          normalize,
-          stride,
-          offset
+          2,
+          gl.FLOAT, //benchmark this vs float
+          false,
+          0,
+          0
         );
-
         gl.bufferData(
           gl.ARRAY_BUFFER,
-          new Float32Array(pixelBuffer),
+          new Float32Array([-1.0, -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0]),
           gl.STATIC_DRAW
         );
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.shadeBuffer);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+        const a = [];
+        for (let i = 0; i < 23040; i++) {
+          a.push(...[255, 255, 255, 255]);
+        }
+
+        // a[12] = 255;
+        // a[13] = 0;
+        // a[14] = 0;
+        // a[15] = 255;
+
+        // a.push(
+        //   ...[
+        //     255, 0, 0,
+        //     // Math.floor(Math.random() * 255),
+        //     // Math.floor(Math.random() * 255),
+        //     255,
+        //   ]
+        // );
+
+        // gl.bindBuffer(gl.PIXEL_UNPACK_BUFFER, this.pixelBuffer);
+        // gl.bufferData(
+        //   gl.PIXEL_UNPACK_BUFFER,
+        //   new Uint8Array(a),
+        //   gl.STREAM_DRAW
+        // );
+        // gl.bufferSubData(
+        //   gl.PIXEL_UNPACK_BUFFER,
+        //   90000,
+        //   new Uint8Array([0, 0, 255, 255])
+        // );
+
+        // gl.bufferSubData(gl.PIXEL_UNPACK_BUFFER, 4, new Uint8Array(a));
+
+        this.screenTexture = gl.createTexture()!;
+        gl.bindTexture(gl.TEXTURE_2D, this.screenTexture);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+        gl.texImage2D(
+          gl.TEXTURE_2D,
+          0,
+          gl.RGBA,
+          GLRenderer.screenWidth,
+          GLRenderer.screenHeight,
+          0,
+          gl.RGBA,
+          gl.UNSIGNED_BYTE,
+          new Uint8Array(a)
+        );
+
+        // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        // gl.generateMipmap(gl.TEXTURE_2D);
+        gl.bindTexture(gl.TEXTURE_2D, null);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.textureCoordBuffer);
         gl.vertexAttribPointer(
-          this.shadeAttributeLocation,
-          3,
-          type,
-          normalize,
-          stride,
-          offset
+          this.textureCoordAttributeLocation,
+          2,
+          gl.FLOAT,
+          false,
+          0,
+          0
         );
         gl.bufferData(
           gl.ARRAY_BUFFER,
-          new Float32Array(shadeBuffer),
-          gl.DYNAMIC_DRAW
+          new Float32Array([0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0]),
+          gl.STATIC_DRAW
         );
       }
-      console.log('Initialized GL Renderer.');
+      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
       this.initialized = true;
+      console.log('Initialized GL Renderer.');
     }
   };
 
-  /**
-   * Compiles the shader program.
-   */
   private createShader = (
     gl: WebGL2RenderingContext,
     type: number,
@@ -171,9 +195,6 @@ class GLRenderer {
     return -1;
   };
 
-  /**
-   * Attaches the shaders and links the program.
-   */
   private createProgram = (
     gl: WebGL2RenderingContext,
     vertexShader: WebGLShader,
@@ -193,18 +214,52 @@ class GLRenderer {
     return -1;
   };
 
-  public setPixel = (x: number, y: number, shade: RGB): void => {
+  public setPixel = (x: number, y: number, shade: RGBA): void => {
+    const {gl} = this;
     if (x >= 0 && x < GLRenderer.screenWidth) {
       if (y >= 0 && y < GLRenderer.screenHeight) {
-        const {gl} = this;
-        // sizeof(float) * num vertices per pixel * number of data points
-        const start: number = y * 72 + x * 72 * GLRenderer.screenHeight;
-        const data: Array<number> = [];
-        for (let i = 0; i < 6; i++) {
-          data.push(...shade);
-        }
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.shadeBuffer);
-        gl.bufferSubData(gl.ARRAY_BUFFER, start, new Float32Array(data));
+        // sizeof(byte) * color * number of data points
+        // const start: number = x * 4 + y * 4 * GLRenderer.screenWidth;
+        // gl.bufferSubData(gl.PIXEL_UNPACK_BUFFER, start, new Uint8Array(shade));
+        gl.texSubImage2D(
+          gl.TEXTURE_2D,
+          0,
+          x,
+          y,
+          1,
+          1,
+          gl.RGBA,
+          gl.UNSIGNED_BYTE,
+          new Uint8Array(shade)
+          // new ImageData(new Uint8ClampedArray(shade), 1, 1)
+        );
+        // gl.bindBuffer(gl.PIXEL_PACK_BUFFER, 0);
+        // gl.activeTexture(gl.TEXTURE0);
+
+        // this.screenTexture = gl.createTexture()!;
+        // gl.bindTexture(gl.TEXTURE_2D, this.screenTexture);
+        // gl.texImage2D(
+        //   gl.TEXTURE_2D,
+        //   0,
+        //   gl.RGBA,
+        //   GLRenderer.screenWidth,
+        //   GLRenderer.screenHeight,
+        //   0,
+        //   gl.RGBA,
+        //   gl.UNSIGNED_BYTE,
+        //   0
+        // );
+        // gl.texImage2D(
+        //   gl.TEXTURE_2D,
+        //   0,
+        //   gl.RGBA,
+        //   300,
+        //   150,
+        //   0,
+        //   gl.RGBA,
+        //   gl.UNSIGNED_BYTE,
+        //   0
+        // );
       }
     }
   };
@@ -215,32 +270,69 @@ class GLRenderer {
     this.ppu = ppu;
   };
 
-  public render = (): void => {
+  public start = (): void => {
     this.timeout = window.requestAnimationFrame(this.draw);
   };
 
-  public buildImage = (): void => {
+  public unpackTexture = (): void => {
+    const {gl} = this;
+    gl.bindTexture(gl.TEXTURE_2D, this.screenTexture);
+    const data = new Uint8Array(92160);
+    const offset = this.ppu.scrollX & 7;
+    let pointer = 0;
     for (let y = 0; y < GLRenderer.screenHeight; y++) {
-      for (let x = 0; x < GLRenderer.screenWidth; x++) {
-        this.setPixel(x, y, this.colorScheme[this.ppu.pixelMap[y][x]]);
+      const scanline = this.ppu.pixelMap[y];
+      for (let i = 7 - offset; i >= 0; i--) {
+        const color = this.colorScheme[(scanline[0] >> (i * 2)) & 0b11];
+        data[pointer] = color[0];
+        data[pointer + 1] = color[1];
+        data[pointer + 3] = color[3];
+        data[pointer + 2] = color[2];
+        pointer += 4;
+      }
+      for (let tile = 1; tile < 20; tile++) {
+        for (let i = 7; i >= 0; i--) {
+          const color = this.colorScheme[(scanline[tile] >> (i * 2)) & 0b11];
+          data[pointer] = color[0];
+          data[pointer + 1] = color[1];
+          data[pointer + 2] = color[2];
+          data[pointer + 3] = color[3];
+          pointer += 4;
+        }
+      }
+      for (let i = 8 - offset; i < 8; i++) {
+        const color = this.colorScheme[(scanline[20] >> (i * 2)) & 0b11];
+        data[pointer] = color[0];
+        data[pointer + 1] = color[1];
+        data[pointer + 2] = color[2];
+        data[pointer + 3] = color[3];
+        pointer += 4;
       }
     }
-    // this.context.drawImage(this.canvasOffscreen, 0, 0);
-
-    // setTimeout(this.draw, 100);
-    // this.context.drawImage(this.image.getImage, 0, 0);
-    // this.timeout = window.requestAnimationFrame(this.draw);
+    gl.texSubImage2D(
+      gl.TEXTURE_2D,
+      0,
+      0,
+      0,
+      GLRenderer.screenWidth,
+      GLRenderer.screenHeight,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      new Uint8Array(data)
+    );
   };
 
   public draw = (): void => {
+    this.unpackTexture();
     const {gl} = this;
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(
-      gl.TRIANGLES,
-      0,
-      6 * GLRenderer.screenWidth * GLRenderer.screenHeight
-    );
+    gl.uniform1i(this.samplerUniformLocation, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
+    gl.bindTexture(gl.TEXTURE_2D, this.screenTexture);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    gl.bindTexture(gl.TEXTURE_2D, null);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    this.timeout = window.requestAnimationFrame(this.draw);
   };
 }
 

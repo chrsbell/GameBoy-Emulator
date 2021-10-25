@@ -35,10 +35,6 @@ const Wrapper = ({
     }
   };
 
-  const selectRendererType = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    appDispatch({type: 'rendererType', rendererType: e.target.id});
-  };
-
   useEffect(() => {
     appDispatch({
       type: 'canvas',
@@ -77,15 +73,6 @@ const Wrapper = ({
             ref={hiddenBIOSRef}
             onChange={(e): void => setBIOSFile(e.target.files![0])}
           />
-          <input
-            type="radio"
-            id="canvas"
-            value="Canvas API"
-            onChange={selectRendererType}
-          />
-          <label htmlFor="canvas">Canvas API</label>
-          <input type="radio" id="webgl" value="WebGL" />
-          <label htmlFor="webgl">WebGL</label>
           <button type="button" onClick={onSubmit}>
             Upload
           </button>

@@ -44,14 +44,19 @@ class PPUBridge {
 
       let lowBit: bit;
       let highBit: bit;
+      let data: word = 0;
 
       for (let x = 7; x >= 0; x--) {
+        // just store each scanline as 8 pixels w/ 1 byte per pixel
         lowBit = (lowByte >> x) & 1;
         highBit = (highByte >> x) & 1;
-        const tileData = (lowBit ? 1 : 0) | (highBit ? 2 : 0);
-        // just store each scanline as 8 pixels w/ 2bpp
-        ppuRef.tileData[tileIndex][y][7 - x] = tileData;
+        data |= lowBit << (x * 2);
+        data |= highBit << (x * 2 + 1);
+        // const tileData = (lowBit ? 1 : 0) | (highBit ? 2 : 0);
       }
+      ppuRef.tileData[tileIndex][y] = data;
+      // ppuRef.tileData[tileIndex][y][0] = lowByte;
+      // ppuRef.tileData[tileIndex][y][1] = highByte;
     } else if (address <= 0x9bff) {
       ppuRef.tileMap[0][address - 0x9800] = data;
     } else {

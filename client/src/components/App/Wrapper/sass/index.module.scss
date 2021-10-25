@@ -78,9 +78,6 @@ canvas {
 
 input {
   display: none;
-  &[type='radio'] {
-    display: unset;
-  }
 }
 
 :export {

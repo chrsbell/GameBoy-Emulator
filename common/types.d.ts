@@ -13,22 +13,20 @@ declare interface OpcodeList {
 }
 
 declare type Action =
-  | {type: 'rendererType'; rendererType: string}
   | {type: 'canvas'; canvas: HTMLCanvasElement}
   | {type: 'parsedROM'; parsedROM: Uint8Array}
   | {type: 'parsedBIOS'; parsedBIOS: Uint8Array};
 
 declare interface AppState {
-  rendererType: string;
   canvas: HTMLCanvasElement | null;
   parsedROM: Uint8Array | null;
   parsedBIOS: Uint8Array | null;
 }
 
-declare type RGB = Array<number>;
+declare type RGBA = Array<number>;
 
 declare interface ColorScheme {
-  [key: string]: RGB;
+  [key: string]: RGBA;
 }
 
 declare interface SizeCode {

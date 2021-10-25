@@ -22,9 +22,9 @@ let mode = 2;
 // stat register
 let stat = 2;
 let paletteMapRef!: number[];
-let tileDataRef!: word[][][];
+let tileDataRef!: word[][];
 let tileMapRef!: byte[][];
-let pixelMapRef!: byte[][];
+let pixelMapRef!: word[][];
 let lcdc!: PPUControl;
 
 const interruptBitForMode: NumNumIdx = {
@@ -52,7 +52,7 @@ class PPU {
     lycLcInterrupt: 6,
   };
   // internal representation of canvas
-  public pixelMap!: byte[][];
+  public pixelMap!: word[][];
   public getLCDC = (): PPUControl => lcdc;
   public setStat = (value: number): void => {
     stat = value;
@@ -88,7 +88,7 @@ class PPU {
   public palette: byte = 0;
   // the current palette mapping
   public paletteMap!: number[];
-  public tileData!: word[][][];
+  public tileData!: word[][];
   public tileMap!: byte[][];
   constructor(ppuBridge: PPUBridge, interruptService: InterruptService) {
     interruptServiceRef = interruptService;
@@ -100,11 +100,10 @@ class PPU {
     lcdc.update(0);
     this.pixelMap = new Array(CanvasRenderer.screenHeight)
       .fill(0)
-      .map(() => new Array(CanvasRenderer.screenWidth).fill(0));
+      // number of possible tiles per line
+      .map(() => new Array(21).fill(0));
     pixelMapRef = this.pixelMap;
-    this.tileData = new Array(384)
-      .fill(0)
-      .map(() => new Array(8).fill(0).map(() => new Array(8).fill(0)));
+    this.tileData = new Array(384).fill(0).map(() => new Array(8).fill(0));
     tileDataRef = this.tileData;
     this.tileMap = new Array(2).fill(0).map(() => new Array(1024).fill(0));
     tileMapRef = this.tileMap;
@@ -258,35 +257,49 @@ class PPU {
     // Window:
     // const windowXOffset = this.windowX - 7;
     // const bgDataAddressIndex = this.bgMemoryMapIndex();
-    let tileCol = (scrollX >> 3) & 31;
-    const tileY = scanline + scrollY;
+    const startCol = (scrollX >> 3) & 31;
+    let tileY = scanline + scrollY;
     const tileRowOffset = ((tileY & 255) >> 3) << 5;
-    let tileIndex = currentMap[tileCol + tileRowOffset];
+    tileY &= 7;
     const isSigned = lcdc.bgWindowTileData === 0;
-    // start from block 2 if using signed data
-    if (isSigned && tileIndex <= 127) tileIndex += 256;
-    let tileX = scrollX & 7;
-    let tileDataRow = tileDataRef[tileIndex][tileY & 7];
+    const tileStartX = scrollX & 7;
     // When using tile lookup method 1, 8000 is the base pointer. Block 0 (8000-87ff) maps to indices 0-127 and Block 1 (8800-8fff) maps to indices 128-255
     // Using method 2, 9000 is the base pointer and the indices are signed. Indices 128-255 (or -127-0) map to block 1 and indices 0-127 map to block 2 (9000-97ff)
-    // could chunk tile data based on when they are going to wrap and concat the chunks in renderer
-    // determine min tile col and max tile col with min tileY and max tileY
-    // send each tile col to gl
-    // let firstChunk = 7-tileX;
-    for (let x = 0; x < 160; x++) {
-      for (tileX; tileX < 7; tileX++) {
-        currentLine[x] = paletteMapRef[tileDataRow[tileX]];
-        x += 1;
-      }
-      currentLine[x] = paletteMapRef[tileDataRow[tileX]];
-      tileX = 0;
-      tileCol += 1;
-      // wrap around screen if reached last tile
-      if (tileCol === 32) tileCol = 0;
-      tileIndex = currentMap[tileCol + tileRowOffset];
-      if (isSigned && tileIndex <= 127) tileIndex += 256;
-      tileDataRow = tileDataRef[tileIndex][(scanline + scrollY) & 7];
+
+    // 4 scenarios, whether tileX is 0 and if the tileCol will wrap to 0
+    let tileIndex = currentMap[startCol + tileRowOffset];
+    // start from block 2 if using signed data
+    if (isSigned && tileIndex <= 0x7f) tileIndex += 0x100;
+    let i = 0;
+
+    // first chunk of 8 pixels
+    currentLine[i] =
+      tileDataRef[tileIndex][tileY] & ((1 << (16 - tileStartX * 2)) - 1);
+    i++;
+
+    const numRemainderChunks = Math.ceil((160 - (8 - tileStartX)) >> 3);
+    const maxTilesPrewrap =
+      Math.min(numRemainderChunks - 1, 32 - startCol) + startCol;
+    let currentCol = startCol + 1;
+
+    for (currentCol; currentCol < maxTilesPrewrap; currentCol++, i++) {
+      tileIndex = currentMap[currentCol + tileRowOffset];
+      if (isSigned && tileIndex <= 0x7f) tileIndex += 0x100;
+      currentLine[i] = tileDataRef[tileIndex][tileY];
     }
+
+    const numTilesPostwrap = numRemainderChunks - (32 - startCol) - 1;
+
+    for (currentCol = 0; currentCol < numTilesPostwrap; currentCol++, i++) {
+      tileIndex = currentMap[currentCol + tileRowOffset];
+      if (isSigned && tileIndex <= 0x7f) tileIndex += 0x100;
+      currentLine[i] = tileDataRef[tileIndex][tileY];
+    }
+
+    // last chunk
+    tileIndex = currentMap[currentCol + tileRowOffset];
+    if (isSigned && tileIndex <= 0x7f) tileIndex += 0x100;
+    currentLine[i] = tileDataRef[tileIndex][tileY] >> (16 - tileStartX * 2);
   };
   public renderSprites = (): void => {};
   public drawScanline = (): void => {
