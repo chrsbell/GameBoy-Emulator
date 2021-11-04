@@ -1,10 +1,10 @@
-import CPU, {
+import CPU from 'CPU/index';
+import {
   setDivider,
-  setInputClock,
+  setTimerControl,
   setTimerCounter,
-  setTimerEnable,
   setTimerModulo,
-} from 'CPU/index';
+} from 'Emulator/index';
 import {DEBUG, Primitive} from 'helpers/index';
 import PPU from 'PPU/index';
 import Cartridge from './Cartridge';
@@ -72,17 +72,12 @@ class Memory {
       // Timer stuff
       if (address === 0xff04) {
         setDivider(0);
-        this.ram[0xff04];
       } else if (address === 0xff05) {
         setTimerCounter(data);
-        this.ram[0xff05] = data;
       } else if (address === 0xff06) {
         setTimerModulo(data);
-        this.ram[0xff06] = data;
       } else if (address === 0xff07) {
-        setInputClock(data & 0b11);
-        setTimerEnable((data >> 2) & 1);
-        this.ram[address] = data;
+        setTimerControl(data);
       } else {
         // I/O + IE Register
         this.ppuBridge.writeGraphicsData(address, data);
@@ -136,14 +131,10 @@ class Memory {
     );
   };
 
-  /**
-   * Performs direct memory address transfer of sprite data.
-   * Pretty much copied from http://www.codeslinger.co.uk/pages/projects/gameboy/dma.html
-   */
   public dmaTransfer = (data: byte): void => {
-    const address = data << 8;
+    const address = data * 0x100;
     for (let i = 0; i < 0xa0; i++) {
-      this.writeByte(0xfe00 + i, this.readByte(address + i));
+      this.writeByte(0xfe00 + i, this.ram[address + i]);
     }
   };
   /**

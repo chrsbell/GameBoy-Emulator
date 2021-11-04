@@ -1,4 +1,4 @@
-import { DEBUG, Primitive } from 'helpers/index';
+import {DEBUG, Primitive} from 'helpers/index';
 import InterruptService from 'Interrupts/index';
 import Memory from 'Memory/index';
 
@@ -16,14 +16,8 @@ let hl: word = 0;
 let pc: word = 0;
 let sp: word = 0;
 
-let allInterruptsEnabled = true;
+let allInterruptsEnabled = false;
 let memoryRef!: Memory;
-
-let timerCounter: byte = 0;
-let divider: byte = 0;
-let timerModulo: byte = 0;
-let timerEnable: bit = 0;
-let inputClock: byte = 0;
 
 const setCYFlag = (value: boolean | byte): void => {
   if (value) {
@@ -61,30 +55,6 @@ const getCYFlag = (): bit => (af >> 4) & 1;
 const getHFlag = (): bit => (af >> 5) & 1;
 const getNFlag = (): bit => (af >> 6) & 1;
 const getZFlag = (): bit => (af >> 7) & 1;
-
-const getTimerCounter = (): byte => timerCounter;
-const getDivider = (): byte => divider;
-const getTimerModulo = (): byte => timerModulo;
-const getTimerEnable = (): bit => timerEnable;
-const getInputClock = (): byte => inputClock;
-
-const setTimerCounter = (value: byte): void => {
-  timerCounter = value;
-  // memoryRef.ram[0xff05] = value;
-};
-const setDivider = (value: byte): void => {
-  divider = value;
-  // memoryRef.ram[0xff04] = value;
-};
-const setTimerModulo = (value: byte): void => {
-  timerModulo = value;
-};
-const setTimerEnable = (value: bit): void => {
-  timerEnable = value;
-};
-const setInputClock = (value: byte): void => {
-  inputClock = value;
-};
 
 /**
  * Sets the half carry flag if a carry will be generated from bits 3 to 4 of the sum.
@@ -125,11 +95,12 @@ const checkFullCarry8 = (op1: byte, op2: byte, subtraction?: boolean): void => {
 
 class CPU {
   // number of clock ticks per second
-  public clock = 4194304;
+  public static clock = 4194304;
   // 16-bit program counter
   // stack pointer
 
   public halted = false;
+  public stopped = false;
   public lastExecuted: Array<byte> = [];
 
   constructor(memory: Memory) {
@@ -143,13 +114,17 @@ class CPU {
   public getDE = (): word => de;
   public getHL = (): word => hl;
   public getSP = (): word => sp;
-  public getIE = (): boolean => allInterruptsEnabled;
+  public getIME = (): boolean => allInterruptsEnabled;
+
+  public setA = (a: byte): void => {
+    af = (af & 0xff) | (a << 8);
+  };
 
   public reset = (): void => {
     pc = 0;
     sp = 0;
     this.halted = false;
-    allInterruptsEnabled = true;
+    allInterruptsEnabled = false;
     af = 0;
     bc = 0;
     de = 0;
@@ -167,19 +142,26 @@ class CPU {
     de = 0x00d8;
     hl = 0x014d;
     sp = 0xfffe;
+    memoryRef.writeByte(0xff00, 0xcf);
+    memoryRef.writeByte(0xff01, 0x00);
+    memoryRef.writeByte(0xff02, 0x7e);
     memoryRef.writeByte(0xff05, 0x00);
     memoryRef.writeByte(0xff06, 0x00);
     memoryRef.writeByte(0xff07, 0x00);
+    memoryRef.writeByte(0xff0f, 0xe1);
     memoryRef.writeByte(0xff10, 0x80);
     memoryRef.writeByte(0xff11, 0xbf);
     memoryRef.writeByte(0xff12, 0xf3);
+    memoryRef.writeByte(0xff13, 0xff);
     memoryRef.writeByte(0xff14, 0xbf);
     memoryRef.writeByte(0xff16, 0x3f);
     memoryRef.writeByte(0xff17, 0x00);
+    memoryRef.writeByte(0xff18, 0xff);
     memoryRef.writeByte(0xff19, 0xbf);
     memoryRef.writeByte(0xff1a, 0x7f);
     memoryRef.writeByte(0xff1b, 0xff);
     memoryRef.writeByte(0xff1c, 0x9f);
+    memoryRef.writeByte(0xff1d, 0xff);
     memoryRef.writeByte(0xff1e, 0xbf);
     memoryRef.writeByte(0xff20, 0xff);
     memoryRef.writeByte(0xff21, 0x00);
@@ -189,14 +171,30 @@ class CPU {
     memoryRef.writeByte(0xff25, 0xf3);
     memoryRef.writeByte(0xff26, 0xf1);
     memoryRef.writeByte(0xff40, 0x91);
+    memoryRef.writeByte(0xff41, 0x81);
     memoryRef.writeByte(0xff42, 0x00);
     memoryRef.writeByte(0xff43, 0x00);
+    memoryRef.writeByte(0xff44, 0x91);
     memoryRef.writeByte(0xff45, 0x00);
+    memoryRef.writeByte(0xff46, 0xff);
     memoryRef.writeByte(0xff47, 0xfc);
     memoryRef.writeByte(0xff48, 0xff);
     memoryRef.writeByte(0xff49, 0xff);
     memoryRef.writeByte(0xff4a, 0x00);
     memoryRef.writeByte(0xff4b, 0x00);
+    memoryRef.writeByte(0xff4d, 0xff);
+    memoryRef.writeByte(0xff4f, 0xff);
+    memoryRef.writeByte(0xff51, 0xff);
+    memoryRef.writeByte(0xff52, 0xff);
+    memoryRef.writeByte(0xff53, 0xff);
+    memoryRef.writeByte(0xff54, 0xff);
+    memoryRef.writeByte(0xff55, 0xff);
+    memoryRef.writeByte(0xff56, 0xff);
+    memoryRef.writeByte(0xff68, 0xff);
+    memoryRef.writeByte(0xff69, 0xff);
+    memoryRef.writeByte(0xff6a, 0xff);
+    memoryRef.writeByte(0xff6b, 0xff);
+    memoryRef.writeByte(0xff70, 0xff);
     memoryRef.writeByte(0xffff, 0x00);
   };
   /**
@@ -220,7 +218,6 @@ class CPU {
       this.initPowerSequence();
       this.execute = this.executeInstruction;
     }
-    this.addCalledInstruction(opcode);
     return numCycles + this.checkInterrupts();
   };
   public addCalledInstruction = (opcode: byte): void => {
@@ -234,6 +231,7 @@ class CPU {
   /**
    * Checks for and handles interrupts.
    */
+  public vblankCalls = 0;
   public checkInterrupts = (): number => {
     if (allInterruptsEnabled) {
       // IME, IE and IF need to be set to handle corresponding interrupts
@@ -242,13 +240,17 @@ class CPU {
         const interruptEnable = memoryRef.readByte(0xffff);
         for (let i = 0; i < 5; i++) {
           if ((interruptEnable >> i) & 1 && (interruptFlag >> i) & 1) {
+            console.log(allInterruptsEnabled);
             // clear IME and IF bit
+            // debugger;
             allInterruptsEnabled = false;
             memoryRef.writeByte(0xff0f, interruptFlag & ~(1 << i));
             PUSH(pc);
             DEBUG && console.log('Handled an interrupt.');
             switch (i) {
               case InterruptService.flags.vBlank:
+                this.vblankCalls += 1;
+                console.log(`Number of VBlank int: ${this.vblankCalls}`);
                 pc = 0x40;
                 break;
               case InterruptService.flags.lcdStat:
@@ -523,9 +525,8 @@ class CPU {
    * Affected flags:
    */
   private STOP = (): byte => {
-    this.halted = true;
-    console.log('Instruction halted.');
-    // throw new Error();
+    this.stopped = true;
+    console.log('Stopped.');
 
     return 4;
   };
@@ -879,6 +880,7 @@ class CPU {
    * Affected flags: Z, H, C
    */
   private DAAA = (): byte => {
+    // source: https://forums.nesdev.com/viewtopic.php?t=15944
     // note: assumes a is a uint8_t and wraps from 0xff to 0
     if (!getNFlag()) {
       // after an addition, adjust if (half-)carry occurred or if result is out of bounds
@@ -7357,6 +7359,7 @@ function RETH(flag: boolean | bit): boolean {
     sp &= 0xffff;
     return true;
   }
+  // console.log('Returned from an interrupt routine.');
   return false;
 }
 
@@ -7548,16 +7551,4 @@ class Flag {
 }
 
 export default CPU;
-export {
-  Flag,
-  getTimerCounter,
-  getDivider,
-  getTimerModulo,
-  getTimerEnable,
-  getInputClock,
-  setTimerCounter,
-  setDivider,
-  setTimerModulo,
-  setTimerEnable,
-  setInputClock,
-};
+export {Flag};

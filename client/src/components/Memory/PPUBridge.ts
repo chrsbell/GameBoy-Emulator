@@ -46,21 +46,23 @@ class PPUBridge {
       let highBit: bit;
       let data: word = 0;
 
+      // store scanline by interlacing high/low bits of 8 pixels
       for (let x = 7; x >= 0; x--) {
-        // just store each scanline as 8 pixels w/ 1 byte per pixel
         lowBit = (lowByte >> x) & 1;
         highBit = (highByte >> x) & 1;
         data |= lowBit << (x * 2);
         data |= highBit << (x * 2 + 1);
-        // const tileData = (lowBit ? 1 : 0) | (highBit ? 2 : 0);
       }
       ppuRef.tileData[tileIndex][y] = data;
-      // ppuRef.tileData[tileIndex][y][0] = lowByte;
-      // ppuRef.tileData[tileIndex][y][1] = highByte;
     } else if (address <= 0x9bff) {
+      // store unsigned and signed indices
       ppuRef.tileMap[0][address - 0x9800] = data;
+      ppuRef.signedTileMap[0][address - 0x9800] =
+        data <= 0x7f ? data + 0x100 : data;
     } else {
       ppuRef.tileMap[1][address - 0x9c00] = data;
+      ppuRef.signedTileMap[1][address - 0x9c00] =
+        data <= 0x7f ? data + 0x100 : data;
     }
   };
 

@@ -4,6 +4,8 @@ let interruptsEnabled = 0;
 let interruptsFlag = 0;
 
 class InterruptService {
+  public static if = 0xff0f;
+  public static ie = 0xffff;
   public static flags: StrNumIdx = {
     vBlank: 0,
     lcdStat: 1,
@@ -17,7 +19,8 @@ class InterruptService {
 
   public enable = (bit: number): void => {
     const register: byte = this.memory.readByte(0xff0f);
-    this.memory.writeByte(0xff0f, register | (1 << bit));
+    interruptsFlag = register | (1 << bit);
+    this.memory.writeByte(0xff0f, interruptsFlag);
   };
 }
 
