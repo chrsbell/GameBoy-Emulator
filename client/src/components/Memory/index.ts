@@ -81,7 +81,6 @@ class Memory {
       } else {
         // I/O + IE Register
         this.ppuBridge.writeGraphicsData(address, data);
-        this.ram[address] = data;
       }
     } else {
       // HRAM

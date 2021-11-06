@@ -3,9 +3,6 @@ import {DEBUG} from '../../helpers/index';
 import Memory from '../Memory/index';
 import PPU from '../PPU/index';
 
-let ppuRef!: PPU;
-let memoryRef!: Memory;
-
 /**
  * Get rid of this?
  */
@@ -15,16 +12,14 @@ class PPUBridge {
   public interruptService!: InterruptService;
   constructor() {
     this.memory = new Memory(this);
-    memoryRef = this.memory;
-    this.interruptService = new InterruptService(memoryRef);
+    this.interruptService = new InterruptService(this.memory);
     this.ppu = new PPU(this, this.interruptService);
-    ppuRef = this.ppu;
   }
   /**
    * Used internally by the PPU/lCD to update the current scanline.
    */
   public updateScanline = (scanline: byte): void => {
-    memoryRef.ram[0xff44] = scanline;
+    this.memory.ram[0xff44] = scanline;
   };
   public updateTiles = (address: word, data: byte): void => {
     // each tile (384 tiles) takes up 16 bytes in vram (range 0x8000 to 0x97ff). each tile is 8x8 pixels. A horizontal row of 8 pixels can be represented using 2 bytes, where the first byte contains the least sig bit of the color ID for each pixel. The second byte contains the most sig bit of the color ID.
@@ -37,8 +32,8 @@ class PPUBridge {
       // 00000000 -> 0
       // 11111111 -> 1
       if (address % 2 === 1) address -= 1;
-      const lowByte = memoryRef.readByte(address);
-      const highByte = memoryRef.readByte(address + 1);
+      const lowByte = this.memory.readByte(address);
+      const highByte = this.memory.readByte(address + 1);
       const tileIndex = (address & 0x1fff) >> 4;
       const y = (address >> 1) & 7;
 
@@ -53,42 +48,46 @@ class PPUBridge {
         data |= lowBit << (x * 2);
         data |= highBit << (x * 2 + 1);
       }
-      ppuRef.tileData[tileIndex][y] = data;
+      this.ppu.tileData[tileIndex][y] = data;
     } else if (address <= 0x9bff) {
       // store unsigned and signed indices
-      ppuRef.tileMap[0][address - 0x9800] = data;
-      ppuRef.signedTileMap[0][address - 0x9800] =
+      this.ppu.tileMap[0][address - 0x9800] = data;
+      this.ppu.signedTileMap[0][address - 0x9800] =
         data <= 0x7f ? data + 0x100 : data;
     } else {
-      ppuRef.tileMap[1][address - 0x9c00] = data;
-      ppuRef.signedTileMap[1][address - 0x9c00] =
+      this.ppu.tileMap[1][address - 0x9c00] = data;
+      this.ppu.signedTileMap[1][address - 0x9c00] =
         data <= 0x7f ? data + 0x100 : data;
     }
   };
 
   public writeGraphicsData = (address: word, data: byte): void => {
     if (address === Memory.addresses.ppu.stat) {
-      ppuRef.setStat(data);
+      this.ppu.setStat(data);
+      return;
     } else if (address === Memory.addresses.ppu.lcdc)
-      ppuRef.getLCDC().update(data);
-    else if (address === Memory.addresses.ppu.scrollY) ppuRef.scrollY = data;
-    else if (address === Memory.addresses.ppu.scrollX) ppuRef.scrollX = data;
+      this.ppu.lcdc.update(data);
+    else if (address === Memory.addresses.ppu.scrollY) this.ppu.scrollY = data;
+    else if (address === Memory.addresses.ppu.scrollX) this.ppu.scrollX = data;
     // reset scanline if trying to write to associated register
     else if (address === Memory.addresses.ppu.scanline) {
-      ppuRef.resetScanline();
+      this.ppu.resetScanline();
+      return;
     } else if (address === Memory.addresses.ppu.scanlineCompare)
-      ppuRef.scanlineCompare = data;
+      this.ppu.scanlineCompare = data;
     else if (address === Memory.addresses.ppu.dma) {
       DEBUG && console.log('Initiated DMA transfer.');
-      memoryRef.dmaTransfer(data);
+      this.memory.dmaTransfer(data);
     } else if (address === Memory.addresses.ppu.paletteData) {
-      ppuRef.palette = data;
-      ppuRef.paletteMap[0] = (((data >> 1) & 1) << 1) | (data & 1);
-      ppuRef.paletteMap[1] = (((data >> 3) & 1) << 1) | ((data >> 2) & 1);
-      ppuRef.paletteMap[2] = (((data >> 5) & 1) << 1) | ((data >> 4) & 1);
-      ppuRef.paletteMap[3] = (((data >> 7) & 1) << 1) | ((data >> 6) & 1);
-    } else if (address === Memory.addresses.ppu.windowX) ppuRef.windowX = data;
-    else if (address === Memory.addresses.ppu.windowY) ppuRef.windowY = data;
+      this.ppu.palette = data;
+      this.ppu.paletteMap[0] = (((data >> 1) & 1) << 1) | (data & 1);
+      this.ppu.paletteMap[1] = (((data >> 3) & 1) << 1) | ((data >> 2) & 1);
+      this.ppu.paletteMap[2] = (((data >> 5) & 1) << 1) | ((data >> 4) & 1);
+      this.ppu.paletteMap[3] = (((data >> 7) & 1) << 1) | ((data >> 6) & 1);
+    } else if (address === Memory.addresses.ppu.windowX)
+      this.ppu.windowX = data;
+    else if (address === Memory.addresses.ppu.windowY) this.ppu.windowY = data;
+    this.memory.ram[address] = data;
   };
 }
 
