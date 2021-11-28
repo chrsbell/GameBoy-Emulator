@@ -1,5 +1,6 @@
 import Cartridge from 'Memory/Cartridge';
-import Memory from 'Memory/index';
+import {Memory} from 'Memory/index';
+
 class MBC0 extends Cartridge {
   constructor(
     memory: Memory,

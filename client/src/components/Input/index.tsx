@@ -4,7 +4,7 @@ class Input {
   private keyState: StrBoolIdx = {};
   private keyDebounce: StrBoolIdx = {};
   private keyDebounceTimeout: StrNumIdx = {};
-  private static DEBOUNCE_DELAY = 100;
+  private static DEBOUNCE_DELAY = 1000;
 
   public mouseX = 0;
   public mouseY = 0;

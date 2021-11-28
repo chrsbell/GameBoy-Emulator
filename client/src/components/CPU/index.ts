@@ -1,6 +1,6 @@
-import {DEBUG, Primitive} from 'helpers/index';
-import InterruptService from 'Interrupts/index';
-import Memory from 'Memory/index';
+import {Primitive} from 'helpers/index';
+import {InterruptService} from 'Interrupts/index';
+import {Memory} from 'Memory/index';
 
 export interface Registers {
   af: word;
@@ -16,8 +16,7 @@ let hl: word = 0;
 let pc: word = 0;
 let sp: word = 0;
 
-let allInterruptsEnabled = false;
-let memoryRef!: Memory;
+let memoryRef: Memory;
 
 const setCYFlag = (value: boolean | byte): void => {
   if (value) {
@@ -100,13 +99,20 @@ class CPU {
   // stack pointer
 
   public halted = false;
+  public haltBug = false;
+  private interruptPendingBeforeHalt = false;
   public stopped = false;
   public lastExecuted: Array<byte> = [];
+  public allInterruptsEnabled = false;
+  private delayedAllInterruptsEnabled = false;
+  private delayedAllInterruptsEnabled2 = false;
 
-  constructor(memory: Memory) {
+  constructor() {}
+
+  public init = (memory: Memory): void => {
     memoryRef = memory;
     this.reset();
-  }
+  };
 
   public getPC = (): word => pc;
   public getAF = (): word => af;
@@ -114,7 +120,6 @@ class CPU {
   public getDE = (): word => de;
   public getHL = (): word => hl;
   public getSP = (): word => sp;
-  public getIME = (): boolean => allInterruptsEnabled;
 
   public setA = (a: byte): void => {
     af = (af & 0xff) | (a << 8);
@@ -124,7 +129,8 @@ class CPU {
     pc = 0;
     sp = 0;
     this.halted = false;
-    allInterruptsEnabled = false;
+    this.allInterruptsEnabled = false;
+    this.delayedAllInterruptsEnabled = false;
     af = 0;
     bc = 0;
     de = 0;
@@ -202,11 +208,33 @@ class CPU {
    * @returns {number} the number of CPU cycles required.
    */
   public executeInstruction = (): number => {
-    const opcode: byte = memoryRef.readByte(pc);
-    pc += 1;
-    pc &= 0xffff;
-    this.addCalledInstruction(opcode);
-    return this.opcodes[opcode]() + this.checkInterrupts();
+    let cycles = 0;
+    if (!this.halted) {
+      if (this.delayedAllInterruptsEnabled)
+        this.delayedAllInterruptsEnabled2 = true;
+      const opcode: byte = memoryRef.readByte(pc);
+      if (!this.haltBug) {
+        pc += 1;
+        pc &= 0xffff;
+      }
+      this.haltBug = false;
+      this.addCalledInstruction(opcode);
+      cycles = this.opcodes[opcode]();
+      if (opcode === 0x76) return cycles;
+      if (this.delayedAllInterruptsEnabled2) this.allInterruptsEnabled = true;
+      const interruptCycles = this.checkInterrupts();
+      return cycles + interruptCycles;
+    } else {
+      const interruptFlag = memoryRef.ram[0xff0f];
+      const interruptEnable = memoryRef.ram[0xffff];
+      if (interruptEnable & interruptFlag) {
+        this.halted = false;
+        if (this.allInterruptsEnabled) return this.checkInterrupts();
+        if (this.interruptPendingBeforeHalt) this.haltBug = true;
+        return 1;
+      }
+      return 1;
+    }
   };
   public execute: () => number = this.executeInstruction;
   public executeBios = (): number => {
@@ -233,24 +261,23 @@ class CPU {
    */
   public vblankCalls = 0;
   public checkInterrupts = (): number => {
-    if (allInterruptsEnabled) {
+    if (this.allInterruptsEnabled) {
       // IME, IE and IF need to be set to handle corresponding interrupts
-      const interruptFlag = memoryRef.readByte(0xff0f);
+      const interruptFlag = memoryRef.ram[0xff0f];
       if (interruptFlag) {
-        const interruptEnable = memoryRef.readByte(0xffff);
+        const interruptEnable = memoryRef.ram[0xffff];
         for (let i = 0; i < 5; i++) {
           if ((interruptEnable >> i) & 1 && (interruptFlag >> i) & 1) {
-            console.log(allInterruptsEnabled);
             // clear IME and IF bit
-            // debugger;
-            allInterruptsEnabled = false;
+            this.allInterruptsEnabled = false;
+            this.delayedAllInterruptsEnabled = false;
+            this.delayedAllInterruptsEnabled2 = false;
+
             memoryRef.writeByte(0xff0f, interruptFlag & ~(1 << i));
             PUSH(pc);
-            DEBUG && console.log('Handled an interrupt.');
+            // DEBUG && console.log('Handled an interrupt.');
             switch (i) {
               case InterruptService.flags.vBlank:
-                this.vblankCalls += 1;
-                console.log(`Number of VBlank int: ${this.vblankCalls}`);
                 pc = 0x40;
                 break;
               case InterruptService.flags.lcdStat:
@@ -267,7 +294,7 @@ class CPU {
                 break;
             }
             // time needed to transfer to ISR
-            return 8;
+            return 20;
           }
         }
       }
@@ -527,6 +554,7 @@ class CPU {
   private STOP = (): byte => {
     this.stopped = true;
     console.log('Stopped.');
+    debugger;
 
     return 4;
   };
@@ -1920,6 +1948,9 @@ class CPU {
    */
   private HALT = (): byte => {
     this.halted = true;
+    if (memoryRef.ram[0xff0f] & memoryRef.ram[0xffff])
+      this.interruptPendingBeforeHalt = true;
+    debugger;
 
     return 4;
   };
@@ -3142,7 +3173,7 @@ class CPU {
    */
   private RETI = (): byte => {
     RETH(true);
-    allInterruptsEnabled = true;
+    this.delayedAllInterruptsEnabled = true;
 
     return 16;
   };
@@ -3432,6 +3463,7 @@ class CPU {
       af,
       memoryRef.readByte(0xff00 + memoryRef.readByte(pc))
     );
+    // if (0xff00 + memoryRef.readByte(pc) !== 0xff44) debugger;
     pc += 1;
     pc &= 0xffff;
 
@@ -3470,7 +3502,9 @@ class CPU {
    * Affected flags:
    */
   private DI = (): byte => {
-    allInterruptsEnabled = false;
+    this.allInterruptsEnabled = false;
+    this.delayedAllInterruptsEnabled = false;
+    this.delayedAllInterruptsEnabled2 = false;
 
     return 4;
   };
@@ -3575,7 +3609,7 @@ class CPU {
    * Affected flags:
    */
   private EI = (): byte => {
-    allInterruptsEnabled = true;
+    this.delayedAllInterruptsEnabled = true;
 
     return 4;
   };
@@ -7359,7 +7393,6 @@ function RETH(flag: boolean | bit): boolean {
     sp &= 0xffff;
     return true;
   }
-  // console.log('Returned from an interrupt routine.');
   return false;
 }
 

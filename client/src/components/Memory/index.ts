@@ -1,22 +1,16 @@
 import CPU from 'CPU/index';
-import {
-  setDivider,
-  setTimerControl,
-  setTimerCounter,
-  setTimerModulo,
-} from 'Emulator/index';
 import {DEBUG, Primitive} from 'helpers/index';
-import PPU from 'PPU/index';
+import {PPU} from 'PPU/index';
+import {Timing} from 'Timing/index';
 import Cartridge from './Cartridge';
 import MBC0 from './Cartridge/MBC0';
 import MBC1 from './Cartridge/MBC1';
-import PPUBridge from './PPUBridge';
 
 class Memory {
-  private ppuBridge!: PPUBridge;
   private bios: ByteArray = [];
   public inBios = false;
   private ppu!: PPU;
+  public timing!: Timing;
   public cart!: Cartridge;
   public ram: ByteArray = [];
   public static addresses = {
@@ -37,16 +31,63 @@ class Memory {
       windowX: 0xff4b,
     },
   };
-  constructor(ppuBridge: PPUBridge) {
-    this.ppuBridge = ppuBridge;
+
+  constructor() {
     this.reset();
   }
-  reset(): void {
+
+  public init = (ppu: PPU, timing: Timing): void => {
+    this.ppu = ppu;
+    this.timing = timing;
+  };
+
+  public reset = (): void => {
     this.bios = [];
     this.inBios = false;
     this.ram = new Uint8Array(0x10000);
     this.cart?.reset();
-  }
+  };
+
+  public updateTiles = (address: word, data: byte): void => {
+    // each tile (384 tiles) takes up 16 bytes in vram (range 0x8000 to 0x97ff). each tile is 8x8 pixels. A horizontal row of 8 pixels can be represented using 2 bytes, where the first byte contains the least sig bit of the color ID for each pixel. The second byte contains the most sig bit of the color ID.
+
+    // https://www.huderlem.com/demos/gameboy2bpp.html
+
+    // writing to tile data in vram
+    if (address < 0x9800) {
+      // using the 2bpp system, the low byte must be on an even address
+      // 00000000 -> 0
+      // 11111111 -> 1
+      if (address % 2 === 1) address -= 1;
+      const lowByte = this.readByte(address);
+      const highByte = this.readByte(address + 1);
+      const tileIndex = (address & 0x1fff) >> 4;
+      const y = (address >> 1) & 7;
+
+      let lowBit: bit;
+      let highBit: bit;
+      let data: word = 0;
+
+      // store scanline by interlacing high/low bits of 8 pixels
+      for (let x = 7; x >= 0; x--) {
+        lowBit = (lowByte >> x) & 1;
+        highBit = (highByte >> x) & 1;
+        data |= lowBit << (x * 2);
+        data |= highBit << (x * 2 + 1);
+      }
+      this.ppu.tileData[tileIndex][y] = data;
+    } else if (address <= 0x9bff) {
+      // store unsigned and signed indices
+      this.ppu.tileMap[0][address - 0x9800] = data;
+      this.ppu.signedTileMap[0][address - 0x9800] =
+        data <= 0x7f ? data + 0x100 : data;
+    } else {
+      this.ppu.tileMap[1][address - 0x9c00] = data;
+      this.ppu.signedTileMap[1][address - 0x9c00] =
+        data <= 0x7f ? data + 0x100 : data;
+    }
+  };
+
   public writeByte = (address: word, data: byte): void => {
     if (this.inBios && address <= 0xff) return;
     if (address <= 0x7fff) {
@@ -54,7 +95,7 @@ class Memory {
     } else if (address <= 0x9fff) {
       // VRAM and update tiles
       this.ram[address] = data;
-      this.ppuBridge.updateTiles(address, data);
+      this.updateTiles(address, data);
     } else if (address <= 0xbfff) {
       this.cart.handleRegisterChanges(address, data);
     } else if (address <= 0xdfff) {
@@ -71,26 +112,28 @@ class Memory {
     } else if (address <= 0xff7f) {
       // Timer stuff
       if (address === 0xff04) {
-        setDivider(0);
+        this.timing.divider = 0;
       } else if (address === 0xff05) {
-        setTimerCounter(data);
+        this.timing.timerCounter = data;
       } else if (address === 0xff06) {
-        setTimerModulo(data);
+        this.timing.timerModulo = data;
       } else if (address === 0xff07) {
-        setTimerControl(data);
+        this.timing.timerControl = data;
       } else {
         // I/O + IE Register
-        this.ppuBridge.writeGraphicsData(address, data);
+        this.writeGraphicsData(address, data);
       }
     } else {
       // HRAM
       this.ram[address] = data;
     }
   };
+
   public writeWord = (address: word, data: word): void => {
     this.writeByte(address & 0xffff, data & 0xff);
     this.writeByte((address + 1) & 0xffff, data >> 8);
   };
+
   public readByte = (address: word): byte => {
     if (this.inBios) {
       if (address < 0x100) {
@@ -124,6 +167,7 @@ class Memory {
     }
     return 0;
   };
+
   public readWord = (address: word): word => {
     return (
       this.readByte(address) | (this.readByte((address + 1) & 0xffff) << 8)
@@ -177,6 +221,34 @@ class Memory {
         break;
     }
   }
+  public writeGraphicsData = (address: word, data: byte): void => {
+    if (address === Memory.addresses.ppu.stat) {
+      this.ppu.setStat(data);
+      return;
+    } else if (address === Memory.addresses.ppu.lcdc)
+      this.ppu.lcdc.update(data);
+    else if (address === Memory.addresses.ppu.scrollY) this.ppu.scrollY = data;
+    else if (address === Memory.addresses.ppu.scrollX) this.ppu.scrollX = data;
+    // reset scanline if trying to write to associated register
+    else if (address === Memory.addresses.ppu.scanline) {
+      this.ppu.resetScanline();
+      return;
+    } else if (address === Memory.addresses.ppu.scanlineCompare)
+      this.ppu.scanlineCompare = data;
+    else if (address === Memory.addresses.ppu.dma) {
+      // DEBUG && console.log('Initiated DMA transfer.');
+      this.dmaTransfer(data);
+    } else if (address === Memory.addresses.ppu.paletteData) {
+      this.ppu.palette = data;
+      this.ppu.paletteMap[0] = (((data >> 1) & 1) << 1) | (data & 1);
+      this.ppu.paletteMap[1] = (((data >> 3) & 1) << 1) | ((data >> 2) & 1);
+      this.ppu.paletteMap[2] = (((data >> 5) & 1) << 1) | ((data >> 4) & 1);
+      this.ppu.paletteMap[3] = (((data >> 7) & 1) << 1) | ((data >> 6) & 1);
+    } else if (address === Memory.addresses.ppu.windowX)
+      this.ppu.windowX = data;
+    else if (address === Memory.addresses.ppu.windowY) this.ppu.windowY = data;
+    this.ram[address] = data;
+  };
 }
 
-export default Memory;
+export {Memory};

@@ -32,7 +32,8 @@
       "PPU/*": ["client/src/components/PPU/*"],
       "PPUBridge/*": ["client/src/components/PPUBridge/*"],
       "helpers/*": ["client/src/helpers/*"],
-      "CPU/*": ["client/src/components/CPU/*"]
+      "CPU/*": ["client/src/components/CPU/*"],
+      "Timing/*": ["client/src/components/Timing/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx"],

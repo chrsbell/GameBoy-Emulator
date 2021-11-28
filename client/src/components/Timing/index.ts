@@ -1,16 +1,16 @@
 import CPU from 'CPU/index';
-import InterruptService from 'Interrupts/index';
-import Memory from 'Memory/index';
+import {InterruptService} from 'Interrupts/index';
+import {Memory} from 'Memory/index';
 
 const timerClockRate: NumNumIdx = {
-  0: 4096,
-  1: 262144,
-  2: 65536,
-  3: 16384,
+  0: 1024,
+  1: 16,
+  2: 64,
+  3: 256,
 };
 
 class Timing {
-  private memory!: Memory;
+  public memory!: Memory;
 
   private _timerCounter: byte = 0;
   private _divider: byte = 0;
@@ -18,8 +18,8 @@ class Timing {
   private _timerEnable: bit = 0;
   private _inputClock: byte = 0;
   private _timerControl: byte = 0;
-  private timerOverflow = 0;
-  private dividerOverflow = 0;
+  public timerOverflow = 0;
+  public dividerOverflow = 0;
   public interruptService!: InterruptService;
 
   // using getters like this during the emulation loop tended to be pretty slow for me, but ok for now
@@ -67,9 +67,12 @@ class Timing {
     this.memory.ram[0xff07] = value;
   }
 
-  constructor(memory: Memory) {
+  constructor() {}
+
+  public init = (memory: Memory, interruptService: InterruptService): void => {
     this.memory = memory;
-  }
+    this.interruptService = interruptService;
+  };
 
   public incrementDivider = (): void => {
     this._divider += 1;
@@ -77,29 +80,35 @@ class Timing {
     this.memory.ram[0xff04] = this._divider;
   };
 
-  public tickDivider = (cpu: CPU, callback: () => number): void => {
+  public tickDivider = (
+    cpu: CPU,
+    executeCallback: () => number,
+    testCallback: () => void = (): void => {}
+  ): void => {
     // If a TMA write is executed on the same cycle as the content of TMA is transferred to TIMA due to a timer overflow, the old value is transferred to TIMA.
     while (this.dividerOverflow < 0x100 && !cpu.stopped) {
-      // const oldTimerModulo = this._timerModulo;
-      const elapsed = callback();
+      const oldTimerModulo = this._timerModulo;
+      const elapsed = executeCallback();
       this.dividerOverflow += elapsed;
-      // if (this._timerEnable) {
-      //   this.timerOverflow += elapsed;
-      //   if (this.timerOverflow >= timerClockRate[this._inputClock]) {
-      //     this.timerOverflow -= timerClockRate[this._inputClock];
-      //     const newTimerCounter = this._timerCounter + 1;
-      //     if (newTimerCounter > 0xff) {
-      //       this.interruptService.enable(InterruptService.flags.timer);
-      //       this.timerCounter = oldTimerModulo;
-      //     } else {
-      //       this.timerCounter = newTimerCounter;
-      //     }
-      //   }
-      // }
+      if (this._timerEnable) {
+        this.timerOverflow += elapsed;
+        if (this.timerOverflow >= timerClockRate[this._inputClock]) {
+          this.timerOverflow -= timerClockRate[this._inputClock];
+          const newTimerCounter = this._timerCounter + 1;
+          if (newTimerCounter > 0xff) {
+            this.interruptService.enable(InterruptService.flags.timer);
+            this.timerCounter = oldTimerModulo;
+          } else {
+            this.timerCounter = newTimerCounter;
+          }
+        }
+      }
+      if (this.dividerOverflow < 0x100) testCallback();
     }
     this.incrementDivider();
     this.dividerOverflow -= 0x100;
+    testCallback();
   };
 }
 
-export default Timing;
+export {Timing};

@@ -19,6 +19,7 @@ module.exports = {
     'PPUBridge/index': ['<rootDir>/client/src/components/PPUBridge/index'],
     'helpers/index': ['<rootDir>/client/src/helpers/index'],
     'CPU/index': ['<rootDir>/client/src/components/CPU/index'],
+    'Timing/index': ['<rootDir>/client/src/components/Timing/index'],
   },
   modulePathIgnorePatterns: ['<rootDir>/node_modules', '<rootDir>/build'],
 };

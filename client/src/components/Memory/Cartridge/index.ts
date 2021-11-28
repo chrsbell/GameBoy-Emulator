@@ -1,5 +1,5 @@
 import {DEBUG} from 'helpers/index';
-import Memory from 'Memory/index';
+import {Memory} from 'Memory/index';
 
 const ROMSizeCodeMap: SizeCode = {
   0x00: {size: 32768, numBanks: 2},

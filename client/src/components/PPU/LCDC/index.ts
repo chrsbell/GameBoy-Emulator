@@ -1,4 +1,5 @@
 import {Primitive} from 'helpers/index';
+
 export default class LCDControl {
   public value: byte = 0;
   public enable: bit = 0;

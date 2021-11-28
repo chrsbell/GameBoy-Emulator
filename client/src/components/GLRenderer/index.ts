@@ -1,4 +1,5 @@
-import PPU from 'PPU/index';
+import error from 'helpers/Error';
+import {PPU} from 'PPU/index';
 
 const colorSchemes = {
   default: {
@@ -34,106 +35,112 @@ class GLRenderer {
 
   constructor() {}
 
-  public initialize = (canvas: HTMLCanvasElement): void => {
+  public setCanvas = (canvas: HTMLCanvasElement): void => {
     if (canvas) {
       this.gl = canvas.getContext('webgl2')!;
-      const gl: WebGL2RenderingContext = this.gl;
-      const vertexElement: HTMLElement = document.getElementById(
-        'vertex-shader'
-      ) as HTMLElement;
-      const fragmentElement: HTMLElement = document.getElementById(
-        'fragment-shader'
-      ) as HTMLElement;
-      if (!vertexElement || !fragmentElement) {
-        throw new Error(`Couldn't find shader source.`);
-      }
+    } else {
+      error(`Couldn't create WebGL2 context.`);
+    }
+  };
 
-      if (gl) {
-        this.vertexShader = this.createShader(
-          gl,
-          gl.VERTEX_SHADER,
-          vertexElement.innerHTML
-        );
-        this.fragmentShader = this.createShader(
-          gl,
-          gl.FRAGMENT_SHADER,
-          fragmentElement.innerHTML
-        );
-        this.program = this.createProgram(
-          gl,
-          this.vertexShader,
-          this.fragmentShader
-        );
-        gl.useProgram(this.program);
+  public init = (ppu: PPU): void => {
+    this.ppu = ppu;
+    const gl: WebGL2RenderingContext = this.gl;
+    const vertexElement: HTMLElement = document.getElementById(
+      'vertex-shader'
+    ) as HTMLElement;
+    const fragmentElement: HTMLElement = document.getElementById(
+      'fragment-shader'
+    ) as HTMLElement;
+    if (!vertexElement || !fragmentElement) {
+      throw new Error(`Couldn't find shader source.`);
+    }
 
-        this.positionAttributeLocation = gl.getAttribLocation(
-          this.program,
-          'aPosition'
-        );
-        gl.enableVertexAttribArray(this.positionAttributeLocation);
+    if (gl) {
+      this.vertexShader = this.createShader(
+        gl,
+        gl.VERTEX_SHADER,
+        vertexElement.innerHTML
+      );
+      this.fragmentShader = this.createShader(
+        gl,
+        gl.FRAGMENT_SHADER,
+        fragmentElement.innerHTML
+      );
+      this.program = this.createProgram(
+        gl,
+        this.vertexShader,
+        this.fragmentShader
+      );
+      gl.useProgram(this.program);
 
-        this.textureCoordAttributeLocation = gl.getAttribLocation(
-          this.program,
-          'aTextureCoord'
-        );
-        gl.enableVertexAttribArray(this.textureCoordAttributeLocation);
+      this.positionAttributeLocation = gl.getAttribLocation(
+        this.program,
+        'aPosition'
+      );
+      gl.enableVertexAttribArray(this.positionAttributeLocation);
 
-        this.positionBuffer = gl.createBuffer()!;
-        this.textureCoordBuffer = gl.createBuffer()!;
+      this.textureCoordAttributeLocation = gl.getAttribLocation(
+        this.program,
+        'aTextureCoord'
+      );
+      gl.enableVertexAttribArray(this.textureCoordAttributeLocation);
 
-        this.screenTexture = gl.createTexture()!;
-        gl.bindTexture(gl.TEXTURE_2D, this.screenTexture);
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-        gl.texImage2D(
-          gl.TEXTURE_2D,
-          0,
-          gl.RGBA,
-          GLRenderer.screenWidth,
-          GLRenderer.screenHeight,
-          0,
-          gl.RGBA,
-          gl.UNSIGNED_BYTE,
-          new Uint8Array(92160).fill(255)
-        );
+      this.positionBuffer = gl.createBuffer()!;
+      this.textureCoordBuffer = gl.createBuffer()!;
 
-        // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.uniform1i(this.samplerUniformLocation, 0);
+      this.screenTexture = gl.createTexture()!;
+      gl.bindTexture(gl.TEXTURE_2D, this.screenTexture);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        gl.RGBA,
+        GLRenderer.screenWidth,
+        GLRenderer.screenHeight,
+        0,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        new Uint8Array(92160).fill(255)
+      );
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.textureCoordBuffer);
-        gl.vertexAttribPointer(
-          this.textureCoordAttributeLocation,
-          2,
-          gl.FLOAT,
-          false,
-          0,
-          0
-        );
-        gl.bufferData(
-          gl.ARRAY_BUFFER,
-          new Float32Array([0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0]),
-          gl.STATIC_DRAW
-        );
-      }
+      // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+      gl.uniform1i(this.samplerUniformLocation, 0);
 
-      gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.textureCoordBuffer);
       gl.vertexAttribPointer(
-        this.positionAttributeLocation,
+        this.textureCoordAttributeLocation,
         2,
-        gl.FLOAT, //benchmark byte vs float
+        gl.FLOAT,
         false,
         0,
         0
       );
       gl.bufferData(
         gl.ARRAY_BUFFER,
-        new Float32Array([-1.0, -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0]),
+        new Float32Array([0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0]),
         gl.STATIC_DRAW
       );
-
-      console.log('Initialized GL Renderer.');
     }
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
+    gl.vertexAttribPointer(
+      this.positionAttributeLocation,
+      2,
+      gl.FLOAT, //benchmark byte vs float
+      false,
+      0,
+      0
+    );
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([-1.0, -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0]),
+      gl.STATIC_DRAW
+    );
+
+    console.log('Initialized GL Renderer.');
   };
 
   private createShader = (
@@ -175,10 +182,6 @@ class GLRenderer {
 
   public stop = (): void => {
     if (this.timeout) window.cancelAnimationFrame(this.timeout);
-  };
-
-  public setPPU = (ppu: PPU): void => {
-    this.ppu = ppu;
   };
 
   public start = (): void => {

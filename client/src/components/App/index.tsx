@@ -50,7 +50,7 @@ const App = (): JSX.Element => {
   useEffect(() => {
     if (appState.canvas && !emulator.current) {
       const renderer: GLRenderer = new GLRenderer();
-      renderer.initialize(appState.canvas);
+      renderer.setCanvas(appState.canvas);
       emulator.current = new Emulator(renderer);
     }
   }, [appState.canvas]);

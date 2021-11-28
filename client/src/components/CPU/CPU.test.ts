@@ -1,11 +1,11 @@
 // @ts-nocheck
 import {green, red} from 'chalk';
 import {Flag} from 'CPU/index';
-import Emulator, {getDivOverflow} from 'Emulator/index';
+import Emulator from 'Emulator/index';
 import * as fs from 'fs';
 import GLRenderer from 'GLRenderer/index';
 import {Primitive} from 'helpers/index';
-import InterruptService from 'Interrupts/index';
+import {InterruptService} from 'Interrupts/index';
 import * as path from 'path';
 import * as util from 'util';
 jest.mock('GLRenderer/index');
@@ -83,7 +83,7 @@ expect.extend({
     expectedState: CPUInfo,
     oldState: CPUInfo
   ) {
-    const {cpu, memory} = emulator;
+    const {cpu, memory, timing} = emulator;
     if (received === expected) {
       return {
         message: (): string => 'Success',
@@ -114,18 +114,18 @@ expect.extend({
             c: cpu.getBC() & 255,
             d: cpu.getDE() >> 8,
             e: cpu.getDE() & 255,
-            hl: cpu.getHL() >> 8,
+            hl: cpu.getHL(),
             sp: cpu.getSP(),
             pc: cpu.getPC(),
-            if: memory.readByte(InterruptService.if),
+            ime: cpu.allInterruptsEnabled,
             ie: memory.readByte(InterruptService.ie),
+            if: memory.readByte(InterruptService.if),
+            halted: cpu.halted,
             div: memory.readByte(0xff04),
             tima: memory.readByte(0xff05),
             tma: memory.readByte(0xff06),
             tac: memory.readByte(0xff07),
-            divTicks: getDivOverflow() & 0xff,
-            allInterruptsEnabled: cpu.getIME(),
-            halted: cpu.halted,
+            divOverflow: timing.dividerOverflow & 0xff,
           })}\n\nExpected Flag: ${logObject(Flag.formatFlag(expectedState.f))}
           \n\nOld Expected State: ${logObject(oldState)}`,
         pass: false,
@@ -172,9 +172,8 @@ const readSaveState = (
 };
 
 describe('CPU', () => {
-  const canvas = new GLRenderer();
-  // canvas.initialize(createCanvas(787, 720));
-  const emulator = new Emulator(canvas);
+  const renderer = new GLRenderer();
+  const emulator = new Emulator(renderer);
   beforeEach(() => {
     emulator.reset();
     jest.spyOn(emulator.ppu, 'buildTileScanline').mockImplementation(jest.fn());
@@ -233,40 +232,8 @@ describe('CPU', () => {
         const d = emulator.cpu.getDE() >> 8;
         const e = emulator.cpu.getDE() & 255;
         const hl = emulator.cpu.getHL();
-        expect(emulator.cpu.getPC()).toMatchRegister(
-          emulator,
-          expected.pc,
-          'PC',
-          expected,
-          oldState
-        );
-        expect(emulator.cpu.getSP()).toMatchRegister(
-          emulator,
-          expected.sp,
-          'SP',
-          expected,
-          oldState
-        );
-        expect(hl).toMatchRegister(emulator, expected.hl, 'HL', expected);
-        // ignore loading scanline to reg, timing may vary across emulators
-        if (
-          emulator.cpu.lastExecuted[emulator.cpu.lastExecuted.length - 1] ===
-            0xf0 &&
-          emulator.memory.readByte(emulator.cpu.getPC() - 1) === 0x44
-        ) {
-          console.log(
-            'ignoring comparison of register A; loaded from scanline'
-          );
-          a = expected.a;
-          emulator.cpu.setA(expected.a);
-        }
-        expect(a).toMatchRegister(emulator, expected.a, 'A', expected);
-        expect(b).toMatchRegister(emulator, expected.b, 'B', expected);
-        expect(c).toMatchRegister(emulator, expected.c, 'C', expected);
-        expect(d).toMatchRegister(emulator, expected.d, 'D', expected);
-        expect(e).toMatchRegister(emulator, expected.e, 'E', expected);
-        expect(f).toMatchRegister(emulator, expected.f, 'F', expected);
-        expect(emulator.cpu.getIME()).toMatchRegister(
+
+        expect(emulator.cpu.allInterruptsEnabled).toMatchRegister(
           emulator,
           expected.ime,
           'IME',
@@ -287,6 +254,39 @@ describe('CPU', () => {
           expected,
           oldState
         );
+        expect(emulator.cpu.getPC()).toMatchRegister(
+          emulator,
+          expected.pc,
+          'PC',
+          expected,
+          oldState
+        );
+        expect(emulator.cpu.getSP()).toMatchRegister(
+          emulator,
+          expected.sp,
+          'SP',
+          expected,
+          oldState
+        );
+        expect(hl).toMatchRegister(emulator, expected.hl, 'HL', expected);
+        // ignore loading scanline to reg, timing may vary slightly across emulators
+        if (
+          emulator.cpu.lastExecuted[emulator.cpu.lastExecuted.length - 1] ===
+            0xf0 &&
+          emulator.memory.readByte(emulator.cpu.getPC() - 1) === 0x44
+        ) {
+          console.warn(
+            'ignoring comparison of register A; loaded from scanline'
+          );
+          a = expected.a;
+          emulator.cpu.setA(expected.a);
+        }
+        expect(a).toMatchRegister(emulator, expected.a, 'A', expected);
+        expect(b).toMatchRegister(emulator, expected.b, 'B', expected);
+        expect(c).toMatchRegister(emulator, expected.c, 'C', expected);
+        expect(d).toMatchRegister(emulator, expected.d, 'D', expected);
+        expect(e).toMatchRegister(emulator, expected.e, 'E', expected);
+        expect(f).toMatchRegister(emulator, expected.f, 'F', expected);
         expect(emulator.cpu.halted).toMatchRegister(
           emulator,
           expected.halted,
@@ -294,13 +294,13 @@ describe('CPU', () => {
           expected,
           oldState
         );
-        // expect(emulator.memory.ram[0xff04]).toMatchRegister(
-        //   emulator,
-        //   expected.div,
-        //   'DIV',
-        //   expected,
-        //   oldState
-        // );
+        expect(emulator.memory.ram[0xff04]).toMatchRegister(
+          emulator,
+          expected.div,
+          'DIV',
+          expected,
+          oldState
+        );
         expect(emulator.memory.ram[0xff05]).toMatchRegister(
           emulator,
           expected.tima,
@@ -322,13 +322,13 @@ describe('CPU', () => {
           expected,
           oldState
         );
-        // expect(getDivOverflow()).toMatchRegister(
-        //   emulator,
-        //   expected.divOverflow & 0xff,
-        //   'DIVTicks',
-        //   expected,
-        //   oldState
-        // );
+        expect(emulator.timing.dividerOverflow).toMatchRegister(
+          emulator,
+          expected.divOverflow & 0xff,
+          'DIVTicks',
+          expected,
+          oldState
+        );
         oldState = expected;
       });
     }
@@ -344,8 +344,12 @@ describe('CPU', () => {
     });
   });
 
-  xit('exectues a ROM file', () => {
-    checkRegisters(null, path.join(TEST_ROM_FOLDER, 'tetris.gb'), 'tetris.gb');
+  it('exectues a ROM file', () => {
+    checkRegisters(
+      null,
+      path.join(TEST_ROM_FOLDER, 'tetris.gb'),
+      'tetris.gb.state'
+    );
   });
 
   xit('executes SP and HL instructions', () => {
@@ -372,7 +376,7 @@ describe('CPU', () => {
     );
   });
 
-  it('executes LD r,r ($40-$7F)', () => {
+  xit('executes LD r,r ($40-$7F)', () => {
     checkRegisters(
       null,
       path.join(TEST_ROM_FOLDER, '06-ld r,r.gb'),

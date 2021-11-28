@@ -1,5 +1,5 @@
 import Cartridge, {RAMSizeCodeMap, ROMSizeCodeMap} from 'Memory/Cartridge';
-import Memory from 'Memory/index';
+import {Memory} from 'Memory/index';
 
 class MBC1 extends Cartridge {
   private ramEnabled = false;

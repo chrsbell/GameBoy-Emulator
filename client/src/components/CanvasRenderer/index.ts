@@ -1,4 +1,4 @@
-import PPU from 'PPU/index';
+import {PPU} from 'PPU/index';
 
 const colorSchemes = {
   default: {
@@ -56,10 +56,6 @@ class CanvasRenderer {
   public clear = (): void => {
     this.clearScreen();
     if (this.timeout !== null) window.cancelAnimationFrame(this.timeout);
-  };
-
-  public setPPU = (ppu: PPU): void => {
-    this.ppu = ppu;
   };
 
   public setPixel = (x: number, y: number, color: RGBA): void => {
