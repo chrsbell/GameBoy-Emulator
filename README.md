@@ -14,12 +14,12 @@ Currently developing a Game Boy emulator using TypeScript. I'm referencing many 
 
 ## Features
 
-- [x] Canvas API based
+- [x] WebGL based
 - [x] Basic ROM support
 - [ ] Remappable keyboard input
 - [ ] Sound
 - [ ] Support for loading/saving states on server
-- [ ] Optimized rendering to image texture
+- [x] Optimized rendering to image texture
 - [ ] Nice looking UI
 - [x] Non-MBC support
 - [ ] All MBC up to MBC3 supported
