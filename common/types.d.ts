@@ -56,3 +56,8 @@ declare interface StrStrIdx {
 declare interface NumFuncIdx {
   [key: number]: Function;
 }
+
+declare interface Settings {
+  benchmarksEnabled: boolean;
+  renderer: GLRenderer;
+}

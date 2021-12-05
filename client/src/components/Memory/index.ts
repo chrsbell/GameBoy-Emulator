@@ -112,6 +112,7 @@ class Memory {
     } else if (address <= 0xff7f) {
       // Timer stuff
       if (address === 0xff04) {
+        // writing to divider will reset it
         this.timing.divider = 0;
       } else if (address === 0xff05) {
         this.timing.timerCounter = data;
@@ -227,8 +228,11 @@ class Memory {
       return;
     } else if (address === Memory.addresses.ppu.lcdc)
       this.ppu.lcdc.update(data);
-    else if (address === Memory.addresses.ppu.scrollY) this.ppu.scrollY = data;
-    else if (address === Memory.addresses.ppu.scrollX) this.ppu.scrollX = data;
+    else if (address === Memory.addresses.ppu.scrollY) {
+      this.ppu.scrollY = data;
+    } else if (address === Memory.addresses.ppu.scrollX) {
+      this.ppu.scrollX = data;
+    }
     // reset scanline if trying to write to associated register
     else if (address === Memory.addresses.ppu.scanline) {
       this.ppu.resetScanline();

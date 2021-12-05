@@ -2,6 +2,8 @@ import CPU from 'CPU/index';
 import {InterruptService} from 'Interrupts/index';
 import {Memory} from 'Memory/index';
 
+// Note: the delay macro from blargg testing roms will delay n cycles, need to x4 for true number of cycles. Then, divide that delay by the selected timerClockRate to get number of times timer counter will increment during the delay period.
+
 const timerClockRate: NumNumIdx = {
   0: 1024,
   1: 16,
@@ -86,27 +88,31 @@ class Timing {
     testCallback: () => void = (): void => {}
   ): void => {
     // If a TMA write is executed on the same cycle as the content of TMA is transferred to TIMA due to a timer overflow, the old value is transferred to TIMA.
-    while (this.dividerOverflow < 0x100 && !cpu.stopped) {
-      const oldTimerModulo = this._timerModulo;
-      const elapsed = executeCallback();
-      this.dividerOverflow += elapsed;
-      if (this._timerEnable) {
-        this.timerOverflow += elapsed;
-        if (this.timerOverflow >= timerClockRate[this._inputClock]) {
-          this.timerOverflow -= timerClockRate[this._inputClock];
-          const newTimerCounter = this._timerCounter + 1;
-          if (newTimerCounter > 0xff) {
-            this.interruptService.enable(InterruptService.flags.timer);
-            this.timerCounter = oldTimerModulo;
-          } else {
-            this.timerCounter = newTimerCounter;
+    if (!cpu.stopped) {
+      while (this.dividerOverflow < 0x100 && !cpu.stopped) {
+        const oldTimerModulo = this._timerModulo;
+        const elapsed = executeCallback();
+        this.dividerOverflow += elapsed;
+        if (this._timerEnable) {
+          this.timerOverflow += elapsed;
+          if (this.timerOverflow >= timerClockRate[this._inputClock]) {
+            this.timerOverflow -= timerClockRate[this._inputClock];
+            const newTimerCounter = this._timerCounter + 1;
+            if (newTimerCounter > 0xff) {
+              this.interruptService.enable(InterruptService.flags.timer);
+              this.timerCounter = oldTimerModulo;
+            } else {
+              this.timerCounter = newTimerCounter;
+            }
           }
         }
+        if (this.dividerOverflow < 0x100) testCallback();
       }
-      if (this.dividerOverflow < 0x100) testCallback();
+      this.incrementDivider();
+      this.dividerOverflow -= 0x100;
+    } else {
+      executeCallback();
     }
-    this.incrementDivider();
-    this.dividerOverflow -= 0x100;
     testCallback();
   };
 }

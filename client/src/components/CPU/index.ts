@@ -102,6 +102,7 @@ class CPU {
   public haltBug = false;
   private interruptPendingBeforeHalt = false;
   public stopped = false;
+  public enteredStop = false;
   public lastExecuted: Array<byte> = [];
   public allInterruptsEnabled = false;
   private delayedAllInterruptsEnabled = false;
@@ -222,8 +223,8 @@ class CPU {
       cycles = this.opcodes[opcode]();
       if (opcode === 0x76) return cycles;
       if (this.delayedAllInterruptsEnabled2) this.allInterruptsEnabled = true;
-      const interruptCycles = this.checkInterrupts();
-      return cycles + interruptCycles;
+      // const interruptCycles =
+      return cycles + this.checkInterrupts();
     } else {
       const interruptFlag = memoryRef.ram[0xff0f];
       const interruptEnable = memoryRef.ram[0xffff];
@@ -272,7 +273,6 @@ class CPU {
             this.allInterruptsEnabled = false;
             this.delayedAllInterruptsEnabled = false;
             this.delayedAllInterruptsEnabled2 = false;
-
             memoryRef.writeByte(0xff0f, interruptFlag & ~(1 << i));
             PUSH(pc);
             // DEBUG && console.log('Handled an interrupt.');
@@ -281,6 +281,7 @@ class CPU {
                 pc = 0x40;
                 break;
               case InterruptService.flags.lcdStat:
+                debugger;
                 pc = 0x48;
                 break;
               case InterruptService.flags.timer:
@@ -290,6 +291,7 @@ class CPU {
                 pc = 0x58;
                 break;
               case InterruptService.flags.joypad:
+                debugger;
                 pc = 0x60;
                 break;
             }
@@ -395,6 +397,7 @@ class CPU {
     // load into B from pc (immediate)
     bc = Primitive.setUpper(bc, Primitive.toByte(memoryRef.readByte(pc)));
     pc += 1;
+    pc &= 0xffff;
 
     return 8;
   };
@@ -520,6 +523,7 @@ class CPU {
     // load into C from pc (immediate)
     bc = Primitive.setLower(bc, Primitive.toByte(memoryRef.readByte(pc)));
     pc += 1;
+    pc &= 0xffff;
 
     return 8;
   };
@@ -553,8 +557,8 @@ class CPU {
    */
   private STOP = (): byte => {
     this.stopped = true;
+    this.enteredStop = true;
     console.log('Stopped.');
-    debugger;
 
     return 4;
   };
@@ -643,6 +647,7 @@ class CPU {
   private LDDid8i = (): byte => {
     de = Primitive.setUpper(de, Primitive.toByte(memoryRef.readByte(pc)));
     pc += 1;
+    pc &= 0xffff;
 
     return 8;
   };
@@ -769,6 +774,7 @@ class CPU {
   private LDEid8i = (): byte => {
     de = Primitive.setLower(de, Primitive.toByte(memoryRef.readByte(pc)));
     pc += 1;
+    pc &= 0xffff;
 
     return 8;
   };
@@ -897,6 +903,7 @@ class CPU {
   private LDHid8i = (): byte => {
     hl = Primitive.setUpper(hl, Primitive.toByte(memoryRef.readByte(pc)));
     pc += 1;
+    pc &= 0xffff;
 
     return 8;
   };
@@ -1032,6 +1039,7 @@ class CPU {
   private LDLid8i = (): byte => {
     hl = Primitive.setLower(hl, Primitive.toByte(memoryRef.readByte(pc)));
     pc += 1;
+    pc &= 0xffff;
 
     return 8;
   };
@@ -1155,6 +1163,7 @@ class CPU {
   private LDHLmd8i = (): byte => {
     memoryRef.writeByte(hl, Primitive.toByte(memoryRef.readByte(pc)));
     pc += 1;
+    pc &= 0xffff;
 
     return 12;
   };
@@ -1273,6 +1282,7 @@ class CPU {
   private LDAid8i = (): byte => {
     af = Primitive.setUpper(af, Primitive.toByte(memoryRef.readByte(pc)));
     pc += 1;
+    pc &= 0xffff;
 
     return 8;
   };
@@ -1948,9 +1958,9 @@ class CPU {
    */
   private HALT = (): byte => {
     this.halted = true;
+    console.log('halted');
     if (memoryRef.ram[0xff0f] & memoryRef.ram[0xffff])
       this.interruptPendingBeforeHalt = true;
-    debugger;
 
     return 4;
   };
@@ -2923,8 +2933,9 @@ class CPU {
     checkHalfCarry(af >> 8, value);
     af = Primitive.addUpper(af, value);
     setZFlag(!(af >> 8));
-    pc += 1;
     setNFlag(0);
+    pc += 1;
+    pc &= 0xffff;
 
     return 8;
   };
@@ -2994,6 +3005,7 @@ class CPU {
     const opcode: byte = memoryRef.readByte(pc);
     this.cbOpcodes[opcode]();
     pc += 1;
+    pc &= 0xffff;
 
     return 4;
   };
@@ -3034,6 +3046,7 @@ class CPU {
   private ADCAid8i = (): byte => {
     ADC(Primitive.toByte(memoryRef.readByte(pc)));
     pc += 1;
+    pc &= 0xffff;
 
     return 8;
   };
@@ -3136,6 +3149,7 @@ class CPU {
   private SUBAid8i = (): byte => {
     SUB(memoryRef.readByte(pc));
     pc += 1;
+    pc &= 0xffff;
 
     return 8;
   };
@@ -3237,6 +3251,7 @@ class CPU {
   private SBCAid8i = (): byte => {
     SBC(Primitive.toByte(memoryRef.readByte(pc)));
     pc += 1;
+    pc &= 0xffff;
 
     return 8;
   };
@@ -3332,6 +3347,7 @@ class CPU {
   private ANDd8i = (): byte => {
     AND(memoryRef.readByte(pc));
     pc += 1;
+    pc &= 0xffff;
 
     return 8;
   };
@@ -3436,6 +3452,7 @@ class CPU {
   private XORd8i = (): byte => {
     XOR(Primitive.toByte(memoryRef.readByte(pc)));
     pc += 1;
+    pc &= 0xffff;
 
     return 8;
   };
@@ -3463,7 +3480,6 @@ class CPU {
       af,
       memoryRef.readByte(0xff00 + memoryRef.readByte(pc))
     );
-    // if (0xff00 + memoryRef.readByte(pc) !== 0xff44) debugger;
     pc += 1;
     pc &= 0xffff;
 
@@ -3505,7 +3521,6 @@ class CPU {
     this.allInterruptsEnabled = false;
     this.delayedAllInterruptsEnabled = false;
     this.delayedAllInterruptsEnabled2 = false;
-
     return 4;
   };
 
@@ -3540,6 +3555,7 @@ class CPU {
   private ORd8i = (): byte => {
     OR(memoryRef.readByte(pc));
     pc += 1;
+    pc &= 0xffff;
 
     return 8;
   };
@@ -3643,6 +3659,7 @@ class CPU {
   private CPd8i = (): byte => {
     CP(memoryRef.readByte(pc));
     pc += 1;
+    pc &= 0xffff;
 
     return 8;
   };

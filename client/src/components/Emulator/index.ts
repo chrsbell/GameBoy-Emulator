@@ -1,6 +1,6 @@
 import CPU from 'CPU/index';
 import GLRenderer from 'GLRenderer/index';
-import Input, {Key} from 'Input/index';
+import benchmark from 'helpers/Performance';
 import {InterruptService} from 'Interrupts/index';
 import {Memory} from 'Memory/index';
 import {PPU} from 'PPU/index';
@@ -12,18 +12,21 @@ class Emulator {
   private renderer!: GLRenderer;
   public cpu!: CPU;
   public ppu!: PPU;
-  private input!: Input;
   private interruptService!: InterruptService;
   private timing: Timing;
-  // private emulationSpeed = 1;
   private cycles = 0;
-  constructor(renderer: GLRenderer) {
+  private prevStartTime = 0;
+  private expectedFrameTime = 1000 / 500; // how long it should take the emulator to render a frame
+  private divTicksPerFrame = PPU.dotsPerFrame / 256;
+  private fps = 0;
+  private elapsedFrames = 0;
+
+  constructor(renderer: GLRenderer, settings?: Settings) {
     this.renderer = renderer;
     this.interruptService = new InterruptService();
     this.memory = new Memory();
     this.timing = new Timing();
     this.cpu = new CPU();
-    this.input = new Input();
     this.ppu = new PPU();
 
     this.renderer.init(this.ppu);
@@ -32,14 +35,14 @@ class Emulator {
     this.timing.init(this.memory, this.interruptService);
     this.cpu.init(this.memory);
     this.ppu.init(this.memory, this.interruptService);
-    // benchmark(this.ppuBridge);
-    // benchmark(this.memory);
-    // benchmark(this.cpu);
-    // benchmark(this.ppu);
-    // benchmark(this.input);
-    // benchmark(this.renderer);
-    // benchmark(this.interruptService);
-    // benchmark(this);
+    if (settings?.benchmarksEnabled) {
+      benchmark(this.memory);
+      benchmark(this.cpu);
+      benchmark(this.ppu);
+      benchmark(this.renderer);
+      benchmark(this.interruptService);
+      benchmark(this);
+    }
     this.renderer.start();
   }
   public reset = (): void => {
@@ -50,51 +53,73 @@ class Emulator {
   };
   public load = (bios: ByteArray | null, rom: Uint8Array): boolean => {
     this.memory.load(this.cpu, bios, rom);
-    this.timeout = window.setInterval(this.cycle, 0);
+    this.timeout = window.requestAnimationFrame(
+      async elapsedTime => await this.cycle(elapsedTime)
+    );
+    window.setInterval(() => console.log(`FPS: ${this.fps}`), 1000);
     window.clearInterval(this.ppu.timeout);
     this.ppu.clearPixelMap();
 
     return true;
   };
-  public cycle = (testCallback: () => void = (): void => {}): void => {
-    if (this.input.pressed(Key.Space)) {
-      if (!this.cpu.stopped) {
-        this.input.debounce(Key.Space);
-        this.cpu.stopped = true;
-        console.log('stopped emulator');
-      } else {
-        this.input.debounce(Key.Space);
-        console.log('unpaused emulator');
-        this.cpu.stopped = false;
-      }
-    }
-    if (this.input.pressed(Key.Escape)) {
-      console.log('emulator reset');
-      this.reset();
-      return;
-    }
-    const {cpu, ppu} = this;
-    const {clock} = CPU;
-    const {buildGraphics} = ppu;
+  public cycle = async (
+    elapsedTime: number,
+    testCallback: () => void = (): void => {}
+  ): Promise<void> => {
+    const delta = elapsedTime - this.prevStartTime;
 
-    // adjust this depending on if loop moving too fast or slow
-    for (let i = 0; i < 0x200; i++) {
+    this.fps = (1000 / delta) * 60;
+    this.prevStartTime = elapsedTime;
+
+    await (async (): Promise<void> => {
+      for (let frame = 0; this.cycles < CPU.clock; frame++) {
+        await this.tickFrame(testCallback);
+      }
+    })();
+
+    this.ppu.numVblankInt = 0;
+
+    this.cycles -= CPU.clock;
+
+    this.timeout = window.requestAnimationFrame(
+      async elapsedTime => await this.cycle(elapsedTime)
+    );
+  };
+
+  private tickFrame = (
+    testCallback: () => void = (): void => {}
+  ): Promise<void> => {
+    const startTime = performance.now();
+    for (let clock = 0; clock < this.divTicksPerFrame; clock++) {
       this.timing.tickDivider(
-        cpu,
+        this.cpu,
         () => {
-          console.log(`SCY: ${this.memory.ram[0xff42]}`);
-          console.log(`SCX: ${this.memory.ram[0xff43]}`);
-          const elapsed = cpu.execute();
-          this.cycles += elapsed;
-          buildGraphics(elapsed);
-          return elapsed;
+          if (!this.cpu.stopped) {
+            const elapsed = this.cpu.execute();
+            this.cycles += elapsed;
+            this.ppu.buildGraphics(elapsed);
+            return elapsed;
+          } else {
+            if (this.cpu.enteredStop) {
+              this.timing.divider = 0;
+              this.cpu.enteredStop = false;
+            }
+            // just build graphics (double check if shouldn't modify interrupts in ppu while in stop mode)
+            this.ppu.buildGraphics(4);
+            return 4;
+          }
         },
         testCallback
       );
+      // Input.update(this.cpu);
     }
-    if (this.cycles > clock) {
-      this.cycles -= clock;
-    }
+    const actualFrameTime = performance.now() - startTime;
+    // delay until next frame if necessary
+    return new Promise(resolve =>
+      setTimeout(() => {
+        resolve();
+      }, this.expectedFrameTime - actualFrameTime)
+    );
   };
 }
 

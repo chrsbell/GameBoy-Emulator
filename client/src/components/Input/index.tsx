@@ -1,3 +1,5 @@
+import CPU from 'CPU/index';
+
 const Key: StrStrIdx = {Space: 'Space', W: 'KeyW', Escape: 'Escape'};
 
 class Input {
@@ -44,7 +46,24 @@ class Input {
   public down = (code: string): boolean => this.keyState[code] ?? false;
   public pressed = (key: string): boolean =>
     this.down(key) && !this.keyDebounce[key];
+  public update = (cpu: CPU): void => {
+    if (this.pressed(Key.Space)) {
+      if (!cpu.stopped) {
+        this.debounce(Key.Space);
+        cpu.stopped = true;
+        console.log('stopped emulator');
+      } else {
+        this.debounce(Key.Space);
+        console.log('unpaused emulator');
+        cpu.stopped = false;
+      }
+    }
+    if (this.pressed(Key.Escape)) {
+      console.log('emulator reset');
+      this.reset();
+    }
+  };
 }
 
-export default Input;
-export {Key};
+export default new Input();
+export {Key, Input};
