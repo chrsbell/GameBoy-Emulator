@@ -59,5 +59,4 @@ declare interface NumFuncIdx {
 
 declare interface Settings {
   benchmarksEnabled: boolean;
-  renderer: GLRenderer;
 }

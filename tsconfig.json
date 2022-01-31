@@ -36,6 +36,5 @@
       "Timing/*": ["client/src/components/Timing/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "build/**/*"]
+  "include": ["**/*.ts", "**/*.tsx"]
 }

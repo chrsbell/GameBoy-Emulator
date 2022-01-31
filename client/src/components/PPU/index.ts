@@ -2,20 +2,7 @@ import CanvasRenderer from 'CanvasRenderer/index';
 import {InterruptService} from 'Interrupts/index';
 import {Memory} from 'Memory/index';
 import LCDControl from './LCDC';
-
-type StatBitsType = {
-  modeLower: number;
-  modeUpper: number;
-  lycLc: number;
-  interrupt: StrNumIdx;
-  lycLcInterrupt: number;
-};
-
-const interruptBitForMode: NumNumIdx = {
-  0: 3,
-  1: 4,
-  2: 5,
-};
+import Stat from './Stat';
 
 class PPU {
   private memory!: Memory;
@@ -23,47 +10,33 @@ class PPU {
   private clock = 0;
   public lcdc!: LCDControl;
   private scanline = 0;
-  private mode = 2;
-  private stat = 2;
-  private static ppuModes: StrNumIdx = {
-    hBlank: 0,
-    vBlank: 1,
-    readOAM: 2,
-    readVRAM: 3,
-  };
-  private static statBits: StatBitsType = {
-    modeLower: 0,
-    modeUpper: 1,
-    lycLc: 2,
-    interrupt: {
-      hBlank: 3,
-      vBlank: 4,
-      readOAM: 5,
+  public numVblankInt = 0;
+  public stat!: Stat;
+  private static cyclesPerMode: {[key: string]: StrNumIdx} = {
+    hBlank: {
+      min: 87,
+      max: 204,
     },
-    lycLcInterrupt: 6,
+    vBlank: {
+      min: 456,
+      max: 456,
+    },
+    readOAM: {
+      min: 80,
+      max: 80,
+    },
+    readVRAM: {
+      min: 172,
+      max: 289,
+    },
   };
+
+  public static dotsPerFrame = 70224;
   // internal representation of canvas
   public pixelMap!: word[][];
-  public setStat = (value: number): void => {
-    this.stat = value;
-    const oldMode = this.mode;
-    this.mode = value & 0b11;
-    this.memory.ram[0xff41] = this.stat;
-    if (oldMode !== this.mode && interruptBitForMode[this.mode])
-      this.modeSwitchInterrupt(interruptBitForMode[this.mode]);
-  };
   public resetScanline = (): void => {
-    this.setMode(2);
+    this.stat.mode = 2;
     this.updateScanline(0);
-  };
-  public setMode = (value: number): void => {
-    const oldMode = this.mode;
-    this.mode = value;
-    this.stat = ((this.stat >> 2) << 2) | value;
-    // this.ppuBridge.writeIORam(0xff41, this.stat);
-    this.memory.ram[0xff41] = this.stat;
-    if (oldMode !== this.mode && interruptBitForMode[this.mode])
-      this.modeSwitchInterrupt(interruptBitForMode[this.mode]);
   };
   public updateScanline = (value: byte): void => {
     this.scanline = value;
@@ -87,13 +60,13 @@ class PPU {
   public init = (memory: Memory, interruptService: InterruptService): void => {
     this.interruptService = interruptService;
     this.memory = memory;
-    this.interruptService = interruptService;
     this.reset();
   };
 
   public reset = (): void => {
     this.lcdc = new LCDControl();
     this.lcdc.update(0);
+    this.stat = new Stat(this.memory, this.interruptService);
     this.pixelMap = new Array(CanvasRenderer.screenHeight)
       .fill(0)
       // number of possible tiles per line
@@ -123,33 +96,14 @@ class PPU {
   public clearPixelMap = (): void => {
     this.pixelMap = this.pixelMap.map(row => row.map(() => 0));
   };
-  /**
-   * Checks each STAT interrupt source bit and sets lcdStat bit in IF if toggled.
-   * @param interruptBit
-   */
-  private modeSwitchInterrupt = (interruptBit: bit): void => {
-    // trigger this.stat interrupt if transitioning from low to high (STAT blocking)
-    const interruptFlagReset = !(
-      (this.memory.readByte(0xff0f) >> InterruptService.flags.lcdStat) &
-      1
-    );
-    // mode switch interrupt source
-    if ((this.stat >> interruptBit) & 1 && interruptFlagReset) {
-      this.interruptService.enable(InterruptService.flags.lcdStat);
-    }
-  };
-  /**
-   * Updates internal representation of graphics
-   */
   public buildGraphics = (cycles: number): void => {
     if (this.lcdc.enable) {
       this.clock += cycles;
-      const oldMode = this.mode;
+      const oldMode = this.stat.mode;
       switch (oldMode) {
-        // HBlank
-        case 0:
-          if (this.clock > 204) {
-            this.clock -= 204;
+        case Stat.hBlankMode:
+          if (this.clock > PPU.cyclesPerMode.hBlank.max) {
+            this.clock -= PPU.cyclesPerMode.hBlank.max;
             if (this.lcdc.bgWindowEnable) {
               this.buildBGScanline();
               if (this.lcdc.windowEnable) this.buildWindowScanline();
@@ -157,58 +111,61 @@ class PPU {
             if (this.lcdc.objEnable) {
               this.buildSpriteScanline();
             }
+            // should only be necessary to check this once per scanline
+            this.scanlineCompareInterrupt();
             this.updateScanline(this.scanline + 1);
             if (this.scanline === 144) {
-              this.setMode(1);
+              this.scanlineCompareInterrupt();
+              this.stat.mode = Stat.vBlankMode;
               this.interruptService.enable(InterruptService.flags.vBlank);
+              this.numVblankInt += 1;
             } else {
-              this.setMode(2);
+              this.stat.mode = Stat.readOAMMode;
             }
           }
           break;
-        // VBlank
-        case 1:
-          if (this.clock > 456) {
-            this.clock -= 456;
+        case Stat.vBlankMode:
+          if (this.clock > PPU.cyclesPerMode.vBlank.max) {
+            this.clock -= PPU.cyclesPerMode.vBlank.max;
             this.updateScanline(this.scanline + 1);
             if (this.scanline === 154) {
               this.resetScanline();
             }
           }
           break;
-        // Read OAM
-        case 2:
-          if (this.clock > 80) {
-            this.clock -= 80;
-            this.setMode(PPU.ppuModes.readVRAM);
+        case Stat.readOAMMode:
+          if (this.clock > PPU.cyclesPerMode.readOAM.max) {
+            this.clock -= PPU.cyclesPerMode.readOAM.max;
+            this.stat.mode = Stat.readVRAMMode;
           }
           break;
-        // Read VRAM
-        case 3:
-          if (this.clock > 172) {
-            this.clock -= 172;
-            this.setMode(PPU.ppuModes.hBlank);
+        case Stat.readVRAMMode:
+          if (this.clock > PPU.cyclesPerMode.readVRAM.min) {
+            this.clock -= PPU.cyclesPerMode.readVRAM.min;
+            this.stat.mode = Stat.hBlankMode;
           }
           break;
       }
-      this.scanlineCompareInterrupt();
     } else {
       // reset vBlank
       this.clock = 0;
       this.updateScanline(0);
-      this.setMode(PPU.ppuModes.vBlank);
+      this.stat.mode = Stat.vBlankMode;
     }
   };
   public scanlineCompareInterrupt = (): void => {
-    const register: byte = this.stat;
+    const interruptFlagReset = !(
+      (this.memory.readByte(0xff0f) >> InterruptService.flags.lcdStat) &
+      1
+    );
     if (this.scanline === this.scanlineCompare) {
-      this.setStat(register | (1 << PPU.statBits.lycLc));
-      // scanline compare interrupt source
-      if ((this.stat >> PPU.statBits.lycLcInterrupt) & 1) {
+      this.stat.lycLc = 1;
+      // scanline compare interrupt source, again only trigger on rising edge
+      if (this.stat.lycLcInterrupt && interruptFlagReset) {
         this.interruptService.enable(InterruptService.flags.lcdStat);
       }
     } else {
-      this.setStat(register & ~(1 << PPU.statBits.lycLc));
+      this.stat.lycLc = 0;
     }
   };
   private windowVisible(): boolean {
@@ -224,26 +181,7 @@ class PPU {
       : this.lcdc.windowTileMapArea;
     return testBit ? 0x9c00 : 0x9800;
   }
-  public buildWindowScanline = (): void => {
-    const {
-      scrollY,
-      scrollX,
-      lcdc,
-      scanline,
-      tileData,
-      tileMap,
-      signedTileMap,
-      pixelMap,
-    } = this;
-    const currentLine = pixelMap[scanline];
-
-    // there are 2 tile maps which map indices to tiles. Each map stores 32x32 tiles. Each tile index is a byte. Each tile is 8x8 pixels, which using 2bit pp means 16 bytes per tile.
-    const tileMapIndex = !lcdc.bgTileMapArea ? 0 : 1;
-    const currentMap =
-      lcdc.bgWindowTileData === 0
-        ? signedTileMap[tileMapIndex]
-        : tileMap[tileMapIndex];
-  };
+  public buildWindowScanline = (): void => {};
   public buildBGScanline = (): void => {
     const {
       scrollY,

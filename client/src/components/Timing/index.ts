@@ -85,11 +85,13 @@ class Timing {
   public tickDivider = (
     cpu: CPU,
     executeCallback: () => number,
-    testCallback: () => void = (): void => {}
+    testCallback: () => void = (): void => {},
+    preTestSetup: () => void = (): void => {}
   ): void => {
     // If a TMA write is executed on the same cycle as the content of TMA is transferred to TIMA due to a timer overflow, the old value is transferred to TIMA.
     if (!cpu.stopped) {
       while (this.dividerOverflow < 0x100 && !cpu.stopped) {
+        preTestSetup();
         const oldTimerModulo = this._timerModulo;
         const elapsed = executeCallback();
         this.dividerOverflow += elapsed;

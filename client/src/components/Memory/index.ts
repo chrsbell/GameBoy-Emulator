@@ -224,7 +224,7 @@ class Memory {
   }
   public writeGraphicsData = (address: word, data: byte): void => {
     if (address === Memory.addresses.ppu.stat) {
-      this.ppu.setStat(data);
+      this.ppu.stat.update(data);
       return;
     } else if (address === Memory.addresses.ppu.lcdc)
       this.ppu.lcdc.update(data);

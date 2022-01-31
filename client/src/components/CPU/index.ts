@@ -104,7 +104,7 @@ class CPU {
   public stopped = false;
   public enteredStop = false;
   public lastExecuted: Array<byte> = [];
-  public allInterruptsEnabled = false;
+  public allInterruptsEnabled = true;
   private delayedAllInterruptsEnabled = false;
   private delayedAllInterruptsEnabled2 = false;
 

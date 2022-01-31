@@ -69,5 +69,4 @@ const benchmarkFunction = (context: any, funcName: string): any => {
   return func;
 };
 
-export default benchmark;
 export {logBenchmarks, benchmark, benchmarkFunction, BENCHMARKS_ENABLED};

@@ -1,6 +1,6 @@
 import CPU from 'CPU/index';
 import GLRenderer from 'GLRenderer/index';
-import benchmark from 'helpers/Performance';
+// import {benchmark} from 'helpers/Performance';
 import {InterruptService} from 'Interrupts/index';
 import {Memory} from 'Memory/index';
 import {PPU} from 'PPU/index';
@@ -36,12 +36,12 @@ class Emulator {
     this.cpu.init(this.memory);
     this.ppu.init(this.memory, this.interruptService);
     if (settings?.benchmarksEnabled) {
-      benchmark(this.memory);
-      benchmark(this.cpu);
-      benchmark(this.ppu);
-      benchmark(this.renderer);
-      benchmark(this.interruptService);
-      benchmark(this);
+      // benchmark(this.memory);
+      // benchmark(this.cpu);
+      // benchmark(this.ppu);
+      // benchmark(this.renderer);
+      // benchmark(this.interruptService);
+      // benchmark(this);
     }
     this.renderer.start();
   }
@@ -64,7 +64,8 @@ class Emulator {
   };
   public cycle = async (
     elapsedTime: number,
-    testCallback: () => void = (): void => {}
+    testCallback: () => void = (): void => {},
+    preTestSetup: () => void = (): void => {}
   ): Promise<void> => {
     const delta = elapsedTime - this.prevStartTime;
 
@@ -73,7 +74,7 @@ class Emulator {
 
     await (async (): Promise<void> => {
       for (let frame = 0; this.cycles < CPU.clock; frame++) {
-        await this.tickFrame(testCallback);
+        await this.tickFrame(testCallback, preTestSetup);
       }
     })();
 
@@ -87,7 +88,8 @@ class Emulator {
   };
 
   private tickFrame = (
-    testCallback: () => void = (): void => {}
+    testCallback: () => void = (): void => {},
+    preTestSetup: () => void = (): void => {}
   ): Promise<void> => {
     const startTime = performance.now();
     for (let clock = 0; clock < this.divTicksPerFrame; clock++) {
@@ -109,7 +111,8 @@ class Emulator {
             return 4;
           }
         },
-        testCallback
+        testCallback,
+        preTestSetup
       );
       // Input.update(this.cpu);
     }
