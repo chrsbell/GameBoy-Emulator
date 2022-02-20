@@ -2,7 +2,7 @@
 
 ## About
 
-Currently developing a Game Boy emulator using TypeScript. I'm referencing many different documentation sources for this:
+A gameboy emulator in TypeScript. Right now it can load the BIOS, here are some of the resources I used:
 
 - https://gbdev.io/pandocs/
 - https://gekkio.fi/files/gb-docs/gbctr.pdf
@@ -20,13 +20,9 @@ Currently developing a Game Boy emulator using TypeScript. I'm referencing many 
 - [ ] Sound
 - [ ] Support for loading/saving states on server
 - [x] Optimized rendering to image texture
-- [ ] Nice looking UI
+- [ ] UI
 - [x] Non-MBC support
 - [ ] All MBC up to MBC3 supported
-
-## Installing Dependencies
-
-This emulator should run on any modern browser with WebGL support, install using yarn or npm.
 
 ## Usage
 
